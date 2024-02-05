@@ -28,6 +28,6 @@ func MustInit() {
 	}
 }
 
-func Port() string {
-	return cfg.Port
+func Token() string {
+	return cfg.Token
 }

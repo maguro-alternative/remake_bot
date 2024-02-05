@@ -5,6 +5,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/bot/config"
 	"github.com/maguro-alternative/remake_bot/bot/cogs"
+	"github.com/maguro-alternative/remake_bot/bot/commands"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 
 	"github.com/bwmarrin/discordgo"
@@ -34,7 +35,7 @@ type Handler struct {
 	guild    string
 }
 
-func BotOnReady(indexDB db.Driver) (*discordgo.Session, error) {
+func BotOnReady(indexDB db.Driver) (*discordgo.Session, func(), error) {
 	/*
 		ボットの起動
 
@@ -50,16 +51,17 @@ func BotOnReady(indexDB db.Driver) (*discordgo.Session, error) {
 	// セッションを作成
 	discordSession, err := discordgo.New("Bot " + config.Token())
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, func(){}, errors.WithStack(err)
 	}
 	discordSession.Identify.Intents = discordgo.IntentsAll
 	discordSession.Token = config.Token()
 	err = discordSession.Open()
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, func(){}, errors.WithStack(err)
 	}
 	registerHandlers(discordSession, indexDB)
-	return discordSession, nil
+	cleanupCommandHandlers := commands.RegisterCommands(discordSession, indexDB)
+	return discordSession, cleanupCommandHandlers, nil
 }
 
 func registerHandlers(

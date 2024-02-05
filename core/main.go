@@ -1,13 +1,13 @@
 package core
 
 import (
+	"context"
 	"os"
 	"os/signal"
-	"context"
 
-	"github.com/maguro-alternative/remake_bot/web"
 	"github.com/maguro-alternative/remake_bot/bot"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
+	"github.com/maguro-alternative/remake_bot/web"
 
 	"github.com/gorilla/sessions"
 )
@@ -21,10 +21,13 @@ func main() {
 	}
 	defer cleanup()
 
-	discord, err := bot.BotOnReady(dbV1)
+	// ボットの起動
+	discord, cleanupCommandHandlers, err := bot.BotOnReady(dbV1)
 	if err != nil {
 		panic(err)
 	}
+	defer discord.Close()
+	defer cleanupCommandHandlers()
 
 	// セッションストアを作成します。
 	store := sessions.NewCookieStore([]byte("secret-key"))

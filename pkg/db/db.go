@@ -32,26 +32,6 @@ type DBHandler struct {
 	NamedExecContext func(ctx context.Context, query string, arg interface{}) (*sql.Result, error)
 }
 
-// NewDB returns go-sqlite3 driver based *sql.DB.
-func NewSqliteDB(path string) (*sqlx.DB, error) {
-	db, err := sqlx.Open("sqlite3", path)
-	if err != nil {
-		return nil, err
-	}
-
-	return db, nil
-}
-
-func NewPostgresDB(path string) (*sqlx.DB, error) {
-	// データベースに接続
-	db, err := sqlx.Open("postgres", path)
-	if err != nil {
-		return nil, err
-	}
-
-	return db, nil
-}
-
 func retryOperation(ctx context.Context, operation func() error) error {
 	/*
 		リトライする関数
@@ -117,24 +97,7 @@ func Rebind(bindType int, query string) string {
 	return sqlx.Rebind(bindType, query)
 }
 
-func NewDBV1(ctx context.Context, driverName string, path string) (*DB, func(), error) {
-	/*
-		データベースに接続する関数
-
-		引数
-			ctx: context.Context型の変数
-			driverName: データベースの種類
-			path: データベースのパス
-
-		戻り値
-			*DB型の変数
-			データベースの接続を閉じる関数
-			error型の変数
-	*/
-	return newDB(ctx, driverName, path)
-}
-
-func newDB(ctx context.Context, driverName string, path string) (*DB, func(), error) {
+func NewDB(ctx context.Context, driverName string, path string) (*DB, func(), error) {
 	/*
 		データベースに接続する関数
 

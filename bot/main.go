@@ -1,7 +1,10 @@
 package bot
 
 import (
+	"fmt"
+
 	"github.com/maguro-alternative/remake_bot/bot/config"
+	"github.com/maguro-alternative/remake_bot/bot/cogs"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 
 	"github.com/bwmarrin/discordgo"
@@ -32,6 +35,19 @@ type Handler struct {
 }
 
 func BotOnReady(indexDB db.Driver) (*discordgo.Session, error) {
+	/*
+		ボットの起動
+
+		args:
+		indexDB: db.Driver
+		データベースのドライバー
+
+		return:
+		*discordgo.Session
+		エラーがなければ、セッションを返します。
+		エラーがあれば、エラーを返します。
+	*/
+	// セッションを作成
 	discordSession, err := discordgo.New("Bot " + config.Token())
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -42,5 +58,15 @@ func BotOnReady(indexDB db.Driver) (*discordgo.Session, error) {
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+	registerHandlers(discordSession, indexDB)
 	return discordSession, nil
+}
+
+func registerHandlers(
+	s *discordgo.Session,
+	sqlxdb db.Driver,
+) {
+	cogs := cogs.NewCogHandler(sqlxdb)
+	fmt.Println(s.State.User.Username + "としてログインしました")
+	s.AddHandler(cogs.OnVoiceStateUpdate)
 }

@@ -1,22 +1,47 @@
 package core
 
 import (
-	"github.com/bwmarrin/discordgo"
+	"os"
+	"os/signal"
+	"context"
+
+	"github.com/maguro-alternative/remake_bot/web"
+	"github.com/maguro-alternative/remake_bot/bot"
+	"github.com/maguro-alternative/remake_bot/pkg/db"
+
+	"github.com/gorilla/sessions"
 )
 
 func main() {
-	Token := "Bot " //"Bot"という接頭辞がないと401 unauthorizedエラーが起きます
-	discord, err := discordgo.New(Token)
-
-	// 権限追加
-	discord.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAll)
-	discord.Token = Token
+	ctx := context.Background()
+	// データベースの接続を開始
+	dbV1, cleanup, err := db.NewDB(ctx, "","")
 	if err != nil {
 		panic(err)
 	}
-	// websocketを開いてlistening開始
-	if err = discord.Open(); err != nil {
-		panic("Error while opening session")
+	defer cleanup()
+
+	discord, err := bot.BotOnReady(dbV1)
+	if err != nil {
+		panic(err)
 	}
+
+	// セッションストアを作成します。
+	store := sessions.NewCookieStore([]byte("secret-key"))
+
+	// サーバーの待ち受けを開始(ゴルーチンで非同期処理)
+	// ここでサーバーを起動すると、Ctrl+Cで終了するまでサーバーが起動し続ける
+	go func() {
+		web.NewWebRouter(
+			dbV1,
+			store,
+			discord,
+		)
+	}()
+	// Ctrl+Cを受け取るためのチャンネル
+	sc := make(chan os.Signal, 1)
+	// Ctrl+Cを受け取る
+	signal.Notify(sc, os.Interrupt)
+	<-sc //プログラムが終了しないようロック
 
 }

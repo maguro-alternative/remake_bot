@@ -1,5 +1,5 @@
 package internal
 
 type Config struct {
-	Token string `env:"TOKEN" envDefault:""`
+	DiscordBotToken string `env:"DISCORD_BOT_TOKEN" envDefault:""`
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/caarlos0/env/v7"
 	"github.com/cockroachdb/errors"
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -16,6 +17,10 @@ var (
 )
 
 func init() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
 	once.Do(MustInit)
 }
 
@@ -28,6 +33,6 @@ func MustInit() {
 	}
 }
 
-func Token() string {
-	return cfg.Token
+func DiscordBotToken() string {
+	return cfg.DiscordBotToken
 }

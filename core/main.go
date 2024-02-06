@@ -1,4 +1,4 @@
-package core
+package main
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"os/signal"
 
 	"github.com/maguro-alternative/remake_bot/bot"
+	"github.com/maguro-alternative/remake_bot/core/config"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/web"
 
@@ -15,7 +16,7 @@ import (
 func main() {
 	ctx := context.Background()
 	// データベースの接続を開始
-	dbV1, cleanup, err := db.NewDB(ctx, "","")
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
 	if err != nil {
 		panic(err)
 	}
@@ -26,11 +27,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer discord.Close()
 	defer cleanupCommandHandlers()
+	defer discord.Close()
 
 	// セッションストアを作成します。
-	store := sessions.NewCookieStore([]byte("secret-key"))
+	store := sessions.NewCookieStore([]byte(config.SessionSecret()))
 
 	// サーバーの待ち受けを開始(ゴルーチンで非同期処理)
 	// ここでサーバーを起動すると、Ctrl+Cで終了するまでサーバーが起動し続ける

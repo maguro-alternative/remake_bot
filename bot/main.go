@@ -12,29 +12,6 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
-/*
-スラッシュコマンドとハンドラの登録
-
-スラッシュコマンドとハンドラの登録は、
-discordgo.Session.ApplicationCommandCreate()と
-discordgo.Session.AddHandler()を使って行います。
-*/
-
-type Command struct {
-	Name        string
-	Aliases     []string
-	Description string
-	Options     []*discordgo.ApplicationCommandOption
-	AppCommand  *discordgo.ApplicationCommand
-	Executor    func(s *discordgo.Session, i *discordgo.InteractionCreate)
-}
-
-type Handler struct {
-	session  *discordgo.Session
-	commands map[string]*Command
-	guild    string
-}
-
 func BotOnReady(indexDB db.Driver) (*discordgo.Session, func(), error) {
 	/*
 		ボットの起動
@@ -49,19 +26,20 @@ func BotOnReady(indexDB db.Driver) (*discordgo.Session, func(), error) {
 		エラーがあれば、エラーを返します。
 	*/
 	// セッションを作成
-	discordSession, err := discordgo.New("Bot " + config.Token())
+	discordToken := "Bot " + config.DiscordBotToken()
+	discordSession, err := discordgo.New(discordToken)
 	if err != nil {
 		return nil, func(){}, errors.WithStack(err)
 	}
-	discordSession.Identify.Intents = discordgo.IntentsAll
-	discordSession.Token = config.Token()
+	discordSession.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAll)
+	discordSession.Token = discordToken
 	err = discordSession.Open()
 	if err != nil {
 		return nil, func(){}, errors.WithStack(err)
 	}
 	registerHandlers(discordSession, indexDB)
-	cleanupCommandHandlers := commands.RegisterCommands(discordSession, indexDB)
-	return discordSession, cleanupCommandHandlers, nil
+	cleanupCommandHandlers, err := commands.RegisterCommands(discordSession, indexDB)
+	return discordSession, cleanupCommandHandlers, err
 }
 
 func registerHandlers(

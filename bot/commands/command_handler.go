@@ -44,22 +44,22 @@ type Command struct {
 	Executor    func(s *discordgo.Session, i *discordgo.InteractionCreate)
 }
 
-func (c *Command) AddApplicationCommand(appCmd *discordgo.ApplicationCommand) {
+func (c *Command) addApplicationCommand(appCmd *discordgo.ApplicationCommand) {
 	c.AppCommand = appCmd
 }
 
-type Handler struct {
+type handler struct {
 	session  *discordgo.Session
 	commands map[string]*Command
 	guild    string
 }
 
 // スラッシュコマンドの作成
-func NewCommandHandler(
+func newCommandHandler(
 	session *discordgo.Session,
 	guildID string,
-) *Handler {
-	return &Handler{
+) *handler {
+	return &handler{
 		session:  session,
 		commands: make(map[string]*Command),
 		guild:    guildID,
@@ -67,11 +67,15 @@ func NewCommandHandler(
 }
 
 // スラッシュコマンドの登録
-func (h *Handler) CommandRegister(command *Command) error {
+func (h *handler) commandRegister(command *Command) error {
+	// すでに同じ名前のコマンドが登録されている場合はエラーを返す
 	if _, exists := h.commands[command.Name]; exists {
 		return fmt.Errorf("command with name `%s` already exists", command.Name)
 	}
 
+	fmt.Println(command.Name, "command registered")
+
+	// スラッシュコマンドを登録
 	appCmd, err := h.session.ApplicationCommandCreate(
 		h.session.State.User.ID,
 		h.guild,
@@ -86,10 +90,13 @@ func (h *Handler) CommandRegister(command *Command) error {
 		return err
 	}
 
-	command.AddApplicationCommand(appCmd)
+	// コマンドに登録したスラッシュコマンドを追加
+	command.addApplicationCommand(appCmd)
 
+	// コマンドを登録
 	h.commands[command.Name] = command
 
+	// スラッシュコマンドのハンドラを登録
 	h.session.AddHandler(
 		func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			command.Executor(s, i)
@@ -100,7 +107,7 @@ func (h *Handler) CommandRegister(command *Command) error {
 }
 
 // スラッシュコマンドの削除
-func (h *Handler) CommandRemove(command *Command) error {
+func (h *handler) CommandRemove(command *Command) error {
 	err := h.session.ApplicationCommandDelete(h.session.State.User.ID, h.guild, command.AppCommand.ID)
 	if err != nil {
 		return fmt.Errorf("error while deleting application command: %v", err)
@@ -112,7 +119,7 @@ func (h *Handler) CommandRemove(command *Command) error {
 }
 
 // スラッシュコマンドの取得
-func (h *Handler) GetCommands() []*Command {
+func (h *handler) GetCommands() []*Command {
 	var commands []*Command
 
 	for _, v := range h.commands {
@@ -122,13 +129,17 @@ func (h *Handler) GetCommands() []*Command {
 	return commands
 }
 
-func RegisterCommands(discordSession *discordgo.Session, db db.Driver) func() {
-	var commandHandlers []*Handler
+func RegisterCommands(discordSession *discordgo.Session, db db.Driver) (func(), error) {
+	var commandHandlers []*handler
 	// 所属しているサーバすべてにスラッシュコマンドを追加する
 	// NewCommandHandlerの第二引数を空にすることで、グローバルでの使用を許可する
-	commandHandler := NewCommandHandler(discordSession, "")
+	commandHandler := newCommandHandler(discordSession, "")
 	// 追加したいコマンドをここに追加
-	commandHandler.CommandRegister(PingCommand(db))
+	err := commandHandler.commandRegister(PingCommand(db))
+	if err != nil {
+		fmt.Printf("error while registering command: %v\n", err)
+		return nil, err
+	}
 	commandHandlers = append(commandHandlers, commandHandler)
 	cleanupCommandHandlers := func() {
 		for _, handler := range commandHandlers {
@@ -140,5 +151,6 @@ func RegisterCommands(discordSession *discordgo.Session, db db.Driver) func() {
 			}
 		}
 	}
-	return cleanupCommandHandlers
+	fmt.Println("commands registered")
+	return cleanupCommandHandlers, nil
 }

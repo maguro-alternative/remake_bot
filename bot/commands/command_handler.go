@@ -18,23 +18,6 @@ func NewCogHandler(db db.Driver) *CommandHandler {
 	}
 }
 
-/*
-スラッシュコマンドのハンドラ
-
-スラッシュコマンドのハンドラは、
-discordgo.Session.AddHandler()で登録する必要があります。
-
-discordgo.Session.AddHandler()の引数には、
-discordgo.Session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	command.Executor(s, i)
-}
-のように、
-discordgo.Session.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	command.Executor(s, i)
-}
-を渡す必要があります。
-*/
-
 type Command struct {
 	Name        string
 	Aliases     []string

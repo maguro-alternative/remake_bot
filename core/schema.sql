@@ -47,11 +47,11 @@ DiscordからLINEへのメッセージ送信設定を保存するテーブル
     bot_message (BOOLEAN): Botのメッセージを送信するか
 */
 CREATE TABLE IF NOT EXISTS line_channels (
-    guild_id TEXT NOT NULL,
     channel_id TEXT NOT NULL,
+    guild_id TEXT NOT NULL,
     ng BOOLEAN NOT NULL,
     bot_message BOOLEAN NOT NULL,
-    PRIMARY KEY(guild_id)
+    PRIMARY KEY(channel_id)
 );
 
 /*
@@ -94,4 +94,121 @@ CREATE TABLE IF NOT EXISTS line_ng_discord_roles (
     guild_id TEXT NOT NULL,
     role_id TEXT NOT NULL,
     PRIMARY KEY(guild_id, role_id)
+);
+
+CREATE TABLE IF NOT EXISTS vc_signal (
+    vc_channel_id TEXT NOT NULL,
+    guild_id TEXT NOT NULL,
+    send_signal BOOLEAN NOT NULL,
+    send_channel_id TEXT NOT NULL,
+    join_bot BOOLEAN NOT NULL,
+    everyone_mention BOOLEAN NOT NULL,
+    PRIMARY KEY(vc_channel_id)
+);
+
+CREATE TABLE IF NOT EXISTS vc_signal_ng (
+    vc_channel_id TEXT NOT NULL,
+    guild_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS vc_signal_ng_role (
+    vc_channel_id TEXT NOT NULL,
+    guild_id TEXT NOT NULL,
+    role_id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, role_id)
+);
+
+CREATE TABLE IF NOT EXISTS vc_signal_mention_user (
+    vc_channel_id TEXT NOT NULL,
+    guild_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS vc_signal_mention_role (
+    vc_channel_id TEXT NOT NULL,
+    guild_id TEXT NOT NULL,
+    role_id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, role_id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook (
+    id SERIAL PRIMARY KEY,
+    guild_id TEXT NOT NULL,
+    webhook_id TEXT NOT NULL,
+    subscription_type TEXT NOT NULL,
+    subscription_id TEXT NOT NULL,
+    last_posted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook_mention_users (
+    id INTEGER PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    PRIMARY KEY(id, user_id),
+    FOREIGN KEY(id) REFERENCES webhook(id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook_mention_roles (
+    id INTEGER PRIMARY KEY,
+    role_id TEXT NOT NULL,
+    PRIMARY KEY(id, role_id),
+    FOREIGN KEY(id) REFERENCES webhook(id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook_ng_or_words (
+    id INTEGER PRIMARY KEY,
+    word TEXT NOT NULL,
+    PRIMARY KEY(id, word),
+    FOREIGN KEY(id) REFERENCES webhook(id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook_ng_and_words (
+    id INTEGER PRIMARY KEY,
+    word TEXT NOT NULL,
+    PRIMARY KEY(id, word),
+    FOREIGN KEY(id) REFERENCES webhook(id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook_search_or_words (
+    id INTEGER PRIMARY KEY,
+    word TEXT NOT NULL,
+    PRIMARY KEY(id, word),
+    FOREIGN KEY(id) REFERENCES webhook(id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook_search_and_words (
+    id INTEGER PRIMARY KEY,
+    word TEXT NOT NULL,
+    PRIMARY KEY(id, word),
+    FOREIGN KEY(id) REFERENCES webhook(id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook_mention_or_words (
+    id INTEGER PRIMARY KEY,
+    word TEXT NOT NULL,
+    PRIMARY KEY(id, word),
+    FOREIGN KEY(id) REFERENCES webhook(id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook_mention_and_words (
+    id INTEGER PRIMARY KEY,
+    word TEXT NOT NULL,
+    PRIMARY KEY(id, word),
+    FOREIGN KEY(id) REFERENCES webhook(id)
+);
+
+CREATE TABLE IF NOT EXISTS line_bot (
+    guild_id TEXT NOT NULL,
+    line_notify_token BYTEA,
+    line_bot_token BYTEA,
+    line_bot_secret BYTEA,
+    line_group_id BYTEA,
+    line_client_id BYTEA,
+    line_client_secret BYTEA,
+    default_channel_id TEXT,
+    debug_mode BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY(guild_id)
 );

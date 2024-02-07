@@ -44,11 +44,11 @@ type LineResponses struct {
 		ReplyToken string `json:"replyToken"`
 		Type       string `json:"type"`
 		Source     struct {
-			GroupID             string   `json:"groupId"`
-			UserID              string   `json:"userId"`
-			Type                string   `json:"type"`
+			GroupID string `json:"groupId"`
+			UserID  string `json:"userId"`
+			Type    string `json:"type"`
 		} `json:"source"`
-		Timestamp int64 `json:"timestamp"`
+		Timestamp float64 `json:"timestamp"`
 		Message   struct {
 			ID                  string   `json:"id"`
 			Text                string   `json:"text"`
@@ -63,15 +63,15 @@ type LineResponses struct {
 			StickerID           string   `json:"stickerId"`
 			StickerResourceType string   `json:"stickerResourceType"`
 			Keywords            []string `json:"keywords"`
-			ImageSet struct {
-				ID string `json:"id"`
+			ImageSet            struct {
+				ID    string  `json:"id"`
 				Index float64 `json:"index"`
 				Total float64 `json:"total"`
 			} `json:"imageSet"`
 			ContentProvider struct {
-				Type string `json:"type"`
+				Type               string `json:"type"`
 				OriginalContentURL string `json:"originalContentUrl"`
-				PreviewImageURL string `json:"previewImageUrl"`
+				PreviewImageURL    string `json:"previewImageUrl"`
 			} `json:"contentProvider"`
 		} `json:"message"`
 		Mode            string `json:"mode"`
@@ -89,6 +89,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var lineBots []LineBot
+	var lineResponses LineResponses
 	// 暗号化キーの取得
 	privateKey := config.PrivateKey()
 	ctx := r.Context()
@@ -178,5 +179,10 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	err = json.Unmarshal(requestBodyByte, &lineBots)
+	err = json.Unmarshal(requestBodyByte, &lineResponses)
+	if err != nil {
+		log.Println("Failed to Load Request")
+		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+		return
+	}
 }

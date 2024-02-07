@@ -96,6 +96,19 @@ CREATE TABLE IF NOT EXISTS line_ng_discord_roles (
     PRIMARY KEY(guild_id, role_id)
 );
 
+/*
+ボイスチャンネルの通知設定を保存するテーブル
+
+カラム:
+
+    vc_channel_id (TEXT PRIMARY KEY): ボイスチャンネルID
+    guild_id (TEXT): サーバーID
+    send_signal (BOOLEAN): 通知を送信するか
+    send_channel_id (TEXT): 通知を送信するチャンネルID
+    join_bot (BOOLEAN): Botの参加を通知するか
+    everyone_mention (BOOLEAN): @everyoneを通知するか
+*/
+
 CREATE TABLE IF NOT EXISTS vc_signal (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
@@ -106,6 +119,16 @@ CREATE TABLE IF NOT EXISTS vc_signal (
     PRIMARY KEY(vc_channel_id)
 );
 
+/*
+指定されたユーザーがボイスチャンネルに参加した場合通知しない
+
+カラム:
+
+    vc_channel_id (TEXT): ボイスチャンネルID
+    guild_id (TEXT): サーバーID
+    user_id (TEXT): ユーザーID
+*/
+
 CREATE TABLE IF NOT EXISTS vc_signal_ng (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
@@ -113,12 +136,32 @@ CREATE TABLE IF NOT EXISTS vc_signal_ng (
     PRIMARY KEY(vc_channel_id, user_id)
 );
 
+/*
+指定されたロールがボイスチャンネルに参加した場合通知しない
+
+カラム:
+
+    vc_channel_id (TEXT): ボイスチャンネルID
+    guild_id (TEXT): サーバーID
+    role_id (TEXT): ロールID
+*/
+
 CREATE TABLE IF NOT EXISTS vc_signal_ng_role (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     role_id TEXT NOT NULL,
     PRIMARY KEY(vc_channel_id, role_id)
 );
+
+/*
+ボイスチャンネルの通知の際にメンションするユーザー
+
+カラム:
+
+    vc_channel_id (TEXT): ボイスチャンネルID
+    guild_id (TEXT): サーバーID
+    user_id (TEXT): ユーザーID
+*/
 
 CREATE TABLE IF NOT EXISTS vc_signal_mention_user (
     vc_channel_id TEXT NOT NULL,
@@ -208,6 +251,7 @@ CREATE TABLE IF NOT EXISTS line_bot (
     line_group_id BYTEA,
     line_client_id BYTEA,
     line_client_secret BYTEA,
+    iv BYTEA,
     default_channel_id TEXT,
     debug_mode BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY(guild_id)

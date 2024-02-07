@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	_ "embed"
 
 	"github.com/maguro-alternative/remake_bot/bot"
 	"github.com/maguro-alternative/remake_bot/core/config"
@@ -13,6 +14,9 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+//go:embed schema.sql
+var schema string // schema.sqlの内容をschemaに代入
+
 func main() {
 	ctx := context.Background()
 	// データベースの接続を開始
@@ -21,6 +25,11 @@ func main() {
 		panic(err)
 	}
 	defer cleanup()
+
+	// データベースの初期化
+	//if _, err := dbV1.ExecContext(ctx, schema); err != nil {
+		//panic(err)
+	//}
 
 	// ボットの起動
 	discord, cleanupCommandHandlers, err := bot.BotOnReady(dbV1)
@@ -47,5 +56,4 @@ func main() {
 	// Ctrl+Cを受け取る
 	signal.Notify(sc, os.Interrupt)
 	<-sc //プログラムが終了しないようロック
-
 }

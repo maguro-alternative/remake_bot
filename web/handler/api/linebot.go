@@ -44,17 +44,41 @@ type LineResponses struct {
 		ReplyToken string `json:"replyToken"`
 		Type       string `json:"type"`
 		Source     struct {
-			GroupID string `json:"groupId"`
-			UserID  string `json:"userId"`
-			Type    string `json:"type"`
+			GroupID             string   `json:"groupId"`
+			UserID              string   `json:"userId"`
+			Type                string   `json:"type"`
 		} `json:"source"`
 		Timestamp int64 `json:"timestamp"`
 		Message   struct {
-			ID        string `json:"id"`
-			Type      string `json:"type"`
-			Text      string `json:"text"`
-			ReplyToken string `json:"replyToken"`
+			ID                  string   `json:"id"`
+			Text                string   `json:"text"`
+			Duration            int64    `json:"duration"`
+			FileName            string   `json:"fileName"`
+			FileSize            int64    `json:"fileSize"`
+			Title               string   `json:"title"`
+			Address             string   `json:"address"`
+			Latitude            float64  `json:"latitude"`
+			Longitude           float64  `json:"longitude"`
+			PackageID           string   `json:"packageId"`
+			StickerID           string   `json:"stickerId"`
+			StickerResourceType string   `json:"stickerResourceType"`
+			Keywords            []string `json:"keywords"`
+			ImageSet struct {
+				ID string `json:"id"`
+				Index float64 `json:"index"`
+				Total float64 `json:"total"`
+			} `json:"imageSet"`
+			ContentProvider struct {
+				Type string `json:"type"`
+				OriginalContentURL string `json:"originalContentUrl"`
+				PreviewImageURL string `json:"previewImageUrl"`
+			} `json:"contentProvider"`
 		} `json:"message"`
+		Mode            string `json:"mode"`
+		WebhookEventID  string `json:"webhookEventId"`
+		DeliveryContext struct {
+			IsRedelivery bool `json:"isRedelivery"`
+		} `json:"isRedelivery"`
 	} `json:"events"`
 }
 

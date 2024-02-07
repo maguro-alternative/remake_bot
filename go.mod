@@ -24,6 +24,7 @@ require (
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/getsentry/sentry-go v0.18.0 // indirect
+	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/gorilla/sessions v1.2.2
 	github.com/gorilla/websocket v1.4.2 // indirect

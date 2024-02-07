@@ -30,6 +30,7 @@ func pkcs7Unpad(data []byte) []byte {
 	return data[:dataLength-padLength]
 }
 
+// Encrypt は、dataをAES暗号化します。
 func Encrypt(data []byte, key []byte) (iv []byte, encrypted []byte, err error) {
 	/*AES暗号化*/
 	// IV (Initialization Vector) の生成
@@ -51,6 +52,7 @@ func Encrypt(data []byte, key []byte) (iv []byte, encrypted []byte, err error) {
 	return iv, encrypted, nil
 }
 
+// Decrypt は、dataをAES復号化します。
 func Decrypt(data []byte, key []byte, iv []byte) ([]byte, error) {
 	/*AES復号化*/
 	block, err := aes.NewCipher(key)

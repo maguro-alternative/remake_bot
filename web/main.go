@@ -19,7 +19,7 @@ func NewWebRouter(
 	indexDB db.Driver,
 	cookieStore *sessions.CookieStore,
 	discordSession *discordgo.Session,
-) *http.ServeMux {
+) {
 	//conf := &oauth2.Config{
 		//ClientID:     "",
 		//ClientSecret: "",
@@ -49,5 +49,5 @@ func NewWebRouter(
 	//mux.Handle("/discord-auth-check", middleChain.Then(testRouter.NewAuthCheckHandler(indexService)))
 	//mux.Handle("/discord/auth", middleChain.Then(controllersDiscord.NewDiscordAuthHandler(discordOAuth2Service)))
 	//mux.Handle("/discord-callback/", middleChain.Then(controllersDiscord.NewDiscordCallbackHandler(discordOAuth2Service)))
-	return mux
+	http.ListenAndServe(":8080", mux)
 }

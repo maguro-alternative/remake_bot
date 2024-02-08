@@ -6,7 +6,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/pkg/middleware"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/handler/api"
+	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"
 
 	//"golang.org/x/oauth2"
 
@@ -45,7 +45,7 @@ func NewWebRouter(
 	// register routes
 	mux := http.NewServeMux()
 	middleChain := alice.New(middleware.LogMiddleware)
-	mux.Handle("/api/line-bot", middleChain.Then(api.NewLineBotHandler(indexService)))
+	mux.Handle("/api/line-bot", middleChain.Then(linebot.NewLineBotHandler(indexService)))
 	//mux.Handle("/discord-auth-check", middleChain.Then(testRouter.NewAuthCheckHandler(indexService)))
 	//mux.Handle("/discord/auth", middleChain.Then(controllersDiscord.NewDiscordAuthHandler(discordOAuth2Service)))
 	//mux.Handle("/discord-callback/", middleChain.Then(controllersDiscord.NewDiscordCallbackHandler(discordOAuth2Service)))

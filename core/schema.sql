@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS vc_signal (
     user_id (TEXT): ユーザーID
 */
 
-CREATE TABLE IF NOT EXISTS vc_signal_ng (
+CREATE TABLE IF NOT EXISTS vc_signal_ng_user (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     user_id TEXT NOT NULL,

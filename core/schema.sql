@@ -201,43 +201,10 @@ CREATE TABLE IF NOT EXISTS webhook_mention_roles (
     FOREIGN KEY(id) REFERENCES webhook(id)
 );
 
-CREATE TABLE IF NOT EXISTS webhook_ng_or_words (
+/*ng_or ng_and search_or search_and mention_or mention_and*/
+CREATE TABLE IF NOT EXISTS webhook_words (
     id INTEGER PRIMARY KEY,
-    word TEXT NOT NULL,
-    PRIMARY KEY(id, word),
-    FOREIGN KEY(id) REFERENCES webhook(id)
-);
-
-CREATE TABLE IF NOT EXISTS webhook_ng_and_words (
-    id INTEGER PRIMARY KEY,
-    word TEXT NOT NULL,
-    PRIMARY KEY(id, word),
-    FOREIGN KEY(id) REFERENCES webhook(id)
-);
-
-CREATE TABLE IF NOT EXISTS webhook_search_or_words (
-    id INTEGER PRIMARY KEY,
-    word TEXT NOT NULL,
-    PRIMARY KEY(id, word),
-    FOREIGN KEY(id) REFERENCES webhook(id)
-);
-
-CREATE TABLE IF NOT EXISTS webhook_search_and_words (
-    id INTEGER PRIMARY KEY,
-    word TEXT NOT NULL,
-    PRIMARY KEY(id, word),
-    FOREIGN KEY(id) REFERENCES webhook(id)
-);
-
-CREATE TABLE IF NOT EXISTS webhook_mention_or_words (
-    id INTEGER PRIMARY KEY,
-    word TEXT NOT NULL,
-    PRIMARY KEY(id, word),
-    FOREIGN KEY(id) REFERENCES webhook(id)
-);
-
-CREATE TABLE IF NOT EXISTS webhook_mention_and_words (
-    id INTEGER PRIMARY KEY,
+    conditions TEXT NOT NULL,
     word TEXT NOT NULL,
     PRIMARY KEY(id, word),
     FOREIGN KEY(id) REFERENCES webhook(id)

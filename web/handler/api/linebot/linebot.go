@@ -2,18 +2,16 @@ package linebot
 
 import (
 	"context"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 
-	"github.com/maguro-alternative/remake_bot/pkg/crypto"
+	"github.com/maguro-alternative/remake_bot/pkg/line"
+
 	"github.com/maguro-alternative/remake_bot/web/config"
-	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot/internal"
+	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
 type Repository interface {
@@ -61,46 +59,14 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 暗号化キーのバイトへの変換
-	keyBytes, err := hex.DecodeString(privateKey)
+	// リクエストボディの検証
+	lineBotDecrypt, err := internal.LineHmac(privateKey, requestBodyByte, lineBots, r.Header.Get("X-Line-Signature"))
 	if err != nil {
 		log.Println("Failed to Load Request")
 		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
 		return
 	}
 
-	for i, lineBot := range lineBots {
-		// 暗号化されたシークレットキーの復号化
-		sercretKey, err := crypto.Decrypt(lineBot.LineBotSecret, keyBytes, lineBot.Iv)
-		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
-			return
-		}
-		inputSign := r.Header.Get("X-Line-Signature")
-		// 受け取った署名をStringからByteへ変換
-		inputSignByte, err := hex.DecodeString(inputSign)
-		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
-			return
-		}
-
-		// macの生成
-		mac := hmac.New(sha256.New, []byte(sercretKey))
-		mac.Write(requestBodyByte)
-		validSignByte := mac.Sum(nil)
-
-		if hmac.Equal(inputSignByte, validSignByte) {
-			break
-		}
-		// 最後の要素までループしても一致しなかった場合終了
-		if i == len(lineBots)-1 {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
-			return
-		}
-	}
 	// リクエストボディのバイトから構造体への変換
 	err = json.Unmarshal(requestBodyByte, &lineResponses)
 	if err != nil {
@@ -114,8 +80,28 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
 		return
 	}
+
+
+	lineRequ := line.NewLineRequest(lineBotDecrypt.LineNotifyToken, lineBotDecrypt.LineBotToken, lineBotDecrypt.LineGroupID)
+	// ユーザー情報の取得
+	lineProfile, err := lineRequ.GetProfile(ctx, lineResponses.Events[0].Source.UserID)
+	if err != nil {
+		log.Println("Failed to Load Request")
+		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+		return
+	}
+
 	// メッセージの種類によって処理を分岐
 	if lineResponses.Events[0].Type == "text" {
+		_, err = h.IndexService.DiscordSession.ChannelMessageSend(
+			lineBotDecrypt.DefaultChannelID,
+			lineProfile.DisplayName+"\n「 "+lineResponses.Events[0].Message.Text+" 」",
+		)
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
+		}
 	}
 	// レスポンスの書き込み
 	w.WriteHeader(http.StatusOK)

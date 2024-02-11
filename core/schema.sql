@@ -60,7 +60,7 @@ LINEへ送信しないメッセージの種類を保存するテーブル
 カラム:
 
     guild_id (TEXT PRIMARY KEY): サーバーID
-    type (TEXT PRIMARY KEY): メッセージの種類
+    type (TEXT PRIMARY KEY): メッセージの種類(ピン止め、スレッド、スレッドの返信)
 */
 CREATE TABLE IF NOT EXISTS line_ng_types (
     guild_id TEXT NOT NULL,
@@ -69,31 +69,19 @@ CREATE TABLE IF NOT EXISTS line_ng_types (
 );
 
 /*
-LINEへ送信しないDiscordユーザーを保存するテーブル
+LINEへ送信しないDiscordユーザー、ロールを保存するテーブル
 
 カラム:
 
     guild_id (TEXT PRIMARY KEY): サーバーID
-    user_id (TEXT PRIMARY KEY): ユーザーID
+    id_type (TEXT PRIMARY KEY): ユーザーIDの種類 (user, role)
+    id (TEXT PRIMARY KEY): ID
 */
-CREATE TABLE IF NOT EXISTS line_ng_discord_users (
+CREATE TABLE IF NOT EXISTS line_ng_discord_id (
     guild_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
-    PRIMARY KEY(guild_id, user_id)
-);
-
-/*
-LINEへ送信しないDiscordロールを保存するテーブル
-
-カラム:
-
-    guild_id (TEXT PRIMARY KEY): サーバーID
-    role_id (TEXT PRIMARY KEY): ロールID
-*/
-CREATE TABLE IF NOT EXISTS line_ng_discord_roles (
-    guild_id TEXT NOT NULL,
-    role_id TEXT NOT NULL,
-    PRIMARY KEY(guild_id, role_id)
+    id_type TEXT NOT NULL,
+    id TEXT NOT NULL,
+    PRIMARY KEY(guild_id, id)
 );
 
 /*
@@ -120,61 +108,41 @@ CREATE TABLE IF NOT EXISTS vc_signal (
 );
 
 /*
-指定されたユーザーがボイスチャンネルに参加した場合通知しない
+指定されたユーザー、ロールがボイスチャンネルに参加した場合通知しない
 
 カラム:
 
     vc_channel_id (TEXT): ボイスチャンネルID
     guild_id (TEXT): サーバーID
-    user_id (TEXT): ユーザーID
+    id_type (TEXT PRIMARY KEY): ユーザーIDの種類 (user, role)
+    id (TEXT): ID
 */
 
-CREATE TABLE IF NOT EXISTS vc_signal_ng_user (
+CREATE TABLE IF NOT EXISTS vc_signal_ng_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
-    PRIMARY KEY(vc_channel_id, user_id)
+    id_type TEXT NOT NULL,
+    id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, id)
 );
 
 /*
-指定されたロールがボイスチャンネルに参加した場合通知しない
+ボイスチャンネルの通知の際にメンションするユーザー、ロールを保存するテーブル
 
 カラム:
 
     vc_channel_id (TEXT): ボイスチャンネルID
     guild_id (TEXT): サーバーID
-    role_id (TEXT): ロールID
+    id_type (TEXT PRIMARY KEY): ユーザーIDの種類 (user, role)
+    id (TEXT): ユーザーID
 */
 
-CREATE TABLE IF NOT EXISTS vc_signal_ng_role (
+CREATE TABLE IF NOT EXISTS vc_signal_mention_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
-    role_id TEXT NOT NULL,
-    PRIMARY KEY(vc_channel_id, role_id)
-);
-
-/*
-ボイスチャンネルの通知の際にメンションするユーザー
-
-カラム:
-
-    vc_channel_id (TEXT): ボイスチャンネルID
-    guild_id (TEXT): サーバーID
-    user_id (TEXT): ユーザーID
-*/
-
-CREATE TABLE IF NOT EXISTS vc_signal_mention_user (
-    vc_channel_id TEXT NOT NULL,
-    guild_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
-    PRIMARY KEY(vc_channel_id, user_id)
-);
-
-CREATE TABLE IF NOT EXISTS vc_signal_mention_role (
-    vc_channel_id TEXT NOT NULL,
-    guild_id TEXT NOT NULL,
-    role_id TEXT NOT NULL,
-    PRIMARY KEY(vc_channel_id, role_id)
+    id_type TEXT NOT NULL,
+    id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, id)
 );
 
 CREATE TABLE IF NOT EXISTS webhook (
@@ -187,18 +155,12 @@ CREATE TABLE IF NOT EXISTS webhook (
     PRIMARY KEY(id)
 );
 
-CREATE TABLE IF NOT EXISTS webhook_mention_users (
-    id INTEGER PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    PRIMARY KEY(id, user_id),
-    FOREIGN KEY(id) REFERENCES webhook(id)
-);
-
-CREATE TABLE IF NOT EXISTS webhook_mention_roles (
-    id INTEGER PRIMARY KEY,
-    role_id TEXT NOT NULL,
-    PRIMARY KEY(id, role_id),
-    FOREIGN KEY(id) REFERENCES webhook(id)
+CREATE TABLE IF NOT EXISTS webhook_mention (
+    webhook_serial_id INTEGER PRIMARY KEY,
+    id_type TEXT NOT NULL,
+    id TEXT NOT NULL,
+    PRIMARY KEY(webhook_serial_id, id),
+    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(id)
 );
 
 /*ng_or ng_and search_or search_and mention_or mention_and*/

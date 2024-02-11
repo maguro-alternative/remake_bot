@@ -8,6 +8,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+
+// スラッシュコマンド内でもデータベースを使用できるようにする
 type CommandHandler struct {
 	DB db.Driver
 }

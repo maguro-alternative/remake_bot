@@ -117,6 +117,7 @@ func (l *LineNotifyMessage) Validate() error {
 	)
 }
 
+// LINE Notifyの画像
 type LineNotifyImage struct {
 	ImageThumbnail string `json:"imageThumbnail"`
 	ImageFullsize  string `json:"imageFullsize"`
@@ -129,4 +130,43 @@ func (l *LineNotifyImage) Validate() error {
 		validation.Field(&l.ImageFullsize, validation.Required),
 		validation.Field(&l.Message, validation.Required),
 	)
+}
+
+// LINE Notifyのスタンプ
+type LineNotifySticker struct {
+	StickerPackageID string `json:"stickerPackageId"`
+	StickerID        string `json:"stickerId"`
+	Message          string `json:"message"`
+}
+
+func (l *LineNotifySticker) Validate() error {
+	return validation.ValidateStruct(l,
+		validation.Field(&l.StickerPackageID, validation.Required),
+		validation.Field(&l.StickerID, validation.Required),
+		validation.Field(&l.Message, validation.Required),
+	)
+}
+
+// LINEのメッセージ
+type LineMessage struct {
+	To 	 string            `json:"to"`
+	Messages []LineMessageType `json:"messages"`
+}
+
+func (l *LineMessage) Validate() error {
+	return validation.ValidateStruct(l,
+		validation.Field(&l.To, validation.Required),
+		validation.Field(&l.Messages, validation.Required),
+	)
+}
+
+// LINEのメッセージタイプ
+type LineMessageType struct {
+	Type               string `json:"type"`
+	Text               string `json:"text,omitempty"`
+	ImageThumbnail     string `json:"imageThumbnail,omitempty"`
+	ImageFullsize      string `json:"imageFullsize,omitempty"`
+	OriginalContentUrl string `json:"originalContentUrl,omitempty"`
+	PreviewImageUrl    string `json:"previewImageUrl,omitempty"`
+	Duration           int    `json:"duration,omitempty"`
 }

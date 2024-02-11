@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 )
 
@@ -195,6 +196,25 @@ func (r *LineRequest) GetPushLimit(ctx context.Context) (int, error) {
 	return lineBotQuota.Value, err
 }
 
+// LINEメッセージ内のファイルを取得
+func (r *LineRequest) GetContent(ctx context.Context, messageID string) (io.ReadCloser, error) {
+	//var buf bytes.Buffer
+	client := &http.Client{}
+	url := "https://api.line.me/v2/bot/message/" + messageID + "/content"
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+r.lineBotToken)
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	return resp.Body, nil
+}
+
 // LINE Notifyでメッセージを送信
 func (r *LineRequest) PushMessageNotify(ctx context.Context, message string) error {
 	client := &http.Client{}
@@ -225,6 +245,7 @@ func (r *LineRequest) PushMessageNotify(ctx context.Context, message string) err
 	return nil
 }
 
+// LINE Notifyで画像を送信
 func (r *LineRequest) PushImageNotify(ctx context.Context, message, image string) error {
 	client := &http.Client{}
 	url := "https://notify-api.line.me/api/notify"
@@ -245,6 +266,105 @@ func (r *LineRequest) PushImageNotify(ctx context.Context, message, image string
 	}
 
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+// LINE Notifyでスタンプを送信
+func (r *LineRequest) PushStampNotify(ctx context.Context, message, stickerPackageID, stickerID string) error {
+	client := &http.Client{}
+	url := "https://notify-api.line.me/api/notify"
+	notifyMessage := LineNotifySticker{
+		Message:          message,
+		StickerPackageID: stickerPackageID,
+		StickerID:        stickerID,
+	}
+	err := notifyMessage.Validate()
+	if err != nil {
+		return err
+	}
+	notifyMessageByte, err := json.Marshal(notifyMessage)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(notifyMessageByte))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+// テキストメッセージを作成
+func (r *LineRequest) NewLineTextMessage(message string) LineMessageType {
+	return LineMessageType{
+		Type: "text",
+		Text: message,
+	}
+}
+
+// 画像メッセージを作成
+func (r *LineRequest) NewLineImageMessage(imageThumbnail, imageFullsize string) LineMessageType {
+	return LineMessageType{
+		Type:           "image",
+		ImageThumbnail: imageThumbnail,
+		ImageFullsize:  imageFullsize,
+	}
+}
+
+// 動画メッセージを作成
+func (r *LineRequest) NewLineVideoMessage(originalContentUrl, previewImageUrl string) LineMessageType {
+	return LineMessageType{
+		Type:               "video",
+		OriginalContentUrl: originalContentUrl,
+		PreviewImageUrl:    previewImageUrl,
+	}
+}
+
+// 音声メッセージを作成
+func (r *LineRequest) NewLineAudioMessage(originalContentUrl string, duration int) LineMessageType {
+	return LineMessageType{
+		Type:               "audio",
+		OriginalContentUrl: originalContentUrl,
+		Duration:           duration * 1000,
+	}
+}
+
+// LINEにメッセージを送信
+func (r *LineRequest) PushMessageBotInGroup(ctx context.Context, messages []LineMessageType) error {
+	client := &http.Client{}
+	url := "https://api.line.me/v2/bot/message/push"
+	lineMessage := LineMessage{
+		To:       r.lineGroupID,
+		Messages: messages,
+	}
+	err := lineMessage.Validate()
+	if err != nil {
+		return err
+	}
+	lineMessageByte, err := json.Marshal(lineMessage)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(lineMessageByte))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+r.lineBotToken)
+	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
 		return err

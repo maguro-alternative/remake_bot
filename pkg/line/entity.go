@@ -149,7 +149,7 @@ func (l *LineNotifySticker) Validate() error {
 
 // LINEのメッセージ
 type LineMessage struct {
-	To 	 string            `json:"to"`
+	To       string            `json:"to"`
 	Messages []LineMessageType `json:"messages"`
 }
 

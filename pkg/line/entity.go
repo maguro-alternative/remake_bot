@@ -1,6 +1,8 @@
 package line
 
 import (
+	"io"
+
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -104,6 +106,12 @@ func (l *LineBotQuota) Validate() error {
 		validation.Field(&l.Type, validation.Required),
 		validation.Field(&l.Value, validation.Required),
 	)
+}
+
+type LineMessageContent struct {
+	Content       io.ReadCloser
+	ContentLength int64
+	ContentType   string
 }
 
 // LINE Notifyのメッセージ

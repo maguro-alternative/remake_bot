@@ -1,6 +1,7 @@
 package linebot
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"io"
@@ -103,6 +104,52 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	if lineResponses.Events[0].Type == "image" {
+		imageContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
+		}
+		// 画像の種類の取得
+		imageType, err := magicNumberRead(imageContent.Content)
+		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
+			lineBotDecrypt.DefaultChannelID,
+			lineProfile.DisplayName+"\n「 "+lineResponses.Events[0].Message.Text+" 」",
+			"image."+imageType,
+			imageContent.Content,
+		)
+	}
 	// レスポンスの書き込み
 	w.WriteHeader(http.StatusOK)
+}
+
+// マジックナンバーからファイルの種類を取得
+func magicNumberRead(content io.ReadCloser) (string, error) {
+	var buf bytes.Buffer
+	data := make([]byte, 12)
+	if _, err := io.Copy(&buf, content); err != nil {
+		return "", err
+	}
+	count, err := buf.Read(data)
+	if err != nil {
+		return "", err
+	}
+	// 最初の4バイトを読み取る
+	if bytes.Equal(data[:count], []byte{0, 0, 0, 24, 102, 116, 121, 112, 109, 112, 52, 50}) {
+		return "mp4", nil
+	} else if bytes.Equal(data[:count], []byte{79, 103, 103, 83, 0, 2, 0, 0, 0, 0, 0, 0}) {
+		return "ogg", nil
+	} else if bytes.Equal(data[:4], []byte{82, 73, 70, 70}) && bytes.Equal(data[8:count], []byte{87, 65, 86, 69}) {
+		return "wav", nil
+	} else if bytes.Equal(data[8:count], []byte{77, 52, 65, 32}) {
+		return "m4a", nil
+	} else if bytes.Equal(data[:4], []byte{73, 68, 51, 4}) {
+		return "mp3", nil
+	} else if bytes.Equal(data[:6], []byte{71, 73, 70, 56, 57, 97}) {
+		return "gif", nil
+	} else if bytes.Equal(data[:3], []byte{255, 216, 255}) {
+		return "jpg", nil
+	}
+	return "", nil
 }

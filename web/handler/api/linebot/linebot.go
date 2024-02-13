@@ -105,6 +105,17 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	if lineResponses.Events[0].Type == "sticker" {
+		_, err = h.IndexService.DiscordSession.ChannelMessageSend(
+			lineBotDecrypt.DefaultChannelID,
+			lineProfile.DisplayName+"\nスタンプを送信しました\nhttps://stickershop.line-scdn.net/stickershop/v1/sticker/"+lineResponses.Events[0].Message.StickerID+"/iPhone/sticker.png",
+		)
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
+		}
+	}
 	if lineResponses.Events[0].Type == "image" {
 		imageContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
@@ -180,6 +191,27 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Failed to Load Request", http.StatusBadRequest)
 				return
 			}
+		}
+	}
+	if lineResponses.Events[0].Type == "audio" {
+		audioContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
+		}
+		// 音声の種類の取得
+		audioType, err := magicNumberRead(audioContent.Content)
+		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
+			lineBotDecrypt.DefaultChannelID,
+			lineProfile.DisplayName+"\n ",
+			"audio."+audioType,
+			audioContent.Content,
+		)
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
 		}
 	}
 	// レスポンスの書き込み

@@ -33,6 +33,10 @@ func MustInit() {
 	}
 }
 
+func PrivateKey() string {
+	return cfg.PrivateKey
+}
+
 func DiscordBotToken() string {
 	return cfg.DiscordBotToken
 }

@@ -36,3 +36,31 @@ func MustInit() {
 func PrivateKey() string {
 	return cfg.PrivateKey
 }
+
+func YouTubeAPIKey() string {
+	return cfg.YouTubeAPIKey
+}
+
+func YoutubeAccessToken() string {
+	return cfg.YoutubeAccessToken
+}
+
+func YoutubeClientID() string {
+	return cfg.YoutubeClientID
+}
+
+func YoutubeClientSecret() string {
+	return cfg.YoutubeClientSecret
+}
+
+func YoutubeRefreshToken() string {
+	return cfg.YoutubeRefreshToken
+}
+
+func YoutubeProjectID() string {
+	return cfg.YoutubeProjectID
+}
+
+func YoutubeTokenExpiry() string {
+	return cfg.YoutubeTokenExpiry
+}

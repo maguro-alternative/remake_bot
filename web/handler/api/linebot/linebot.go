@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/pkg/line"
+	"github.com/maguro-alternative/remake_bot/pkg/youtube"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot/internal"
@@ -115,10 +116,71 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		imageType, err := magicNumberRead(imageContent.Content)
 		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
 			lineBotDecrypt.DefaultChannelID,
-			lineProfile.DisplayName+"\n「 "+lineResponses.Events[0].Message.Text+" 」",
+			lineProfile.DisplayName+"\n ",
 			"image."+imageType,
 			imageContent.Content,
 		)
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
+		}
+	}
+	if lineResponses.Events[0].Type == "video" {
+		videoContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
+		}
+		if videoContent.ContentLength <= 25000000 {
+			// 動画の種類の取得
+			videoType, err := magicNumberRead(videoContent.Content)
+			_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
+				lineBotDecrypt.DefaultChannelID,
+				lineProfile.DisplayName+"\n ",
+				"video."+videoType,
+				videoContent.Content,
+			)
+			if err != nil {
+				log.Println("Failed to Load Request")
+				http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+				return
+			}
+		} else {
+			// 25MB以上の動画はYoutubeにアップロードさせる
+			youtubeAPI := youtube.NewYoutubeAPI(
+				config.YoutubeAccessToken(),
+				config.YoutubeTokenExpiry(),
+				config.YoutubeClientID(),
+				config.YoutubeClientSecret(),
+				config.YoutubeRefreshToken(),
+				config.YoutubeProjectID(),
+			)
+			videoID, err := youtubeAPI.VideoUpload(
+				ctx,
+				videoContent.Content,
+				lineProfile.DisplayName+"の動画",
+				"LINEからの動画投稿",
+				"22",
+				"unlisted",
+				[]string{"LINE", "動画"},
+			)
+			if err != nil {
+				log.Println("Failed to Load Request")
+				http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+				return
+			}
+			_, err = h.IndexService.DiscordSession.ChannelMessageSend(
+				lineBotDecrypt.DefaultChannelID,
+				lineProfile.DisplayName+"\nhttps://www.youtube.com/watch?v="+videoID,
+			)
+			if err != nil {
+				log.Println("Failed to Load Request")
+				http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+				return
+			}
+		}
 	}
 	// レスポンスの書き込み
 	w.WriteHeader(http.StatusOK)

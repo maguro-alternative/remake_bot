@@ -33,7 +33,6 @@ type LineMessageType struct {
 	Duration           int    `json:"duration,omitempty"`
 }
 
-
 // テキストメッセージを作成
 func (r *LineRequest) NewLineTextMessage(message string) LineMessageType {
 	return LineMessageType{

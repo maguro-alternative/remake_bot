@@ -29,8 +29,8 @@ func (r *LineRequest) GetContent(ctx context.Context, messageID string) (LineMes
 	}
 	defer resp.Body.Close()
 	content := LineMessageContent{
-		Content: resp.Body,
-		ContentType: resp.Header.Get("Content-Type"),
+		Content:       resp.Body,
+		ContentType:   resp.Header.Get("Content-Type"),
 		ContentLength: resp.ContentLength,
 	}
 	return content, nil

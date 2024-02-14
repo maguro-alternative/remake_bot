@@ -100,25 +100,19 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 		extension := filepath.Ext(attachment.Filename)
 		fileNameNoExt := filepath.Base(attachment.Filename[:len(attachment.Filename)-len(extension)])
 		switch extension {
-		case ".png":
-		case ".jpg":
-		case ".jpeg":
-		case ".gif":
+		case ".png", ".jpg", ".jpeg", ".gif":
 			err = lineRequ.PushImageNotify(ctx, sendText, attachment.URL)
 			if err != nil {
 				return
 			}
-		case ".mp4":
-		case ".mov":
+		case ".mp4", ".mov", ".avi", ".wmv", ".flv", ".webm":
 			st, err := s.Guild(vs.GuildID)
 			if err != nil {
 				return
 			}
 			lineMessageType := lineRequ.NewLineVideoMessage(attachment.URL, st.IconURL("512"))
 			lineMessageTypes = append(lineMessageTypes, &lineMessageType)
-		case ".mp3":
-		case ".wav":
-		case ".ogg":
+		case ".mp3", ".wav", ".ogg", ".m4a":
 			tmpFile := os.TempDir()+"/"+attachment.Filename
 			tmpFileNotExt := os.TempDir()+"/"+fileNameNoExt
 			downloadFilePath, err := downloadFile(tmpFile, attachment.URL)
@@ -164,7 +158,6 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 				audioLen,
 			)
 			lineMessageTypes = append(lineMessageTypes, &audio)
-		case ".m4a":
 		}
 	}
 }

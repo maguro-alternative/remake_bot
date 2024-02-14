@@ -119,9 +119,11 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 			if err != nil {
 				return
 			}
-			err = exec.CommandContext(ctx, "ffmpeg", "-i", downloadFilePath, tmpFileNotExt+".m4a").Run()
-			if err != nil {
-				return
+			if extension != ".m4a" {
+				err = exec.CommandContext(ctx, "ffmpeg", "-i", downloadFilePath, tmpFileNotExt+".m4a").Run()
+				if err != nil {
+					return
+				}
 			}
 			f, err := os.Open(tmpFileNotExt+".m4a")
 			if err != nil {
@@ -136,6 +138,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 			if err != nil {
 				return
 			}
+			// 音声ファイルの秒数を取得
 			cmd := exec.CommandContext(
 				ctx,
 				"ffprobe",

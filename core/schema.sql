@@ -5,12 +5,12 @@
 
     guild_id (TEXT PRIMARY KEY): サーバーID
     type (TEXT): 権限の種類 (line, line_bot, vc, webhook)
-    code (TEXT): Discord上での権限コード
+    code (BIGINT): Discord上での権限コード
 */
 CREATE TABLE IF NOT EXISTS permissions_code (
     guild_id TEXT NOT NULL,
     type TEXT NOT NULL,
-    code TEXT NOT NULL,
+    code BIGINT NOT NULL,
     PRIMARY KEY(guild_id, type)
 );
 
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS permissions_code (
     type (TEXT): 権限の種類 (line, line_bot, vc, webhook)
     target_type (TEXT): 対象の種類 (user, role)
     target_id (TEXT): 対象ID (ユーザーID、ロールID)
-    permission (TEXT): 権限レベル
+    permission (TEXT): 権限レベル(read, write, admin)
 */
 CREATE TABLE IF NOT EXISTS permissions_id (
     guild_id TEXT NOT NULL,
@@ -44,7 +44,7 @@ DiscordからLINEへのメッセージ送信設定を保存するテーブル
     ng (BOOLEAN): 送信NGのチャンネルか
     bot_message (BOOLEAN): Botのメッセージを送信するか
 */
-CREATE TABLE IF NOT EXISTS line_channels (
+CREATE TABLE IF NOT EXISTS line_channel (
     channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     ng BOOLEAN NOT NULL,
@@ -58,11 +58,11 @@ LINEへ送信しないメッセージの種類を保存するテーブル
 カラム:
 
     guild_id (TEXT PRIMARY KEY): サーバーID
-    type (TEXT PRIMARY KEY): メッセージの種類(ピン止め、スレッド、スレッドの返信)
+    type (INTEGER PRIMARY KEY): メッセージの種類(ピン止め、スレッド、スレッドの返信)
 */
-CREATE TABLE IF NOT EXISTS line_ng_types (
+CREATE TABLE IF NOT EXISTS line_ng_type (
     guild_id TEXT NOT NULL,
-    type TEXT NOT NULL,
+    type INTEGER NOT NULL,
     PRIMARY KEY(guild_id, type)
 );
 
@@ -72,13 +72,13 @@ LINEへ送信しないDiscordユーザー、ロールを保存するテーブル
 カラム:
 
     guild_id (TEXT PRIMARY KEY): サーバーID
-    id_type (TEXT PRIMARY KEY): ユーザーIDの種類 (user, role)
     id (TEXT PRIMARY KEY): ID
+    id_type (TEXT PRIMARY KEY): ユーザーIDの種類 (user, role)
 */
 CREATE TABLE IF NOT EXISTS line_ng_discord_id (
     guild_id TEXT NOT NULL,
-    id_type TEXT NOT NULL,
     id TEXT NOT NULL,
+    id_type TEXT NOT NULL,
     PRIMARY KEY(guild_id, id)
 );
 
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS line_ng_discord_id (
     everyone_mention (BOOLEAN): @everyoneを通知するか
 */
 
-CREATE TABLE IF NOT EXISTS vc_signal (
+CREATE TABLE IF NOT EXISTS vc_signal_channel (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     send_signal BOOLEAN NOT NULL,
@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS webhook_mention (
 );
 
 /*ng_or ng_and search_or search_and mention_or mention_and*/
-CREATE TABLE IF NOT EXISTS webhook_words (
+CREATE TABLE IF NOT EXISTS webhook_word (
     id INTEGER PRIMARY KEY,
     conditions TEXT NOT NULL,
     word TEXT NOT NULL,

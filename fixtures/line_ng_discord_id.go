@@ -5,47 +5,47 @@ import (
 	"testing"
 )
 
-type PermissionsCode struct {
+type LineNgDiscordID struct {
 	GuildID string `db:"guild_id"`
-	Type    string `db:"type"`
-	Code    int64  `db:"code"`
+	IDType  string `db:"id_type"`
+	ID      string `db:"id"`
 }
 
-func NewPermissionsCode(ctx context.Context, setter ...func(b *PermissionsCode)) *ModelConnector {
-	permissionsCode := &PermissionsCode{
+func NewLineNgDiscordID(ctx context.Context, setter ...func(b *LineNgDiscordID)) *ModelConnector {
+	lineNgDiscordID := &LineNgDiscordID{
 		GuildID: "1111111111111",
-		Type:    "line",
-		Code:    8,
+		IDType:  "user",
+		ID:      "1111111111111",
 	}
 
 	return &ModelConnector{
-		Model: permissionsCode,
+		Model: lineNgDiscordID,
 		setter: func() {
 			for _, s := range setter {
-				s(permissionsCode)
+				s(lineNgDiscordID)
 			}
 		},
 		addToFixture: func(t *testing.T, f *Fixture) {
-			f.PermissionsCodes = append(f.PermissionsCodes, permissionsCode)
+			f.LineNgDiscordIDs = append(f.LineNgDiscordIDs, lineNgDiscordID)
 		},
 		connect: func(t *testing.T, f *Fixture, connectingModel interface{}) {
 			switch connectingModel.(type) {
 			default:
-				t.Fatalf("%T cannot be connected to %T", connectingModel, permissionsCode)
+				t.Fatalf("%T cannot be connected to %T", connectingModel, lineNgDiscordID)
 			}
 		},
 		insertTable: func(t *testing.T, f *Fixture) {
 			_, err := f.DBv1.NamedExecContext(ctx, `
-				INSERT INTO permissions_code (
+				INSERT INTO line_ng_discord_id (
 					guild_id,
-					type,
-					code
+					id_type,
+					id
 				) VALUES (
 					:guild_id,
-					:type,
-					:code
+					:id_type,
+					:id
 				)
-			`, permissionsCode)
+			`, lineNgDiscordID)
 			if err != nil {
 				t.Fatalf("insert error: %v", err)
 			}

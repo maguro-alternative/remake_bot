@@ -105,7 +105,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 		sendText = st.Name+"にて、"+vs.Message.Author.Username
 	}
 
-	// スタンプが送信さ送信されていた場合、画像URLを取得
+	// スタンプが送信されていた場合、画像URLを取得
 	if vs.StickerItems != nil {
 		for _, sticker := range vs.StickerItems {
 			switch sticker.FormatType {

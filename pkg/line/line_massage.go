@@ -11,8 +11,8 @@ import (
 
 // LINEのメッセージ
 type LineMessage struct {
-	To       string            `json:"to"`
-	Messages []LineMessageType `json:"messages"`
+	To       string             `json:"to"`
+	Messages []*LineMessageType `json:"messages"`
 }
 
 func (l *LineMessage) Validate() error {
@@ -34,16 +34,16 @@ type LineMessageType struct {
 }
 
 // テキストメッセージを作成
-func (r *LineRequest) NewLineTextMessage(message string) LineMessageType {
-	return LineMessageType{
+func (r *LineRequest) NewLineTextMessage(message string) *LineMessageType {
+	return &LineMessageType{
 		Type: "text",
 		Text: message,
 	}
 }
 
 // 画像メッセージを作成
-func (r *LineRequest) NewLineImageMessage(imageThumbnail, imageFullsize string) LineMessageType {
-	return LineMessageType{
+func (r *LineRequest) NewLineImageMessage(imageThumbnail, imageFullsize string) *LineMessageType {
+	return &LineMessageType{
 		Type:           "image",
 		ImageThumbnail: imageThumbnail,
 		ImageFullsize:  imageFullsize,
@@ -51,8 +51,8 @@ func (r *LineRequest) NewLineImageMessage(imageThumbnail, imageFullsize string) 
 }
 
 // 動画メッセージを作成
-func (r *LineRequest) NewLineVideoMessage(originalContentUrl, previewImageUrl string) LineMessageType {
-	return LineMessageType{
+func (r *LineRequest) NewLineVideoMessage(originalContentUrl, previewImageUrl string) *LineMessageType {
+	return &LineMessageType{
 		Type:               "video",
 		OriginalContentUrl: originalContentUrl,
 		PreviewImageUrl:    previewImageUrl,
@@ -60,8 +60,8 @@ func (r *LineRequest) NewLineVideoMessage(originalContentUrl, previewImageUrl st
 }
 
 // 音声メッセージを作成
-func (r *LineRequest) NewLineAudioMessage(originalContentUrl string, duration int) LineMessageType {
-	return LineMessageType{
+func (r *LineRequest) NewLineAudioMessage(originalContentUrl string, duration int) *LineMessageType {
+	return &LineMessageType{
 		Type:               "audio",
 		OriginalContentUrl: originalContentUrl,
 		Duration:           duration * 1000,
@@ -69,7 +69,7 @@ func (r *LineRequest) NewLineAudioMessage(originalContentUrl string, duration in
 }
 
 // LINEにメッセージを送信
-func (r *LineRequest) PushMessageBotInGroup(ctx context.Context, messages []LineMessageType) error {
+func (r *LineRequest) PushMessageBotInGroup(ctx context.Context, messages []*LineMessageType) error {
 	client := &http.Client{}
 	url := "https://api.line.me/v2/bot/message/push"
 	lineMessage := LineMessage{

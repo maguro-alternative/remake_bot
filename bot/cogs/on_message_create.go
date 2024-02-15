@@ -28,7 +28,10 @@ type Repository interface {
 func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.MessageCreate) {
 	var channel onMessageCreate.LineChannel
 	var lineMessageTypes []*line.LineMessageType
+	var imageUrls []string
 	var sendText string
+	var videoCount, voiceCount int
+
 	ctx := context.Background()
 	repo := onMessageCreate.NewRepository(h.DB)
 	channel, err := repo.GetLineChannel(ctx, vs.ChannelID)
@@ -93,25 +96,42 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	case discordgo.MessageTypeGuildMemberJoin:
 		sendText = vs.Message.Author.Username + "が参加しました。"
 	default:
-		sendText = vs.Message.Author.Username + "「 " + vs.Message.Content + " 」"
+		st, err := s.Channel(vs.ChannelID)
+		if err != nil {
+			return
+		}
+		sendText = st.Name+"にて、"+vs.Message.Author.Username
 	}
 
+	if vs.StickerItems != nil {
+		for _, sticker := range vs.StickerItems {
+			switch sticker.FormatType {
+			case 1:
+				imageUrls = append(imageUrls, "https://cdn.discordapp.com/stickers/"+sticker.ID+".png")
+			case 2:
+				imageUrls = append(imageUrls, "https://cdn.discordapp.com/stickers/"+sticker.ID+".apng")
+			case 4:
+				imageUrls = append(imageUrls, "https://cdn.discordapp.com/stickers/"+sticker.ID+".gif")
+			}
+		}
+	}
+
+	videoCount = 0
+	voiceCount = 0
 	for _, attachment := range vs.Message.Attachments {
 		extension := filepath.Ext(attachment.Filename)
 		fileNameNoExt := filepath.Base(attachment.Filename[:len(attachment.Filename)-len(extension)])
 		switch extension {
 		case ".png", ".jpg", ".jpeg", ".gif":
-			err = lineRequ.PushImageNotify(ctx, sendText, attachment.URL)
-			if err != nil {
-				return
-			}
+			imageUrls = append(imageUrls, attachment.URL)
 		case ".mp4", ".mov", ".avi", ".wmv", ".flv", ".webm":
 			st, err := s.Guild(vs.GuildID)
 			if err != nil {
 				return
 			}
 			lineMessageType := lineRequ.NewLineVideoMessage(attachment.URL, st.IconURL("512"))
-			lineMessageTypes = append(lineMessageTypes, &lineMessageType)
+			lineMessageTypes = append(lineMessageTypes, lineMessageType)
+			videoCount++
 		case ".mp3", ".wav", ".ogg", ".m4a":
 			tmpFile := os.TempDir()+"/"+attachment.Filename
 			tmpFileNotExt := os.TempDir()+"/"+fileNameNoExt
@@ -160,7 +180,36 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 				messsage.Attachments[0].URL,
 				audioLen,
 			)
-			lineMessageTypes = append(lineMessageTypes, &audio)
+			lineMessageTypes = append(lineMessageTypes, audio)
+			voiceCount++
+		}
+	}
+
+	if len(imageUrls) > 0 {
+		sendText += " 画像を" + strconv.Itoa(len(imageUrls)) + "枚、"
+	}
+	if videoCount > 0 {
+		sendText += " 動画を" + strconv.Itoa(videoCount) + "個、"
+	}
+	if voiceCount > 0 {
+		sendText += " 音声を" + strconv.Itoa(voiceCount) + "個、"
+	}
+	if len(imageUrls) > 0 || videoCount > 0 || voiceCount > 0 {
+		sendText += "送信しました。"
+	}
+
+	sendText += "「 " + vs.Message.Content + " 」"
+
+	for _, url := range imageUrls {
+		err = lineRequ.PushImageNotify(ctx, sendText, url)
+		if err != nil {
+			return
+		}
+	}
+	if len(lineMessageTypes) > 0 {
+		err = lineRequ.PushMessageBotInGroup(ctx, lineMessageTypes)
+		if err != nil {
+			return
 		}
 	}
 }

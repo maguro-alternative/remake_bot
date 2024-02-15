@@ -50,6 +50,7 @@ func (l *LineNotifySticker) Validate() error {
 	)
 }
 
+// LINE Notifyのリクエスト
 type LineNotifyCall struct {
 	c *http.Client
 	r *http.Request

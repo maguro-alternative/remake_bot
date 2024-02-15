@@ -49,8 +49,8 @@ func (r *Repository) InsertLineChannel(ctx context.Context, channelID string, gu
 	return err
 }
 
-func (r *Repository) GetLineNgType(ctx context.Context, guildID string) ([]string, error) {
-	var ngTypes []string
+func (r *Repository) GetLineNgType(ctx context.Context, guildID string) ([]int, error) {
+	var ngTypes []int
 	query := `
 		SELECT
 			type

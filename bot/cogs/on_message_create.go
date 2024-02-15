@@ -47,6 +47,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	} else if err != nil {
 		return
 	}
+	// チャンネルがNGの場合、またはBotメッセージでない場合は処理を終了
 	if channel.Ng || (!channel.BotMessage && vs.Author.Bot) {
 		return
 	}
@@ -84,6 +85,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 		lineBotDecrypt.LineNotifyToken,
 	)
 
+	// メッセージの種類によって処理を分岐
 	switch vs.ReferencedMessage.Type {
 	case discordgo.MessageTypeUserPremiumGuildSubscription:
 		sendText = vs.Message.Author.Username + "がサーバーブーストしました。"
@@ -103,6 +105,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 		sendText = st.Name+"にて、"+vs.Message.Author.Username
 	}
 
+	// スタンプが送信さ送信されていた場合、画像URLを取得
 	if vs.StickerItems != nil {
 		for _, sticker := range vs.StickerItems {
 			switch sticker.FormatType {
@@ -118,6 +121,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 
 	videoCount = 0
 	voiceCount = 0
+	// 添付ファイルが送信されていた場合、LINE用に変換
 	for _, attachment := range vs.Message.Attachments {
 		extension := filepath.Ext(attachment.Filename)
 		fileNameNoExt := filepath.Base(attachment.Filename[:len(attachment.Filename)-len(extension)])
@@ -200,12 +204,14 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 
 	sendText += "「 " + vs.Message.Content + " 」"
 
+	// LINEに送信
 	for _, url := range imageUrls {
 		err = lineRequ.PushImageNotify(ctx, sendText, url)
 		if err != nil {
 			return
 		}
 	}
+	// 動画、音声を送信
 	if len(lineMessageTypes) > 0 {
 		err = lineRequ.PushMessageBotInGroup(ctx, lineMessageTypes)
 		if err != nil {

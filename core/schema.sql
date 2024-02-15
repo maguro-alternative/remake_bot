@@ -5,15 +5,13 @@
 
     guild_id (TEXT PRIMARY KEY): サーバーID
     type (TEXT): 権限の種類 (line, line_bot, vc, webhook)
-    permission_code (TEXT): DIscord上での権限コード
-    permission (TEXT): 権限レベル
+    code (TEXT): Discord上での権限コード
 */
 CREATE TABLE IF NOT EXISTS permissions_code (
     guild_id TEXT NOT NULL,
     type TEXT NOT NULL,
-    permission_code TEXT NOT NULL,
-    permission TEXT NOT NULL,
-    PRIMARY KEY(guild_id)
+    code TEXT NOT NULL,
+    PRIMARY KEY(guild_id, type)
 );
 
 /*

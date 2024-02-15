@@ -7,6 +7,8 @@ import (
 )
 
 type Fixture struct {
+	PermissionsCodes []*PermissionsCode
+
 	DBv1 db.Driver
 }
 

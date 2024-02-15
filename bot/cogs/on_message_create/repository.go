@@ -23,7 +23,7 @@ func (r *Repository) GetLineChannel(ctx context.Context, channelID string) (Line
 			ng,
 			bot_message
 		FROM
-			line_channels
+			line_channel
 		WHERE
 			channel_id = $1
 	`
@@ -33,7 +33,7 @@ func (r *Repository) GetLineChannel(ctx context.Context, channelID string) (Line
 
 func (r *Repository) InsertLineChannel(ctx context.Context, channelID string, guildID string) error {
 	query := `
-		INSERT INTO line_channels (
+		INSERT INTO line_channel (
 			channel_id,
 			guild_id,
 			ng,
@@ -55,7 +55,7 @@ func (r *Repository) GetLineNgType(ctx context.Context, guildID string) ([]strin
 		SELECT
 			type
 		FROM
-			line_ng_types
+			line_ng_type
 		WHERE
 			guild_id = $1
 	`

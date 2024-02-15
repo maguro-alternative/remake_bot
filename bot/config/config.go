@@ -40,3 +40,50 @@ func PrivateKey() string {
 func DiscordBotToken() string {
 	return cfg.DiscordBotToken
 }
+
+func DatabaseName() string {
+	return cfg.DBName
+}
+
+func DatabaseUser() string {
+	return cfg.DBUser
+}
+
+func DatabasePassword() string {
+	return cfg.DBPassword
+}
+
+func DatabaseHost() string {
+	return cfg.DBHost
+}
+
+func DatabasePort() string {
+	return cfg.DBPort
+}
+
+func DatabaseURL() string {
+	return fmt.Sprintf("%s://%s:%s/%s?user=%s&password=%s&sslmode=disable", cfg.DBName, cfg.DBHost, cfg.DBPort, cfg.DBName, cfg.DBUser, cfg.DBPassword)
+}
+
+func DatabaseURLWithUserAndPassword() string {
+	return fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable", DatabaseUser(), DatabasePassword(), DatabaseName(), DatabaseHost(), DatabasePort())
+}
+
+func DatabaseURLWithoutUserAndPassword() string {
+	return fmt.Sprintf("dbname=%s host=%s port=%s sslmode=disable", DatabaseName(), DatabaseHost(), DatabasePort())
+}
+
+func DatabaseURLWithoutUserAndPasswordForMigration() string {
+	return fmt.Sprintf("dbname=%s host=%s port=%s sslmode=disable", "postgres", "localhost", "5432")
+}
+
+func DatabaseURLWithUserAndPasswordForMigration() string {
+	return fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable", "postgres", "", "postgres", "localhost", "5432")
+}
+
+func DatabaseURLForMigration() string {
+	if DatabaseUser() == "" && DatabasePassword() == "" {
+		return DatabaseURLWithoutUserAndPasswordForMigration()
+	}
+	return DatabaseURLWithUserAndPasswordForMigration()
+}

@@ -20,13 +20,13 @@ func (r *Repository) GetLineBots(ctx context.Context) ([]*LineBot, error) {
 	var lineBots []*LineBot
 	query := `
 		SELECT
+			guild_id,
 			line_notify_token,
 			line_bot_token,
 			line_bot_secret,
 			line_group_id,
 			line_client_id,
 			line_client_sercret,
-			iv,
 			default_channel_id,
 			debug_mode
 		FROM
@@ -43,9 +43,24 @@ func (r *Repository) GetLineBots(ctx context.Context) ([]*LineBot, error) {
 			line_client_id IS NOT NULL
 		AND
 			line_client_sercret IS NOT NULL
-		AND
-			iv IS NOT NULL
 	`
 	err := r.db.SelectContext(ctx, &lineBots, query)
 	return lineBots, err
+}
+
+func (r *Repository) GetLineBotIv(ctx context.Context, guildID string) (LineBotIv, error) {
+	var lineBotIv LineBotIv
+	query := `
+		SELECT
+			line_notify_token_iv,
+			line_bot_token_iv,
+			line_bot_secret_iv,
+			line_group_id_iv
+		FROM
+			line_bot_iv
+		WHERE
+			guild_id = $1
+	`
+	err := r.db.GetContext(ctx, &lineBotIv, query, guildID)
+	return lineBotIv, err
 }

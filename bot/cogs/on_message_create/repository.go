@@ -96,3 +96,20 @@ func (r *Repository) GetLineBot(ctx context.Context, guildID string) (LineBot, e
 	err := r.db.GetContext(ctx, &lineBot, query, guildID)
 	return lineBot, err
 }
+
+func (r *Repository) GetLineBotIv(ctx context.Context, guildID string) (LineBotIv, error) {
+	var lineBotIv LineBotIv
+	query := `
+		SELECT
+			line_notify_token_iv,
+			line_bot_token_iv,
+			line_bot_secret_iv,
+			line_group_id_iv
+		FROM
+			line_bot
+		WHERE
+			guild_id = $1
+	`
+	err := r.db.GetContext(ctx, &lineBotIv, query, guildID)
+	return lineBotIv, err
+}

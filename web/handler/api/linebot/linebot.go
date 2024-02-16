@@ -18,6 +18,7 @@ import (
 
 type Repository interface {
 	GetLineBots(ctx context.Context) ([]*internal.LineBot, error)
+	GetLineBotIvs(ctx context.Context) ([]*internal.LineBotIv, error)
 }
 
 // A LineBotHandler handles requests for the line bot.
@@ -39,6 +40,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var lineResponses LineResponses
+	var lineBotDecrypt *internal.LineBotDecrypt
+	var lineBotIv internal.LineBotIv
 	// 暗号化キーの取得
 	privateKey := config.PrivateKey()
 	ctx := r.Context()
@@ -61,12 +64,24 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// リクエストボディの検証
-	lineBotDecrypt, err := internal.LineHmac(privateKey, requestBodyByte, lineBots, r.Header.Get("X-Line-Signature"))
-	if err != nil {
-		log.Println("Failed to Load Request")
-		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
-		return
+	for _, lineBot := range lineBots {
+		lineBotIv, err = repo.GetLineBotIv(ctx, lineBot.GuildID)
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
+		}
+		// リクエストボディの検証
+		lineBotDecrypt, err = internal.LineHmac(privateKey, requestBodyByte, *lineBot, lineBotIv, r.Header.Get("X-Line-Signature"))
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
+		}
+		// 署名が一致した場合はループを抜ける
+		if lineBotDecrypt != nil {
+			break
+		}
 	}
 
 	// リクエストボディのバイトから構造体への変換
@@ -125,6 +140,11 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		// 画像の種類の取得
 		imageType, err := magicNumberRead(imageContent.Content)
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
+		}
 		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\n ",
@@ -147,6 +167,11 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if videoContent.ContentLength <= 25000000 {
 			// 動画の種類の取得
 			videoType, err := magicNumberRead(videoContent.Content)
+			if err != nil {
+				log.Println("Failed to Load Request")
+				http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+				return
+			}
 			_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
 				lineBotDecrypt.DefaultChannelID,
 				lineProfile.DisplayName+"\n ",
@@ -202,6 +227,11 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		// 音声の種類の取得
 		audioType, err := magicNumberRead(audioContent.Content)
+		if err != nil {
+			log.Println("Failed to Load Request")
+			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			return
+		}
 		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\n ",

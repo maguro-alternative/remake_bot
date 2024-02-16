@@ -7,6 +7,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/bot/config"
 	"github.com/maguro-alternative/remake_bot/fixtures"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
+	//"github.com/maguro-alternative/remake_bot/pkg/crypto"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -116,7 +117,15 @@ func TestGetLineBot(t *testing.T) {
 			lb.LineBotToken = []byte("123456789")
 			lb.LineBotSecret = []byte("123456789")
 			lb.LineGroupID = []byte("987654321")
-			lb.Iv = []byte("123456789")
+			lb.DefaultChannelID = "987654321"
+			lb.DebugMode = false
+		}),
+		fixtures.NewLineBot(ctx, func(lb *fixtures.LineBot) {
+			lb.GuildID = "123456789"
+			lb.LineNotifyToken = []byte("testnotifytoken")
+			lb.LineBotToken = []byte("testbottoken")
+			lb.LineBotSecret = []byte("testbotsecret")
+			lb.LineGroupID = []byte("testgroupid")
 			lb.DefaultChannelID = "987654321"
 			lb.DebugMode = false
 		}),
@@ -129,7 +138,17 @@ func TestGetLineBot(t *testing.T) {
 		assert.Equal(t, []byte("123456789"), lineBot.LineBotToken)
 		assert.Equal(t, []byte("123456789"), lineBot.LineBotSecret)
 		assert.Equal(t, []byte("987654321"), lineBot.LineGroupID)
-		assert.Equal(t, []byte("123456789"), lineBot.Iv)
+		assert.Equal(t, "987654321", lineBot.DefaultChannelID)
+		assert.Equal(t, false, lineBot.DebugMode)
+	})
+
+	t.Run("GuildIDからLineBotを取得できること", func(t *testing.T) {
+		lineBot, err := repo.GetLineBot(ctx, "987654321")
+		assert.NoError(t, err)
+		assert.Equal(t, []byte("123456789"), lineBot.LineNotifyToken)
+		assert.Equal(t, []byte("123456789"), lineBot.LineBotToken)
+		assert.Equal(t, []byte("123456789"), lineBot.LineBotSecret)
+		assert.Equal(t, []byte("987654321"), lineBot.LineGroupID)
 		assert.Equal(t, "987654321", lineBot.DefaultChannelID)
 		assert.Equal(t, false, lineBot.DebugMode)
 	})

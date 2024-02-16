@@ -55,21 +55,25 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	if err != nil {
 		return
 	}
+	lineBotIv, err := repo.GetLineBotIv(ctx, vs.GuildID)
+	if err != nil {
+		return
+	}
 	var lineBotDecrypt onMessageCreate.LineBotDecrypt
 	// 暗号化キーのバイトへの変換
 	keyBytes, err := hex.DecodeString(config.PrivateKey())
 	if err != nil {
 		return
 	}
-	lineNotifyTokenByte, err := crypto.Decrypt(lineBotApi.LineNotifyToken, keyBytes, lineBotApi.Iv)
+	lineNotifyTokenByte, err := crypto.Decrypt(lineBotApi.LineNotifyToken, keyBytes, lineBotIv.LineNotifyTokenIv)
 	if err != nil {
 		return
 	}
-	lineBotTokenByte, err := crypto.Decrypt(lineBotApi.LineBotToken, keyBytes, lineBotApi.Iv)
+	lineBotTokenByte, err := crypto.Decrypt(lineBotApi.LineBotToken, keyBytes, lineBotIv.LineBotTokenIv)
 	if err != nil {
 		return
 	}
-	lineGroupByte, err := crypto.Decrypt(lineBotApi.LineGroupID, keyBytes, lineBotApi.Iv)
+	lineGroupByte, err := crypto.Decrypt(lineBotApi.LineGroupID, keyBytes, lineBotIv.LineGroupIDIv)
 	if err != nil {
 		return
 	}

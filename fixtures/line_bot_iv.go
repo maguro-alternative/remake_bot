@@ -6,7 +6,7 @@ import (
 )
 
 type LineBotIv struct {
-	GuildID          string `db:"guild_id"`
+	GuildID            string `db:"guild_id"`
 	LineNotifyTokenIv  []byte `db:"line_notify_token_iv"`
 	LineBotTokenIv     []byte `db:"line_bot_token_iv"`
 	LineBotSecretIv    []byte `db:"line_bot_secret_iv"`
@@ -17,7 +17,7 @@ type LineBotIv struct {
 
 func NewLineBotIv(ctx context.Context, setter ...func(b *LineBotIv)) *ModelConnector {
 	lineBotIv := &LineBotIv{
-		GuildID:          "1111111111111",
+		GuildID:            "1111111111111",
 		LineNotifyTokenIv:  []byte("1111111111111"),
 		LineBotTokenIv:     []byte("1111111111111"),
 		LineBotSecretIv:    []byte("1111111111111"),

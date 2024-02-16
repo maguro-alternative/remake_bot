@@ -15,7 +15,7 @@ import (
 var db *sqlx.DB // DBは*sql.DB型の変数、グローバル変数
 
 // RetryLimit はリトライする最大回数を指定します。
-const retryLimit = 3
+//const retryLimit = 3
 
 // RetryInterval はリトライの間隔を指定します（ミリ秒単位）。
 const retryInterval = 1 // 1秒

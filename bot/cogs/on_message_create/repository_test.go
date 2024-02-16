@@ -152,7 +152,7 @@ func TestGetLineBot(t *testing.T) {
 		assert.Equal(t, false, lineBot.DebugMode)
 	})
 
-	t.Run("GuildIDからLineBotを取得できること", func(t *testing.T) {
+	t.Run("GuildIDからLineBotを取得し、復号できること", func(t *testing.T) {
 		lineBot, err := repo.GetLineBot(ctx, "123456789")
 		assert.NoError(t, err)
 

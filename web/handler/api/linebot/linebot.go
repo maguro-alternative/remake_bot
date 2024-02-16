@@ -18,7 +18,7 @@ import (
 
 type Repository interface {
 	GetLineBots(ctx context.Context) ([]*internal.LineBot, error)
-	GetLineBotIvs(ctx context.Context) ([]*internal.LineBotIv, error)
+	GetLineBotIv(ctx context.Context) (internal.LineBotIv, error)
 }
 
 // A LineBotHandler handles requests for the line bot.
@@ -164,7 +164,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
 			return
 		}
-		if videoContent.ContentLength <= 25000000 {
+		if videoContent.ContentLength <= 25_000_000 {
 			// 動画の種類の取得
 			videoType, err := magicNumberRead(videoContent.Content)
 			if err != nil {

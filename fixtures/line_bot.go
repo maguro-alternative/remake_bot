@@ -41,7 +41,10 @@ func NewLineBot(ctx context.Context, setter ...func(b *LineBot)) *ModelConnector
 			f.LineBots = append(f.LineBots, lineBot)
 		},
 		connect: func(t *testing.T, f *Fixture, connectingModel interface{}) {
-			switch connectingModel.(type) {
+			switch connectingModel := connectingModel.(type) {
+			case *LineBotIv:
+				lineBotIv := connectingModel
+				lineBotIv.GuildID = lineBot.GuildID
 			default:
 				t.Fatalf("%T cannot be connected to %T", connectingModel, lineBot)
 			}

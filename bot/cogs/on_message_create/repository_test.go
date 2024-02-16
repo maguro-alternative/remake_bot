@@ -153,3 +153,34 @@ func TestGetLineBot(t *testing.T) {
 		assert.Equal(t, false, lineBot.DebugMode)
 	})
 }
+
+func TestGetLineBotIv(t *testing.T) {
+	ctx := context.Background()
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	assert.NoError(t, err)
+	defer cleanup()
+	tx, err := dbV1.BeginTxx(ctx, nil)
+	assert.NoError(t, err)
+
+	defer tx.RollbackCtx(ctx)
+
+	f := &fixtures.Fixture{DBv1: tx}
+	f.Build(t,
+		fixtures.NewLineBotIv(ctx, func(lbi *fixtures.LineBotIv) {
+			lbi.GuildID = "987654321"
+			lbi.LineNotifyTokenIv = []byte("123456789")
+			lbi.LineBotTokenIv = []byte("123456789")
+			lbi.LineBotSecretIv = []byte("123456789")
+			lbi.LineGroupIDIv = []byte("987654321")
+		}),
+	)
+	repo := NewRepository(tx)
+	t.Run("GuildIDからLineBotIvを取得できること", func(t *testing.T) {
+		lineBotIv, err := repo.GetLineBotIv(ctx, "987654321")
+		assert.NoError(t, err)
+		assert.Equal(t, []byte("123456789"), lineBotIv.LineNotifyTokenIv)
+		assert.Equal(t, []byte("123456789"), lineBotIv.LineBotTokenIv)
+		assert.Equal(t, []byte("123456789"), lineBotIv.LineBotSecretIv)
+		assert.Equal(t, []byte("987654321"), lineBotIv.LineGroupIDIv)
+	})
+}

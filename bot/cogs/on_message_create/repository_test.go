@@ -153,7 +153,7 @@ func TestGetLineBot(t *testing.T) {
 	})
 
 	t.Run("GuildIDからLineBotを取得できること", func(t *testing.T) {
-		lineBot, err := repo.GetLineBot(ctx, "987654321")
+		lineBot, err := repo.GetLineBot(ctx, "123456789")
 		assert.NoError(t, err)
 
 		notifyTokenDecrypted, err := crypto.Decrypt(lineBot.LineNotifyToken, key, []byte("fc18bf369f91199353d81b4530beb521"))

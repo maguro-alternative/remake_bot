@@ -2,12 +2,13 @@ package on_message_create
 
 import (
 	"context"
+	"encoding/hex"
 	"testing"
 
 	"github.com/maguro-alternative/remake_bot/bot/config"
 	"github.com/maguro-alternative/remake_bot/fixtures"
+	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
-	//"github.com/maguro-alternative/remake_bot/pkg/crypto"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -109,6 +110,15 @@ func TestGetLineBot(t *testing.T) {
 
 	defer tx.RollbackCtx(ctx)
 
+	keyString := "645E739A7F9F162725C1533DC2C5E827"
+	key, err := hex.DecodeString(keyString)
+	assert.NoError(t, err)
+
+	notifyToken := "testnotifytoken"
+	botToken := "testbottoken"
+	botSecret := "testbotsecret"
+	groupID := "testgroupid"
+
 	f := &fixtures.Fixture{DBv1: tx}
 	f.Build(t,
 		fixtures.NewLineBot(ctx, func(lb *fixtures.LineBot) {
@@ -122,10 +132,10 @@ func TestGetLineBot(t *testing.T) {
 		}),
 		fixtures.NewLineBot(ctx, func(lb *fixtures.LineBot) {
 			lb.GuildID = "123456789"
-			lb.LineNotifyToken = []byte("testnotifytoken")
-			lb.LineBotToken = []byte("testbottoken")
-			lb.LineBotSecret = []byte("testbotsecret")
-			lb.LineGroupID = []byte("testgroupid")
+			lb.LineNotifyToken = []byte("nTOK7MAo4X69eZu/0rg0Gw==")
+			lb.LineBotToken = []byte("uy2qtvYTnSoB5qIntwUdVQ==")
+			lb.LineBotSecret = []byte("i2uHQCyn58wRR/b03fRw6w==")
+			lb.LineGroupID = []byte("YgexFQQlLcaXmsw9mFN35Q==")
 			lb.DefaultChannelID = "987654321"
 			lb.DebugMode = false
 		}),
@@ -145,10 +155,20 @@ func TestGetLineBot(t *testing.T) {
 	t.Run("GuildIDからLineBotを取得できること", func(t *testing.T) {
 		lineBot, err := repo.GetLineBot(ctx, "987654321")
 		assert.NoError(t, err)
-		assert.Equal(t, []byte("123456789"), lineBot.LineNotifyToken)
-		assert.Equal(t, []byte("123456789"), lineBot.LineBotToken)
-		assert.Equal(t, []byte("123456789"), lineBot.LineBotSecret)
-		assert.Equal(t, []byte("987654321"), lineBot.LineGroupID)
+
+		notifyTokenDecrypted, err := crypto.Decrypt(lineBot.LineNotifyToken, key, []byte("fc18bf369f91199353d81b4530beb521"))
+		assert.NoError(t, err)
+		botTokenDecrypted, err := crypto.Decrypt(lineBot.LineBotToken, key, []byte("baeff317cb83ef55b193b6d3de194124"))
+		assert.NoError(t, err)
+		botSecretDecrypted, err := crypto.Decrypt(lineBot.LineBotSecret, key, []byte("0ffa8ed72efcb5f1d834e4ce8463a62c"))
+		assert.NoError(t, err)
+		groupIDDecrypted, err := crypto.Decrypt(lineBot.LineGroupID, key, []byte("e14db710b23520766fd652c0f19d437a"))
+		assert.NoError(t, err)
+
+		assert.Equal(t, notifyToken, string(notifyTokenDecrypted))
+		assert.Equal(t, botToken, string(botTokenDecrypted))
+		assert.Equal(t, botSecret, string(botSecretDecrypted))
+		assert.Equal(t, groupID, string(groupIDDecrypted))
 		assert.Equal(t, "987654321", lineBot.DefaultChannelID)
 		assert.Equal(t, false, lineBot.DebugMode)
 	})

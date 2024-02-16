@@ -13,7 +13,6 @@ type LineBot struct {
 	LineGroupID      []byte `db:"line_group_id"`
 	LineClientID     []byte `db:"line_client_id"`
 	LineClientSecret []byte `db:"line_client_secret"`
-	Iv               []byte `db:"iv"`
 	DefaultChannelID string `db:"default_channel_id"`
 	DebugMode        bool   `db:"debug_mode"`
 }
@@ -27,7 +26,6 @@ func NewLineBot(ctx context.Context, setter ...func(b *LineBot)) *ModelConnector
 		LineGroupID:      []byte("1111111111111"),
 		LineClientID:     []byte("1111111111111"),
 		LineClientSecret: []byte("1111111111111"),
-		Iv:               []byte("1111111111111"),
 		DefaultChannelID: "1111111111111",
 		DebugMode:        true,
 	}
@@ -58,7 +56,6 @@ func NewLineBot(ctx context.Context, setter ...func(b *LineBot)) *ModelConnector
 					line_group_id,
 					line_client_id,
 					line_client_secret,
-					iv,
 					default_channel_id,
 					debug_mode
 				) VALUES (
@@ -69,7 +66,6 @@ func NewLineBot(ctx context.Context, setter ...func(b *LineBot)) *ModelConnector
 					:line_group_id,
 					:line_client_id,
 					:line_client_secret,
-					:iv,
 					:default_channel_id,
 					:debug_mode
 				)

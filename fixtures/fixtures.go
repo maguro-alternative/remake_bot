@@ -13,6 +13,7 @@ type Fixture struct {
 	LineNgTypes        []*LineNgType
 	LineNgDiscordIDs   []*LineNgDiscordID
 	LineBots           []*LineBot
+	LineBotIvs         []*LineBotIv
 	VcSignalChannels   []*VcSignalChannel
 	VcSignalNgIDs      []*VcSignalNgID
 	VcSignalMentionIDs []*VcSignalMentionID

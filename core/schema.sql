@@ -178,8 +178,18 @@ CREATE TABLE IF NOT EXISTS line_bot (
     line_group_id BYTEA,
     line_client_id BYTEA,
     line_client_secret BYTEA,
-    iv BYTEA,
     default_channel_id TEXT,
     debug_mode BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY(guild_id)
+);
+
+CREATE TABLE IF NOT EXISTS line_bot_iv (
+    guild_id TEXT NOT NULL,
+    line_notify_token_iv BYTEA,
+    line_bot_token_iv BYTEA,
+    line_bot_secret_iv BYTEA,
+    line_group_id_iv BYTEA,
+    line_client_id_iv BYTEA,
+    line_client_secret_iv BYTEA,
     PRIMARY KEY(guild_id)
 );

@@ -98,10 +98,11 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	lineEvent := lineResponses.Events[0]
 
 	lineRequ := line.NewLineRequest(lineBotDecrypt.LineNotifyToken, lineBotDecrypt.LineBotToken, lineBotDecrypt.LineGroupID)
 	// ユーザー情報の取得
-	lineProfile, err := lineRequ.GetProfile(ctx, lineResponses.Events[0].Source.UserID)
+	lineProfile, err := lineRequ.GetProfile(ctx, lineEvent.Source.UserID)
 	if err != nil {
 		log.Println("Failed to Load Request")
 		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
@@ -109,7 +110,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// メッセージの種類によって処理を分岐
-	if lineResponses.Events[0].Type == "text" {
+	switch lineEvent.Type {
+	case "text":
 		_, err = h.IndexService.DiscordSession.ChannelMessageSend(
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\n「 "+lineResponses.Events[0].Message.Text+" 」",
@@ -119,8 +121,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
 			return
 		}
-	}
-	if lineResponses.Events[0].Type == "sticker" {
+	case "sticker":
 		_, err = h.IndexService.DiscordSession.ChannelMessageSend(
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\nスタンプを送信しました\nhttps://stickershop.line-scdn.net/stickershop/v1/sticker/"+lineResponses.Events[0].Message.StickerID+"/iPhone/sticker.png",
@@ -130,8 +131,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
 			return
 		}
-	}
-	if lineResponses.Events[0].Type == "image" {
+	case "image":
 		imageContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
 			log.Println("Failed to Load Request")
@@ -156,8 +156,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
 			return
 		}
-	}
-	if lineResponses.Events[0].Type == "video" {
+	case "video":
 		videoContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
 			log.Println("Failed to Load Request")
@@ -217,8 +216,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-	}
-	if lineResponses.Events[0].Type == "audio" {
+	case "audio":
 		audioContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
 			log.Println("Failed to Load Request")

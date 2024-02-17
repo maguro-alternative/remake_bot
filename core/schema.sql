@@ -193,3 +193,5 @@ CREATE TABLE IF NOT EXISTS line_bot_iv (
     line_client_secret_iv BYTEA,
     PRIMARY KEY(guild_id)
 );
+
+/*DROP TABLE IF EXISTS permission_code, permission_id, line_channel, line_ng_type, line_ng_discord_id, vc_signal_channel, vc_signal_ng_id, vc_signal_mention_id, webhook, webhook_mention, webhook_word, line_bot, line_bot_iv CASCADE;*/

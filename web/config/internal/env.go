@@ -1,6 +1,10 @@
 package internal
 
 type Config struct {
+	DiscordClientID     string `env:"DISCORD_CLIENT_ID" envDefault:""`
+	DiscordClientSecret string `env:"DISCORD_CLIENT_SECRET" envDefault:""`
+	DiscordCallbackUrl  string `env:"DISCORD_CALLBACK_URL" envDefault:""`
+	DiscordScopes       string `env:"DISCORD_SCOPES" envDefault:""`
 	PrivateKey          string `env:"PRIVATE_KEY" envDefault:""`
 	YouTubeAPIKey       string `env:"YOUTUBE_API_KEY" envDefault:""`
 	YoutubeAccessToken  string `env:"YOUTUBE_ACCESS_TOKEN" envDefault:""`

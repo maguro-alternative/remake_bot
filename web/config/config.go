@@ -33,6 +33,22 @@ func MustInit() {
 	}
 }
 
+func DiscordClientID() string {
+	return cfg.DiscordClientID
+}
+
+func DiscordClientSecret() string {
+	return cfg.DiscordClientSecret
+}
+
+func DiscordCallbackUrl() string {
+	return cfg.DiscordCallbackUrl
+}
+
+func DiscordScopes() string {
+	return cfg.DiscordScopes
+}
+
 func PrivateKey() string {
 	return cfg.PrivateKey
 }

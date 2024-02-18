@@ -56,6 +56,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (Bot *internal.LineBot, BotIv *internal.LineBotIv, err error) {
@@ -96,5 +97,8 @@ func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (B
 			return nil, nil, err
 		}
 	}
+	lineBot.GuildID = lineBotJson.GuildID
+	lineBot.DefaultChannelID = lineBotJson.DefaultChannelID
+	lineBot.DebugMode = lineBotJson.DebugMode
 	return lineBot, lineBotIv, nil
 }

@@ -28,7 +28,7 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	// これがない場合、エラーが発生する
 	gob.Register(&internal.DiscordUser{})
 	uuid := uuid.New().String()
-	session, err := h.DiscordOAuth2Service.CookieStore.Get(r, config.SessionName())
+	session, err := h.DiscordOAuth2Service.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
 		panic(err)
 	}

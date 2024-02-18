@@ -7,6 +7,7 @@ type Config struct {
 	DiscordScopes       string `env:"DISCORD_SCOPES" envDefault:""`
 	PrivateKey          string `env:"PRIVATE_KEY" envDefault:""`
 	SessionName         string `env:"SESSION_NAME" envDefault:""`
+	SessionSecret       string `env:"SESSION_SECRET" envDefault:""`
 	YouTubeAPIKey       string `env:"YOUTUBE_API_KEY" envDefault:""`
 	YoutubeAccessToken  string `env:"YOUTUBE_ACCESS_TOKEN" envDefault:""`
 	YoutubeClientID     string `env:"YOUTUBE_CLIENT_ID" envDefault:""`

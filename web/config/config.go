@@ -57,6 +57,10 @@ func SessionName() string {
 	return cfg.SessionName
 }
 
+func SessionSecret() string {
+	return cfg.SessionSecret
+}
+
 func YouTubeAPIKey() string {
 	return cfg.YouTubeAPIKey
 }

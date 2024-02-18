@@ -51,31 +51,31 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	repo := internal.NewRepository(h.IndexService.DB)
 	lineBots, err := repo.GetLineBots(ctx)
 	if err != nil {
-		log.Println("Failed to Load Request")
-		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+		log.Println("line_botの取得に失敗しました。")
+		http.Error(w, "line_botの取得に失敗しました。", http.StatusBadRequest)
 		return
 	}
 
 	// リクエストボディの読み込み
 	requestBodyByte, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Println("Failed to Load Request")
-		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+		log.Println("リクエストの読み込みに失敗しました。")
+		http.Error(w, "リクエストの読み込みに失敗しました。", http.StatusBadRequest)
 		return
 	}
 
 	for _, lineBot := range lineBots {
 		lineBotIv, err = repo.GetLineBotIv(ctx, lineBot.GuildID)
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("line_bot_ivの取得に失敗しました。")
+			http.Error(w, "line_bot_ivの取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
 		// リクエストボディの検証
 		lineBotDecrypt, err = internal.LineHmac(privateKey, requestBodyByte, *lineBot, lineBotIv, r.Header.Get("X-Line-Signature"))
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("署名の検証に失敗しました。")
+			http.Error(w, "署名の検証に失敗しました。", http.StatusBadRequest)
 			return
 		}
 		// 署名が一致した場合はループを抜ける
@@ -87,14 +87,14 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// リクエストボディのバイトから構造体への変換
 	err = json.Unmarshal(requestBodyByte, &lineResponses)
 	if err != nil {
-		log.Println("Failed to Load Request")
-		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+		log.Println("jsonの読み込みに失敗しました。")
+		http.Error(w, "jsonの読み込みに失敗しました。", http.StatusBadRequest)
 		return
 	}
 	// バリデーションチェック
 	if err := lineResponses.Validate(); err != nil {
-		log.Println("Failed to Load Request")
-		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+		log.Println("バリデーションチェックに失敗しました。")
+		http.Error(w, "バリデーションチェックに失敗しました。", http.StatusBadRequest)
 		return
 	}
 
@@ -104,8 +104,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// ユーザー情報の取得
 	lineProfile, err := lineRequ.GetProfile(ctx, lineEvent.Source.UserID)
 	if err != nil {
-		log.Println("Failed to Load Request")
-		http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+		log.Println("LINEユーザー情報の取得に失敗しました。")
+		http.Error(w, "LINEユーザー情報の取得に失敗しました。", http.StatusBadRequest)
 		return
 	}
 
@@ -117,8 +117,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			lineProfile.DisplayName+"\n「 "+lineResponses.Events[0].Message.Text+" 」",
 		)
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("discordへのメッセージ送信に失敗しました。")
+			http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
 			return
 		}
 	case "sticker":
@@ -127,22 +127,22 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			lineProfile.DisplayName+"\nスタンプを送信しました\nhttps://stickershop.line-scdn.net/stickershop/v1/sticker/"+lineResponses.Events[0].Message.StickerID+"/iPhone/sticker.png",
 		)
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("discordへのメッセージ送信に失敗しました。")
+			http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
 			return
 		}
 	case "image":
 		imageContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("LINE画像の取得に失敗しました。")
+			http.Error(w, "LINE画像の取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
 		// 画像の種類の取得
 		imageType, err := magicNumberRead(imageContent.Content)
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("マジックナンバーの取得に失敗しました。")
+			http.Error(w, "マジックナンバーの取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
 		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
@@ -152,23 +152,23 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			imageContent.Content,
 		)
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("discordへのメッセージ送信に失敗しました。")
+			http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
 			return
 		}
 	case "video":
 		videoContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("LINE動画の取得に失敗しました。")
+			http.Error(w, "LINE動画の取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
 		if videoContent.ContentLength <= 25_000_000 {
 			// 動画の種類の取得
 			videoType, err := magicNumberRead(videoContent.Content)
 			if err != nil {
-				log.Println("Failed to Load Request")
-				http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+				log.Println("マジックナンバーの取得に失敗しました。")
+				http.Error(w, "マジックナンバーの取得に失敗しました。", http.StatusBadRequest)
 				return
 			}
 			_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
@@ -178,8 +178,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				videoContent.Content,
 			)
 			if err != nil {
-				log.Println("Failed to Load Request")
-				http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+				log.Println("discordへのメッセージ送信に失敗しました。")
+				http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
 				return
 			}
 		} else {
@@ -202,8 +202,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				[]string{"LINE", "動画"},
 			)
 			if err != nil {
-				log.Println("Failed to Load Request")
-				http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+				log.Println("Youtubeへの動画アップロードに失敗しました。")
+				http.Error(w, "Youtubeへの動画アップロードに失敗しました。", http.StatusBadRequest)
 				return
 			}
 			_, err = h.IndexService.DiscordSession.ChannelMessageSend(
@@ -211,23 +211,23 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				lineProfile.DisplayName+"\nhttps://www.youtube.com/watch?v="+videoID,
 			)
 			if err != nil {
-				log.Println("Failed to Load Request")
-				http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+				log.Println("discordへのメッセージ送信に失敗しました。")
+				http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
 				return
 			}
 		}
 	case "audio":
 		audioContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("LINE音声の取得に失敗しました。")
+			http.Error(w, "LINE音声の取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
 		// 音声の種類の取得
 		audioType, err := magicNumberRead(audioContent.Content)
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("マジックナンバーの取得に失敗しました。")
+			http.Error(w, "マジックナンバーの取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
 		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
@@ -237,8 +237,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			audioContent.Content,
 		)
 		if err != nil {
-			log.Println("Failed to Load Request")
-			http.Error(w, "Failed to Load Request", http.StatusBadRequest)
+			log.Println("discordへのメッセージ送信に失敗しました。")
+			http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
 			return
 		}
 	}

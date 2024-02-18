@@ -31,6 +31,7 @@ func (g LineBotJson) Validate() error {
 }
 
 type LineBot struct {
+	GuildID          string `db:"guild_id"`
 	LineNotifyToken  []byte `db:"line_notify_token"`
 	LineBotToken     []byte `db:"line_bot_token"`
 	LineBotSecret    []byte `db:"line_bot_secret"`

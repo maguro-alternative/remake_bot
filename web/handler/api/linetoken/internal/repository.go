@@ -94,3 +94,55 @@ func (r *Repository) UpdateLineBotIv(ctx context.Context, lineBotIv *LineBotIv) 
 	_, err := r.db.NamedExecContext(ctx, query, lineBotIv)
 	return err
 }
+
+func (r *Repository) InsertLineBot(ctx context.Context, lineBot *LineBot)  error {
+	query := `
+		INSERT INTO line_bot (
+			guild_id,
+			line_notify_token,
+			line_bot_token,
+			line_bot_secret,
+			line_group_id,
+			line_client_id,
+			line_client_secret,
+			default_channel_id,
+			debug_mode
+		) VALUES (
+			:guild_id,
+			:line_notify_token,
+			:line_bot_token,
+			:line_bot_secret,
+			:line_group_id,
+			:line_client_id,
+			:line_client_secret,
+			:default_channel_id,
+			:debug_mode
+		)
+	`
+	_, err := r.db.NamedExecContext(ctx, query, lineBot)
+	return err
+}
+
+func (r *Repository) InsertLineBotIv(ctx context.Context, lineBotIv *LineBotIv) error {
+	query := `
+		INSERT INTO line_bot_iv (
+			guild_id,
+			line_notify_token_iv,
+			line_bot_token_iv,
+			line_bot_secret_iv,
+			line_group_id_iv,
+			line_client_id_iv,
+			line_client_secret_iv
+		) VALUES (
+			:guild_id,
+			:line_notify_token_iv,
+			:line_bot_token_iv,
+			:line_bot_secret_iv,
+			:line_group_id_iv,
+			:line_client_id_iv,
+			:line_client_secret_iv
+		)
+	`
+	_, err := r.db.NamedExecContext(ctx, query, lineBotIv)
+	return err
+}

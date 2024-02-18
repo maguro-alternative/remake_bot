@@ -33,6 +33,31 @@ func MustInit() {
 	}
 }
 
+func DatabaseName() string {
+	return cfg.DBName
+}
+
+func DatabaseUser() string {
+	return cfg.DBUser
+}
+
+func DatabasePassword() string {
+	return cfg.DBPassword
+}
+
+func DatabaseHost() string {
+	return cfg.DBHost
+}
+
+func DatabasePort() string {
+	return cfg.DBPort
+}
+
+func DatabaseURL() string {
+	return fmt.Sprintf("%s://%s:%s/%s?user=%s&password=%s&sslmode=disable", cfg.DBName, cfg.DBHost, cfg.DBPort, cfg.DBName, cfg.DBUser, cfg.DBPassword)
+}
+
+
 func DiscordClientID() string {
 	return cfg.DiscordClientID
 }

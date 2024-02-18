@@ -1,6 +1,11 @@
 package internal
 
 type Config struct {
+	DBName              string `env:"DB_NAME" envDefault:"postgres"`
+	DBUser              string `env:"DB_USER" envDefault:"postgres"`
+	DBPassword          string `env:"DB_PASSWORD" envDefault:""`
+	DBHost              string `env:"DB_HOST" envDefault:"localhost"`
+	DBPort              string `env:"DB_PORT" envDefault:"5432"`
 	DiscordClientID     string `env:"DISCORD_CLIENT_ID" envDefault:""`
 	DiscordClientSecret string `env:"DISCORD_CLIENT_SECRET" envDefault:""`
 	DiscordCallbackUrl  string `env:"DISCORD_CALLBACK_URL" envDefault:""`

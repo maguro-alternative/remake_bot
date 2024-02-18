@@ -66,7 +66,7 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 		assert.Equal(t, true, lineBot.DebugMode)
 	})
 
-	t.Run("LineBotが正しく更新されること", func(t *testing.T) {
+	t.Run("LineBotの1部分(notifyとbottoken)が正しく更新されること", func(t *testing.T) {
 		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
 		assert.NoError(t, err)
 		defer cleanup()
@@ -96,9 +96,6 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 			LineNotifyToken: []byte("987654321"),
 			LineBotToken: []byte("987654321"),
 			LineBotSecret: []byte("987654321"),
-			LineGroupID: []byte("123456789"),
-			LineClientID: []byte("123456789"),
-			LineClientSecret: []byte("123456789"),
 			DefaultChannelID: "123456789",
 			DebugMode: true,
 		}
@@ -112,9 +109,9 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 		assert.Equal(t, []byte("987654321"), lineBot.LineNotifyToken)
 		assert.Equal(t, []byte("987654321"), lineBot.LineBotToken)
 		assert.Equal(t, []byte("987654321"), lineBot.LineBotSecret)
-		assert.Equal(t, []byte("123456789"), lineBot.LineGroupID)
-		assert.Equal(t, []byte("123456789"), lineBot.LineClientID)
-		assert.Equal(t, []byte("123456789"), lineBot.LineClientSecret)
+		assert.Equal(t, []byte("987654321"), lineBot.LineGroupID)
+		assert.Equal(t, []byte("987654321"), lineBot.LineClientID)
+		assert.Equal(t, []byte("987654321"), lineBot.LineClientSecret)
 		assert.Equal(t, "123456789", lineBot.DefaultChannelID)
 		assert.Equal(t, true, lineBot.DebugMode)
 	})

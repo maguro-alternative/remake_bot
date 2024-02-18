@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
@@ -63,20 +62,27 @@ func (r *Repository) UpdateLineBot(ctx context.Context, lineBot *LineBot) error 
 
 func (r *Repository) UpdateLineBotIv(ctx context.Context, lineBotIv *LineBotIv) error {
 	var setNameQuery string
-	structTypeOf := reflect.TypeOf(lineBotIv)
+	var setQueryArray []string
 
-	// 受け取った構造体のフィールドのみを更新する
-	for i := 0; i < structTypeOf.NumField(); i++ {
-		field := structTypeOf.Field(i).Tag.Get("db")
-		if field == "" || field == "guild_id"{
-			continue
-		}
-		if i == structTypeOf.NumField()-1 {
-			setNameQuery += field + " = :" + field
-			continue
-		}
-		setNameQuery += field + " = :" + field + ","
+	if len(lineBotIv.LineNotifyTokenIv) > 0 {
+		setQueryArray = append(setQueryArray, "line_notify_token_iv = :line_notify_token_iv")
 	}
+	if len(lineBotIv.LineBotTokenIv) > 0 {
+		setQueryArray = append(setQueryArray, "line_bot_token_iv = :line_bot_token_iv")
+	}
+	if len(lineBotIv.LineBotSecretIv) > 0 {
+		setQueryArray = append(setQueryArray, "line_bot_secret_iv = :line_bot_secret_iv")
+	}
+	if len(lineBotIv.LineGroupIDIv) > 0 {
+		setQueryArray = append(setQueryArray, "line_group_id_iv = :line_group_id_iv")
+	}
+	if len(lineBotIv.LineClientIDIv) > 0 {
+		setQueryArray = append(setQueryArray, "line_client_id_iv = :line_client_id_iv")
+	}
+	if len(lineBotIv.LineClientSecretIv) > 0 {
+		setQueryArray = append(setQueryArray, "line_client_secret_iv = :line_client_secret_iv")
+	}
+	setNameQuery = strings.Join(setQueryArray, ",")
 	query := fmt.Sprintf(`
 		UPDATE
 			line_bot_iv

@@ -71,7 +71,6 @@ func (r *Repository) GetLineBot(ctx context.Context, guildID string) (LineBot, e
 			line_bot_token,
 			line_bot_secret,
 			line_group_id,
-			iv,
 			default_channel_id,
 			debug_mode
 		FROM
@@ -90,8 +89,6 @@ func (r *Repository) GetLineBot(ctx context.Context, guildID string) (LineBot, e
 			line_client_id IS NOT NULL
 		AND
 			line_client_sercret IS NOT NULL
-		AND
-			iv IS NOT NULL
 	`
 	err := r.db.GetContext(ctx, &lineBot, query, guildID)
 	return lineBot, err

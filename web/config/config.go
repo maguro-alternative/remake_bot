@@ -53,6 +53,10 @@ func PrivateKey() string {
 	return cfg.PrivateKey
 }
 
+func SessionName() string {
+	return cfg.SessionName
+}
+
 func YouTubeAPIKey() string {
 	return cfg.YouTubeAPIKey
 }

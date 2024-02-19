@@ -166,4 +166,48 @@ func TestRepository_UpdateLineBotIv(t *testing.T) {
 		assert.Equal(t, []byte("987654321"), lineBotIv.LineClientIDIv)
 		assert.Equal(t, []byte("987654321"), lineBotIv.LineClientSecretIv)
 	})
+
+	t.Run("LineBotのIVの1部分(notifyとbottoken)が正しく更新されること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewLineBotIv(ctx, func(lb *fixtures.LineBotIv) {
+				lb.GuildID = "987654321"
+				lb.LineNotifyTokenIv = []byte("123456789")
+				lb.LineBotTokenIv = []byte("123456789")
+				lb.LineBotSecretIv = []byte("123456789")
+				lb.LineGroupIDIv = []byte("123456789")
+				lb.LineClientIDIv = []byte("123456789")
+				lb.LineClientSecretIv = []byte("123456789")
+			}),
+		)
+
+		updateLineBotIv := &LineBotIv{
+			GuildID:           "987654321",
+			LineNotifyTokenIv: []byte("987654321"),
+			LineBotTokenIv:    []byte("987654321"),
+		}
+
+		repo := NewRepository(tx)
+		err = repo.UpdateLineBotIv(ctx, updateLineBotIv)
+		assert.NoError(t, err)
+
+		var lineBotIv LineBotIv
+		err = tx.GetContext(ctx, &lineBotIv, "SELECT * FROM line_bot_iv WHERE guild_id = $1", "987654321")
+		assert.NoError(t, err)
+		assert.Equal(t, "987654321", lineBotIv.GuildID)
+		assert.Equal(t, []byte("987654321"), lineBotIv.LineNotifyTokenIv)
+		assert.Equal(t, []byte("987654321"), lineBotIv.LineBotTokenIv)
+		assert.Equal(t, []byte("123456789"), lineBotIv.LineBotSecretIv)
+		assert.Equal(t, []byte("123456789"), lineBotIv.LineGroupIDIv)
+		assert.Equal(t, []byte("123456789"), lineBotIv.LineClientIDIv)
+		assert.Equal(t, []byte("123456789"), lineBotIv.LineClientSecretIv)
+	})
 }

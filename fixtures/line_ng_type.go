@@ -7,12 +7,14 @@ import (
 
 type LineNgType struct {
 	ChannelID string `db:"channel_id"`
+	GuildID   string `db:"guild_id"`
 	Type      int    `db:"type"`
 }
 
 func NewLineNgType(ctx context.Context, setter ...func(b *LineNgType)) *ModelConnector {
 	lineNgType := &LineNgType{
 		ChannelID: "1111111111111",
+		GuildID:   "2222222222222",
 		Type:      6,
 	}
 
@@ -36,9 +38,11 @@ func NewLineNgType(ctx context.Context, setter ...func(b *LineNgType)) *ModelCon
 			_, err := f.DBv1.NamedExecContext(ctx, `
 				INSERT INTO line_ng_type (
 					channel_id,
+					guild_id,
 					type
 				) VALUES (
 					:channel_id,
+					:guild_id,
 					:type
 				)
 			`, lineNgType)

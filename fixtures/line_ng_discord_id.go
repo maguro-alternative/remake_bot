@@ -6,16 +6,18 @@ import (
 )
 
 type LineNgDiscordID struct {
-	GuildID string `db:"guild_id"`
-	IDType  string `db:"id_type"`
-	ID      string `db:"id"`
+	ChannelID string `db:"channel_id"`
+	GuildID   string `db:"guild_id"`
+	IDType    string `db:"id_type"`
+	ID        string `db:"id"`
 }
 
 func NewLineNgDiscordID(ctx context.Context, setter ...func(b *LineNgDiscordID)) *ModelConnector {
 	lineNgDiscordID := &LineNgDiscordID{
-		GuildID: "1111111111111",
-		IDType:  "user",
-		ID:      "1111111111111",
+		ChannelID: "1111111111111",
+		GuildID:   "1111111111111",
+		IDType:    "user",
+		ID:        "1111111111111",
 	}
 
 	return &ModelConnector{
@@ -37,10 +39,12 @@ func NewLineNgDiscordID(ctx context.Context, setter ...func(b *LineNgDiscordID))
 		insertTable: func(t *testing.T, f *Fixture) {
 			_, err := f.DBv1.NamedExecContext(ctx, `
 				INSERT INTO line_ng_discord_id (
+					channel_id,
 					guild_id,
 					id_type,
 					id
 				) VALUES (
+					:channel_id,
 					:guild_id,
 					:id_type,
 					:id

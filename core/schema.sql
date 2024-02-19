@@ -57,13 +57,15 @@ LINEへ送信しないメッセージの種類を保存するテーブル
 
 カラム:
 
+    channel_id (TEXT PRIMARY KEY): チャンネルID
     guild_id (TEXT PRIMARY KEY): サーバーID
     type (INTEGER PRIMARY KEY): メッセージの種類(ピン止め、スレッド、スレッドの返信)
 */
 CREATE TABLE IF NOT EXISTS line_ng_type (
+    channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     type INTEGER NOT NULL,
-    PRIMARY KEY(guild_id, type)
+    PRIMARY KEY(channel_id, type)
 );
 
 /*
@@ -71,15 +73,17 @@ LINEへ送信しないDiscordユーザー、ロールを保存するテーブル
 
 カラム:
 
+    channel_id (TEXT): チャンネルID
     guild_id (TEXT PRIMARY KEY): サーバーID
     id (TEXT PRIMARY KEY): ID
     id_type (TEXT PRIMARY KEY): ユーザーIDの種類 (user, role)
 */
 CREATE TABLE IF NOT EXISTS line_ng_discord_id (
+    channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     id TEXT NOT NULL,
     id_type TEXT NOT NULL,
-    PRIMARY KEY(guild_id, id)
+    PRIMARY KEY(channel_id, id)
 );
 
 /*

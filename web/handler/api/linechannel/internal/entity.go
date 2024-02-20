@@ -9,11 +9,11 @@ type LineChannelJson struct {
 	GuildID  string `json:"guild_id"`
 	Channels []struct {
 		ChannelID  string   `json:"channel_id"`
-		NG         bool     `json:"ng"`
+		Ng         bool     `json:"ng"`
 		BotMessage bool     `json:"bot_message"`
-		NGTypes    []string `json:"ng_types"`
-		NGUsers    []string `json:"ng_users"`
-		NGRoles    []string `json:"ng_roles"`
+		NgTypes    []string `json:"ng_types"`
+		NgUsers    []string `json:"ng_users"`
+		NgRoles    []string `json:"ng_roles"`
 	} `json:"channels"`
 }
 
@@ -27,7 +27,7 @@ func (g LineChannelJson) Validate() error {
 type LineChannel struct {
 	ChannelID  string `db:"channel_id"`
 	GuildID    string `db:"guild_id"`
-	NG         bool   `db:"ng"`
+	Ng         bool   `db:"ng"`
 	BotMessage bool   `db:"bot_message"`
 }
 

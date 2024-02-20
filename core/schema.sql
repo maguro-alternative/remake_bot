@@ -61,7 +61,7 @@ LINEへ送信しないメッセージの種類を保存するテーブル
     guild_id (TEXT PRIMARY KEY): サーバーID
     type (INTEGER PRIMARY KEY): メッセージの種類(ピン止め、スレッド、スレッドの返信)
 */
-CREATE TABLE IF NOT EXISTS line_ng_type (
+CREATE TABLE IF NOT EXISTS line_ng_discord_message_type (
     channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     type INTEGER NOT NULL,
@@ -198,4 +198,4 @@ CREATE TABLE IF NOT EXISTS line_bot_iv (
     PRIMARY KEY(guild_id)
 );
 
-/*DROP TABLE IF EXISTS permission_code, permission_id, line_post_discord_channel, line_ng_type, line_ng_discord_id, vc_signal_channel, vc_signal_ng_id, vc_signal_mention_id, webhook, webhook_mention, webhook_word, line_bot, line_bot_iv CASCADE;*/
+/*DROP TABLE IF EXISTS permission_code, permission_id, line_post_discord_channel, line_ng_discord_message_type, line_ng_discord_id, vc_signal_channel, vc_signal_ng_id, vc_signal_mention_id, webhook, webhook_mention, webhook_word, line_bot, line_bot_iv CASCADE;*/

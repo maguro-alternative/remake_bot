@@ -44,7 +44,7 @@ func (r *Repository) UpdateLineChannel(ctx context.Context, lineChannel []LineCh
 
 func (r *Repository) InsertLineNgTypes(ctx context.Context, lineNgTypes []LineNgType) error {
 	query := `
-		INSERT INTO line_ng_type (
+		INSERT INTO line_ng_discord_message_type (
 			channel_id,
 			guild_id,
 			type
@@ -71,7 +71,7 @@ func (r *Repository) DeleteNotInsertLineNgTypes(ctx context.Context, lineNgTypes
 	// INSERT されるもの以外を削除
 	query := fmt.Sprintf(`
 	DELETE FROM
-		line_ng_type
+		line_ng_discord_message_type
 	WHERE NOT EXISTS (
 		SELECT
 			*
@@ -81,8 +81,8 @@ func (r *Repository) DeleteNotInsertLineNgTypes(ctx context.Context, lineNgTypes
 					%s
 			) AS t(channel_id, guild_id, type) ON CONFLICT (channel_id, type) DO NOTHING
 		WHERE
-			line_ng_type.channel_id = t.channel_id AND
-			line_ng_type.type = t.type
+			line_ng_discord_message_type.channel_id = t.channel_id AND
+			line_ng_discord_message_type.type = t.type
 	)
 	`, strings.Join(values, ","))
 	_, err := r.db.ExecContext(ctx, query)

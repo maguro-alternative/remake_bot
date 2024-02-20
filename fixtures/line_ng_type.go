@@ -36,7 +36,7 @@ func NewLineNgType(ctx context.Context, setter ...func(b *LineNgType)) *ModelCon
 		},
 		insertTable: func(t *testing.T, f *Fixture) {
 			_, err := f.DBv1.NamedExecContext(ctx, `
-				INSERT INTO line_ng_type (
+				INSERT INTO line_ng_discord_message_type (
 					channel_id,
 					guild_id,
 					type

@@ -55,7 +55,7 @@ func (r *Repository) GetLineNgType(ctx context.Context, guildID string) ([]int, 
 		SELECT
 			type
 		FROM
-			line_ng_type
+			line_ng_discord_message_type
 		WHERE
 			guild_id = $1
 	`

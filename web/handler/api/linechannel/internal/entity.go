@@ -11,7 +11,7 @@ type LineChannelJson struct {
 		ChannelID  string   `json:"channel_id"`
 		Ng         bool     `json:"ng"`
 		BotMessage bool     `json:"bot_message"`
-		NgTypes    []string `json:"ng_types"`
+		NgTypes    []int    `json:"ng_types"`
 		NgUsers    []string `json:"ng_users"`
 		NgRoles    []string `json:"ng_roles"`
 	} `json:"channels"`
@@ -34,7 +34,7 @@ type LineChannel struct {
 type LineNgType struct {
 	ChannelID string `db:"channel_id"`
 	GuildID   string `db:"guild_id"`
-	Type      string `db:"type"`
+	Type      int    `db:"type"`
 }
 
 type LineNgID struct {

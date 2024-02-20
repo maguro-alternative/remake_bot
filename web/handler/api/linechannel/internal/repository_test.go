@@ -13,7 +13,7 @@ import (
 
 func TestRepository_UpdateLineBot(t *testing.T) {
 	ctx := context.Background()
-	t.Run("LineBotが正しく更新されること", func(t *testing.T) {
+	t.Run("Channelが正しく更新されること", func(t *testing.T) {
 		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
 		assert.NoError(t, err)
 		defer cleanup()
@@ -33,15 +33,13 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		updateLineChannels := []LineChannel{
-			{
+		updateLineChannel := LineChannel{
 				ChannelID:  "123456789",
 				GuildID:    "987654321",
 				Ng:         true,
 				BotMessage: true,
-			},
 		}
-		err = repo.UpdateLineChannel(ctx, updateLineChannels)
+		err = repo.UpdateLinePostDiscordChannel(ctx, updateLineChannel)
 		assert.NoError(t, err)
 
 		var lineChannel LineChannel

@@ -18,31 +18,21 @@ func NewRepository(db db.Driver) *Repository {
 	}
 }
 
-func (r *Repository) UpdateLineChannel(ctx context.Context, lineChannel []LineChannel) error {
-	var setNameQuery string
-	var setQueryArray []string
-
-	if len(lineChannel) > 0 {
-		setQueryArray = append(setQueryArray, "ng = :ng")
-	}
-	if len(lineChannel) > 0 {
-		setQueryArray = append(setQueryArray, "bot_message = :bot_message")
-	}
-	setNameQuery = strings.Join(setQueryArray, ",")
-
-	query := fmt.Sprintf(`
+func (r *Repository) UpdateLinePostDiscordChannel(ctx context.Context, lineChannel LineChannel) error {
+	query := `
 		UPDATE
 			line_post_discord_channel
 		SET
-			%s
+			ng = :ng,
+			bot_message = :bot_message
 		WHERE
 			channel_id = :channel_id
-	`, setNameQuery)
+	`
 	_, err := r.db.NamedExecContext(ctx, query, lineChannel)
 	return err
 }
 
-func (r *Repository) InsertLineNgTypes(ctx context.Context, lineNgTypes []LineNgType) error {
+func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgTypes []LineNgType) error {
 	query := `
 		INSERT INTO line_ng_discord_message_type (
 			channel_id,
@@ -63,7 +53,7 @@ func (r *Repository) InsertLineNgTypes(ctx context.Context, lineNgTypes []LineNg
 	return nil
 }
 
-func (r *Repository) DeleteNotInsertLineNgTypes(ctx context.Context, lineNgTypes []LineNgType) error {
+func (r *Repository) DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgTypes []LineNgType) error {
 	var values []string
 	for _, lineNgType := range lineNgTypes {
 		values = append(values, fmt.Sprintf("('%s', '%s', %s)", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.Type))
@@ -89,7 +79,7 @@ func (r *Repository) DeleteNotInsertLineNgTypes(ctx context.Context, lineNgTypes
 	return err
 }
 
-func (r *Repository) InsertLineNgIDs(ctx context.Context, lineNgIDs []LineNgID) error {
+func (r *Repository) InsertLineNgDiscordIDs(ctx context.Context, lineNgIDs []LineNgID) error {
 	query := `
 		INSERT INTO line_ng_id (
 			channel_id,
@@ -112,7 +102,7 @@ func (r *Repository) InsertLineNgIDs(ctx context.Context, lineNgIDs []LineNgID) 
 	return nil
 }
 
-func (r *Repository) DeleteNotInsertLineNgIDs(ctx context.Context, lineNgIDs []LineNgID) error {
+func (r *Repository) DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNgIDs []LineNgID) error {
 	var values []string
 	for _, lineNgType := range lineNgIDs {
 		values = append(values, fmt.Sprintf("('%s', '%s', '%s', '%s')", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.ID, lineNgType.IDType))

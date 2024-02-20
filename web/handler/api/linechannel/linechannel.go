@@ -43,28 +43,30 @@ func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	repo := internal.NewRepository(h.IndexService.DB)
 	lineChannels, lineNgTypes, lineNgIDs := lineChannelJsonRead(lineChannelJson)
 
-	if err := repo.UpdateLineChannel(ctx, lineChannels); err != nil {
-		http.Error(w, "DB更新に失敗しました。", http.StatusInternalServerError)
+	for _, lineChannel := range lineChannels {
+		if err := repo.UpdateLinePostDiscordChannel(ctx, lineChannel); err != nil {
+			http.Error(w, "line_post_discord_channel更新に失敗しました。", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if err := repo.InsertLineNgDiscordMessageTypes(ctx, lineNgTypes); err != nil {
+		http.Error(w, "line_ng_discord_message_type更新に失敗しました。", http.StatusInternalServerError)
 		return
 	}
 
-	if err := repo.InsertLineNgTypes(ctx, lineNgTypes); err != nil {
-		http.Error(w, "DB更新に失敗しました。", http.StatusInternalServerError)
+	if err := repo.DeleteNotInsertLineNgDiscordMessageTypes(ctx, lineNgTypes); err != nil {
+		http.Error(w, "line_ng_discord_message_type更新に失敗しました。", http.StatusInternalServerError)
 		return
 	}
 
-	if err := repo.DeleteNotInsertLineNgIDs(ctx, lineNgIDs); err != nil {
-		http.Error(w, "DB更新に失敗しました。", http.StatusInternalServerError)
+	if err := repo.InsertLineNgDiscordIDs(ctx, lineNgIDs); err != nil {
+		http.Error(w, "line_ng_discord_id更新に失敗しました。", http.StatusInternalServerError)
 		return
 	}
 
-	if err := repo.InsertLineNgIDs(ctx, lineNgIDs); err != nil {
-		http.Error(w, "DB更新に失敗しました。", http.StatusInternalServerError)
-		return
-	}
-
-	if err := repo.DeleteNotInsertLineNgIDs(ctx, lineNgIDs); err != nil {
-		http.Error(w, "DB更新に失敗しました。", http.StatusInternalServerError)
+	if err := repo.DeleteNotInsertLineNgDiscordIDs(ctx, lineNgIDs); err != nil {
+		http.Error(w, "line_ng_discord_id更新に失敗しました。", http.StatusInternalServerError)
 		return
 	}
 

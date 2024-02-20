@@ -56,7 +56,7 @@ func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNg
 func (r *Repository) DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgTypes []LineNgType) error {
 	var values []string
 	for _, lineNgType := range lineNgTypes {
-		values = append(values, fmt.Sprintf("('%s', '%s', %s)", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.Type))
+		values = append(values, fmt.Sprintf("('%s', '%s', %d)", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.Type))
 	}
 	// INSERT されるもの以外を削除
 	query := fmt.Sprintf(`

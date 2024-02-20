@@ -45,7 +45,7 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 		assert.NoError(t, err)
 
 		var lineChannel LineChannel
-		err = tx.GetContext(ctx, &lineChannel, "SELECT * FROM line_channel WHERE channel_id = $1", "123456789")
+		err = tx.GetContext(ctx, &lineChannel, "SELECT * FROM line_post_discord_channel WHERE channel_id = $1", "123456789")
 		assert.NoError(t, err)
 
 		assert.Equal(t, "123456789", lineChannel.ChannelID)

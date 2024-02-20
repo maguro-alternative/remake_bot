@@ -32,7 +32,7 @@ func (r *Repository) UpdateLineChannel(ctx context.Context, lineChannel []LineCh
 
 	query := fmt.Sprintf(`
 		UPDATE
-			line_channel
+			line_post_discord_channel
 		SET
 			%s
 		WHERE

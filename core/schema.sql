@@ -44,7 +44,7 @@ DiscordからLINEへのメッセージ送信設定を保存するテーブル
     ng (BOOLEAN): 送信NGのチャンネルか
     bot_message (BOOLEAN): Botのメッセージを送信するか
 */
-CREATE TABLE IF NOT EXISTS line_channel (
+CREATE TABLE IF NOT EXISTS line_post_discord_channel (
     channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     ng BOOLEAN NOT NULL,
@@ -198,4 +198,4 @@ CREATE TABLE IF NOT EXISTS line_bot_iv (
     PRIMARY KEY(guild_id)
 );
 
-/*DROP TABLE IF EXISTS permission_code, permission_id, line_channel, line_ng_type, line_ng_discord_id, vc_signal_channel, vc_signal_ng_id, vc_signal_mention_id, webhook, webhook_mention, webhook_word, line_bot, line_bot_iv CASCADE;*/
+/*DROP TABLE IF EXISTS permission_code, permission_id, line_post_discord_channel, line_ng_type, line_ng_discord_id, vc_signal_channel, vc_signal_ng_id, vc_signal_mention_id, webhook, webhook_mention, webhook_word, line_bot, line_bot_iv CASCADE;*/

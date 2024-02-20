@@ -23,7 +23,7 @@ func (r *Repository) GetLineChannel(ctx context.Context, channelID string) (Line
 			ng,
 			bot_message
 		FROM
-			line_channel
+			line_post_discord_channel
 		WHERE
 			channel_id = $1
 	`
@@ -33,7 +33,7 @@ func (r *Repository) GetLineChannel(ctx context.Context, channelID string) (Line
 
 func (r *Repository) InsertLineChannel(ctx context.Context, channelID string, guildID string) error {
 	query := `
-		INSERT INTO line_channel (
+		INSERT INTO line_post_discord_channel (
 			channel_id,
 			guild_id,
 			ng,

@@ -61,7 +61,7 @@ func TestInsertLineChannel(t *testing.T) {
 			SELECT
 				*
 			FROM
-				line_channel
+				line_post_discord_channel
 			WHERE
 				channel_id = $1
 		`

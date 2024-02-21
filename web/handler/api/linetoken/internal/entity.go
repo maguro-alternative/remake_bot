@@ -3,6 +3,7 @@ package internal
 import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
+	"github.com/lib/pq"
 )
 
 type LineBotJson struct {
@@ -31,23 +32,23 @@ func (g LineBotJson) Validate() error {
 }
 
 type LineBot struct {
-	GuildID          string `db:"guild_id"`
-	LineNotifyToken  []byte `db:"line_notify_token"`
-	LineBotToken     []byte `db:"line_bot_token"`
-	LineBotSecret    []byte `db:"line_bot_secret"`
-	LineGroupID      []byte `db:"line_group_id"`
-	LineClientID     []byte `db:"line_client_id"`
-	LineClientSecret []byte `db:"line_client_secret"`
-	DefaultChannelID string `db:"default_channel_id"`
-	DebugMode        bool   `db:"debug_mode"`
+	GuildID          string        `db:"guild_id"`
+	LineNotifyToken  pq.ByteaArray `db:"line_notify_token"`
+	LineBotToken     pq.ByteaArray `db:"line_bot_token"`
+	LineBotSecret    pq.ByteaArray `db:"line_bot_secret"`
+	LineGroupID      pq.ByteaArray `db:"line_group_id"`
+	LineClientID     pq.ByteaArray `db:"line_client_id"`
+	LineClientSecret pq.ByteaArray `db:"line_client_secret"`
+	DefaultChannelID string        `db:"default_channel_id"`
+	DebugMode        bool          `db:"debug_mode"`
 }
 
 type LineBotIv struct {
-	GuildID            string `db:"guild_id"`
-	LineNotifyTokenIv  []byte `db:"line_notify_token_iv"`
-	LineBotTokenIv     []byte `db:"line_bot_token_iv"`
-	LineBotSecretIv    []byte `db:"line_bot_secret_iv"`
-	LineGroupIDIv      []byte `db:"line_group_id_iv"`
-	LineClientIDIv     []byte `db:"line_client_id_iv"`
-	LineClientSecretIv []byte `db:"line_client_secret_iv"`
+	GuildID            string        `db:"guild_id"`
+	LineNotifyTokenIv  pq.ByteaArray `db:"line_notify_token_iv"`
+	LineBotTokenIv     pq.ByteaArray `db:"line_bot_token_iv"`
+	LineBotSecretIv    pq.ByteaArray `db:"line_bot_secret_iv"`
+	LineGroupIDIv      pq.ByteaArray `db:"line_group_id_iv"`
+	LineClientIDIv     pq.ByteaArray `db:"line_client_id_iv"`
+	LineClientSecretIv pq.ByteaArray `db:"line_client_secret_iv"`
 }

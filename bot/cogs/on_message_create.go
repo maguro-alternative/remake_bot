@@ -2,12 +2,13 @@ package cogs
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/hex"
-	"os/exec"
-	"os"
 	"io"
-	"path/filepath"
 	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strconv"
 
@@ -65,15 +66,41 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	if err != nil {
 		return
 	}
-	lineNotifyTokenByte, err := crypto.Decrypt(lineBotApi.LineNotifyToken, keyBytes, lineBotIv.LineNotifyTokenIv)
+
+	decodeNotifyToken, err := hex.DecodeString(string(lineBotIv.LineNotifyTokenIv[0]))
 	if err != nil {
 		return
 	}
-	lineBotTokenByte, err := crypto.Decrypt(lineBotApi.LineBotToken, keyBytes, lineBotIv.LineBotTokenIv)
+	decodeBotToken, err := hex.DecodeString(string(lineBotIv.LineBotTokenIv[0]))
 	if err != nil {
 		return
 	}
-	lineGroupByte, err := crypto.Decrypt(lineBotApi.LineGroupID, keyBytes, lineBotIv.LineGroupIDIv)
+	decodeGroupID, err := hex.DecodeString(string(lineBotIv.LineGroupIDIv[0]))
+	if err != nil {
+		return
+	}
+	lineNotifyStr, err := base64.StdEncoding.DecodeString(string(lineBotApi.LineNotifyToken[0]))
+	if err != nil {
+		return
+	}
+	lineBotTokenStr, err := base64.StdEncoding.DecodeString(string(lineBotApi.LineBotToken[0]))
+	if err != nil {
+		return
+	}
+	lineGroupStr, err := base64.StdEncoding.DecodeString(string(lineBotApi.LineGroupID[0]))
+	if err != nil {
+		return
+	}
+
+	lineNotifyTokenByte, err := crypto.Decrypt(lineNotifyStr, keyBytes, decodeNotifyToken)
+	if err != nil {
+		return
+	}
+	lineBotTokenByte, err := crypto.Decrypt(lineBotTokenStr, keyBytes, decodeBotToken)
+	if err != nil {
+		return
+	}
+	lineGroupByte, err := crypto.Decrypt(lineGroupStr, keyBytes, decodeGroupID)
 	if err != nil {
 		return
 	}
@@ -106,7 +133,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 		if err != nil {
 			return
 		}
-		sendText = st.Name+"にて、"+vs.Message.Author.Username
+		sendText = st.Name + "にて、" + vs.Message.Author.Username
 	}
 
 	// スタンプが送信されていた場合、画像URLを取得
@@ -141,8 +168,8 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 			lineMessageTypes = append(lineMessageTypes, lineMessageType)
 			videoCount++
 		case ".mp3", ".wav", ".ogg", ".m4a":
-			tmpFile := os.TempDir()+"/"+attachment.Filename
-			tmpFileNotExt := os.TempDir()+"/"+fileNameNoExt
+			tmpFile := os.TempDir() + "/" + attachment.Filename
+			tmpFileNotExt := os.TempDir() + "/" + fileNameNoExt
 			downloadFilePath, err := downloadFile(tmpFile, attachment.URL)
 			if err != nil {
 				return
@@ -153,7 +180,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 					return
 				}
 			}
-			f, err := os.Open(tmpFileNotExt+".m4a")
+			f, err := os.Open(tmpFileNotExt + ".m4a")
 			if err != nil {
 				return
 			}

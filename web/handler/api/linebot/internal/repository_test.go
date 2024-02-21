@@ -9,6 +9,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/lib/pq"
 )
 
 func TestRepository_UpdateLineBot(t *testing.T) {
@@ -25,10 +26,10 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 	f.Build(t,
 		fixtures.NewLineBot(ctx, func(lb *fixtures.LineBot) {
 			lb.GuildID = "987654321"
-			lb.LineNotifyToken = []byte("123456789")
-			lb.LineBotToken = []byte("123456789")
-			lb.LineBotSecret = []byte("123456789")
-			lb.LineGroupID = []byte("987654321")
+			lb.LineNotifyToken = pq.ByteaArray{[]byte("123456789")}
+			lb.LineBotToken = pq.ByteaArray{[]byte("123456789")}
+			lb.LineBotSecret = pq.ByteaArray{[]byte("123456789")}
+			lb.LineGroupID = pq.ByteaArray{[]byte("987654321")}
 			lb.DefaultChannelID = "987654321"
 			lb.DebugMode = false
 		}),
@@ -63,10 +64,10 @@ func TestRepository_GetLineBotIv(t *testing.T) {
 	f.Build(t,
 		fixtures.NewLineBotIv(ctx, func(lbi *fixtures.LineBotIv) {
 			lbi.GuildID = "987654321"
-			lbi.LineNotifyTokenIv = []byte("123456789")
-			lbi.LineBotTokenIv = []byte("123456789")
-			lbi.LineBotSecretIv = []byte("123456789")
-			lbi.LineGroupIDIv = []byte("987654321")
+			lbi.LineNotifyTokenIv = pq.ByteaArray{[]byte("123456789")}
+			lbi.LineBotTokenIv = pq.ByteaArray{[]byte("123456789")}
+			lbi.LineBotSecretIv = pq.ByteaArray{[]byte("123456789")}
+			lbi.LineGroupIDIv = pq.ByteaArray{[]byte("987654321")}
 		}),
 	)
 	repo := NewRepository(tx)

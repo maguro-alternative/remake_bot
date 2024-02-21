@@ -207,10 +207,10 @@ func TestGetLineBotIv(t *testing.T) {
 	f.Build(t,
 		fixtures.NewLineBotIv(ctx, func(lbi *fixtures.LineBotIv) {
 			lbi.GuildID = "987654321"
-			lbi.LineNotifyTokenIv = []byte("123456789")
-			lbi.LineBotTokenIv = []byte("123456789")
-			lbi.LineBotSecretIv = []byte("123456789")
-			lbi.LineGroupIDIv = []byte("987654321")
+			lbi.LineNotifyTokenIv = pq.ByteaArray{[]byte("123456789")}
+			lbi.LineBotTokenIv = pq.ByteaArray{[]byte("123456789")}
+			lbi.LineBotSecretIv = pq.ByteaArray{[]byte("123456789")}
+			lbi.LineGroupIDIv = pq.ByteaArray{[]byte("987654321")}
 		}),
 	)
 	repo := NewRepository(tx)

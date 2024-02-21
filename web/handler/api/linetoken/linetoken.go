@@ -68,32 +68,32 @@ func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (B
 	}
 	// 暗号化
 	if len(lineBot.LineNotifyToken) > 0 {
-		if lineBot.LineNotifyToken, lineBotIv.LineNotifyTokenIv, err = crypto.Encrypt([]byte(lineBotJson.LineNotifyToken), key); err != nil {
+		if lineBot.LineNotifyToken[0], lineBotIv.LineNotifyTokenIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineNotifyToken), key); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBot.LineBotToken) > 0 {
-		if lineBot.LineBotToken, lineBotIv.LineBotTokenIv, err = crypto.Encrypt([]byte(lineBotJson.LineBotToken), key); err != nil {
+		if lineBot.LineBotToken[0], lineBotIv.LineBotTokenIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotToken), key); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBot.LineBotSecret) > 0 {
-		if lineBot.LineBotSecret, lineBotIv.LineBotSecretIv, err = crypto.Encrypt([]byte(lineBotJson.LineBotSecret), key) ; err != nil {
+		if lineBot.LineBotSecret[0], lineBotIv.LineBotSecretIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotSecret), key) ; err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBot.LineGroupID) > 0 {
-		if lineBot.LineGroupID, lineBotIv.LineGroupIDIv, err = crypto.Encrypt([]byte(lineBotJson.LineGroupID), key); err != nil {
+		if lineBot.LineGroupID[0], lineBotIv.LineGroupIDIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineGroupID), key); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBot.LineClientID) > 0 {
-		if lineBot.LineClientID, lineBotIv.LineClientIDIv, err = crypto.Encrypt([]byte(lineBotJson.LineClientID), key); err != nil {
+		if lineBot.LineClientID[0], lineBotIv.LineClientIDIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineClientID), key); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBot.LineClientSecret) > 0 {
-		if lineBot.LineClientSecret, lineBotIv.LineClientSecretIv, err = crypto.Encrypt([]byte(lineBotJson.LineClientSecret), key); err != nil {
+		if lineBot.LineClientSecret[0], lineBotIv.LineClientSecretIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineClientSecret), key); err != nil {
 			return nil, nil, err
 		}
 	}

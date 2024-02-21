@@ -17,8 +17,41 @@ func LineHmac(privateKey string, requestBodyByte []byte, lineBot LineBot, lineBo
 		return nil, err
 	}
 
+	decodeBotSecret, err := hex.DecodeString(string(lineBotIv.LineBotSecretIv[0]))
+	if err != nil {
+		return nil, err
+	}
+	decodeNotifyToken, err := hex.DecodeString(string(lineBotIv.LineNotifyTokenIv[0]))
+	if err != nil {
+		return
+	}
+	decodeBotToken, err := hex.DecodeString(string(lineBotIv.LineBotTokenIv[0]))
+	if err != nil {
+		return
+	}
+	decodeGroupID, err := hex.DecodeString(string(lineBotIv.LineGroupIDIv[0]))
+	if err != nil {
+		return
+	}
+	lineBotSecretStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineBotSecret[0]))
+	if err != nil {
+		return nil, err
+	}
+	lineNotifyStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineNotifyToken[0]))
+	if err != nil {
+		return
+	}
+	lineBotTokenStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineBotToken[0]))
+	if err != nil {
+		return
+	}
+	lineGroupStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineGroupID[0]))
+	if err != nil {
+		return
+	}
+
 	// 暗号化されたシークレットキーの復号化
-	sercretKey, err := crypto.Decrypt(lineBot.LineBotSecret, keyBytes, lineBotIv.LineBotSecretIv)
+	sercretKey, err := crypto.Decrypt(lineBotSecretStr, keyBytes, decodeBotSecret)
 	if err != nil {
 		return nil, err
 	}
@@ -34,15 +67,15 @@ func LineHmac(privateKey string, requestBodyByte []byte, lineBot LineBot, lineBo
 	if header != signature {
 		return nil, nil
 	}
-	lineNotifyTokenByte, err := crypto.Decrypt(lineBot.LineNotifyToken, keyBytes, lineBotIv.LineNotifyTokenIv)
+	lineNotifyTokenByte, err := crypto.Decrypt(lineNotifyStr, keyBytes, decodeNotifyToken)
 	if err != nil {
 		return nil, err
 	}
-	lineBotTokenByte, err := crypto.Decrypt(lineBot.LineBotToken, keyBytes, lineBotIv.LineBotTokenIv)
+	lineBotTokenByte, err := crypto.Decrypt(lineBotTokenStr, keyBytes, decodeBotToken)
 	if err != nil {
 		return nil, err
 	}
-	lineGroupByte, err := crypto.Decrypt(lineBot.LineGroupID, keyBytes, lineBotIv.LineGroupIDIv)
+	lineGroupByte, err := crypto.Decrypt(lineGroupStr, keyBytes, decodeGroupID)
 	if err != nil {
 		return nil, err
 	}

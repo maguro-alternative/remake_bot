@@ -49,14 +49,14 @@ func NewWebhook(ctx context.Context, setter ...func(b *Webhook)) *ModelConnector
 		insertTable: func(t *testing.T, f *Fixture) {
 			_, err := f.DBv1.NamedExecContext(ctx, `
 				INSERT INTO webhook (
-					id,
+					webhook_serial_id,
 					guild_id,
 					webhook_id,
 					subscription_type,
 					subscription_id,
 					last_posted_at
 				) VALUES (
-					:id,
+					:webhook_serial_id,
 					:guild_id,
 					:webhook_id,
 					:subscription_type,

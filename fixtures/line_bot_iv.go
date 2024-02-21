@@ -3,27 +3,29 @@ package fixtures
 import (
 	"context"
 	"testing"
+
+	"github.com/lib/pq"
 )
 
 type LineBotIv struct {
 	GuildID            string `db:"guild_id"`
-	LineNotifyTokenIv  []byte `db:"line_notify_token_iv"`
-	LineBotTokenIv     []byte `db:"line_bot_token_iv"`
-	LineBotSecretIv    []byte `db:"line_bot_secret_iv"`
-	LineGroupIDIv      []byte `db:"line_group_id_iv"`
-	LineClientIDIv     []byte `db:"line_client_id_iv"`
-	LineClientSecretIv []byte `db:"line_client_secret_iv"`
+	LineNotifyTokenIv  pq.ByteaArray `db:"line_notify_token_iv"`
+	LineBotTokenIv     pq.ByteaArray `db:"line_bot_token_iv"`
+	LineBotSecretIv    pq.ByteaArray `db:"line_bot_secret_iv"`
+	LineGroupIDIv      pq.ByteaArray `db:"line_group_id_iv"`
+	LineClientIDIv     pq.ByteaArray `db:"line_client_id_iv"`
+	LineClientSecretIv pq.ByteaArray `db:"line_client_secret_iv"`
 }
 
 func NewLineBotIv(ctx context.Context, setter ...func(b *LineBotIv)) *ModelConnector {
 	lineBotIv := &LineBotIv{
 		GuildID:            "1111111111111",
-		LineNotifyTokenIv:  []byte("1111111111111"),
-		LineBotTokenIv:     []byte("1111111111111"),
-		LineBotSecretIv:    []byte("1111111111111"),
-		LineGroupIDIv:      []byte("1111111111111"),
-		LineClientIDIv:     []byte("1111111111111"),
-		LineClientSecretIv: []byte("1111111111111"),
+		LineNotifyTokenIv:  pq.ByteaArray{[]byte("1111111111111")},
+		LineBotTokenIv:     pq.ByteaArray{[]byte("1111111111111")},
+		LineBotSecretIv:    pq.ByteaArray{[]byte("1111111111111")},
+		LineGroupIDIv:      pq.ByteaArray{[]byte("1111111111111")},
+		LineClientIDIv:     pq.ByteaArray{[]byte("1111111111111")},
+		LineClientSecretIv: pq.ByteaArray{[]byte("1111111111111")},
 	}
 
 	return &ModelConnector{

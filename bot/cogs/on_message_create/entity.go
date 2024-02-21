@@ -1,5 +1,9 @@
 package on_message_create
 
+import (
+	"github.com/lib/pq"
+)
+
 type TestLineChannel struct {
 	ChannelID  string `db:"channel_id"`
 	GuildID    string `db:"guild_id"`
@@ -13,19 +17,19 @@ type LineChannel struct {
 }
 
 type LineBot struct {
-	LineNotifyToken  []byte `db:"line_notify_token"`
-	LineBotToken     []byte `db:"line_bot_token"`
-	LineBotSecret    []byte `db:"line_bot_secret"`
-	LineGroupID      []byte `db:"line_group_id"`
+	LineNotifyToken  pq.ByteaArray `db:"line_notify_token"`
+	LineBotToken     pq.ByteaArray `db:"line_bot_token"`
+	LineBotSecret    pq.ByteaArray `db:"line_bot_secret"`
+	LineGroupID      pq.ByteaArray `db:"line_group_id"`
 	DefaultChannelID string `db:"default_channel_id"`
 	DebugMode        bool   `db:"debug_mode"`
 }
 
 type LineBotIv struct {
-	LineNotifyTokenIv  []byte `db:"line_notify_token_iv"`
-	LineBotTokenIv     []byte `db:"line_bot_token_iv"`
-	LineBotSecretIv    []byte `db:"line_bot_secret_iv"`
-	LineGroupIDIv      []byte `db:"line_group_id_iv"`
+	LineNotifyTokenIv  pq.ByteaArray `db:"line_notify_token_iv"`
+	LineBotTokenIv     pq.ByteaArray `db:"line_bot_token_iv"`
+	LineBotSecretIv    pq.ByteaArray `db:"line_bot_secret_iv"`
+	LineGroupIDIv      pq.ByteaArray `db:"line_group_id_iv"`
 }
 
 type LineBotDecrypt struct {

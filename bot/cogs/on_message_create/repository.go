@@ -49,7 +49,7 @@ func (r *Repository) InsertLineChannel(ctx context.Context, channelID string, gu
 	return err
 }
 
-func (r *Repository) GetLineNgType(ctx context.Context, guildID string) ([]int, error) {
+func (r *Repository) GetLineNgType(ctx context.Context, channelID string) ([]int, error) {
 	var ngTypes []int
 	query := `
 		SELECT
@@ -57,9 +57,9 @@ func (r *Repository) GetLineNgType(ctx context.Context, guildID string) ([]int, 
 		FROM
 			line_ng_discord_message_type
 		WHERE
-			guild_id = $1
+			channel_id = $1
 	`
-	err := r.db.GetContext(ctx, &ngTypes, query, guildID)
+	err := r.db.SelectContext(ctx, &ngTypes, query, channelID)
 	return ngTypes, err
 }
 
@@ -85,10 +85,6 @@ func (r *Repository) GetLineBot(ctx context.Context, guildID string) (LineBot, e
 			line_bot_secret IS NOT NULL
 		AND
 			line_group_id IS NOT NULL
-		AND
-			line_client_id IS NOT NULL
-		AND
-			line_client_sercret IS NOT NULL
 	`
 	err := r.db.GetContext(ctx, &lineBot, query, guildID)
 	return lineBot, err

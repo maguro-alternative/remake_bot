@@ -2,6 +2,7 @@ package on_message_create
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/hex"
 	"testing"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 
+	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,7 +55,7 @@ func TestInsertLineChannel(t *testing.T) {
 
 	repo := NewRepository(tx)
 
-	var channel TestLineChannel
+	var channels []TestLineChannel
 	t.Run("ChannelIDを追加できること", func(t *testing.T) {
 		err := repo.InsertLineChannel(ctx, "123456789", "987654321")
 		assert.NoError(t, err)
@@ -65,13 +67,13 @@ func TestInsertLineChannel(t *testing.T) {
 			WHERE
 				channel_id = $1
 		`
-		err = tx.SelectContext(ctx, &channel, query, "123456789")
+		err = tx.SelectContext(ctx, &channels, query, "123456789")
 		assert.NoError(t, err)
 
-		assert.Equal(t, "123456789", channel.ChannelID)
-		assert.Equal(t, "987654321", channel.GuildID)
-		assert.Equal(t, false, channel.Ng)
-		assert.Equal(t, false, channel.BotMessage)
+		assert.Equal(t, "123456789", channels[0].ChannelID)
+		assert.Equal(t, "987654321", channels[0].GuildID)
+		assert.Equal(t, false, channels[0].Ng)
+		assert.Equal(t, false, channels[0].BotMessage)
 	})
 }
 
@@ -123,19 +125,19 @@ func TestGetLineBot(t *testing.T) {
 	f.Build(t,
 		fixtures.NewLineBot(ctx, func(lb *fixtures.LineBot) {
 			lb.GuildID = "987654321"
-			lb.LineNotifyToken = []byte("123456789")
-			lb.LineBotToken = []byte("123456789")
-			lb.LineBotSecret = []byte("123456789")
-			lb.LineGroupID = []byte("987654321")
+			lb.LineNotifyToken = pq.ByteaArray{[]byte("123456789")}
+			lb.LineBotToken = pq.ByteaArray{[]byte("123456789")}
+			lb.LineBotSecret = pq.ByteaArray{[]byte("123456789")}
+			lb.LineGroupID = pq.ByteaArray{[]byte("987654321")}
 			lb.DefaultChannelID = "987654321"
 			lb.DebugMode = false
 		}),
 		fixtures.NewLineBot(ctx, func(lb *fixtures.LineBot) {
 			lb.GuildID = "123456789"
-			lb.LineNotifyToken = []byte("nTOK7MAo4X69eZu/0rg0Gw==")
-			lb.LineBotToken = []byte("uy2qtvYTnSoB5qIntwUdVQ==")
-			lb.LineBotSecret = []byte("i2uHQCyn58wRR/b03fRw6w==")
-			lb.LineGroupID = []byte("YgexFQQlLcaXmsw9mFN35Q==")
+			lb.LineNotifyToken = pq.ByteaArray{[]byte("X+P6kmO6DnEjM3TVqXkwNA==")}//95 227 250 146 99 186 14 113 35 51 116 213 169 121 48 52
+			lb.LineBotToken = pq.ByteaArray{[]byte("uy2qtvYTnSoB5qIntwUdVQ==")}
+			lb.LineBotSecret = pq.ByteaArray{[]byte("i2uHQCyn58wRR/b03fRw6w==")}
+			lb.LineGroupID = pq.ByteaArray{[]byte("YgexFQQlLcaXmsw9mFN35Q==")}
 			lb.DefaultChannelID = "987654321"
 			lb.DebugMode = false
 		}),
@@ -144,10 +146,10 @@ func TestGetLineBot(t *testing.T) {
 	t.Run("GuildIDからLineBotを取得できること", func(t *testing.T) {
 		lineBot, err := repo.GetLineBot(ctx, "987654321")
 		assert.NoError(t, err)
-		assert.Equal(t, []byte("123456789"), lineBot.LineNotifyToken)
-		assert.Equal(t, []byte("123456789"), lineBot.LineBotToken)
-		assert.Equal(t, []byte("123456789"), lineBot.LineBotSecret)
-		assert.Equal(t, []byte("987654321"), lineBot.LineGroupID)
+		assert.Equal(t, []byte("123456789"), lineBot.LineNotifyToken[0])
+		assert.Equal(t, []byte("123456789"), lineBot.LineBotToken[0])
+		assert.Equal(t, []byte("123456789"), lineBot.LineBotSecret[0])
+		assert.Equal(t, []byte("987654321"), lineBot.LineGroupID[0])
 		assert.Equal(t, "987654321", lineBot.DefaultChannelID)
 		assert.Equal(t, false, lineBot.DebugMode)
 	})
@@ -156,13 +158,30 @@ func TestGetLineBot(t *testing.T) {
 		lineBot, err := repo.GetLineBot(ctx, "123456789")
 		assert.NoError(t, err)
 
-		notifyTokenDecrypted, err := crypto.Decrypt(lineBot.LineNotifyToken, key, []byte("fc18bf369f91199353d81b4530beb521"))
+		decodeNotifyToken, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
 		assert.NoError(t, err)
-		botTokenDecrypted, err := crypto.Decrypt(lineBot.LineBotToken, key, []byte("baeff317cb83ef55b193b6d3de194124"))
+		lineNotifyStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineNotifyToken[0]))
 		assert.NoError(t, err)
-		botSecretDecrypted, err := crypto.Decrypt(lineBot.LineBotSecret, key, []byte("0ffa8ed72efcb5f1d834e4ce8463a62c"))
+		decodeBotToken, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
 		assert.NoError(t, err)
-		groupIDDecrypted, err := crypto.Decrypt(lineBot.LineGroupID, key, []byte("e14db710b23520766fd652c0f19d437a"))
+		lineBotStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineBotToken[0]))
+		assert.NoError(t, err)
+		decodeBotSecret, err := hex.DecodeString("0ffa8ed72efcb5f1d834e4ce8463a62c")
+		assert.NoError(t, err)
+		lineBotSecretStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineBotSecret[0]))
+		assert.NoError(t, err)
+		decodeGroupID, err := hex.DecodeString("e14db710b23520766fd652c0f19d437a")
+		assert.NoError(t, err)
+		lineGroupStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineGroupID[0]))
+		assert.NoError(t, err)
+
+		notifyTokenDecrypted, err := crypto.Decrypt(lineNotifyStr, key, decodeNotifyToken)
+		assert.NoError(t, err)
+		botTokenDecrypted, err := crypto.Decrypt(lineBotStr, key, decodeBotToken)
+		assert.NoError(t, err)
+		botSecretDecrypted, err := crypto.Decrypt(lineBotSecretStr, key, decodeBotSecret)
+		assert.NoError(t, err)
+		groupIDDecrypted, err := crypto.Decrypt(lineGroupStr, key, decodeGroupID)
 		assert.NoError(t, err)
 
 		assert.Equal(t, notifyToken, string(notifyTokenDecrypted))

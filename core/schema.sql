@@ -148,30 +148,30 @@ CREATE TABLE IF NOT EXISTS vc_signal_mention_id (
 );
 
 CREATE TABLE IF NOT EXISTS webhook (
-    id SERIAL PRIMARY KEY,
+    webhook_serial_id SERIAL,
     guild_id TEXT NOT NULL,
     webhook_id TEXT NOT NULL,
     subscription_type TEXT NOT NULL,
     subscription_id TEXT NOT NULL,
     last_posted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY(id)
+    PRIMARY KEY(webhook_serial_id)
 );
 
 CREATE TABLE IF NOT EXISTS webhook_mention (
-    webhook_serial_id INTEGER PRIMARY KEY,
+    webhook_serial_id INTEGER,
     id_type TEXT NOT NULL,
     id TEXT NOT NULL,
     PRIMARY KEY(webhook_serial_id, id),
-    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(id)
+    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id)
 );
 
 /*ng_or ng_and search_or search_and mention_or mention_and*/
 CREATE TABLE IF NOT EXISTS webhook_word (
-    id INTEGER PRIMARY KEY,
+    webhook_serial_id INTEGER,
     conditions TEXT NOT NULL,
     word TEXT NOT NULL,
-    PRIMARY KEY(id, word),
-    FOREIGN KEY(id) REFERENCES webhook(id)
+    PRIMARY KEY(webhook_serial_id, word),
+    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id)
 );
 
 CREATE TABLE IF NOT EXISTS line_bot (

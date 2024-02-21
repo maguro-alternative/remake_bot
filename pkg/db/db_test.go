@@ -62,7 +62,7 @@ func TestDB_Bytea(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Run("Bytea型のデータが正常に登録できること", func(t *testing.T) {
-		_, err := tx.ExecContext(ctx, "INSERT INTO bytea_table (bytea_column) VALUES ($1)", []byte{0x62, 0x79, 0x74, 0x65, 0x61})
+		_, err := tx.ExecContext(ctx, "INSERT INTO bytea_table (bytea_column) VALUES ($1)", []byte("bytea"))
 		assert.NoError(t, err)
 	})
 

@@ -3,15 +3,15 @@ package internal
 import "github.com/lib/pq"
 
 type LineBot struct {
-	GuildID           string        `db:"guild_id"`
-	LineNotifyToken   pq.ByteaArray `db:"line_notify_token"`
-	LineBotToken      pq.ByteaArray `db:"line_bot_token"`
-	LineBotSecret     pq.ByteaArray `db:"line_bot_secret"`
-	LineGroupID       pq.ByteaArray `db:"line_group_id"`
-	LineClientID      pq.ByteaArray `db:"line_client_id"`
-	LineClientSercret pq.ByteaArray `db:"line_client_sercret"`
-	DefaultChannelID  string        `db:"default_channel_id"`
-	DebugMode         bool          `db:"debug_mode"`
+	GuildID          string        `db:"guild_id"`
+	LineNotifyToken  pq.ByteaArray `db:"line_notify_token"`
+	LineBotToken     pq.ByteaArray `db:"line_bot_token"`
+	LineBotSecret    pq.ByteaArray `db:"line_bot_secret"`
+	LineGroupID      pq.ByteaArray `db:"line_group_id"`
+	LineClientID     pq.ByteaArray `db:"line_client_id"`
+	LineClientSecret pq.ByteaArray `db:"line_client_secret"`
+	DefaultChannelID string        `db:"default_channel_id"`
+	DebugMode        bool          `db:"debug_mode"`
 }
 
 type LineBotIv struct {

@@ -57,23 +57,20 @@ func (r *Repository) DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Contex
 	var values []string
 	for _, lineNgType := range lineNgTypes {
 		values = append(values, fmt.Sprintf("('%s', '%s', %d)", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.Type))
+		_, err := r.db.ExecContext(ctx, "DELETE FROM line_ng_discord_message_type WHERE channel_id = $1", lineNgType.ChannelID)
+		if err != nil {
+			return err
+		}
 	}
 	// INSERT されるもの以外を削除
 	query := fmt.Sprintf(`
-	DELETE FROM
-		line_ng_discord_message_type
-	WHERE NOT EXISTS (
-		SELECT
-			*
-		FROM
-			(
-				VALUES
-					%s
-			) AS t(channel_id, guild_id, type) ON CONFLICT (channel_id, type) DO NOTHING
-		WHERE
-			line_ng_discord_message_type.channel_id = t.channel_id AND
-			line_ng_discord_message_type.type = t.type
-	)
+		INSERT INTO line_ng_discord_message_type (
+			channel_id,
+			guild_id,
+			type
+		) VALUES
+				%s
+		ON CONFLICT (channel_id, type) DO NOTHING
 	`, strings.Join(values, ","))
 	_, err := r.db.ExecContext(ctx, query)
 	return err
@@ -106,24 +103,21 @@ func (r *Repository) DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNg
 	var values []string
 	for _, lineNgType := range lineNgIDs {
 		values = append(values, fmt.Sprintf("('%s', '%s', '%s', '%s')", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.ID, lineNgType.IDType))
+		_, err := r.db.ExecContext(ctx, "DELETE FROM line_ng_discord_id WHERE channel_id = $1", lineNgType.ChannelID)
+		if err != nil {
+			return err
+		}
 	}
 	// INSERT されるもの以外を削除
 	query := fmt.Sprintf(`
-	DELETE FROM
-		line_ng_discord_id
-	WHERE NOT EXISTS (
-		SELECT
-			*
-		FROM
-			(
-				VALUES
-					%s
-			) AS t(channel_id, guild_id, id, id_type) ON CONFLICT (channel_id, id, id_type) DO NOTHING
-		WHERE
-			line_ng_discord_id.channel_id = t.channel_id AND
-			line_ng_discord_id.id = t.id AND
-			line_ng_discord_id.id_type = t.id_type
-	)
+		INSERT INTO line_ng_discord_id (
+			channel_id,
+			guild_id,
+			id,
+			id_type
+		) VALUES
+			%s
+		ON CONFLICT (channel_id, id) DO NOTHING
 	`, strings.Join(values, ","))
 	_, err := r.db.ExecContext(ctx, query)
 	return err

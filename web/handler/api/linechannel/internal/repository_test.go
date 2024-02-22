@@ -64,18 +64,24 @@ func TestRepository_InsertLineNgDiscordMessageTypes(t *testing.T) {
 
 		defer tx.RollbackCtx(ctx)
 
+		_, err = tx.ExecContext(ctx, "DELETE FROM line_ng_discord_message_type")
+		assert.NoError(t, err)
+
 		repo := NewRepository(tx)
 		lineNgDiscordTypes := []LineNgType{
 			{
 				ChannelID: "123456789",
+				GuildID:   "987654321",
 				Type:      6,
 			},
 			{
 				ChannelID: "123456789",
+				GuildID:   "987654321",
 				Type:      7,
 			},
 			{
 				ChannelID: "987654321",
+				GuildID:   "123456789",
 				Type:      6,
 			},
 		}
@@ -83,7 +89,7 @@ func TestRepository_InsertLineNgDiscordMessageTypes(t *testing.T) {
 		assert.NoError(t, err)
 
 		var lineChannelCount int
-		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_post_discord_channel WHERE channel_id = $1", "123456789")
+		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_ng_discord_message_type")
 		assert.NoError(t, err)
 
 		assert.Equal(t, 3, lineChannelCount)
@@ -100,6 +106,9 @@ func TestRepository_DeleteLineNgDiscordMessageTypes(t *testing.T) {
 		assert.NoError(t, err)
 
 		defer tx.RollbackCtx(ctx)
+
+		_, err = tx.ExecContext(ctx, "DELETE FROM line_ng_discord_message_type")
+		assert.NoError(t, err)
 
 		f := &fixtures.Fixture{DBv1: tx}
 		f.Build(t,
@@ -133,7 +142,7 @@ func TestRepository_DeleteLineNgDiscordMessageTypes(t *testing.T) {
 		assert.NoError(t, err)
 
 		var lineChannelCount int
-		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_post_discord_channel")
+		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_ng_discord_message_type")
 		assert.NoError(t, err)
 
 		assert.Equal(t, 2, lineChannelCount)
@@ -176,7 +185,7 @@ func TestRepository_InsertLineNgDiscordIDs(t *testing.T) {
 		assert.NoError(t, err)
 
 		var lineChannelCount int
-		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_ng_discord_id WHERE channel_id = $1", "123456789")
+		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_ng_discord_id")
 		assert.NoError(t, err)
 
 		assert.Equal(t, 3, lineChannelCount)

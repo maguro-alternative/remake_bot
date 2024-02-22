@@ -99,7 +99,7 @@ func (r *Repository) GetLineBotIv(ctx context.Context, guildID string) (LineBotI
 			line_bot_secret_iv,
 			line_group_id_iv
 		FROM
-			line_bot
+			line_bot_iv
 		WHERE
 			guild_id = $1
 	`

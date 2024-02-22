@@ -217,9 +217,9 @@ func TestGetLineBotIv(t *testing.T) {
 	t.Run("GuildIDからLineBotIvを取得できること", func(t *testing.T) {
 		lineBotIv, err := repo.GetLineBotIv(ctx, "987654321")
 		assert.NoError(t, err)
-		assert.Equal(t, []byte("123456789"), lineBotIv.LineNotifyTokenIv)
-		assert.Equal(t, []byte("123456789"), lineBotIv.LineBotTokenIv)
-		assert.Equal(t, []byte("123456789"), lineBotIv.LineBotSecretIv)
-		assert.Equal(t, []byte("987654321"), lineBotIv.LineGroupIDIv)
+		assert.Equal(t, []byte("123456789"), lineBotIv.LineNotifyTokenIv[0])
+		assert.Equal(t, []byte("123456789"), lineBotIv.LineBotTokenIv[0])
+		assert.Equal(t, []byte("123456789"), lineBotIv.LineBotSecretIv[0])
+		assert.Equal(t, []byte("987654321"), lineBotIv.LineGroupIDIv[0])
 	})
 }

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <header>
+        <meta charset="UTF-8">
+        <title>LINE Botのトークン</title>
+    </header>
+    <body>
+        <main>
+            <!-- 入力フォーム -->
+            <form action="#" id="form">
+                <label for="lineNotifyToken">LINE Notifyのトークン</label>
+                <input id="lineNotifyToken" type="password" name="lineNotifyToken">
+
+                <label for="lineBotToken">LINE Botのトークン</label>
+                <input id="lineBotToken" type="password" name="lineBotToken">
+
+                <label for="lineBotSecret">LINE Botのシークレット</label>
+                <input id="lineBotSecret" type="password" name="lineBotSecret">
+
+                <label for="lineGroupId">LINEグループID</label>
+                <input id="lineGroupId" type="password" name="lineGroupId">
+
+                <label for="lineClientId">LINEのクライアントID</label>
+                <input id="lineClientId" type="password" name="lineClientId">
+
+                <label for="lineClientSecret">LINEのクライアントシークレット</label>
+                <input id="lineClientSecret" type="password" name="lineClientSecret">
+
+                <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>
+                <select id="defaultChannel" name="defaultChannel" >
+                    {{ .channels }}
+                </select>
+
+                <label for="debugMode">デバッグモード</label>
+                <input id="debugMode" type="checkbox" name="debugMode" value="true">
+
+                <input type="submit" value="送信">
+            </form>
+            <!-- 入力結果を出力 -->
+            <p id="output"></p>
+        </main>
+    </body>
+    <!-- 以下JavaScriptを記述 -->
+    <script>
+        // submit時にイベント実行をする関数
+        document.getElementById('form').onsubmit = async function (event) {
+            // 再読み込み防止
+            event.preventDefault();
+            const formData = new FormData(document.getElementById('form'));
+            const data = Object.fromEntries(formData.entries());
+
+            const jsonData = JSON.stringify(data);
+
+            // データを送信
+            await fetch('/guilds/{{ .guildID }}/linetoken', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            })
+
+        }
+    </script>
+</html>

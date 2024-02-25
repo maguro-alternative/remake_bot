@@ -83,7 +83,15 @@ func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo
 		if err != nil {
 			return err
 		}
-		for _, channel := range channels {
+		channelsAndThreads := make([]*discordgo.Channel, 0, len(channels)+len(guildSt.Threads))
+		channelsAndThreads = append(channelsAndThreads, channels...)
+		channelsAndThreads = append(channelsAndThreads, guildSt.Threads...)
+		activeThreads, err := discordSession.GuildThreadsActive(guild.ID)
+		if err != nil {
+			return err
+		}
+		channelsAndThreads = append(channelsAndThreads, activeThreads.Threads...)
+		for _, channel := range channelsAndThreads {
 			if channel.Type == discordgo.ChannelTypeGuildCategory {
 				continue
 			}
@@ -100,7 +108,24 @@ func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo
 					$4
 				) ON CONFLICT (channel_id) DO NOTHING
 			`
-			_, err := dbv1.ExecContext(ctx, query, channel.ID, guild.ID, false, false)
+			if channel.Type == discordgo.ChannelTypeGuildForum {
+				archivedThreads, err := discordSession.ThreadsArchived(channel.ID, nil, 1000)
+				if err != nil {
+					return err
+				}
+				privateArchivedThreads, err := discordSession.ThreadsPrivateArchived(channel.ID, nil, 1000)
+				if err != nil {
+					return err
+				}
+				archivedThreads.Threads = append(archivedThreads.Threads, privateArchivedThreads.Threads...)
+				for _, thread := range archivedThreads.Threads {
+					_, err := dbv1.ExecContext(ctx, query, thread.ID, guild.ID, false, false)
+					if err != nil {
+						return err
+					}
+				}
+			}
+			_, err = dbv1.ExecContext(ctx, query, channel.ID, guild.ID, false, false)
 			if err != nil {
 				return err
 			}

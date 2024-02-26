@@ -2,8 +2,11 @@ package guildid
 
 import (
 	"html/template"
-	"os"
 	"net/http"
+	"os"
+	"strings"
+
+	"github.com/bwmarrin/discordgo"
 
 	"github.com/maguro-alternative/remake_bot/web/service"
 )
@@ -18,12 +21,26 @@ func NewGuildIdHandler(indexService *service.IndexService) *GuildIdHandler {
 	}
 }
 
-func Index(w http.ResponseWriter, r *http.Request) {
-	data := struct {
-		Title string
-	}{
-		Title: "Hello, World",
+func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
+	//       7
+	// /guild/{guildId:[0-9]+}/linetoken
+	guildId := r.URL.String()[7:strings.Index(r.URL.String(), "/linetoken")]
+	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
-	t := template.Must(template.New("a.html").ParseFiles("a.html"))
-    t.Execute(os.Stdout, data)
+	for _, channel := range guild.Channels {
+		if channel.Type == discordgo.ChannelTypeGuildCategory {
+			continue
+		}
+	}
+	data := struct {
+		guildID  string
+		chennels string
+	}{
+		guildID: guildId,
+	}
+	t := template.Must(template.New("linetoken.html").ParseFiles("linetoken.html"))
+	t.Execute(os.Stdout, data)
 }

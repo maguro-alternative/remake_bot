@@ -8,6 +8,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/web/handler/guilds/guildid/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
@@ -24,7 +25,7 @@ func NewGuildIdHandler(indexService *service.IndexService) *GuildIdHandler {
 func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
 	//       7
 	// /guild/{guildId:[0-9]+}/linetoken
-	categoryPositions := make(map[string]int)
+	categoryPositions := make(map[string]internal.DiscordChannel)
 	guildId := r.URL.String()[7:strings.Index(r.URL.String(), "/linetoken")]
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
@@ -35,9 +36,12 @@ func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue
 		}
-		categoryPositions[channel.ID] = channel.Position
+		categoryPositions[channel.ID] = internal.DiscordChannel{
+			Name:     channel.Name,
+			Position: channel.Position,
+		}
 	}
-	//[position]map[channelID]channelName
+	//[categoryPosition]map[channelPosition]channelName
 	channelsInCategory := make(map[int]map[int]string, len(categoryPositions)+1)
 	for _, channel := range guild.Channels {
 		if channel.Type == discordgo.ChannelTypeGuildForum {
@@ -45,11 +49,15 @@ func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
 		}
 		if channel.Type == discordgo.ChannelTypeGuildCategory {
 			categoryPosition := categoryPositions[channel.ID]
-			channelsInCategory[categoryPosition] = make(map[int]string)
+			channelsInCategory[categoryPosition.Position] = make(map[int]string)
 			continue
 		}
+		typeIcon := ":🔊:"
+		if channel.Type == discordgo.ChannelTypeGuildText {
+			typeIcon = ":📝:"
+		}
 		categoryPosition := categoryPositions[channel.ParentID]
-		channelsInCategory[categoryPosition][channel.Position] = channel.Name
+		channelsInCategory[categoryPosition.Position][channel.Position] = categoryPosition.Name+typeIcon+channel.Name
 	}
 	data := struct {
 		guildID  string

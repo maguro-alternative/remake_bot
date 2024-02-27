@@ -1,0 +1,61 @@
+package internal
+
+import (
+	"context"
+
+	"github.com/maguro-alternative/remake_bot/pkg/db"
+)
+
+type Repository struct {
+	db db.Driver
+}
+
+func NewRepository(db db.Driver) *Repository {
+	return &Repository{
+		db: db,
+	}
+}
+
+func (r *Repository) GetLineBot(ctx context.Context, guildID string) (LineBot, error) {
+	var lineBot LineBot
+	query := `
+		SELECT
+			line_notify_token,
+			line_bot_token,
+			line_bot_secret,
+			line_group_id,
+			default_channel_id,
+			debug_mode
+		FROM
+			line_bot
+		WHERE
+			guild_id = $1
+		AND
+			line_notify_token IS NOT NULL
+		AND
+			line_bot_token IS NOT NULL
+		AND
+			line_bot_secret IS NOT NULL
+		AND
+			line_group_id IS NOT NULL
+	`
+	err := r.db.GetContext(ctx, &lineBot, query, guildID)
+	return lineBot, err
+}
+
+func (r *Repository) GetLineBotIv(ctx context.Context, guildID string) (LineBotIv, error) {
+	var lineBotIv LineBotIv
+	query := `
+		SELECT
+			line_notify_token_iv,
+			line_bot_token_iv,
+			line_bot_secret_iv,
+			line_group_id_iv
+		FROM
+			line_bot_iv
+		WHERE
+			guild_id = $1
+	`
+	err := r.db.GetContext(ctx, &lineBotIv, query, guildID)
+	return lineBotIv, err
+}

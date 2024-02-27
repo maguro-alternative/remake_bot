@@ -10,6 +10,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"
 	discordOAuth "github.com/maguro-alternative/remake_bot/web/handler/auth/discordOAuth"
 	discordCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/discordCallback"
+	"github.com/maguro-alternative/remake_bot/web/handler/guilds/guildid"
 	"github.com/maguro-alternative/remake_bot/web/service"
 
 	"golang.org/x/oauth2"
@@ -54,5 +55,6 @@ func NewWebRouter(
 	//mux.Handle("/discord-auth-check", middleChain.Then(testRouter.NewAuthCheckHandler(indexService)))
 	mux.Handle("/auth/discord", middleChain.Then(discordOAuth.NewDiscordOAuth2Handler(discordOAuth2Service)))
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
+	mux.Handle("/guild/", middleChain.ThenFunc(guildid.NewGuildIdHandler(indexService).Index))
 	http.ListenAndServe(":8080", mux)
 }

@@ -24,6 +24,7 @@ func NewGuildIdHandler(indexService *service.IndexService) *GuildIdHandler {
 func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
 	//       7
 	// /guild/{guildId:[0-9]+}/linetoken
+	categoryPositions := make(map[string]int)
 	guildId := r.URL.String()[7:strings.Index(r.URL.String(), "/linetoken")]
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
@@ -31,9 +32,24 @@ func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, channel := range guild.Channels {
-		if channel.Type == discordgo.ChannelTypeGuildCategory {
+		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue
 		}
+		categoryPositions[channel.ID] = channel.Position
+	}
+	//[position]map[channelID]channelName
+	channelsInCategory := make(map[int]map[int]string, len(categoryPositions)+1)
+	for _, channel := range guild.Channels {
+		if channel.Type == discordgo.ChannelTypeGuildForum {
+			continue
+		}
+		if channel.Type == discordgo.ChannelTypeGuildCategory {
+			categoryPosition := categoryPositions[channel.ID]
+			channelsInCategory[categoryPosition] = make(map[int]string)
+			continue
+		}
+		categoryPosition := categoryPositions[channel.ParentID]
+		channelsInCategory[categoryPosition][channel.Position] = channel.Name
 	}
 	data := struct {
 		guildID  string

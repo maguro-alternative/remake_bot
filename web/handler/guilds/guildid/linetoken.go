@@ -1,6 +1,7 @@
 package guildid
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -32,6 +33,7 @@ func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	repo := internal.NewRepository(g.IndexService.DB)
 	for _, channel := range guild.Channels {
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue
@@ -42,28 +44,47 @@ func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	//[categoryPosition]map[channelPosition]channelName
-	channelsInCategory := make(map[int]map[int]string, len(categoryPositions)+1)
+	channelsInCategory := make(map[int]map[int]internal.DiscordChannelSelect, len(categoryPositions)+1)
 	for _, channel := range guild.Channels {
 		if channel.Type == discordgo.ChannelTypeGuildForum {
 			continue
 		}
 		if channel.Type == discordgo.ChannelTypeGuildCategory {
 			categoryPosition := categoryPositions[channel.ID]
-			channelsInCategory[categoryPosition.Position] = make(map[int]string)
+			channelsInCategory[categoryPosition.Position] = make(map[int]internal.DiscordChannelSelect)
 			continue
 		}
-		typeIcon := ":🔊:"
+		typeIcon := "🔊"
 		if channel.Type == discordgo.ChannelTypeGuildText {
-			typeIcon = ":📝:"
+			typeIcon = "📝"
 		}
 		categoryPosition := categoryPositions[channel.ParentID]
-		channelsInCategory[categoryPosition.Position][channel.Position] = categoryPosition.Name+typeIcon+channel.Name
+		channelsInCategory[categoryPosition.Position][channel.Position] = internal.DiscordChannelSelect{
+			ID:   channel.ID,
+			Name: fmt.Sprintf("%s:%s:%s", categoryPosition.Name, typeIcon, channel.Name),
+		}
+	}
+	lineBot, err := repo.GetLineBot(r.Context(), guildId)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	htmlSelectChannels := ``
+	for _, channels := range channelsInCategory {
+		for _, channelSelect := range channels {
+			if lineBot.DefaultChannelID == channelSelect.ID {
+				htmlSelectChannels += fmt.Sprintf(`<option value="%s" selected>%s</option>`, channelSelect.ID, channelSelect.Name)
+				continue
+			}
+			htmlSelectChannels += fmt.Sprintf(`<option value="%s">%s</option>`, channelSelect.ID, channelSelect.Name)
+		}
 	}
 	data := struct {
 		guildID  string
 		chennels string
 	}{
 		guildID: guildId,
+		chennels: htmlSelectChannels,
 	}
 	t := template.Must(template.New("linetoken.html").ParseFiles("linetoken.html"))
 	t.Execute(os.Stdout, data)

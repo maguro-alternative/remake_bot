@@ -4,6 +4,16 @@ import (
 	"github.com/lib/pq"
 )
 
+type DiscordChannel struct {
+	Name     string `db:"name"`
+	Position int    `db:"position"`
+}
+
+type DiscordChannelSelect struct {
+	ID       string `db:"id"`
+	Name     string `db:"name"`
+}
+
 type LineBot struct {
 	LineNotifyToken  pq.ByteaArray `db:"line_notify_token"`
 	LineBotToken     pq.ByteaArray `db:"line_bot_token"`

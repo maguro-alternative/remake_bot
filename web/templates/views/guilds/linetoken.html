@@ -11,29 +11,37 @@
             <form action="#" id="form">
                 <label for="lineNotifyToken">LINE Notifyのトークン</label>
                 <input id="lineNotifyToken" type="password" name="lineNotifyToken">
+                <br/>
 
                 <label for="lineBotToken">LINE Botのトークン</label>
                 <input id="lineBotToken" type="password" name="lineBotToken">
+                <br/>
 
                 <label for="lineBotSecret">LINE Botのシークレット</label>
                 <input id="lineBotSecret" type="password" name="lineBotSecret">
+                <br/>
 
                 <label for="lineGroupId">LINEグループID</label>
                 <input id="lineGroupId" type="password" name="lineGroupId">
+                <br/>
 
                 <label for="lineClientId">LINEのクライアントID</label>
                 <input id="lineClientId" type="password" name="lineClientId">
+                <br/>
 
                 <label for="lineClientSecret">LINEのクライアントシークレット</label>
                 <input id="lineClientSecret" type="password" name="lineClientSecret">
+                <br/>
 
                 <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>
                 <select id="defaultChannel" name="defaultChannel" >
-                    {{ .channels }}
+                    {{ .Channels }}
                 </select>
+                <br/>
 
                 <label for="debugMode">デバッグモード</label>
                 <input id="debugMode" type="checkbox" name="debugMode" value="true">
+                <br/>
 
                 <input type="submit" value="送信">
             </form>

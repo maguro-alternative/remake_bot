@@ -23,14 +23,14 @@ func NewGuildIdHandler(indexService *service.IndexService) *GuildIdHandler {
 	}
 }
 
-func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
+func (g *GuildIdHandler) Index(w http.ResponseWriter, r *http.Request) {
 	//       7
 	// /guild/{guildId:[0-9]+}/linetoken
 	categoryPositions := make(map[string]internal.DiscordChannel)
 	guildId := r.URL.String()[7:strings.Index(r.URL.String(), "/linetoken")]
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		http.Error(w, "Not get guild id", http.StatusInternalServerError)
 		return
 	}
 	repo := internal.NewRepository(g.IndexService.DB)
@@ -65,8 +65,25 @@ func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	lineBot, err := repo.GetLineBot(r.Context(), guildId)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	if err != nil && err.Error() == "sql: no rows in result set" {
+		err = repo.InsertLineBot(r.Context(), &internal.LineBot{
+			GuildID: guildId,
+			DefaultChannelID: guild.SystemChannelID,
+			DebugMode: false,
+		})
+		if err != nil {
+			http.Error(w, "line_bot:"+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		err = repo.InsertLineBotIv(r.Context(), &internal.LineBotIv{
+			GuildID: guildId,
+		})
+		if err != nil {
+			http.Error(w, "line_bot_iv:"+err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	htmlSelectChannels := ``
@@ -83,9 +100,9 @@ func (g *GuildIdHandler) LineTokenForm(w http.ResponseWriter, r *http.Request) {
 		guildID  string
 		chennels string
 	}{
-		guildID: guildId,
+		guildID:  guildId,
 		chennels: htmlSelectChannels,
 	}
-	t := template.Must(template.New("linetoken.html").ParseFiles("linetoken.html"))
+	t := template.Must(template.New("linetoken.html").ParseFiles("web/templates/views/guilds/linetoken.html"))
 	t.Execute(os.Stdout, data)
 }

@@ -15,6 +15,7 @@ type DiscordChannelSelect struct {
 }
 
 type LineBot struct {
+	GuildID          string        `db:"guild_id"`
 	LineNotifyToken  pq.ByteaArray `db:"line_notify_token"`
 	LineBotToken     pq.ByteaArray `db:"line_bot_token"`
 	LineBotSecret    pq.ByteaArray `db:"line_bot_secret"`
@@ -24,6 +25,7 @@ type LineBot struct {
 }
 
 type LineBotIv struct {
+	GuildID          string        `db:"guild_id"`
 	LineNotifyTokenIv pq.ByteaArray `db:"line_notify_token_iv"`
 	LineBotTokenIv    pq.ByteaArray `db:"line_bot_token_iv"`
 	LineBotSecretIv   pq.ByteaArray `db:"line_bot_secret_iv"`

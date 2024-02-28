@@ -1,6 +1,6 @@
 module github.com/maguro-alternative/remake_bot
 
-go 1.20
+go 1.22
 
 require (
 	github.com/bwmarrin/discordgo v0.27.1

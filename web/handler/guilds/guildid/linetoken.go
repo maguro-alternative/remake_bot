@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"strings"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -23,10 +22,8 @@ func NewGuildIdHandler(indexService *service.IndexService) *GuildIdHandler {
 }
 
 func (g *GuildIdHandler) Index(w http.ResponseWriter, r *http.Request) {
-	//       7
-	// /guild/{guildId:[0-9]+}/linetoken
 	categoryPositions := make(map[string]internal.DiscordChannel)
-	guildId := r.URL.String()[7:strings.Index(r.URL.String(), "/linetoken")]
+	guildId := r.PathValue("guildId")
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Not get guild id", http.StatusInternalServerError)

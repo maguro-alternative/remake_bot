@@ -83,6 +83,7 @@ func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo
 		if err != nil {
 			return err
 		}
+		fmt.Println(guildSt.Name+"のチャンネル数", len(channels))
 		channelsAndThreads := make([]*discordgo.Channel, 0, len(channels)+len(guildSt.Threads))
 		channelsAndThreads = append(channelsAndThreads, channels...)
 		channelsAndThreads = append(channelsAndThreads, guildSt.Threads...)
@@ -90,6 +91,7 @@ func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo
 		if err != nil {
 			return err
 		}
+		fmt.Println(guildSt.Name+"のスレッド数", len(activeThreads.Threads))
 		channelsAndThreads = append(channelsAndThreads, activeThreads.Threads...)
 		for _, channel := range channelsAndThreads {
 			if channel.Type == discordgo.ChannelTypeGuildCategory {
@@ -109,17 +111,18 @@ func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo
 				) ON CONFLICT (channel_id) DO NOTHING
 			`
 			if channel.Type == discordgo.ChannelTypeGuildForum {
-				archivedThreads, err := discordSession.ThreadsArchived(channel.ID, nil, 1000)
-				if err != nil {
+				archivedThreads, err := discordSession.ThreadsArchived(channel.ID, nil, 100)
+				if err != nil && err.Error() != `HTTP 400 Bad Request, {"message": "Cannot execute action on this channel type", "code": 50024}` {
 					return err
 				}
-				privateArchivedThreads, err := discordSession.ThreadsPrivateArchived(channel.ID, nil, 1000)
-				if err != nil {
-					return err
+				if err != nil && err.Error() == `HTTP 400 Bad Request, {"message": "Cannot execute action on this channel type", "code": 50024}`{
+					archivedThreads, err = discordSession.ThreadsPrivateArchived(channel.ID, nil, 100)
+					if err != nil {
+						return err
+					}
 				}
-				archivedThreads.Threads = append(archivedThreads.Threads, privateArchivedThreads.Threads...)
 				for _, thread := range archivedThreads.Threads {
-					_, err := dbv1.ExecContext(ctx, query, thread.ID, guild.ID, false, false)
+					_, err = dbv1.ExecContext(ctx, query, thread.ID, guild.ID, false, false)
 					if err != nil {
 						return err
 					}

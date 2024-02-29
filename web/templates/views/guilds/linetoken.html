@@ -8,7 +8,7 @@
     <body>
         <main>
             <!-- 入力フォーム -->
-            <form action="/guilds/{{ .GuildID }}/linetoken" id="form">
+            <form action="#" id="form">
                 <label for="lineNotifyToken">LINE Notifyのトークン</label>
                 <input id="lineNotifyToken" type="password" name="lineNotifyToken">
                 <br/>
@@ -59,7 +59,7 @@
             const jsonData = JSON.stringify(data);
 
             // データを送信
-            await fetch('/guilds/{{ .guildID }}/linetoken', {
+            await fetch('/api/{{ .GuildID }}/linetoken', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

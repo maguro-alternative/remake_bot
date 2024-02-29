@@ -30,14 +30,6 @@ func (r *Repository) GetLineBot(ctx context.Context, guildID string) (LineBot, e
 			line_bot
 		WHERE
 			guild_id = $1
-		AND
-			line_notify_token IS NOT NULL
-		AND
-			line_bot_token IS NOT NULL
-		AND
-			line_bot_secret IS NOT NULL
-		AND
-			line_group_id IS NOT NULL
 	`
 	err := r.db.GetContext(ctx, &lineBot, query, guildID)
 	return lineBot, err

@@ -103,7 +103,11 @@
 
             const jsonArray = JSON.stringify(contentArray);
 
-            console.log(data, contentArray, jsonArray);
+            //console.log(data[0], contentArray, jsonArray);
+            for (let i = 0; i < document.forms['form'].elements.length; i++) {
+                console.log(document.forms['form'].elements[i].name);
+            }
+            //console.log(document.forms['form'].elements[0].name);
             // 入力フォームの内容を取得
             let inputForm = data;
             console.log(inputForm)

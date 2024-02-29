@@ -35,6 +35,8 @@ func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	lineChannelJson.GuildID = r.PathValue("guildId")
+
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = r.Context()
@@ -99,7 +101,7 @@ func lineChannelJsonRead(lineChannelJson internal.LineChannelJson) (channels []i
 					ChannelID: lineChannel.ChannelID,
 					GuildID:   lineChannelJson.GuildID,
 					ID:        ngUser,
-					IDType:   "user",
+					IDType:    "user",
 				})
 			}
 		}
@@ -109,7 +111,7 @@ func lineChannelJsonRead(lineChannelJson internal.LineChannelJson) (channels []i
 					ChannelID: lineChannel.ChannelID,
 					GuildID:   lineChannelJson.GuildID,
 					ID:        ngRole,
-					IDType:   "role",
+					IDType:    "role",
 				})
 			}
 		}

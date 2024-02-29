@@ -9,7 +9,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/handler/auth/discordOAuth/internal"
+	"github.com/maguro-alternative/remake_bot/web/handler/auth/discord_oauth/internal"
 )
 
 type DiscordOAuth2Handler struct {

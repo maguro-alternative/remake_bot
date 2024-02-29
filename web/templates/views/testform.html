@@ -98,14 +98,21 @@
             const formData = new FormData(document.getElementById('form'));
             const data = Object.fromEntries(formData.entries());
             // それぞれ入力内容を配列に格納
-            const contentArray = formData.getAll('content[]');
-            const selecttArray = formData.getAll('test[]');
+            let contentArray, selectArray
 
             const jsonArray = JSON.stringify(contentArray);
 
             //console.log(data[0], contentArray, jsonArray);
             for (let i = 0; i < document.forms['form'].elements.length; i++) {
-                console.log(document.forms['form'].elements[i].name);
+                formKey = document.forms['form'].elements[i].name;
+                channelId = formKey.match(/[0-9]/g);
+                if ((formKey.includes('content')) && (formKey.includes('[]'))) {
+                    contentArray = formData.getAll(formKey);
+                }
+                if ((formKey.includes('test')) && (formKey.includes('[]'))) {
+                    selectArray = formData.getAll(formKey);
+                }
+                console.log(channelId);
             }
             //console.log(document.forms['form'].elements[0].name);
             // 入力フォームの内容を取得

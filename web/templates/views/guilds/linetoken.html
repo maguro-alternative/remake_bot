@@ -10,37 +10,37 @@
             <!-- 入力フォーム -->
             <form action="#" id="form">
                 <label for="lineNotifyToken">LINE Notifyのトークン</label>
-                <input id="lineNotifyToken" type="password" name="lineNotifyToken">
+                <input id="lineNotifyToken" type="password" name="line_notify_token">
                 <br/>
 
                 <label for="lineBotToken">LINE Botのトークン</label>
-                <input id="lineBotToken" type="password" name="lineBotToken">
+                <input id="lineBotToken" type="password" name="line_bot_token">
                 <br/>
 
                 <label for="lineBotSecret">LINE Botのシークレット</label>
-                <input id="lineBotSecret" type="password" name="lineBotSecret">
+                <input id="lineBotSecret" type="password" name="line_bot_secret">
                 <br/>
 
                 <label for="lineGroupId">LINEグループID</label>
-                <input id="lineGroupId" type="password" name="lineGroupId">
+                <input id="lineGroupId" type="password" name="line_group_id">
                 <br/>
 
                 <label for="lineClientId">LINEのクライアントID</label>
-                <input id="lineClientId" type="password" name="lineClientId">
+                <input id="lineClientId" type="password" name="line_client_id">
                 <br/>
 
                 <label for="lineClientSecret">LINEのクライアントシークレット</label>
-                <input id="lineClientSecret" type="password" name="lineClientSecret">
+                <input id="lineClientSecret" type="password" name="line_client_secret">
                 <br/>
 
                 <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>
-                <select id="defaultChannel" name="defaultChannel" >
+                <select id="defaultChannel" name="default_channel_id" >
                     {{ .Channels }}
                 </select>
                 <br/>
 
                 <label for="debugMode">デバッグモード</label>
-                <input id="debugMode" type="checkbox" name="debugMode" value="true">
+                <input id="debugMode" type="checkbox" name="debug_mode" value="true">
                 <br/>
 
                 <input type="submit" value="送信">
@@ -57,6 +57,8 @@
             const data = Object.fromEntries(formData.entries());
 
             const jsonData = JSON.stringify(data);
+
+            console.log(jsonData);
 
             // データを送信
             await fetch('/api/{{ .GuildID }}/linetoken', {

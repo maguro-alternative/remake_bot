@@ -3,6 +3,7 @@ package linetoken
 import (
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
@@ -24,15 +25,18 @@ func NewLineTokenHandler(indexService *service.IndexService) *LineTokenHandler {
 func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode("Method Not Allowed")
 		return
 	}
 	var lineTokenJson internal.LineBotJson
 	if err := json.NewDecoder(r.Body).Decode(&lineTokenJson); err != nil {
-		http.Error(w, "Jsonの読み取りに失敗しました", http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 	if err := lineTokenJson.Validate(); err != nil {
-		http.Error(w, "Jsonの形式が正しくありません"+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 	ctx := r.Context()
@@ -42,27 +46,33 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	lineTokenJson.GuildID = r.PathValue("guildId")
 	// 暗号化キーの取得
 	privateKey := config.PrivateKey()
+	fmt.Println(&lineTokenJson)
 	lineBot, lineBotIv, err := lineBotJsonEncrypt(privateKey, &lineTokenJson)
 	if err != nil {
-		http.Error(w, "Internal Server Error "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 	// 暗号化
 	repo := internal.NewRepository(h.IndexService.DB)
 	if err := repo.UpdateLineBot(ctx, lineBot); err != nil {
-		http.Error(w, "Internal Server Error "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 	if err := repo.UpdateLineBotIv(ctx, lineBotIv); err != nil {
-		http.Error(w, "Internal Server Error "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("OK")
 }
 
 func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (Bot *internal.LineBot, BotIv *internal.LineBotIv, err error) {
 	var lineBot internal.LineBot
 	var lineBotIv internal.LineBotIv
+	fmt.Println(lineBotJson.GuildID)
 	key, err := hex.DecodeString(privateKey)
 	if err != nil {
 		return nil, nil, err

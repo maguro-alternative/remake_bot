@@ -1,26 +1,93 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <header>
+    <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>テスト</title>
-    </header>
+    </head>
     <body>
-        <main>
-            <!-- 入力フォーム -->
-            <form action="#" id="form">
-                <select multiple name="test[]" >
-                    <option value="">選択してください</option>
-                    <option value="test1">test1</option>
-                    <option value="test2">test2</option>
-                    <option value="test3">test3</option>
-                </select>
-                <input type="text" name="content[]">
-                <input type="text" name="content[]">
-                <input type="submit" value="送信">
-            </form>
-            <!-- 入力結果を出力 -->
-            <p id="output"></p>
-        </main>
+        <!-- 入力フォーム -->
+        <form action="#" id="form">
+            <details>
+                <summary>詳細1</summary>
+                <details>
+                    <summary>テスト1</summary>
+                    <label for="test_1">テスト</label>
+                    <select id="test_1" multiple name="test_1[]" >
+                        <option value="">選択してください</option>
+                        <option value="test1">test1</option>
+                        <option value="test2">test2</option>
+                        <option value="test3">test3</option>
+                    </select>
+                    <br/>
+                    <label for="textcontent_1">テキスト</label>
+                    <input id="textcontent_1" type="text" name="content_1[]">
+                    <br/>
+                    <label for="textcontent_2">テキスト2</label>
+                    <input id="textcontent_2" type="text" name="content_1[]">
+                    <br/>
+                </details>
+                <details>
+                    <summary>テスト2</summary>
+                    <label for="test_2">テスト</label>
+                    <select id="test_2" multiple name="test_2[]" >
+                        <option value="">選択してください</option>
+                        <option value="test1">test1</option>
+                        <option value="test2">test2</option>
+                        <option value="test3">test3</option>
+                    </select>
+                    <br/>
+                    <label for="textcontent_3">テキスト</label>
+                    <input id="textcontent_3" type="text" name="content_2[]">
+                    <br/>
+                    <label for="textcontent_4">テキスト2</label>
+                    <input id="textcontent_4" type="text" name="content_2[]">
+                    <br/>
+                </details>
+            </details>
+            <br/>
+            <details>
+                <summary>詳細2</summary>
+                <details>
+                    <summary>テスト3</summary>
+                    <label for="test_3">テスト</label>
+                    <select id="test_3" multiple name="test_3[]" >
+                        <option value="">選択してください</option>
+                        <option value="test1">test1</option>
+                        <option value="test2">test2</option>
+                        <option value="test3">test3</option>
+                    </select>
+                    <br/>
+                    <label for="textcontent_5">テキスト</label>
+                    <input id="textcontent_5" type="text" name="content_3[]">
+                    <br/>
+                    <label for="textcontent_6">テキスト2</label>
+                    <input id="textcontent_6" type="text" name="content_3[]">
+                    <br/>
+                </details>
+                <details>
+                    <summary>テスト4</summary>
+                    <label for="test_4">テスト</label>
+                    <select id="test_4" multiple name="test_4[]" >
+                        <option value="">選択してください</option>
+                        <option value="test1">test1</option>
+                        <option value="test2">test2</option>
+                        <option value="test3">test3</option>
+                    </select>
+                    <br/>
+                    <label for="textcontent_7">テキスト</label>
+                    <input id="textcontent_7" type="text" name="content_4[]">
+                    <br/>
+                    <label for="textcontent_8">テキスト2</label>
+                    <input id="textcontent_8" type="text" name="content_4[]">
+                    <br/>
+                </details>
+            </details>
+            <br/>
+            <input type="submit" value="送信">
+        </form>
+        <!-- 入力結果を出力 -->
+        <p id="output"></p>
     </body>
     <!-- 以下JavaScriptを記述 -->
     <script>

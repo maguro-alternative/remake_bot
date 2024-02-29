@@ -47,6 +47,9 @@ func (r *Repository) UpdateLineBot(ctx context.Context, lineBot *LineBot) error 
 		setQueryArray = append(setQueryArray, "debug_mode = :debug_mode")
 	}
 	setNameQuery = strings.Join(setQueryArray, ",")
+	if setNameQuery == "" {
+		return nil
+	}
 
 	query := fmt.Sprintf(`
 		UPDATE
@@ -83,6 +86,10 @@ func (r *Repository) UpdateLineBotIv(ctx context.Context, lineBotIv *LineBotIv) 
 		setQueryArray = append(setQueryArray, "line_client_secret_iv = :line_client_secret_iv")
 	}
 	setNameQuery = strings.Join(setQueryArray, ",")
+	if setNameQuery == "" {
+		return nil
+	}
+
 	query := fmt.Sprintf(`
 		UPDATE
 			line_bot_iv

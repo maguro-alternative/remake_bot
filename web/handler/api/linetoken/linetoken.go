@@ -1,12 +1,12 @@
 package linetoken
 
 import (
-	"net/http"
-	"encoding/json"
 	"encoding/hex"
+	"encoding/json"
+	"net/http"
 
-	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
+	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 )
@@ -28,71 +28,72 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var lineTokenJson internal.LineBotJson
 	if err := json.NewDecoder(r.Body).Decode(&lineTokenJson); err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		http.Error(w, "Jsonの読み取りに失敗しました", http.StatusBadRequest)
 		return
 	}
 	if err := lineTokenJson.Validate(); err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		http.Error(w, "Jsonの形式が正しくありません"+err.Error(), http.StatusBadRequest)
 		return
 	}
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = r.Context()
 	}
+	lineTokenJson.GuildID = r.PathValue("guildId")
 	// 暗号化キーの取得
 	privateKey := config.PrivateKey()
 	lineBot, lineBotIv, err := lineBotJsonEncrypt(privateKey, &lineTokenJson)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	// 暗号化
 	repo := internal.NewRepository(h.IndexService.DB)
 	if err := repo.UpdateLineBot(ctx, lineBot); err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if err := repo.UpdateLineBotIv(ctx, lineBotIv); err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 }
 
 func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (Bot *internal.LineBot, BotIv *internal.LineBotIv, err error) {
-	var lineBot *internal.LineBot
-	var lineBotIv *internal.LineBotIv
+	var lineBot internal.LineBot
+	var lineBotIv internal.LineBotIv
 	key, err := hex.DecodeString(privateKey)
 	if err != nil {
 		return nil, nil, err
 	}
 	// 暗号化
-	if len(lineBot.LineNotifyToken) > 0 {
+	if len(lineBotJson.LineNotifyToken) > 0 {
 		if lineBot.LineNotifyToken[0], lineBotIv.LineNotifyTokenIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineNotifyToken), key); err != nil {
 			return nil, nil, err
 		}
 	}
-	if len(lineBot.LineBotToken) > 0 {
+	if len(lineBotJson.LineBotToken) > 0 {
 		if lineBot.LineBotToken[0], lineBotIv.LineBotTokenIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotToken), key); err != nil {
 			return nil, nil, err
 		}
 	}
-	if len(lineBot.LineBotSecret) > 0 {
-		if lineBot.LineBotSecret[0], lineBotIv.LineBotSecretIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotSecret), key) ; err != nil {
+	if len(lineBotJson.LineBotSecret) > 0 {
+		if lineBot.LineBotSecret[0], lineBotIv.LineBotSecretIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotSecret), key); err != nil {
 			return nil, nil, err
 		}
 	}
-	if len(lineBot.LineGroupID) > 0 {
+	if len(lineBotJson.LineGroupID) > 0 {
 		if lineBot.LineGroupID[0], lineBotIv.LineGroupIDIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineGroupID), key); err != nil {
 			return nil, nil, err
 		}
 	}
-	if len(lineBot.LineClientID) > 0 {
+	if len(lineBotJson.LineClientID) > 0 {
 		if lineBot.LineClientID[0], lineBotIv.LineClientIDIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineClientID), key); err != nil {
 			return nil, nil, err
 		}
 	}
-	if len(lineBot.LineClientSecret) > 0 {
+	if len(lineBotJson.LineClientSecret) > 0 {
 		if lineBot.LineClientSecret[0], lineBotIv.LineClientSecretIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineClientSecret), key); err != nil {
 			return nil, nil, err
 		}
@@ -100,5 +101,5 @@ func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (B
 	lineBot.GuildID = lineBotJson.GuildID
 	lineBot.DefaultChannelID = lineBotJson.DefaultChannelID
 	lineBot.DebugMode = lineBotJson.DebugMode
-	return lineBot, lineBotIv, nil
+	return &lineBot, &lineBotIv, nil
 }

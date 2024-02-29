@@ -10,7 +10,7 @@ import (
 
 	"reflect"
 
-	"github.com/maguro-alternative/remake_bot/web/handler/callback/discordCallback/internal"
+	"github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback/internal"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 )

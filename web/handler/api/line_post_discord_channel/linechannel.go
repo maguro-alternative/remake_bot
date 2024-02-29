@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	//"github.com/maguro-alternative/remake_bot/web/config"
-	"github.com/maguro-alternative/remake_bot/web/handler/api/linechannel/internal"
+	"github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 )
 

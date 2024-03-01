@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>LINEへ送信するDiscordのチャンネル設定</title>
+    </head>
+    <body>
+        <main>
+            <!-- 入力フォーム -->
+            <form action="#" id="form">
+
+                <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>
+                <select id="defaultChannel" name="default_channel_id" >
+                    {{ .Channels }}
+                </select>
+                <br/>
+
+                <label for="debugMode">デバッグモード</label>
+                <input id="debugMode" type="checkbox" name="debug_mode" value="true">
+                <br/>
+
+                <input type="submit" value="送信">
+            </form>
+        </main>
+    </body>
+    <!-- 以下JavaScriptを記述 -->
+    <script>
+        // submit時にイベント実行をする関数
+        document.getElementById('form').onsubmit = async function (event) {
+            // 再読み込み防止
+            event.preventDefault();
+            const formData = new FormData(document.getElementById('form'));
+            const formElements = document.forms['form'].elements;
+            const data = Object.fromEntries(formData.entries());
+            // それぞれ入力内容を配列に格納
+            let ngTypeArray, ngUserArray, ngRoleArray;
+            let ngBool, BotMessageBool = false;
+            const channelArray = [];
+            let jsonTmp = {};
+
+            const jsonArray = JSON.stringify(contentArray);
+
+            // 各formのkeyを取得
+            for (let i = 0; i < formElements.length; i++) {
+                formKey = formElements[i].name;
+                channelId = formKey.match(/[0-9]/);
+                if ((formKey.includes('ng_types')) && (formKey.includes('[]'))) {
+                    ngTypeArray = formData.getAll(formKey);
+                }
+                if ((formKey.includes('ng_users')) && (formKey.includes('[]'))) {
+                    ngUserArray = formData.getAll(formKey);
+                }
+                if ((formKey.includes('ng_roles')) && (formKey.includes('[]'))) {
+                    ngRoleArray = formData.getAll(formKey);
+                }
+                if ((formKey.includes('ng_')) && (!formKey.includes('[]'))) {
+                    ngBool = true;
+                }
+                if (formKey.includes('bot_message')) {
+                    BotMessageBool = true;
+                }
+                jsonTmp[channelId] = {
+                    "channel_id": channelId,
+                    "ng": ngBool,
+                    "bot_message": BotMessageBool,
+                    "ng_types": ngTypeArray,
+                    "ng_users": ngUserArray,
+                    "ng_roles": ngRoleArray
+                }
+            }
+
+            for (let i = 0; i < jsonTmp.length; i++) {
+                channelArray.push(jsonTmp[i]);
+            }
+
+            const jsonData = JSON.stringify({
+                "channels": channelArray
+            });
+
+            // データを送信
+            await fetch('/api/{{ .GuildID }}/line-post-channel-discord', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonData
+            })
+
+        }
+    </script>
+</html>

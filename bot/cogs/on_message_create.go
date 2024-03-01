@@ -24,6 +24,10 @@ import (
 type Repository interface {
 	GetLineChannel(ctx context.Context, channelID string) (onMessageCreate.LineChannel, error)
 	InsertLineChannel(ctx context.Context, channelID string, guildID string) error
+	GetLineNgType(ctx context.Context, channelID string) ([]int, error)
+	GetLineNgDiscordID(ctx context.Context, channelID string) ([]onMessageCreate.LineNgID, error)
+	GetLineBot(ctx context.Context, guildID string) (onMessageCreate.LineBot, error)
+	GetLineBotIv(ctx context.Context, guildID string) (onMessageCreate.LineBotIv, error)
 }
 
 func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.MessageCreate) {
@@ -36,17 +40,44 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	ctx := context.Background()
 	repo := onMessageCreate.NewRepository(h.DB)
 	channel, err := repo.GetLineChannel(ctx, vs.ChannelID)
-	if err.Error() == "sql: no rows in result set" {
+	if err != nil && err.Error() != "sql: no rows in result set" {
+		return
+	} else if err != nil {
 		err = repo.InsertLineChannel(ctx, vs.ChannelID, vs.GuildID)
 		if err != nil {
 			return
 		}
-		channel, err = repo.GetLineChannel(ctx, vs.ChannelID)
-		if err != nil {
+		channel = onMessageCreate.LineChannel{
+			Ng:          false,
+			BotMessage:  false,
+		}
+	}
+	ngTypes, err := repo.GetLineNgType(ctx, vs.ChannelID)
+	if err != nil {
+		return
+	}
+	ngDiscordIDs, err := repo.GetLineNgDiscordID(ctx, vs.ChannelID)
+	if err != nil {
+		return
+	}
+	// メッセージの種類がNGの場合は処理を終了
+	for _, ngType := range ngTypes {
+		if vs.Message.Type == discordgo.MessageType(ngType) {
 			return
 		}
-	} else if err != nil {
-		return
+	}
+	// メッセージの送信者がNGの場合は処理を終了
+	for _, ngDiscordID := range ngDiscordIDs {
+		if ngDiscordID.IDType == "user" && vs.Author.ID == ngDiscordID.ID {
+			return
+		}
+		if ngDiscordID.IDType == "role" {
+			for _, role := range vs.Member.Roles {
+				if role == ngDiscordID.ID {
+					return
+				}
+			}
+		}
 	}
 	// チャンネルがNGの場合、またはBotメッセージでない場合は処理を終了
 	if channel.Ng || (!channel.BotMessage && vs.Author.Bot) {

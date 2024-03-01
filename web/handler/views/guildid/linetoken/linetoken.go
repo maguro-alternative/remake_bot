@@ -7,21 +7,21 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	"github.com/maguro-alternative/remake_bot/web/handler/guilds/guildid/internal"
+	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
-type GuildIdHandler struct {
+type LineTokenViewHandler struct {
 	IndexService *service.IndexService
 }
 
-func NewGuildIdHandler(indexService *service.IndexService) *GuildIdHandler {
-	return &GuildIdHandler{
+func NewLineTokenViewHandler(indexService *service.IndexService) *LineTokenViewHandler {
+	return &LineTokenViewHandler{
 		IndexService: indexService,
 	}
 }
 
-func (g *GuildIdHandler) Index(w http.ResponseWriter, r *http.Request) {
+func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	categoryPositions := make(map[string]internal.DiscordChannel)
 	guildId := r.PathValue("guildId")
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)

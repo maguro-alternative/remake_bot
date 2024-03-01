@@ -102,6 +102,34 @@ func TestGetLineNgType(t *testing.T) {
 	})
 }
 
+func TestGetLineNgDiscordID(t *testing.T) {
+	ctx := context.Background()
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	assert.NoError(t, err)
+	defer cleanup()
+	tx, err := dbV1.BeginTxx(ctx, nil)
+	assert.NoError(t, err)
+
+	defer tx.RollbackCtx(ctx)
+
+	f := &fixtures.Fixture{DBv1: tx}
+	f.Build(t,
+		fixtures.NewLineNgDiscordID(ctx, func(lng *fixtures.LineNgDiscordID) {
+			lng.ChannelID = "987654321"
+			lng.GuildID = "123456789"
+			lng.IDType = "user"
+			lng.ID = "123456789"
+		}),
+	)
+	repo := NewRepository(tx)
+	t.Run("GuildIDからNG Discord IDを取得できること", func(t *testing.T) {
+		ngDiscordIDs, err := repo.GetLineNgDiscordID(ctx, "987654321")
+		assert.NoError(t, err)
+		assert.Equal(t, "123456789", ngDiscordIDs[0].ID)
+		assert.Equal(t, "user", ngDiscordIDs[0].IDType)
+	})
+}
+
 func TestGetLineBot(t *testing.T) {
 	ctx := context.Background()
 	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())

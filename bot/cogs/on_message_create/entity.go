@@ -16,6 +16,11 @@ type LineChannel struct {
 	BotMessage bool `db:"bot_message"`
 }
 
+type LineNgID struct {
+	ID    string `db:"id"`
+	IDType string `db:"id_type"`
+}
+
 type LineBot struct {
 	LineNotifyToken  pq.ByteaArray `db:"line_notify_token"`
 	LineBotToken     pq.ByteaArray `db:"line_bot_token"`

@@ -63,6 +63,21 @@ func (r *Repository) GetLineNgType(ctx context.Context, channelID string) ([]int
 	return ngTypes, err
 }
 
+func (r *Repository) GetLineNgDiscordID(ctx context.Context, channelID string) ([]LineNgID, error) {
+	var ngIDs []LineNgID
+	query := `
+		SELECT
+			id,
+			id_type
+		FROM
+			line_ng_discord_id
+		WHERE
+			channel_id = $1
+	`
+	err := r.db.SelectContext(ctx, &ngIDs, query, channelID)
+	return ngIDs, err
+}
+
 func (r *Repository) GetLineBot(ctx context.Context, guildID string) (LineBot, error) {
 	var lineBot LineBot
 	query := `

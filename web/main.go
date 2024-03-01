@@ -11,7 +11,9 @@ import (
 	discordOAuth "github.com/maguro-alternative/remake_bot/web/handler/auth/discord_oauth"
 	discordCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken"
+	linePostDiscordChannel "github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel"
 	linetokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken"
+	linePostDiscordChannelView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel"
 	"github.com/maguro-alternative/remake_bot/web/service"
 
 	"golang.org/x/oauth2"
@@ -57,6 +59,8 @@ func NewWebRouter(
 	mux.Handle("/auth/discord", middleChain.Then(discordOAuth.NewDiscordOAuth2Handler(discordOAuth2Service)))
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
 	mux.Handle("/api/{guildId}/linetoken", middleChain.Then(linetoken.NewLineTokenHandler(indexService)))
+	mux.Handle("/api/{guildId}/line-post-discord-channel", middleChain.Then(linePostDiscordChannel.NewLineChannelHandler(indexService)))
 	mux.Handle("/guild/{guildId}/linetoken/", middleChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService).Index))
+	mux.Handle("/guild/{guildId}/line-post-discord-channel", middleChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService).Index))
 	http.ListenAndServe(":8080", mux)
 }

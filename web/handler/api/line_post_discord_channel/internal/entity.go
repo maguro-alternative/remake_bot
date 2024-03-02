@@ -19,7 +19,7 @@ type LineChannelJson struct {
 
 func (g LineChannelJson) Validate() error {
 	return validation.ValidateStruct(&g,
-		validation.Field(&g.GuildID, validation.Required),
+		//validation.Field(&g.GuildID, validation.Required),
 		validation.Field(&g.Channels, validation.Required),
 	)
 }

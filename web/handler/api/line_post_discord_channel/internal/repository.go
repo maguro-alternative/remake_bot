@@ -62,6 +62,9 @@ func (r *Repository) DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Contex
 			return err
 		}
 	}
+	if len(values) == 0 {
+		return nil
+	}
 	// INSERT されるもの以外を削除
 	query := fmt.Sprintf(`
 		INSERT INTO line_ng_discord_message_type (
@@ -107,6 +110,9 @@ func (r *Repository) DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNg
 		if err != nil {
 			return err
 		}
+	}
+	if len(values) == 0 {
+		return nil
 	}
 	// INSERT されるもの以外を削除
 	query := fmt.Sprintf(`

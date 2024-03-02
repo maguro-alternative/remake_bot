@@ -17,7 +17,7 @@ type LineChannel struct {
 }
 
 type LineNgID struct {
-	ID    string `db:"id"`
+	ID     string `db:"id"`
 	IDType string `db:"id_type"`
 }
 

@@ -63,16 +63,17 @@ func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := repo.InsertLineNgDiscordIDs(ctx, lineNgIDs); err != nil {
-		http.Error(w, "line_ng_discord_id更新に失敗しました。", http.StatusInternalServerError)
+		http.Error(w, "line_ng_discord_id更新(挿入)に失敗しました。", http.StatusInternalServerError)
 		return
 	}
 
 	if err := repo.DeleteNotInsertLineNgDiscordIDs(ctx, lineNgIDs); err != nil {
-		http.Error(w, "line_ng_discord_id更新に失敗しました。", http.StatusInternalServerError)
+		http.Error(w, "line_ng_discord_id更新(削除)に失敗しました。"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("OK")
 }
 
 func lineChannelJsonRead(lineChannelJson internal.LineChannelJson) (channels []internal.LineChannel, ngTypes []internal.LineNgType, ngIDs []internal.LineNgID) {

@@ -22,6 +22,28 @@ func NewLinePostDiscordChannelViewHandler(indexService *service.IndexService) *L
 }
 
 func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http.Request) {
+	messageTypes := []string{
+		"デフォルト",
+		"RecipientAdd",
+		"RecipientRemove",
+		"DM通話開始",
+		"チャンネル名変更",
+		"チャンネルアイコン変更",
+		"メッセージピン止め",
+		"サーバー参加",
+		"サーバーブースト",
+		"サーバーレベル1",
+		"サーバーレベル2",
+		"サーバーレベル3",
+		"サーバーフォロー",
+		"サーバーディスカバリー失格メッセージ",
+		"サーバーディスカバリー要件メッセージ",
+		"スレッド作成",
+		"リプライメッセージ",
+		"スラッシュコマンド",
+		"スレッドスタートメッセージ",
+		"コンテンツメニュー",
+	}
 	categoryPositions := make(map[string]internal.DiscordChannel)
 	guildId := r.PathValue("guildId")
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
@@ -105,37 +127,6 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		}
 	}
 
-	selectMemberForm := ""
-	for _, member := range guild.Members {
-		selectMemberForm += fmt.Sprintf(`<option value="%s">%s</option>`, member.User.ID, member.User.Username)
-	}
-	selectRoleForm := ""
-	for _, role := range guild.Roles {
-		selectRoleForm += fmt.Sprintf(`<option value="%s">%s</option>`, role.ID, role.Name)
-	}
-	selectMessageTypeForm := `
-		<option value=0>デフォルト</option>
-		<option value=1>RecipientAdd</option>
-		<option value=2>RecipientRemove</option>
-		<option value=3>DM通話開始</option>
-		<option value=4>チャンネル名変更</option>
-		<option value=5>チャンネルアイコン変更</option>
-		<option value=6>メッセージピン止め</option>
-		<option value=7>サーバー参加</option>
-		<option value=8>サーバーブースト</option>
-		<option value=9>サーバーレベル1</option>
-		<option value=10>サーバーレベル2</option>
-		<option value=11>サーバーレベル3</option>
-		<option value=12>サーバーフォロー</option>
-		<option value=13>サーバーディスカバリー失格メッセージ</option>
-		<option value=14>サーバーディスカバリー要件メッセージ</option>
-		<option value=15>スレッド作成</option>
-		<option value=16>リプライメッセージ</option>
-		<option value=17>スラッシュコマンド</option>
-		<option value=18>スレッドスタートメッセージ</option>
-		<option value=19>コンテンツメニュー</option>
-	`
-
 	htmlForm := ``
 	for categoryID, channels := range channelsInCategory {
 		htmlForm += fmt.Sprintf(`
@@ -146,14 +137,22 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 			if channel.ID == "" {
 				continue
 			}
+			messageNgFlag, botNgFlag := "", ""
+			selectMemberForm, selectRoleForm, selectMessageTypeForm := createSelectForm(guild, channel, messageTypes)
+			if channel.Ng {
+				messageNgFlag = "checked"
+			}
+			if channel.BotMessage {
+				botNgFlag = "checked"
+			}
 			htmlForm += `
 			<details>
                 <summary>` + channel.Name + `</summary>
 				<label for="ng_` + channel.ID + `">LINEへ送信しない</label>
-				<input type="checkbox" id="ng_` + channel.ID + `" name="ng_` + channel.ID + `" />
+				<input type="checkbox" id="ng_` + channel.ID + `" name="ng_` + channel.ID + `" ` + messageNgFlag + ` />
 				<br/>
 				<label for="bot_message_` + channel.ID + `">Botのメッセージを送信しない</label>
-				<input type="checkbox" id="bot_message_` + channel.ID + `" name="bot_message_` + channel.ID + `" />
+				<input type="checkbox" id="bot_message_` + channel.ID + `" name="bot_message_` + channel.ID + `"` + botNgFlag + ` />
 				<br/>
 				<label for="ng_types_` + channel.ID + `[]">NGタイプ</label>
 				<select id="ng_types_` + channel.ID + `[]" name="ng_types_` + channel.ID + `[]" multiple>
@@ -190,4 +189,53 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		fmt.Println(err.Error())
 	}
+}
+
+func createSelectForm(guild *discordgo.Guild, channel internal.DiscordChannelSet, messageTypes []string) (member string, role string, messageType string) {
+	selectMemberForm := ""
+	for _, member := range guild.Members {
+		selectedFlag := false
+		for _, ngUserID := range channel.NgUsers {
+			if ngUserID == member.User.ID {
+				selectedFlag = true
+				break
+			}
+		}
+		if selectedFlag {
+			selectMemberForm += fmt.Sprintf(`<option value="%s" selected>%s</option>`, member.User.ID, member.User.Username)
+			continue
+		}
+		selectMemberForm += fmt.Sprintf(`<option value="%s">%s</option>`, member.User.ID, member.User.Username)
+	}
+	selectRoleForm := ""
+	for _, role := range guild.Roles {
+		selectedFlag := false
+		for _, ngRoleID := range channel.NgRoles {
+			if ngRoleID == role.ID {
+				selectedFlag = true
+				break
+			}
+		}
+		if selectedFlag {
+			selectRoleForm += fmt.Sprintf(`<option value="%s" selected>%s</option>`, role.ID, role.Name)
+			continue
+		}
+		selectRoleForm += fmt.Sprintf(`<option value="%s">%s</option>`, role.ID, role.Name)
+	}
+	selectMessageTypeForm := ""
+	for i, messageType := range messageTypes {
+		selectedFlag := false
+		for _, ngType := range channel.NgTypes {
+			if ngType == i {
+				selectedFlag = true
+				break
+			}
+		}
+		if selectedFlag {
+			selectMessageTypeForm += fmt.Sprintf(`<option value=%d selected>%s</option>`, i, messageType)
+			continue
+		}
+		selectMessageTypeForm += fmt.Sprintf(`<option value=%d>%s</option>`, i, messageType)
+	}
+	return selectMemberForm, selectRoleForm, selectMessageTypeForm
 }

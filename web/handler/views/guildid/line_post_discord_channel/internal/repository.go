@@ -43,7 +43,7 @@ func (r *Repository) InsertLineChannel(ctx context.Context, channelID string, gu
 			$2,
 			false,
 			false
-		)
+		) ON CONFLICT DO NOTHING
 	`
 	_, err := r.db.ExecContext(ctx, query, channelID, guildID)
 	return err

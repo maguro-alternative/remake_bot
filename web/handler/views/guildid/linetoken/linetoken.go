@@ -56,6 +56,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			typeIcon = "📝"
 		}
 		categoryPosition := categoryPositions[channel.ParentID]
+		// まだチャンネルがない場合は初期化
 		if len(channelsInCategory[categoryPosition.ID]) == 0 {
 			channelsInCategory[categoryPosition.ID] = make([]internal.DiscordChannelSelect, len(guild.Channels)-2, len(guild.Channels))
 		}

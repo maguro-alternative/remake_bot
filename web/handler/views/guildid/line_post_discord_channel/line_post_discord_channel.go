@@ -62,10 +62,12 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		discordChannel, err := repo.GetLineChannel(r.Context(), channel.ID)
 		if err != nil && err.Error() != "sql: no rows in result set" {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			fmt.Println(err.Error())
 			return
 		} else {
 			if err := repo.InsertLineChannel(r.Context(), channel.ID, guildId); err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				fmt.Println(err.Error())
 				return
 			}
 			discordChannel = internal.LineChannel{
@@ -78,11 +80,13 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		ngTypes, err := repo.GetLineNgType(r.Context(), channel.ID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			fmt.Println(err.Error())
 			return
 		}
 		ngDiscordIDs, err := repo.GetLineNgDiscordID(r.Context(), channel.ID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			fmt.Println(err.Error())
 			return
 		}
 		channelsInCategory[categoryPosition.ID][channel.Position] = internal.DiscordChannelSet{
@@ -136,31 +140,34 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	for categoryID, channels := range channelsInCategory {
 		htmlForm += fmt.Sprintf(`
 		<details>
-            <summary>%d</summary>
-		`, categoryPositions[categoryID].Position)
+            <summary>%s</summary>
+		`, categoryPositions[categoryID].Name)
 		for _, channel := range channels {
+			if channel.ID == "" {
+				continue
+			}
 			htmlForm += `
 			<details>
                 <summary>` + channel.Name + `</summary>
-				<label for="ng_`+channel.ID+`">LINEへ送信しない</label>
-				<input type="checkbox" id="ng_`+channel.ID+`" name="ng_`+channel.ID+`" />
+				<label for="ng_` + channel.ID + `">LINEへ送信しない</label>
+				<input type="checkbox" id="ng_` + channel.ID + `" name="ng_` + channel.ID + `" />
 				<br/>
-				<label for="bot_message_`+channel.ID+`">Botのメッセージを送信しない</label>
-				<input type="checkbox" id="bot_message_`+channel.ID+`" name="bot_message_`+channel.ID+`" />
+				<label for="bot_message_` + channel.ID + `">Botのメッセージを送信しない</label>
+				<input type="checkbox" id="bot_message_` + channel.ID + `" name="bot_message_` + channel.ID + `" />
 				<br/>
-				<label for="ng_types_`+channel.ID+`[]">NGタイプ</label>
-				<select id="ng_types_`+channel.ID+`[]" name="ng_types_`+channel.ID+`[]" multiple>
-					`+selectMessageTypeForm+`
+				<label for="ng_types_` + channel.ID + `[]">NGタイプ</label>
+				<select id="ng_types_` + channel.ID + `[]" name="ng_types_` + channel.ID + `[]" multiple>
+					` + selectMessageTypeForm + `
 				</select>
 				<br/>
-				<label for="ng_users_`+channel.ID+`[]">NGユーザー</label>
-				<select id="ng_users_`+channel.ID+`[]" name="ng_users_`+channel.ID+`[]" multiple>
-					`+selectMemberForm+`
+				<label for="ng_users_` + channel.ID + `[]">NGユーザー</label>
+				<select id="ng_users_` + channel.ID + `[]" name="ng_users_` + channel.ID + `[]" multiple>
+					` + selectMemberForm + `
 				</select>
 				<br/>
-				<label for="ng_roles_`+channel.ID+`[]">NGロール</label>
-				<select id="ng_roles_`+channel.ID+`[]" name="ng_roles_`+channel.ID+`[]" multiple>
-					`+selectRoleForm+`
+				<label for="ng_roles_` + channel.ID + `[]">NGロール</label>
+				<select id="ng_roles_` + channel.ID + `[]" name="ng_roles_` + channel.ID + `[]" multiple>
+					` + selectRoleForm + `
 				</select>
 				<br/>
 			</details>
@@ -170,14 +177,17 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		</details>`
 	}
 
-	tmpl := template.Must(template.New("index").ParseFiles("web/template/layout.html", "web/template/guildid/line_post_discord_channel/index.html"))
+	tmpl := template.Must(template.New("line_post_discord_channel.html").ParseFiles("web/templates/views/guilds/line_post_discord_channel.html"))
 	if err := tmpl.Execute(w, struct {
 		GuildName string
+		GuildID   string
 		HTMLForm  template.HTML
 	}{
 		GuildName: guild.Name,
+		GuildID:   guildId,
 		HTMLForm:  template.HTML(htmlForm),
 	}); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		fmt.Println(err.Error())
 	}
 }

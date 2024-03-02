@@ -10,15 +10,7 @@
             <!-- 入力フォーム -->
             <form action="#" id="form">
 
-                <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>
-                <select id="defaultChannel" name="default_channel_id" >
-                    {{ .Channels }}
-                </select>
-                <br/>
-
-                <label for="debugMode">デバッグモード</label>
-                <input id="debugMode" type="checkbox" name="debug_mode" value="true">
-                <br/>
+                {{ .HTMLForm }}
 
                 <input type="submit" value="送信">
             </form>

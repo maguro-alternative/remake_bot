@@ -29,16 +29,18 @@
             let ngTypeArray, ngUserArray, ngRoleArray;
             let ngBool, BotMessageBool = false;
             const channelArray = [];
-            let jsonTmp = {};
-
-            const jsonArray = JSON.stringify(contentArray);
+            let jsonTmp = [];
 
             // 各formのkeyを取得
             for (let i = 0; i < formElements.length; i++) {
                 formKey = formElements[i].name;
-                channelId = formKey.match(/[0-9]/);
+                channelIdmatch = formKey.match(/[0-9]/g);
+                if (channelIdmatch === null) {
+                    continue;
+                }
+                channelId = channelIdmatch.join('');
                 if ((formKey.includes('ng_types')) && (formKey.includes('[]'))) {
-                    ngTypeArray = formData.getAll(formKey);
+                    ngTypeArray = formData.getAll(formKey).map( str => parseInt(str, 10) );
                 }
                 if ((formKey.includes('ng_users')) && (formKey.includes('[]'))) {
                     ngUserArray = formData.getAll(formKey);
@@ -62,8 +64,8 @@
                 }
             }
 
-            for (let i = 0; i < jsonTmp.length; i++) {
-                channelArray.push(jsonTmp[i]);
+            for (let key in jsonTmp) {
+                channelArray.push(jsonTmp[key]);
             }
 
             const jsonData = JSON.stringify({
@@ -71,7 +73,7 @@
             });
 
             // データを送信
-            await fetch('/api/{{ .GuildID }}/line-post-channel-discord', {
+            await fetch('/api/{{ .GuildID }}/line-post-discord-channel', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

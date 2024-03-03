@@ -4,7 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -59,27 +63,28 @@ type LineNotifyCall struct {
 // LINE Notifyでメッセージを送信
 func (r *LineRequest) PushMessageNotify(ctx context.Context, message string) error {
 	client := &http.Client{}
-	url := "https://notify-api.line.me/api/notify"
-	notifyMessage := LineNotifyMessage{
-		Message: message,
-	}
-	err := notifyMessage.Validate()
+	notifyUrl := "https://notify-api.line.me/api/notify"
+	u, err := url.ParseRequestURI(notifyUrl)
 	if err != nil {
 		return err
 	}
-	notifyMessageByte, err := json.Marshal(notifyMessage)
-	if err != nil {
-		return err
-	}
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(notifyMessageByte))
+	form := url.Values{}
+	form.Add("message", message)
+
+	body := strings.NewReader(form.Encode())
+	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), body)
 	if err != nil {
 		return err
 	}
 
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return errors.New(fmt.Sprintln("%+v\n", resp))
 	}
 	defer resp.Body.Close()
 
@@ -108,6 +113,7 @@ func (r *LineRequest) PushImageNotify(ctx context.Context, message, image string
 		return err
 	}
 
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
 	resp, err := client.Do(req)
 	if err != nil {
@@ -140,6 +146,7 @@ func (r *LineRequest) PushStampNotify(ctx context.Context, message, stickerPacka
 		return err
 	}
 
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
 	resp, err := client.Do(req)
 	if err != nil {
@@ -170,6 +177,7 @@ func (r *LineRequest) PushMessageNotifyCall(ctx context.Context, message string)
 		return nil, err
 	}
 
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
 	return &LineNotifyCall{
 		c: client,
@@ -182,7 +190,7 @@ func (r *LineRequest) PushImageNotifyCall(ctx context.Context, message, image st
 	client := &http.Client{}
 	url := "https://notify-api.line.me/api/notify"
 	notifyMessage := LineNotifyImage{
-		Message: message,
+		Message:        message,
 		ImageThumbnail: image,
 		ImageFullsize:  image,
 	}
@@ -229,6 +237,7 @@ func (r *LineRequest) PushStampNotifyCall(ctx context.Context, message, stickerP
 		return nil, err
 	}
 
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
 	return &LineNotifyCall{
 		c: client,

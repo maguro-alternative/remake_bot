@@ -50,8 +50,8 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 			return
 		}
 		channel = onMessageCreate.LineChannel{
-			Ng:          false,
-			BotMessage:  false,
+			Ng:         false,
+			BotMessage: false,
 		}
 	}
 	ngTypes, err := repo.GetLineNgType(ctx, vs.ChannelID)
@@ -131,9 +131,9 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	lineBotDecrypt.DebugMode = lineBotApi.DebugMode
 
 	lineRequ := line.NewLineRequest(
+		lineBotDecrypt.LineNotifyToken,
 		lineBotDecrypt.LineBotToken,
 		lineBotDecrypt.LineGroupID,
-		lineBotDecrypt.LineNotifyToken,
 	)
 
 	// メッセージの種類によって処理を分岐
@@ -277,6 +277,12 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 			slog.InfoContext(ctx, err.Error())
 			return
 		}
+	}
+	slog.InfoContext(ctx, sendText)
+	err = lineRequ.PushMessageNotify(ctx, sendText)
+	if err != nil {
+		slog.InfoContext(ctx, err.Error())
+		return
 	}
 }
 

@@ -21,7 +21,7 @@ type LineBotJson struct {
 func (g LineBotJson) Validate() error {
 	return validation.ValidateStruct(&g,
 		validation.Field(&g.LineNotifyToken, is.Alphanumeric),
-		validation.Field(&g.LineBotToken, is.Alphanumeric),
+		validation.Field(&g.LineBotToken, validation.Required),
 		validation.Field(&g.LineBotSecret, is.Alphanumeric),
 		validation.Field(&g.LineGroupID, is.Alphanumeric),
 		validation.Field(&g.LineClientID, is.Alphanumeric),

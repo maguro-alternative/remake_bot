@@ -2,9 +2,9 @@ package cogs
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/hex"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/exec"
@@ -41,10 +41,12 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	repo := onMessageCreate.NewRepository(h.DB)
 	channel, err := repo.GetLineChannel(ctx, vs.ChannelID)
 	if err != nil && err.Error() != "sql: no rows in result set" {
+		slog.InfoContext(ctx, err.Error())
 		return
 	} else if err != nil {
 		err = repo.InsertLineChannel(ctx, vs.ChannelID, vs.GuildID)
 		if err != nil {
+			slog.InfoContext(ctx, err.Error())
 			return
 		}
 		channel = onMessageCreate.LineChannel{
@@ -54,26 +56,31 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	}
 	ngTypes, err := repo.GetLineNgType(ctx, vs.ChannelID)
 	if err != nil {
+		slog.InfoContext(ctx, err.Error())
 		return
 	}
 	ngDiscordIDs, err := repo.GetLineNgDiscordID(ctx, vs.ChannelID)
 	if err != nil {
+		slog.InfoContext(ctx, err.Error())
 		return
 	}
 	// メッセージの種類がNGの場合は処理を終了
 	for _, ngType := range ngTypes {
 		if vs.Message.Type == discordgo.MessageType(ngType) {
+			slog.InfoContext(ctx, "NG Type")
 			return
 		}
 	}
 	// メッセージの送信者がNGの場合は処理を終了
 	for _, ngDiscordID := range ngDiscordIDs {
 		if ngDiscordID.IDType == "user" && vs.Author.ID == ngDiscordID.ID {
+			slog.InfoContext(ctx, "NG User")
 			return
 		}
 		if ngDiscordID.IDType == "role" {
 			for _, role := range vs.Member.Roles {
 				if role == ngDiscordID.ID {
+					slog.InfoContext(ctx, "NG Role")
 					return
 				}
 			}
@@ -81,63 +88,45 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	}
 	// チャンネルがNGの場合、またはBotメッセージでない場合は処理を終了
 	if channel.Ng || (!channel.BotMessage && vs.Author.Bot) {
+		slog.InfoContext(ctx, "NG Channel or Bot Message")
 		return
 	}
 	lineBotApi, err := repo.GetLineBot(ctx, vs.GuildID)
 	if err != nil {
+		slog.InfoContext(ctx, err.Error())
 		return
 	}
 	lineBotIv, err := repo.GetLineBotIv(ctx, vs.GuildID)
 	if err != nil {
+		slog.InfoContext(ctx, err.Error())
 		return
 	}
 	var lineBotDecrypt onMessageCreate.LineBotDecrypt
 	// 暗号化キーのバイトへの変換
 	keyBytes, err := hex.DecodeString(config.PrivateKey())
 	if err != nil {
+		slog.InfoContext(ctx, err.Error())
 		return
 	}
 
-	decodeNotifyToken, err := hex.DecodeString(string(lineBotIv.LineNotifyTokenIv[0]))
+	lineNotifyTokenByte, err := crypto.Decrypt(lineBotApi.LineNotifyToken[0], keyBytes, lineBotIv.LineNotifyTokenIv[0])
 	if err != nil {
+		slog.InfoContext(ctx, err.Error())
 		return
 	}
-	decodeBotToken, err := hex.DecodeString(string(lineBotIv.LineBotTokenIv[0]))
+	lineBotTokenByte, err := crypto.Decrypt(lineBotApi.LineBotToken[0], keyBytes, lineBotIv.LineBotTokenIv[0])
 	if err != nil {
+		slog.InfoContext(ctx, err.Error())
 		return
 	}
-	decodeGroupID, err := hex.DecodeString(string(lineBotIv.LineGroupIDIv[0]))
+	lineGroupIDByte, err := crypto.Decrypt(lineBotApi.LineGroupID[0], keyBytes, lineBotIv.LineGroupIDIv[0])
 	if err != nil {
-		return
-	}
-	lineNotifyStr, err := base64.StdEncoding.DecodeString(string(lineBotApi.LineNotifyToken[0]))
-	if err != nil {
-		return
-	}
-	lineBotTokenStr, err := base64.StdEncoding.DecodeString(string(lineBotApi.LineBotToken[0]))
-	if err != nil {
-		return
-	}
-	lineGroupStr, err := base64.StdEncoding.DecodeString(string(lineBotApi.LineGroupID[0]))
-	if err != nil {
-		return
-	}
-
-	lineNotifyTokenByte, err := crypto.Decrypt(lineNotifyStr, keyBytes, decodeNotifyToken)
-	if err != nil {
-		return
-	}
-	lineBotTokenByte, err := crypto.Decrypt(lineBotTokenStr, keyBytes, decodeBotToken)
-	if err != nil {
-		return
-	}
-	lineGroupByte, err := crypto.Decrypt(lineGroupStr, keyBytes, decodeGroupID)
-	if err != nil {
+		slog.InfoContext(ctx, err.Error())
 		return
 	}
 	lineBotDecrypt.LineNotifyToken = string(lineNotifyTokenByte)
 	lineBotDecrypt.LineBotToken = string(lineBotTokenByte)
-	lineBotDecrypt.LineGroupID = string(lineGroupByte)
+	lineBotDecrypt.LineGroupID = string(lineGroupIDByte)
 	lineBotDecrypt.DefaultChannelID = lineBotApi.DefaultChannelID
 	lineBotDecrypt.DebugMode = lineBotApi.DebugMode
 
@@ -148,7 +137,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	)
 
 	// メッセージの種類によって処理を分岐
-	switch vs.ReferencedMessage.Type {
+	switch vs.Message.Type {
 	case discordgo.MessageTypeUserPremiumGuildSubscription:
 		sendText = vs.Message.Author.Username + "がサーバーブーストしました。"
 	case discordgo.MessageTypeUserPremiumGuildSubscriptionTierOne:
@@ -162,6 +151,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	default:
 		st, err := s.Channel(vs.ChannelID)
 		if err != nil {
+			slog.InfoContext(ctx, err.Error())
 			return
 		}
 		sendText = st.Name + "にて、" + vs.Message.Author.Username
@@ -203,16 +193,19 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 			tmpFileNotExt := os.TempDir() + "/" + fileNameNoExt
 			downloadFilePath, err := downloadFile(tmpFile, attachment.URL)
 			if err != nil {
+				slog.InfoContext(ctx, err.Error())
 				return
 			}
 			if extension != ".m4a" {
 				err = exec.CommandContext(ctx, "ffmpeg", "-i", downloadFilePath, tmpFileNotExt+".m4a").Run()
 				if err != nil {
+					slog.InfoContext(ctx, err.Error())
 					return
 				}
 			}
 			f, err := os.Open(tmpFileNotExt + ".m4a")
 			if err != nil {
+				slog.InfoContext(ctx, err.Error())
 				return
 			}
 			defer f.Close()
@@ -222,6 +215,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 				f,
 			)
 			if err != nil {
+				slog.InfoContext(ctx, err.Error())
 				return
 			}
 			// 音声ファイルの秒数を取得
@@ -235,11 +229,13 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 			)
 			out, err := cmd.CombinedOutput()
 			if err != nil {
+				slog.InfoContext(ctx, err.Error())
 				return
 			}
 			match := regexp.MustCompile(`(\d+\.\d+)`).FindStringSubmatch(string(out))
 			audioLen, err := strconv.Atoi(match[0])
 			if err != nil {
+				slog.InfoContext(ctx, err.Error())
 				return
 			}
 			audio := lineRequ.NewLineAudioMessage(
@@ -270,6 +266,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	for _, url := range imageUrls {
 		err = lineRequ.PushImageNotify(ctx, sendText, url)
 		if err != nil {
+			slog.InfoContext(ctx, err.Error())
 			return
 		}
 	}
@@ -277,6 +274,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	if len(lineMessageTypes) > 0 {
 		err = lineRequ.PushMessageBotInGroup(ctx, lineMessageTypes)
 		if err != nil {
+			slog.InfoContext(ctx, err.Error())
 			return
 		}
 	}

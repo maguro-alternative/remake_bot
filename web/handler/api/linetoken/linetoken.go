@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/lib/pq"
+
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken/internal"
@@ -70,44 +72,58 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (Bot *internal.LineBot, BotIv *internal.LineBotIv, err error) {
-	var lineBot internal.LineBot
-	var lineBotIv internal.LineBotIv
-	fmt.Println(lineBotJson.GuildID)
+	lineBot := internal.LineBot{
+		LineNotifyToken:  make(pq.ByteaArray, 1),
+		LineBotToken:     make(pq.ByteaArray, 1),
+		LineBotSecret:    make(pq.ByteaArray, 1),
+		LineGroupID:      make(pq.ByteaArray, 1),
+		LineClientID:     make(pq.ByteaArray, 1),
+		LineClientSecret: make(pq.ByteaArray, 1),
+	}
+	lineBotIv := internal.LineBotIv{
+		LineNotifyTokenIv:  make(pq.ByteaArray, 1),
+		LineBotTokenIv:     make(pq.ByteaArray, 1),
+		LineBotSecretIv:    make(pq.ByteaArray, 1),
+		LineGroupIDIv:      make(pq.ByteaArray, 1),
+		LineClientIDIv:     make(pq.ByteaArray, 1),
+		LineClientSecretIv: make(pq.ByteaArray, 1),
+	}
 	key, err := hex.DecodeString(privateKey)
 	if err != nil {
 		return nil, nil, err
 	}
 	// 暗号化
 	if len(lineBotJson.LineNotifyToken) > 0 {
-		if lineBot.LineNotifyToken[0], lineBotIv.LineNotifyTokenIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineNotifyToken), key); err != nil {
+		if lineBotIv.LineNotifyTokenIv[0], lineBot.LineNotifyToken[0], err = crypto.Encrypt([]byte(lineBotJson.LineNotifyToken), key); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBotJson.LineBotToken) > 0 {
-		if lineBot.LineBotToken[0], lineBotIv.LineBotTokenIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotToken), key); err != nil {
+		if lineBotIv.LineBotTokenIv[0], lineBot.LineBotToken[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotToken), key); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBotJson.LineBotSecret) > 0 {
-		if lineBot.LineBotSecret[0], lineBotIv.LineBotSecretIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotSecret), key); err != nil {
+		if lineBotIv.LineBotSecretIv[0], lineBot.LineBotSecret[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotSecret), key); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBotJson.LineGroupID) > 0 {
-		if lineBot.LineGroupID[0], lineBotIv.LineGroupIDIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineGroupID), key); err != nil {
+		if lineBotIv.LineGroupIDIv[0], lineBot.LineGroupID[0], err = crypto.Encrypt([]byte(lineBotJson.LineGroupID), key); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBotJson.LineClientID) > 0 {
-		if lineBot.LineClientID[0], lineBotIv.LineClientIDIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineClientID), key); err != nil {
+		if lineBotIv.LineClientIDIv[0], lineBot.LineClientID[0], err = crypto.Encrypt([]byte(lineBotJson.LineClientID), key); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBotJson.LineClientSecret) > 0 {
-		if lineBot.LineClientSecret[0], lineBotIv.LineClientSecretIv[0], err = crypto.Encrypt([]byte(lineBotJson.LineClientSecret), key); err != nil {
+		if lineBotIv.LineClientSecretIv[0], lineBot.LineClientSecret[0], err = crypto.Encrypt([]byte(lineBotJson.LineClientSecret), key); err != nil {
 			return nil, nil, err
 		}
 	}
+	lineBotIv.GuildID = lineBotJson.GuildID
 	lineBot.GuildID = lineBotJson.GuildID
 	lineBot.DefaultChannelID = lineBotJson.DefaultChannelID
 	lineBot.DebugMode = lineBotJson.DebugMode

@@ -109,8 +109,11 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println(lineProfile.DisplayName + "からのメッセージを受信しました。")
+	log.Println("メッセージの種類: " + lineEvent.Message.Type)
+
 	// メッセージの種類によって処理を分岐
-	switch lineEvent.Type {
+	switch lineEvent.Message.Type {
 	case "text":
 		_, err = h.IndexService.DiscordSession.ChannelMessageSend(
 			lineBotDecrypt.DefaultChannelID,

@@ -17,6 +17,7 @@ type LineResponses struct {
 		Message   struct {
 			ID                  string   `json:"id"`
 			Text                string   `json:"text"`
+			Type                string   `json:"type"`
 			Duration            int64    `json:"duration"`
 			FileName            string   `json:"fileName"`
 			FileSize            int64    `json:"fileSize"`

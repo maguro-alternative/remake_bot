@@ -10,54 +10,20 @@ import (
 )
 
 func LineHmac(privateKey string, requestBodyByte []byte, lineBot LineBot, lineBotIv LineBotIv, header string) (decrypt *LineBotDecrypt, err error) {
-	var lineBotDecrypt *LineBotDecrypt
+	lineBotDecrypt := &LineBotDecrypt{}
 	// 暗号化キーのバイトへの変換
 	keyBytes, err := hex.DecodeString(privateKey)
 	if err != nil {
 		return nil, err
 	}
 
-	decodeBotSecret, err := hex.DecodeString(string(lineBotIv.LineBotSecretIv[0]))
-	if err != nil {
-		return nil, err
-	}
-	decodeNotifyToken, err := hex.DecodeString(string(lineBotIv.LineNotifyTokenIv[0]))
-	if err != nil {
-		return
-	}
-	decodeBotToken, err := hex.DecodeString(string(lineBotIv.LineBotTokenIv[0]))
-	if err != nil {
-		return
-	}
-	decodeGroupID, err := hex.DecodeString(string(lineBotIv.LineGroupIDIv[0]))
-	if err != nil {
-		return
-	}
-	lineBotSecretStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineBotSecret[0]))
-	if err != nil {
-		return nil, err
-	}
-	lineNotifyStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineNotifyToken[0]))
-	if err != nil {
-		return
-	}
-	lineBotTokenStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineBotToken[0]))
-	if err != nil {
-		return
-	}
-	lineGroupStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineGroupID[0]))
-	if err != nil {
-		return
-	}
-
-	// 暗号化されたシークレットキーの復号化
-	sercretKey, err := crypto.Decrypt(lineBotSecretStr, keyBytes, decodeBotSecret)
+	lineBotSecretKey, err := crypto.Decrypt(lineBot.LineBotSecret[0], keyBytes, lineBotIv.LineBotSecretIv[0])
 	if err != nil {
 		return nil, err
 	}
 
 	// macの生成
-	mac := hmac.New(sha256.New, []byte(sercretKey))
+	mac := hmac.New(sha256.New, []byte(lineBotSecretKey))
 	mac.Write(requestBodyByte)
 	validSignByte := mac.Sum(nil)
 
@@ -67,15 +33,15 @@ func LineHmac(privateKey string, requestBodyByte []byte, lineBot LineBot, lineBo
 	if header != signature {
 		return nil, nil
 	}
-	lineNotifyTokenByte, err := crypto.Decrypt(lineNotifyStr, keyBytes, decodeNotifyToken)
+	lineNotifyTokenByte, err := crypto.Decrypt(lineBot.LineNotifyToken[0], keyBytes, lineBotIv.LineNotifyTokenIv[0])
 	if err != nil {
 		return nil, err
 	}
-	lineBotTokenByte, err := crypto.Decrypt(lineBotTokenStr, keyBytes, decodeBotToken)
+	lineBotTokenByte, err := crypto.Decrypt(lineBot.LineBotToken[0], keyBytes, lineBotIv.LineBotTokenIv[0])
 	if err != nil {
 		return nil, err
 	}
-	lineGroupByte, err := crypto.Decrypt(lineGroupStr, keyBytes, decodeGroupID)
+	lineGroupByte, err := crypto.Decrypt(lineBot.LineGroupID[0], keyBytes, lineBotIv.LineGroupIDIv[0])
 	if err != nil {
 		return nil, err
 	}

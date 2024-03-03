@@ -86,7 +86,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			fmt.Println(err.Error())
 			return
-		} else {
+		} else if err != nil {
 			if err := repo.InsertLineChannel(r.Context(), channel.ID, guildId); err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				fmt.Println(err.Error())

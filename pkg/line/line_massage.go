@@ -60,11 +60,11 @@ func (r *LineRequest) NewLineVideoMessage(originalContentUrl, previewImageUrl st
 }
 
 // 音声メッセージを作成
-func (r *LineRequest) NewLineAudioMessage(originalContentUrl string, duration int) *LineMessageType {
+func (r *LineRequest) NewLineAudioMessage(originalContentUrl string, duration float64) *LineMessageType {
 	return &LineMessageType{
 		Type:               "audio",
 		OriginalContentUrl: originalContentUrl,
-		Duration:           duration * 1000,
+		Duration:           int(duration * 1000),
 	}
 }
 

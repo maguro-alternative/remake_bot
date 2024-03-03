@@ -191,13 +191,16 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 		case ".mp3", ".wav", ".ogg", ".m4a":
 			tmpFile := os.TempDir() + "/" + attachment.Filename
 			tmpFileNotExt := os.TempDir() + "/" + fileNameNoExt
-			downloadFilePath, err := downloadFile(tmpFile, attachment.URL)
+			slog.InfoContext(ctx, "download:"+attachment.URL)
+			err = downloadFile(tmpFile, attachment.URL)
 			if err != nil {
 				slog.InfoContext(ctx, err.Error())
 				return
 			}
 			if extension != ".m4a" {
-				err = exec.CommandContext(ctx, "ffmpeg", "-i", downloadFilePath, tmpFileNotExt+".m4a").Run()
+				slog.InfoContext(ctx, "m4a変換:"+tmpFile)
+				slog.InfoContext(ctx, "ffmpeg:"+tmpFile)
+				err = exec.CommandContext(ctx, "ffmpeg", "-i", tmpFile, tmpFileNotExt+".m4a").Run()
 				if err != nil {
 					slog.InfoContext(ctx, err.Error())
 					return
@@ -209,9 +212,10 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 				return
 			}
 			defer f.Close()
-			messsage, err := s.ChannelFileSend(
+			messsage, err := s.ChannelFileSendWithMessage(
 				vs.ChannelID,
-				"m4aに変換します。"+tmpFileNotExt+".m4a",
+				"m4aに変換します。",
+				tmpFileNotExt+".m4a",
 				f,
 			)
 			if err != nil {
@@ -224,16 +228,18 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 				"ffprobe",
 				"-hide_banner",
 				tmpFileNotExt+".m4a",
-				"show_entries",
+				"-show_entries",
 				"format=duration",
 			)
+			slog.InfoContext(ctx, "秒数取得:"+tmpFileNotExt+".m4a")
 			out, err := cmd.CombinedOutput()
 			if err != nil {
 				slog.InfoContext(ctx, err.Error())
 				return
 			}
 			match := regexp.MustCompile(`(\d+\.\d+)`).FindStringSubmatch(string(out))
-			audioLen, err := strconv.Atoi(match[0])
+			slog.InfoContext(ctx, "秒数:"+match[0])
+			audioLen, err := strconv.ParseFloat(match[0], 64)
 			if err != nil {
 				slog.InfoContext(ctx, err.Error())
 				return
@@ -289,17 +295,17 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	}
 }
 
-func downloadFile(tmpFilePath, url string) (string, error) {
+func downloadFile(tmpFilePath, url string) (error) {
 	f, err := os.Create(tmpFilePath)
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer f.Close()
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer resp.Body.Close()
 	_, err = io.Copy(f, resp.Body)
-	return "", err
+	return err
 }

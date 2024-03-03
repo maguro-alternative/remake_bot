@@ -278,7 +278,10 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 			return
 		}
 	}
-	slog.InfoContext(ctx, sendText)
+	// 画像、動画、音声がない場合はテキストのみ送信
+	if len(imageUrls) > 0 || videoCount > 0 || voiceCount > 0 {
+		return
+	}
 	err = lineRequ.PushMessageNotify(ctx, sendText)
 	if err != nil {
 		slog.InfoContext(ctx, err.Error())

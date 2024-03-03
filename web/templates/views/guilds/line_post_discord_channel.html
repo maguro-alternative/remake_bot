@@ -29,7 +29,7 @@
             let ngTypeArray, ngUserArray, ngRoleArray;
             let ngBool, BotMessageBool = false;
             const channelArray = [];
-            let jsonTmp = [];
+            let jsonTmp = {};
 
             // 各formのkeyを取得
             for (let i = 0; i < formElements.length; i++) {
@@ -39,28 +39,30 @@
                     continue;
                 }
                 channelId = channelIdmatch.join('');
+                if (jsonTmp[channelId] === undefined) {
+                    jsonTmp[channelId] = {
+                        "channel_id": channelId,
+                        "ng": false,
+                        "bot_message": false,
+                        "ng_types": ngTypeArray,
+                        "ng_users": ngUserArray,
+                        "ng_roles": ngRoleArray
+                    }
+                }
                 if ((formKey.includes('ng_types')) && (formKey.includes('[]'))) {
-                    ngTypeArray = formData.getAll(formKey).map( str => parseInt(str, 10) );
+                    jsonTmp[channelId]['ng_types'] = formData.getAll(formKey).map( str => parseInt(str, 10) );
                 }
                 if ((formKey.includes('ng_users')) && (formKey.includes('[]'))) {
-                    ngUserArray = formData.getAll(formKey);
+                    jsonTmp[channelId]['ng_users'] = formData.getAll(formKey);
                 }
                 if ((formKey.includes('ng_roles')) && (formKey.includes('[]'))) {
-                    ngRoleArray = formData.getAll(formKey);
+                    jsonTmp[channelId]['ng_roles'] = formData.getAll(formKey);
                 }
                 if ((formKey.includes('ng_')) && (!formKey.includes('[]'))) {
-                    ngBool = true;
+                    document.getElementById(formKey).checked ? jsonTmp[channelId]["ng"] = true : jsonTmp[channelId]["ng"] = false;
                 }
                 if (formKey.includes('bot_message')) {
-                    BotMessageBool = true;
-                }
-                jsonTmp[channelId] = {
-                    "channel_id": channelId,
-                    "ng": ngBool,
-                    "bot_message": BotMessageBool,
-                    "ng_types": ngTypeArray,
-                    "ng_users": ngUserArray,
-                    "ng_roles": ngRoleArray
+                    document.getElementById(formKey).checked ? jsonTmp[channelId]["bot_message"] = true : jsonTmp[channelId]["bot_message"] = false;
                 }
             }
 

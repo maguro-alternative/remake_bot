@@ -137,22 +137,31 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "image":
 		imageContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
-			log.Println("LINE画像の取得に失敗しました。")
+			log.Println("LINE画像の取得に失敗しました。"+err.Error())
 			http.Error(w, "LINE画像の取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
-		// 画像の種類の取得
-		imageType, err := magicNumberRead(imageContent.Content)
+		defer imageContent.Content.Close()
+		imageBytes, err := io.ReadAll(imageContent.Content)
 		if err != nil {
-			log.Println("マジックナンバーの取得に失敗しました。")
+			log.Println("画像の読み込みに失敗しました。")
+			http.Error(w, "画像の読み込みに失敗しました。", http.StatusBadRequest)
+			return
+		}
+		// 画像の種類の取得
+		imageType, err := magicNumberRead(bytes.NewReader(imageBytes))
+		if err != nil {
+			log.Println("マジックナンバーの取得に失敗しました。"+lineResponses.Events[0].Message.ID)
+			log.Println(err)
 			http.Error(w, "マジックナンバーの取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
+		//log.Println(imageContent.Content)
 		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\n ",
 			"image."+imageType,
-			imageContent.Content,
+			bytes.NewReader(imageBytes),
 		)
 		if err != nil {
 			log.Println("discordへのメッセージ送信に失敗しました。")
@@ -166,6 +175,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "LINE動画の取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
+		defer videoContent.Content.Close()
 		if videoContent.ContentLength <= 25_000_000 {
 			// 動画の種類の取得
 			videoType, err := magicNumberRead(videoContent.Content)
@@ -226,6 +236,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "LINE音声の取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
+		defer audioContent.Content.Close()
 		// 音声の種類の取得
 		audioType, err := magicNumberRead(audioContent.Content)
 		if err != nil {
@@ -250,7 +261,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // マジックナンバーからファイルの種類を取得
-func magicNumberRead(content io.ReadCloser) (string, error) {
+func magicNumberRead(content io.Reader) (string, error) {
 	var buf bytes.Buffer
 	data := make([]byte, 12)
 	if _, err := io.Copy(&buf, content); err != nil {

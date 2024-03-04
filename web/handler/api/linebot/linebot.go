@@ -142,26 +142,28 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer imageContent.Content.Close()
+		// 画像のバイトデータのコピー
+		// close()後にバイトデータを使用するため、コピーしておく
 		imageBytes, err := io.ReadAll(imageContent.Content)
 		if err != nil {
 			log.Println("画像の読み込みに失敗しました。")
 			http.Error(w, "画像の読み込みに失敗しました。", http.StatusBadRequest)
 			return
 		}
+		imageData := bytes.NewReader(imageBytes)
 		// 画像の種類の取得
-		imageType, err := magicNumberRead(bytes.NewReader(imageBytes))
+		imageType, err := magicNumberRead(imageData)
 		if err != nil {
 			log.Println("マジックナンバーの取得に失敗しました。"+lineResponses.Events[0].Message.ID)
 			log.Println(err)
 			http.Error(w, "マジックナンバーの取得に失敗しました。", http.StatusBadRequest)
 			return
 		}
-		//log.Println(imageContent.Content)
 		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\n ",
 			"image."+imageType,
-			bytes.NewReader(imageBytes),
+			imageData,
 		)
 		if err != nil {
 			log.Println("discordへのメッセージ送信に失敗しました。")
@@ -176,9 +178,17 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer videoContent.Content.Close()
+		videoBytes, err := io.ReadAll(videoContent.Content)
+		if err != nil {
+			log.Println("動画の読み込みに失敗しました。")
+			http.Error(w, "動画の読み込みに失敗しました。", http.StatusBadRequest)
+			return
+		}
+		videoData := bytes.NewReader(videoBytes)
+		// 25MB以下の動画はdiscordにアップロードさせる
 		if videoContent.ContentLength <= 25_000_000 {
 			// 動画の種類の取得
-			videoType, err := magicNumberRead(videoContent.Content)
+			videoType, err := magicNumberRead(videoData)
 			if err != nil {
 				log.Println("マジックナンバーの取得に失敗しました。")
 				http.Error(w, "マジックナンバーの取得に失敗しました。", http.StatusBadRequest)
@@ -237,8 +247,15 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer audioContent.Content.Close()
+		audioBytes, err := io.ReadAll(audioContent.Content)
+		if err != nil {
+			log.Println("動画の読み込みに失敗しました。")
+			http.Error(w, "動画の読み込みに失敗しました。", http.StatusBadRequest)
+			return
+		}
+		audioData := bytes.NewReader(audioBytes)
 		// 音声の種類の取得
-		audioType, err := magicNumberRead(audioContent.Content)
+		audioType, err := magicNumberRead(audioData)
 		if err != nil {
 			log.Println("マジックナンバーの取得に失敗しました。")
 			http.Error(w, "マジックナンバーの取得に失敗しました。", http.StatusBadRequest)
@@ -248,7 +265,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\n ",
 			"audio."+audioType,
-			audioContent.Content,
+			audioData,
 		)
 		if err != nil {
 			log.Println("discordへのメッセージ送信に失敗しました。")

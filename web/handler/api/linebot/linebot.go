@@ -98,6 +98,12 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 応答確認の場合は200を返す
+	if len(lineResponses.Events) == 0 {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	lineEvent := lineResponses.Events[0]
 
 	lineRequ := line.NewLineRequest(lineBotDecrypt.LineNotifyToken, lineBotDecrypt.LineBotToken, lineBotDecrypt.LineGroupID)

@@ -51,6 +51,6 @@ type LineResponses struct {
 // Validate validates the LineResponses.
 func (h *LineResponses) Validate() error {
 	return validation.ValidateStruct(h,
-		validation.Field(&h.Events, validation.Required),
+		validation.Field(&h.Events, validation.Length(0, 1)),
 	)
 }

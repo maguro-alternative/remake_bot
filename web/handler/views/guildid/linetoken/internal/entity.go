@@ -32,3 +32,9 @@ type LineBotIv struct {
 	LineBotSecretIv   pq.ByteaArray `db:"line_bot_secret_iv"`
 	LineGroupIDIv     pq.ByteaArray `db:"line_group_id_iv"`
 }
+
+type PermissionID struct {
+	TargetType string `db:"target_type"`
+	TargetID   string `db:"target_id"`
+	Permission string `db:"permission"`
+}

@@ -1,4 +1,4 @@
-package oauthcheck
+package getoauth
 
 import (
 	"errors"
@@ -6,6 +6,19 @@ import (
 
 	"github.com/gorilla/sessions"
 )
+
+type DiscordOAuthSession struct {
+	Token string      `json:"token"`
+	User  DiscordUser `json:"user"`
+}
+
+type DiscordToken struct {
+	AccessToken  string `json:"access_token"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int    `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	Scope        string `json:"scope"`
+}
 
 type DiscordUser struct {
 	ID               string `json:"id"`
@@ -28,7 +41,7 @@ type DiscordUser struct {
 	Bio              string `json:"bio"`
 }
 
-func OAuthCheck(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*DiscordUser, error) {
+func DiscordOAuthCheck(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*DiscordUser, error) {
 	session, err := store.Get(r, sessionSecret)
 	if err != nil {
 		return nil, err

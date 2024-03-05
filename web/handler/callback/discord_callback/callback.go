@@ -27,7 +27,10 @@ func NewDiscordCallbackHandler(svc *service.DiscordOAuth2Service) *DiscordCallba
 
 func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var user internal.DiscordUser
-	ctx := context.Background()
+	ctx := r.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
 	gob.Register(&internal.DiscordUser{})

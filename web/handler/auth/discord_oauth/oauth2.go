@@ -3,6 +3,7 @@ package discordoauth
 import (
 	"encoding/gob"
 	"net/http"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"golang.org/x/oauth2"
@@ -31,7 +32,9 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	uuid := uuid.New().String()
 	session, err := h.DiscordOAuth2Service.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
-		panic(err)
+		slog.InfoContext(r.Context(), "sessionの取得に失敗しました。")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	session.Values["state"] = uuid
 	// セッションに保存

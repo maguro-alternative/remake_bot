@@ -57,7 +57,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 権限のチェック
-	if (permissionCode & discordGuildMember.Permissions) == 0 {
+	if (permissionCode & discordGuildMember.Permissions) != permissionCode {
 		http.Error(w, "権限がありません", http.StatusForbidden)
 		return
 	}

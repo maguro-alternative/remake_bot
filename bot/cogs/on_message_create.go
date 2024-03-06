@@ -250,6 +250,9 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 			)
 			lineMessageTypes = append(lineMessageTypes, audio)
 			voiceCount++
+		default:
+			slog.InfoContext(ctx, "未対応のファイル形式です。")
+			sendText += attachment.URL + "\n"
 		}
 	}
 

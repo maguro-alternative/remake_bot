@@ -24,7 +24,7 @@ func NewLineTokenViewHandler(indexService *service.IndexService) *LineTokenViewH
 }
 
 func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
-	_, err := getoauth.GetDiscordOAuth(
+	discordLoginUser, err := getoauth.GetDiscordOAuth(
 		g.IndexService.CookieStore,
 		r,
 		config.SessionSecret(),
@@ -41,6 +41,41 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not get guild id", http.StatusInternalServerError)
 		return
 	}
+	permissionCode, err := repo.GetPermissionCode(r.Context(), guildId, "")
+	if err != nil {
+		http.Error(w, "権限コードの取得に失敗しました", http.StatusInternalServerError)
+		return
+	}
+	permissionIDs, err := repo.GetPermissionIDs(r.Context(), guildId, "")
+	if err != nil {
+		http.Error(w, "権限読み込みに失敗しました", http.StatusInternalServerError)
+		return
+	}
+	discordGuildMember, err := g.IndexService.DiscordSession.GuildMember(guildId, discordLoginUser.User.ID)
+	if err != nil {
+		http.Error(w, "Not get discord member", http.StatusInternalServerError)
+		return
+	}
+	// 権限のチェック
+	if (permissionCode & discordGuildMember.Permissions) == 0 {
+		http.Error(w, "権限がありません", http.StatusForbidden)
+		return
+	}
+	for _, permissionId := range permissionIDs {
+		if permissionId.TargetType == "user" && permissionId.TargetID == discordLoginUser.User.ID {
+			http.Error(w, "権限がありません", http.StatusForbidden)
+			return
+		}
+		if permissionId.TargetType == "role" && discordGuildMember.Roles != nil {
+			for _, role := range discordGuildMember.Roles {
+				if permissionId.TargetID == role {
+					http.Error(w, "権限がありません", http.StatusForbidden)
+					return
+				}
+			}
+		}
+	}
+	// カテゴリーのチャンネルを取得
 	//[categoryID]map[channelPosition]channelName
 	channelsInCategory := make(map[string][]internal.DiscordChannelSelect)
 	for _, channel := range guild.Channels {

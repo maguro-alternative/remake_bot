@@ -95,8 +95,8 @@ func (r *Repository) GetPermissionCode(ctx context.Context, guildID, permissionT
 	return code, err
 }
 
-func (r *Repository) GetPermissionID(ctx context.Context, guildID, permissionType string) (PermissionID, error) {
-	var permissionID PermissionID
+func (r *Repository) GetPermissionIDs(ctx context.Context, guildID, permissionType string) ([]PermissionID, error) {
+	var permissionIDs []PermissionID
 	query := `
 		SELECT
 			target_type,
@@ -108,6 +108,6 @@ func (r *Repository) GetPermissionID(ctx context.Context, guildID, permissionTyp
 			guild_id = $1 AND
 			type = $2
 	`
-	err := r.db.GetContext(ctx, &permissionID, query, guildID, permissionType)
-	return permissionID, err
+	err := r.db.SelectContext(ctx, &permissionIDs, query, guildID, permissionType)
+	return permissionIDs, err
 }

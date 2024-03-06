@@ -45,6 +45,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		"コンテンツメニュー",
 	}
 	categoryPositions := make(map[string]internal.DiscordChannel)
+	var categoryIDTmps []string
 	guildId := r.PathValue("guildId")
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
@@ -58,6 +59,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue
 		}
+		categoryIDTmps = append(categoryIDTmps, channel.ID)
 		categoryPositions[channel.ID] = internal.DiscordChannel{
 			ID:       channel.ID,
 			Name:     channel.Name,
@@ -84,12 +86,10 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		discordChannel, err := repo.GetLineChannel(r.Context(), channel.ID)
 		if err != nil && err.Error() != "sql: no rows in result set" {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Println(err.Error())
 			return
 		} else if err != nil {
 			if err := repo.InsertLineChannel(r.Context(), channel.ID, guildId); err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				fmt.Println(err.Error())
 				return
 			}
 			discordChannel = internal.LineChannel{
@@ -102,13 +102,11 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		ngTypes, err := repo.GetLineNgType(r.Context(), channel.ID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Println(err.Error())
 			return
 		}
 		ngDiscordIDs, err := repo.GetLineNgDiscordID(r.Context(), channel.ID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Println(err.Error())
 			return
 		}
 		channelsInCategory[categoryPosition.ID][channel.Position] = internal.DiscordChannelSet{
@@ -128,11 +126,27 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	}
 
 	htmlForm := ``
+	categoryComponents := make([]string, len(categoryIDTmps)+1)
+	var categoryIndex int
 	for categoryID, channels := range channelsInCategory {
-		htmlForm += fmt.Sprintf(`
+		for i, categoryIDTmp := range categoryIDTmps {
+			if categoryID == "" {
+				categoryIndex = len(categoryIDTmps)
+				break
+			}
+			if categoryIDTmp == categoryID {
+				categoryIndex = i
+				break
+			}
+		}
+		categoryChannelName := categoryPositions[categoryID].Name
+		if categoryID == "" {
+			categoryChannelName = "カテゴリーなし"
+		}
+		categoryComponents[categoryIndex] = fmt.Sprintf(`
 		<details>
             <summary>%s</summary>
-		`, categoryPositions[categoryID].Name)
+		`, categoryChannelName)
 		for _, channel := range channels {
 			if channel.ID == "" {
 				continue
@@ -145,7 +159,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 			if channel.BotMessage {
 				botNgFlag = "checked"
 			}
-			htmlForm += `
+			categoryComponents[categoryIndex] += `
 			<details>
                 <summary>` + channel.Name + `</summary>
 				<label for="ng_` + channel.ID + `">LINEへ送信しない</label>
@@ -172,8 +186,11 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 			</details>
 			`
 		}
-		htmlForm += `
+		categoryComponents[categoryIndex] += `
 		</details>`
+	}
+	for _, categoryComponent := range categoryComponents {
+		htmlForm += categoryComponent
 	}
 
 	tmpl := template.Must(template.New("line_post_discord_channel.html").ParseFiles("web/templates/views/guilds/line_post_discord_channel.html"))
@@ -187,7 +204,6 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		HTMLForm:  template.HTML(htmlForm),
 	}); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		fmt.Println(err.Error())
 	}
 }
 

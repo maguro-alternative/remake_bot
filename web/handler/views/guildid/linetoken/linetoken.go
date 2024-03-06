@@ -78,10 +78,12 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	// カテゴリーのチャンネルを取得
 	//[categoryID]map[channelPosition]channelName
 	channelsInCategory := make(map[string][]internal.DiscordChannelSelect)
+	var categoryIDTmps []string
 	for _, channel := range guild.Channels {
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue
 		}
+		categoryIDTmps = append(categoryIDTmps, channel.ID)
 		categoryPositions[channel.ID] = internal.DiscordChannel{
 			ID:       channel.ID,
 			Name:     channel.Name,
@@ -110,6 +112,12 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			ID:   channel.ID,
 			Name: fmt.Sprintf("%s:%s:%s", categoryPosition.Name, typeIcon, channel.Name),
 		}
+		if categoryPosition.ID == "" {
+			channelsInCategory[categoryPosition.ID][channel.Position] = internal.DiscordChannelSelect{
+				ID:   channel.ID,
+				Name: fmt.Sprintf("カテゴリーなし:%s:%s", typeIcon, channel.Name),
+			}
+		}
 	}
 	lineBot, err := repo.GetLineBot(r.Context(), guildId)
 	if err != nil && err.Error() == "sql: no rows in result set" {
@@ -134,17 +142,32 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	htmlSelectChannels := ``
-	for _, channels := range channelsInCategory {
+	categoryOptions := make([]string, len(categoryIDTmps)+1)
+	var categoryIndex int
+	for categoryID, channels := range channelsInCategory {
+		for i, categoryIDTmp := range categoryIDTmps {
+			if categoryID == "" {
+				categoryIndex = len(categoryIDTmps)
+				break
+			}
+			if categoryIDTmp == categoryID {
+				categoryIndex = i
+				break
+			}
+		}
 		for _, channelSelect := range channels {
 			if channelSelect.ID == "" {
 				continue
 			}
 			if lineBot.DefaultChannelID == channelSelect.ID {
-				htmlSelectChannels += fmt.Sprintf(`<option value="%s" selected>%s</option>`, channelSelect.ID, channelSelect.Name)
+				categoryOptions[categoryIndex] += fmt.Sprintf(`<option value="%s" selected>%s</option>`, channelSelect.ID, channelSelect.Name)
 				continue
 			}
-			htmlSelectChannels += fmt.Sprintf(`<option value="%s">%s</option>`, channelSelect.ID, channelSelect.Name)
+			categoryOptions[categoryIndex] += fmt.Sprintf(`<option value="%s">%s</option>`, channelSelect.ID, channelSelect.Name)
 		}
+	}
+	for _, categoryOption := range categoryOptions {
+		htmlSelectChannels += categoryOption
 	}
 	data := struct {
 		GuildID  string

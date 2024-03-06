@@ -3,7 +3,6 @@ package linetoken
 import (
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/lib/pq"
@@ -48,7 +47,6 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	lineTokenJson.GuildID = r.PathValue("guildId")
 	// 暗号化キーの取得
 	privateKey := config.PrivateKey()
-	fmt.Println(&lineTokenJson)
 	lineBot, lineBotIv, err := lineBotJsonEncrypt(privateKey, &lineTokenJson)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

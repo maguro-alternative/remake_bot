@@ -9,6 +9,8 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/config"
+	"github.com/maguro-alternative/remake_bot/web/session/getoauth"
 )
 
 type LineTokenViewHandler struct {
@@ -22,6 +24,16 @@ func NewLineTokenViewHandler(indexService *service.IndexService) *LineTokenViewH
 }
 
 func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
+	_, err := getoauth.GetDiscordOAuth(
+		g.IndexService.CookieStore,
+		r,
+		config.SessionSecret(),
+	)
+	if err != nil {
+		http.Redirect(w, r, "/auth/discord", http.StatusFound)
+		return
+	}
+	repo := internal.NewRepository(g.IndexService.DB)
 	categoryPositions := make(map[string]internal.DiscordChannel)
 	guildId := r.PathValue("guildId")
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
@@ -31,7 +43,6 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	//[categoryID]map[channelPosition]channelName
 	channelsInCategory := make(map[string][]internal.DiscordChannelSelect)
-	repo := internal.NewRepository(g.IndexService.DB)
 	for _, channel := range guild.Channels {
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue

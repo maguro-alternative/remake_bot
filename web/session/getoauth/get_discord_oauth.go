@@ -4,20 +4,14 @@ import (
 	"errors"
 	"net/http"
 
+	"golang.org/x/oauth2"
+
 	"github.com/gorilla/sessions"
 )
 
 type DiscordOAuthSession struct {
-	Token string      `json:"token"`
-	User  DiscordUser `json:"user"`
-}
-
-type DiscordToken struct {
-	AccessToken  string `json:"access_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
-	RefreshToken string `json:"refresh_token"`
-	Scope        string `json:"scope"`
+	Token oauth2.Token `json:"token"`
+	User  DiscordUser  `json:"user"`
 }
 
 type DiscordUser struct {
@@ -41,13 +35,13 @@ type DiscordUser struct {
 	Bio              string `json:"bio"`
 }
 
-func DiscordOAuthCheck(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*DiscordUser, error) {
+func GetDiscordOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*DiscordOAuthSession, error) {
 	session, err := store.Get(r, sessionSecret)
 	if err != nil {
 		return nil, err
 	}
 	// セッションに保存されているdiscorduserを取得
-	discordUser, ok := session.Values["discord_user"].(*DiscordUser)
+	discordUser, ok := session.Values["discord_user"].(*DiscordOAuthSession)
 	if !ok {
 		return nil, errors.New("session not found")
 	}

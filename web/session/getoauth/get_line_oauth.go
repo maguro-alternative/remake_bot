@@ -4,12 +4,14 @@ import (
 	"errors"
 	"net/http"
 
+	"golang.org/x/oauth2"
+
 	"github.com/gorilla/sessions"
 )
 
 type LineOAuthSession struct {
-	Token LineToken `json:"token"`
-	User  LineUser  `json:"user"`
+	Token oauth2.Token `json:"token"`
+	User  LineUser     `json:"user"`
 }
 
 type LineToken struct {
@@ -35,7 +37,7 @@ type LineUser struct {
 	Email    string   `json:"email"`
 }
 
-func LineOAuthCheck(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*LineUser, error) {
+func GetLineOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*LineUser, error) {
 	session, err := store.Get(r, sessionSecret)
 	if err != nil {
 		return nil, err

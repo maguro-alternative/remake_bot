@@ -7,8 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	"reflect"
+
+	"golang.org/x/oauth2"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback/internal"
 	"github.com/maguro-alternative/remake_bot/web/config"
@@ -34,6 +35,7 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
 	gob.Register(&internal.DiscordUser{})
+	gob.Register(&oauth2.Token{})
 	session, err := h.svc.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
 		fmt.Println("sessionの取得に失敗しました。")
@@ -63,7 +65,7 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		fmt.Println(err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
-	session.Values["discord_access_token"] = token.AccessToken
+	session.Values["discord_oauth_token"] = &token
 	// 3. ユーザー情報の取得
 	client := conf.Client(ctx, token)
 	resp, err := client.Get("https://discord.com/api/users/@me")

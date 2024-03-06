@@ -27,6 +27,7 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
 	gob.Register(&internal.DiscordUser{})
+	gob.Register(&oauth2.Token{})
 	uuid := uuid.New().String()
 	session, err := h.DiscordOAuth2Service.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {

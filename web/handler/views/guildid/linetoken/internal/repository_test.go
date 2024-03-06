@@ -137,3 +137,71 @@ func TestGetLineBotIv(t *testing.T) {
 		assert.Equal(t, []byte("987654321"), lineBotIv.LineGroupIDIv[0])
 	})
 }
+
+func TestGetPermissionsCode(t *testing.T) {
+	ctx := context.Background()
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	assert.NoError(t, err)
+	defer cleanup()
+	tx, err := dbV1.BeginTxx(ctx, nil)
+	assert.NoError(t, err)
+
+	defer tx.RollbackCtx(ctx)
+
+	f := &fixtures.Fixture{DBv1: tx}
+	f.Build(t,
+		fixtures.NewPermissionsCode(ctx, func(p *fixtures.PermissionsCode) {
+			p.GuildID = "987654321"
+			p.Type = "line_bot"
+			p.Code = 8
+		}),
+	)
+	repo := NewRepository(tx)
+	t.Run("GuildIDからPermissionsCodeを取得できること", func(t *testing.T) {
+		permissionCode, err := repo.GetPermissionCode(ctx, "987654321", "line_bot")
+		assert.NoError(t, err)
+		assert.Equal(t, 8, permissionCode)
+	})
+}
+
+func TestGetPermissionIDs(t *testing.T) {
+	ctx := context.Background()
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	assert.NoError(t, err)
+	defer cleanup()
+	tx, err := dbV1.BeginTxx(ctx, nil)
+	assert.NoError(t, err)
+
+	defer tx.RollbackCtx(ctx)
+
+	f := &fixtures.Fixture{DBv1: tx}
+	f.Build(t,
+		fixtures.NewPermissionsID(ctx, func(p *fixtures.PermissionsID) {
+			p.GuildID = "987654321"
+			p.TargetID = "123456789"
+			p.TargetType = "user"
+			p.Type = "line_bot"
+			p.Permission = "read"
+		}),
+		fixtures.NewPermissionsID(ctx, func(p *fixtures.PermissionsID) {
+			p.GuildID = "987654321"
+			p.TargetID = "345678912"
+			p.TargetType = "user"
+			p.Type = "line_bot"
+			p.Permission = "write"
+		}),
+		fixtures.NewPermissionsID(ctx, func(p *fixtures.PermissionsID) {
+			p.GuildID = "987654321"
+			p.TargetID = "567891234"
+			p.TargetType = "user"
+			p.Type = "line_bot"
+			p.Permission = "all"
+		}),
+	)
+	repo := NewRepository(tx)
+	t.Run("GuildIDからPermissionIDを取得できること", func(t *testing.T) {
+		permissionIDs, err := repo.GetPermissionIDs(ctx, "987654321", "line_bot")
+		assert.NoError(t, err)
+		assert.Equal(t, "123456789", permissionIDs[0])
+	})
+}

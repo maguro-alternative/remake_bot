@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"reflect"
 
@@ -38,21 +38,24 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	gob.Register(&oauth2.Token{})
 	session, err := h.svc.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
-		fmt.Println("sessionの取得に失敗しました。")
-		fmt.Println(err)
+		slog.InfoContext(ctx, "sessionの取得に失敗しました。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	state, ok := session.Values["state"].(string)
 	if !ok {
-		fmt.Println(reflect.TypeOf(session.Values["state"]))
+		stateType := reflect.TypeOf(session.Values["state"]).String()
+		slog.InfoContext(ctx, stateType)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	// 2. 認可ページからリダイレクトされてきたときに送られてくるstateパラメータ
 	if r.URL.Query().Get("state") != state {
-		fmt.Println(session.Values["state"])
+		slog.InfoContext(ctx, "stateが一致しません。")
 		session.Values["state"] = ""
 		h.svc.CookieStore.Save(r, w, session)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	session.Values["state"] = ""
 	// 1. 認可ページのURL
@@ -61,41 +64,41 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	// 2. アクセストークンの取得
 	token, err := conf.Exchange(ctx, code)
 	if err != nil {
-		fmt.Println("アクセストークンの取得に失敗しました。")
-		fmt.Println(err)
+		slog.InfoContext(ctx, "アクセストークンの取得に失敗しました。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	session.Values["discord_oauth_token"] = &token
 	// 3. ユーザー情報の取得
 	client := conf.Client(ctx, token)
 	resp, err := client.Get("https://discord.com/api/users/@me")
 	if err != nil {
-		fmt.Println("ユーザー情報の取得に失敗しました。")
-		fmt.Println(err)
+		slog.InfoContext(ctx, "ユーザー情報の取得に失敗しました。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	defer resp.Body.Close()
 
 	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
-		fmt.Println("ユーザー情報のデコードに失敗しました。")
-		fmt.Println(err)
+		slog.InfoContext(ctx, "ユーザー情報のデコードに失敗しました。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	// セッションに保存
 	session.Values["discord_user"] = user
 	err = session.Save(r, w)
 	if err != nil {
-		fmt.Println("セッションの保存に失敗しました。")
-		fmt.Println(err)
+		slog.InfoContext(ctx, "セッションの保存に失敗しました。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 	err = h.svc.CookieStore.Save(r, w, session)
 	if err != nil {
-		fmt.Println("セッションの保存に失敗しました。")
-		fmt.Println(err)
+		slog.InfoContext(ctx, "セッションの保存に失敗しました。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
-	log.Println(user)
+	slog.InfoContext(ctx, fmt.Sprintf("ユーザー情報: %+v", user))
 	// 4. ログイン後のページに遷移
 	http.Redirect(w, r, "/", http.StatusFound)
 }

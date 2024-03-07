@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS permissions_id (
     target_type TEXT NOT NULL,
     target_id TEXT NOT NULL,
     permission TEXT NOT NULL,
-    PRIMARY KEY(guild_id)
+    PRIMARY KEY(guild_id, type, target_type, target_id)
 );
 
 /*

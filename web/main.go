@@ -37,7 +37,7 @@ func NewWebRouter(
 			AuthURL:  "https://discord.com/api/oauth2/authorize",
 			TokenURL: "https://discord.com/api/oauth2/token",
 		},
-		RedirectURL: "/discord-callback/",
+		RedirectURL: "/callback/discord-callback/",
 	}
 	// create a *service.TODOService type variable using the *sql.DB type variable
 	var indexService = service.NewIndexService(
@@ -60,7 +60,7 @@ func NewWebRouter(
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
 	mux.Handle("/api/{guildId}/linetoken", middleChain.Then(linetoken.NewLineTokenHandler(indexService)))
 	mux.Handle("/api/{guildId}/line-post-discord-channel", middleChain.Then(linePostDiscordChannel.NewLineChannelHandler(indexService)))
-	mux.Handle("/guild/{guildId}/linetoken/", middleChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService).Index))
+	mux.Handle("/guild/{guildId}/linetoken", middleChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/line-post-discord-channel", middleChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService).Index))
-	http.ListenAndServe(":8080", mux)
+	http.ListenAndServe(":"+config.Port(), mux)
 }

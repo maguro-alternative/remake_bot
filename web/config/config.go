@@ -78,6 +78,10 @@ func PrivateKey() string {
 	return cfg.PrivateKey
 }
 
+func Port() string {
+	return cfg.Port
+}
+
 func SessionName() string {
 	return cfg.SessionName
 }

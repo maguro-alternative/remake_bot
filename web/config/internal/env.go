@@ -11,6 +11,7 @@ type Config struct {
 	DiscordCallbackUrl  string `env:"DISCORD_CALLBACK_URL" envDefault:""`
 	DiscordScopes       string `env:"DISCORD_SCOPES" envDefault:""`
 	PrivateKey          string `env:"PRIVATE_KEY" envDefault:""`
+	Port                string `env:"PORT" envDefault:"8080"`
 	SessionName         string `env:"SESSION_NAME" envDefault:""`
 	SessionSecret       string `env:"SESSION_SECRET" envDefault:""`
 	YouTubeAPIKey       string `env:"YOUTUBE_API_KEY" envDefault:""`

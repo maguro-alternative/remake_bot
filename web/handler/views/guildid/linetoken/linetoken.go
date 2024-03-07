@@ -176,7 +176,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		GuildID:  guildId,
 		Channels: template.HTML(htmlSelectChannels),
 	}
-	t := template.Must(template.New("linetoken.html").ParseFiles("web/templates/views/guilds/linetoken.html"))
+	t := template.Must(template.New("linetoken.html").ParseFiles("web/templates/views/guildid/linetoken.html"))
 	err = t.ExecuteTemplate(w, "linetoken.html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

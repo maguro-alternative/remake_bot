@@ -193,7 +193,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		htmlForm += categoryComponent
 	}
 
-	tmpl := template.Must(template.New("line_post_discord_channel.html").ParseFiles("web/templates/views/guilds/line_post_discord_channel.html"))
+	tmpl := template.Must(template.New("line_post_discord_channel.html").ParseFiles("web/templates/views/guildid/line_post_discord_channel.html"))
 	if err := tmpl.Execute(w, struct {
 		GuildName string
 		GuildID   string

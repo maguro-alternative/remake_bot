@@ -160,7 +160,7 @@ func TestGetPermissionsCode(t *testing.T) {
 	t.Run("GuildIDからPermissionsCodeを取得できること", func(t *testing.T) {
 		permissionCode, err := repo.GetPermissionCode(ctx, "987654321", "line_bot")
 		assert.NoError(t, err)
-		assert.Equal(t, 8, permissionCode)
+		assert.Equal(t, int64(8), permissionCode)
 	})
 }
 
@@ -202,6 +202,14 @@ func TestGetPermissionIDs(t *testing.T) {
 	t.Run("GuildIDからPermissionIDを取得できること", func(t *testing.T) {
 		permissionIDs, err := repo.GetPermissionIDs(ctx, "987654321", "line_bot")
 		assert.NoError(t, err)
-		assert.Equal(t, "123456789", permissionIDs[0])
+		assert.Equal(t, "123456789", permissionIDs[0].TargetID)
+		assert.Equal(t, "user", permissionIDs[0].TargetType)
+		assert.Equal(t, "read", permissionIDs[0].Permission)
+		assert.Equal(t, "345678912", permissionIDs[1].TargetID)
+		assert.Equal(t, "user", permissionIDs[1].TargetType)
+		assert.Equal(t, "write", permissionIDs[1].Permission)
+		assert.Equal(t, "567891234", permissionIDs[2].TargetID)
+		assert.Equal(t, "user", permissionIDs[2].TargetType)
+		assert.Equal(t, "all", permissionIDs[2].Permission)
 	})
 }

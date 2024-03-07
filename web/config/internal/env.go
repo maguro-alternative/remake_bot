@@ -9,9 +9,10 @@ type Config struct {
 	DiscordClientID     string `env:"DISCORD_CLIENT_ID" envDefault:""`
 	DiscordClientSecret string `env:"DISCORD_CLIENT_SECRET" envDefault:""`
 	DiscordCallbackUrl  string `env:"DISCORD_CALLBACK_URL" envDefault:""`
-	DiscordScopes       string `env:"DISCORD_SCOPES" envDefault:""`
+	DiscordScopes       string `env:"DISCORD_SCOPE" envDefault:""`
 	PrivateKey          string `env:"PRIVATE_KEY" envDefault:""`
 	Port                string `env:"PORT" envDefault:"8080"`
+	ServerUrl           string `env:"SERVER_URL" envDefault:"http://localhost:8080"`
 	SessionName         string `env:"SESSION_NAME" envDefault:""`
 	SessionSecret       string `env:"SESSION_SECRET" envDefault:""`
 	YouTubeAPIKey       string `env:"YOUTUBE_API_KEY" envDefault:""`

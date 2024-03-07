@@ -82,6 +82,10 @@ func Port() string {
 	return cfg.Port
 }
 
+func ServerUrl() string {
+	return cfg.ServerUrl
+}
+
 func SessionName() string {
 	return cfg.SessionName
 }

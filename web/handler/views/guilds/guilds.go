@@ -4,15 +4,24 @@ import (
 	"context"
 	"encoding/json"
 	"html/template"
+	"log/slog"
 	"net/http"
 
 	"github.com/bwmarrin/discordgo"
 
-	//"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel/internal"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/session/getoauth"
 )
+
+type userGuild struct {
+	ID          string                   `json:"id"`
+	Name        string                   `json:"name"`
+	Icon        string                   `json:"icon"`
+	Owner       bool                     `json:"owner"`
+	Permissions int64                    `json:"permissions"`
+	Features    []discordgo.GuildFeature `json:"features"`
+}
 
 type GuildsViewHandler struct {
 	IndexService *service.IndexService
@@ -47,6 +56,7 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	userGuilds, err := getUserGuilds(discordLoginUser.Token)
 	if err != nil {
+		slog.InfoContext(ctx, "user guilds error: "+err.Error())
 		http.Error(w, "Not get user guilds", http.StatusInternalServerError)
 		return
 	}
@@ -80,7 +90,7 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}{
 		Guilds: template.HTML(htmlGuilds),
 	}
-	tmpl := template.Must(template.ParseFiles("web/template/guilds/guilds.html"))
+	tmpl := template.Must(template.ParseFiles("web/templates/views/guilds/guilds.html"))
 	if err := tmpl.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -99,9 +109,20 @@ func getUserGuilds(token string) ([]discordgo.UserGuild, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var guilds []discordgo.UserGuild
+	var guilds []userGuild
 	if err := json.NewDecoder(resp.Body).Decode(&guilds); err != nil {
 		return nil, err
 	}
-	return guilds, nil
+	var userGuilds []discordgo.UserGuild
+	for _, guild := range guilds {
+		userGuilds = append(userGuilds, discordgo.UserGuild{
+			ID:          guild.ID,
+			Name:        guild.Name,
+			Icon:        guild.Icon,
+			Owner:       guild.Owner,
+			Permissions: guild.Permissions,
+			Features:    guild.Features,
+		})
+	}
+	return userGuilds, nil
 }

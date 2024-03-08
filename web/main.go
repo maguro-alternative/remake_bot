@@ -7,14 +7,15 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/pkg/middleware"
 	"github.com/maguro-alternative/remake_bot/web/config"
+	linePostDiscordChannel "github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"
+	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken"
 	discordOAuth "github.com/maguro-alternative/remake_bot/web/handler/auth/discord_oauth"
 	discordCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback"
-	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken"
-	guildsView "github.com/maguro-alternative/remake_bot/web/handler/views/guilds"
-	linePostDiscordChannel "github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel"
-	linetokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken"
+
 	linePostDiscordChannelView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel"
+	linetokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken"
+	guildsView "github.com/maguro-alternative/remake_bot/web/handler/views/guilds"
 	"github.com/maguro-alternative/remake_bot/web/service"
 
 	"golang.org/x/oauth2"
@@ -38,7 +39,7 @@ func NewWebRouter(
 			AuthURL:  "https://discord.com/api/oauth2/authorize",
 			TokenURL: "https://discord.com/api/oauth2/token",
 		},
-		RedirectURL: config.ServerUrl()+"/callback/discord-callback/",
+		RedirectURL: config.ServerUrl() + "/callback/discord-callback/",
 	}
 	// create a *service.TODOService type variable using the *sql.DB type variable
 	var indexService = service.NewIndexService(

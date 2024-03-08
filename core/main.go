@@ -66,6 +66,7 @@ func main() {
 }
 
 func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo.Session) error {
+	permissionTypes := []string{"line_bot", "line_post_discord_channel", "vc_signal", "webhook"}
 	// データベースにユーザーを追加
 	// ここにユーザーを追加するコードを書く
 	// 例: dbV1.ExecContext(ctx, "INSERT INTO users (discord_id) VALUES ($1)", discordSession.State.User.ID)
@@ -156,6 +157,23 @@ func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo
 				if err != nil {
 					return err
 				}
+			}
+		}
+		for _, permissionType := range permissionTypes {
+			query := `
+				INSERT INTO permissions_code (
+					guild_id,
+					type,
+					code
+				) VALUES (
+					$1,
+					$2,
+					$3
+				) ON CONFLICT (guild_id, type) DO NOTHING
+			`
+			_, err = dbv1.ExecContext(ctx, query, guild.ID, permissionType, 8)
+			if err != nil {
+				return err
 			}
 		}
 	}

@@ -1,4 +1,9 @@
-package internal
+package model
+
+type DiscordOAuthSession struct {
+	Token string      `json:"token"`
+	User  DiscordUser `json:"user"`
+}
 
 type DiscordUser struct {
 	ID               string `json:"id"`

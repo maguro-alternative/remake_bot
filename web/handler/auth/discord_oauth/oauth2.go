@@ -10,7 +10,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/handler/auth/discord_oauth/internal"
+	"github.com/maguro-alternative/remake_bot/web/session/model"
 )
 
 type DiscordOAuth2Handler struct {
@@ -27,12 +27,11 @@ func NewDiscordOAuth2Handler(discordOAuth2Service *service.DiscordOAuth2Service)
 func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
-	gob.Register(&internal.DiscordUser{})
-	gob.Register(&oauth2.Token{})
+	gob.Register(&model.DiscordUser{})
 	uuid := uuid.New().String()
 	session, err := h.DiscordOAuth2Service.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
-		slog.InfoContext(r.Context(), "sessionの取得に失敗しました。")
+		slog.InfoContext(r.Context(), "sessionの取得に失敗しました。"+err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -43,5 +42,5 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	conf := h.DiscordOAuth2Service.OAuth2Conf
 	// 1. 認可ページのURL
 	url := conf.AuthCodeURL(uuid, oauth2.AccessTypeOffline)
-	http.Redirect(w, r, url, http.StatusFound)
+	http.Redirect(w, r, url, http.StatusSeeOther)
 }

@@ -9,9 +9,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"golang.org/x/oauth2"
-
-	"github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback/internal"
+	"github.com/maguro-alternative/remake_bot/web/session/model"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 )
@@ -27,15 +25,14 @@ func NewDiscordCallbackHandler(svc *service.DiscordOAuth2Service) *DiscordCallba
 }
 
 func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var user internal.DiscordUser
+	var user model.DiscordUser
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
-	gob.Register(&internal.DiscordUser{})
-	gob.Register(&oauth2.Token{})
+	gob.Register(&model.DiscordUser{})
 	session, err := h.svc.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
 		slog.InfoContext(ctx, "sessionの取得に失敗しました。")
@@ -68,7 +65,7 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	session.Values["discord_oauth_token"] = &token
+	session.Values["discord_oauth_token"] = token.AccessToken
 	// 3. ユーザー情報の取得
 	client := conf.Client(ctx, token)
 	resp, err := client.Get("https://discord.com/api/users/@me")
@@ -88,17 +85,17 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	session.Values["discord_user"] = user
 	err = session.Save(r, w)
 	if err != nil {
-		slog.InfoContext(ctx, "セッションの保存に失敗しました。")
+		slog.InfoContext(ctx, "セッションの保存に失敗しました。"+err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	err = h.svc.CookieStore.Save(r, w, session)
 	if err != nil {
-		slog.InfoContext(ctx, "セッションの保存に失敗しました。")
+		slog.InfoContext(ctx, "セッションの保存に失敗しました。"+err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	slog.InfoContext(ctx, fmt.Sprintf("ユーザー情報: %+v", user))
 	// 4. ログイン後のページに遷移
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "/guilds", http.StatusFound)
 }

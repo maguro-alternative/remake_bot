@@ -4,14 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	"golang.org/x/oauth2"
-
 	"github.com/gorilla/sessions"
 )
 
 type LineOAuthSession struct {
-	Token oauth2.Token `json:"token"`
-	User  LineUser     `json:"user"`
+	Token string   `json:"token"`
+	User  LineUser `json:"user"`
 }
 
 type LineToken struct {

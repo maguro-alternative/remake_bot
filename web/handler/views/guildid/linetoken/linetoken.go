@@ -1,15 +1,16 @@
 package guildid
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"net/http"
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/session/getoauth"
 )
 
@@ -24,7 +25,12 @@ func NewLineTokenViewHandler(indexService *service.IndexService) *LineTokenViewH
 }
 
 func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	discordLoginUser, err := getoauth.GetDiscordOAuth(
+		ctx,
 		g.IndexService.CookieStore,
 		r,
 		config.SessionSecret(),
@@ -41,12 +47,12 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not get guild id", http.StatusInternalServerError)
 		return
 	}
-	permissionCode, err := repo.GetPermissionCode(r.Context(), guildId, "")
+	permissionCode, err := repo.GetPermissionCode(ctx, guildId, "")
 	if err != nil {
 		http.Error(w, "権限コードの取得に失敗しました", http.StatusInternalServerError)
 		return
 	}
-	permissionIDs, err := repo.GetPermissionIDs(r.Context(), guildId, "")
+	permissionIDs, err := repo.GetPermissionIDs(ctx, guildId, "")
 	if err != nil {
 		http.Error(w, "権限読み込みに失敗しました", http.StatusInternalServerError)
 		return
@@ -119,9 +125,9 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	lineBot, err := repo.GetLineBot(r.Context(), guildId)
+	lineBot, err := repo.GetLineBot(ctx, guildId)
 	if err != nil && err.Error() == "sql: no rows in result set" {
-		err = repo.InsertLineBot(r.Context(), &internal.LineBot{
+		err = repo.InsertLineBot(ctx, &internal.LineBot{
 			GuildID:          guildId,
 			DefaultChannelID: guild.SystemChannelID,
 			DebugMode:        false,
@@ -130,7 +136,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "line_bot:"+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		err = repo.InsertLineBotIv(r.Context(), &internal.LineBotIv{
+		err = repo.InsertLineBotIv(ctx, &internal.LineBotIv{
 			GuildID: guildId,
 		})
 		if err != nil {

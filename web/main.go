@@ -2,7 +2,7 @@ package web
 
 import (
 	"net/http"
-	//"strings"
+	"strings"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/pkg/middleware"
@@ -29,11 +29,11 @@ func NewWebRouter(
 	cookieStore *sessions.CookieStore,
 	discordSession *discordgo.Session,
 ) {
-	//scopes := config.DiscordScopes()
+	scopes := config.DiscordScopes()
 	conf := &oauth2.Config{
 		ClientID:     config.DiscordClientID(),
 		ClientSecret: config.DiscordClientSecret(),
-		Scopes:       []string{"identify"},
+		Scopes:       strings.Split(scopes, "%20"),
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://discord.com/api/oauth2/authorize",
 			TokenURL: "https://discord.com/api/oauth2/token",

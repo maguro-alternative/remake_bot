@@ -12,7 +12,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/permission/internal"
 )
 
-func CheckPermission(
+func CheckDiscordPermission(
 	ctx context.Context,
 	w http.ResponseWriter,
 	r *http.Request,

@@ -30,7 +30,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not get guild id", http.StatusInternalServerError)
 		return
 	}
-	statusCode, err := permission.CheckPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	statusCode, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		http.Error(w, "Not get guild id", http.StatusInternalServerError)
 		return

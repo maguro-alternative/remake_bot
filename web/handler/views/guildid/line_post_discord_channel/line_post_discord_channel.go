@@ -1,6 +1,7 @@
 package linepostdiscordchannel
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 )
 
 type LinePostDiscordChannelViewHandler struct {
@@ -47,9 +49,27 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	categoryPositions := make(map[string]internal.DiscordChannel)
 	var categoryIDTmps []string
 	guildId := r.PathValue("guildId")
+	ctx := r.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Not get guild id", http.StatusInternalServerError)
+		return
+	}
+	statusCode, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	if err != nil {
+		if statusCode == http.StatusFound {
+			http.Redirect(w, r, "/auth/discord", http.StatusFound)
+			return
+		}
+		if statusCode != 200 {
+			http.Error(w, "Not get guild", statusCode)
+			return
+		}
+		http.Error(w, "Not permission", http.StatusInternalServerError)
 		return
 	}
 	//[categoryID]map[channelPosition]channelName
@@ -83,12 +103,12 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		if len(channelsInCategory[categoryPosition.ID]) == 0 {
 			channelsInCategory[categoryPosition.ID] = make([]internal.DiscordChannelSet, len(guild.Channels)-2, len(guild.Channels))
 		}
-		discordChannel, err := repo.GetLineChannel(r.Context(), channel.ID)
+		discordChannel, err := repo.GetLineChannel(ctx, channel.ID)
 		if err != nil && err.Error() != "sql: no rows in result set" {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		} else if err != nil {
-			if err := repo.InsertLineChannel(r.Context(), channel.ID, guildId); err != nil {
+			if err := repo.InsertLineChannel(ctx, channel.ID, guildId); err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
@@ -99,12 +119,12 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 				BotMessage: false,
 			}
 		}
-		ngTypes, err := repo.GetLineNgType(r.Context(), channel.ID)
+		ngTypes, err := repo.GetLineNgType(ctx, channel.ID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		ngDiscordIDs, err := repo.GetLineNgDiscordID(r.Context(), channel.ID)
+		ngDiscordIDs, err := repo.GetLineNgDiscordID(ctx, channel.ID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return

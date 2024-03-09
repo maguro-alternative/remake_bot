@@ -43,6 +43,6 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not get guild id", statusCode)
 		return
 	}
-	tmpl := template.Must(template.ParseFiles("web/template/guildid/index.html"))
+	tmpl := template.Must(template.ParseFiles("web/templates/views/guildid.html"))
 	tmpl.Execute(w, nil)
 }

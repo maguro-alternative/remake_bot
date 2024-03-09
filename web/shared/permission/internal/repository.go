@@ -79,3 +79,35 @@ func (r *Repository) InsertLineBotIv(ctx context.Context, lineBotIv *LineBotIv) 
 	_, err := r.db.NamedExecContext(ctx, query, lineBotIv)
 	return err
 }
+
+func (r *Repository) GetPermissionCode(ctx context.Context, guildID, permissionType string) (int64, error) {
+	var code int64
+	query := `
+		SELECT
+			code
+		FROM
+			permissions_code
+		WHERE
+			guild_id = $1 AND
+			type = $2
+	`
+	err := r.db.GetContext(ctx, &code, query, guildID, permissionType)
+	return code, err
+}
+
+func (r *Repository) GetPermissionIDs(ctx context.Context, guildID, permissionType string) ([]PermissionID, error) {
+	var permissionIDs []PermissionID
+	query := `
+		SELECT
+			target_type,
+			target_id,
+			permission
+		FROM
+			permissions_id
+		WHERE
+			guild_id = $1 AND
+			type = $2
+	`
+	err := r.db.SelectContext(ctx, &permissionIDs, query, guildID, permissionType)
+	return permissionIDs, err
+}

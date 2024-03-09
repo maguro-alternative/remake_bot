@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/maguro-alternative/remake_bot/web/session/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 
 	"github.com/gorilla/sessions"
 )

@@ -8,10 +8,9 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 )
 
 type LineTokenViewHandler struct {
@@ -25,8 +24,6 @@ func NewLineTokenViewHandler(indexService *service.IndexService) *LineTokenViewH
 }
 
 func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
-	var userPermissionCode int64
-	userPermissionCode = 0
 	repo := internal.NewRepository(g.IndexService.DB)
 	categoryPositions := make(map[string]internal.DiscordChannel)
 	guildId := r.PathValue("guildId")
@@ -35,78 +32,23 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		ctx = context.Background()
 	}
 
-	// ログインユーザーの取得
-	discordLoginUser, err := getoauth.GetDiscordOAuth(
-		ctx,
-		g.IndexService.CookieStore,
-		r,
-		config.SessionSecret(),
-	)
-	if err != nil {
-		http.Redirect(w, r, "/auth/discord", http.StatusFound)
-		return
-	}
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Not get guild id", http.StatusInternalServerError)
 		return
 	}
-	permissionCode, err := repo.GetPermissionCode(ctx, guildId, "line_bot")
+	statusCode, err := permission.CheckPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
-		http.Error(w, "権限コードの取得に失敗しました", http.StatusInternalServerError)
+		http.Error(w, "Not get guild id", http.StatusInternalServerError)
 		return
 	}
-	permissionIDs, err := repo.GetPermissionIDs(ctx, guildId, "line_bot")
-	if err != nil {
-		http.Error(w, "権限読み込みに失敗しました", http.StatusInternalServerError)
+	if statusCode == 302 {
+		http.Redirect(w, r, "/auth/discord", http.StatusFound)
 		return
 	}
-	discordGuildMember, err := g.IndexService.DiscordSession.GuildMember(guildId, discordLoginUser.User.ID)
-	if err != nil {
-		http.Error(w, "Not get discord member", http.StatusInternalServerError)
+	if statusCode != 200 {
+		http.Error(w, "Not get guild id", statusCode)
 		return
-	}
-	guildRoles, err := g.IndexService.DiscordSession.GuildRoles(guildId)
-	if err != nil {
-		http.Error(w, "Not get guild roles", http.StatusInternalServerError)
-		return
-	}
-
-	for _, role := range discordGuildMember.Roles {
-		for _, guildRole := range guildRoles {
-			if role == guildRole.ID {
-				userPermissionCode |= guildRole.Permissions
-			}
-		}
-	}
-	// メンバーの権限を取得
-	// discordgoの場合guildMemberから正しく権限を取得できないため、UserChannelPermissionsを使用
-	memberPermission, err := g.IndexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, guild.Channels[0].ID)
-	if err != nil {
-		http.Error(w, "Not get member permission", http.StatusInternalServerError)
-		return
-	}
-	// 権限のチェック
-	if (permissionCode & (memberPermission | userPermissionCode)) == 0 {
-		permissionFlag := false
-		for _, permissionId := range permissionIDs {
-			if permissionId.TargetType == "user" && permissionId.TargetID == discordLoginUser.User.ID {
-				permissionFlag = true
-				break
-			}
-			if permissionId.TargetType == "role" && discordGuildMember.Roles != nil {
-				for _, role := range discordGuildMember.Roles {
-					if permissionId.TargetID == role {
-						permissionFlag = true
-						break
-					}
-				}
-			}
-		}
-		if !permissionFlag {
-			http.Error(w, "権限がありません", http.StatusForbidden)
-			return
-		}
 	}
 	// カテゴリーのチャンネルを取得
 	//[categoryID]map[channelPosition]channelName

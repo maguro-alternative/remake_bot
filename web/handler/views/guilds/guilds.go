@@ -11,7 +11,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 )
 
 type userGuild struct {

@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/maguro-alternative/remake_bot/web/session/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 )

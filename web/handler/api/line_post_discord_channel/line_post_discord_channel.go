@@ -1,12 +1,13 @@
 package linechannel
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
-	//"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 )
 
 type LineChannelHandler struct {
@@ -24,6 +25,10 @@ func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	ctx := r.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	var lineChannelJson internal.LineChannelJson
 	if err := json.NewDecoder(r.Body).Decode(&lineChannelJson); err != nil {
 		http.Error(w, "Json読み取りに失敗しました。", http.StatusBadRequest)
@@ -36,10 +41,19 @@ func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	lineChannelJson.GuildID = r.PathValue("guildId")
-
-	ctx := r.Context()
-	if ctx == nil {
-		ctx = r.Context()
+	guild, err := h.IndexService.DiscordSession.State.Guild(lineChannelJson.GuildID)
+	if err != nil {
+		http.Error(w, "Not get guild id", http.StatusInternalServerError)
+		return
+	}
+	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, h.IndexService, guild, "line_bot")
+	if err != nil {
+		if statusCode == http.StatusFound {
+			http.Redirect(w, r, "/auth/discord", http.StatusFound)
+			return
+		}
+		http.Error(w, "Not permission", statusCode)
+		return
 	}
 
 	repo := internal.NewRepository(h.IndexService.DB)

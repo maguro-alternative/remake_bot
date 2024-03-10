@@ -51,14 +51,17 @@
     <script>
         // submit時にイベント実行をする関数
         document.getElementById('form').onsubmit = async function (event) {
+            let check = window.confirm('送信します。よろしいですか？');
+            if (check === false) {
+                event.preventDefault();
+                return;
+            }
             // 再読み込み防止
             event.preventDefault();
             const formData = new FormData(document.getElementById('form'));
             const data = Object.fromEntries(formData.entries());
 
             const jsonData = JSON.stringify(data);
-
-            console.log(jsonData);
 
             // データを送信
             await fetch('/api/{{ .GuildID }}/linetoken', {
@@ -67,7 +70,14 @@
                     'Content-Type': 'application/json'
                 },
                 body: jsonData
-            })
+            }).then((res) => {
+                if (res.ok && res.status === 200) {
+                    alert('設定を保存しました');
+                    window.location.href = '/guild/{{ .GuildID }}';
+                } else {
+                    alert('設定の保存に失敗しました');
+                }
+            });
 
         }
     </script>

@@ -1,6 +1,7 @@
 package linetoken
 
 import (
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 )
 
 type LineTokenHandler struct {
@@ -42,9 +44,23 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := r.Context()
 	if ctx == nil {
-		ctx = r.Context()
+		ctx = context.Background()
 	}
 	lineTokenJson.GuildID = r.PathValue("guildId")
+	guild, err := h.IndexService.DiscordSession.State.Guild(lineTokenJson.GuildID)
+	if err != nil {
+		http.Error(w, "Not get guild id", http.StatusInternalServerError)
+		return
+	}
+	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, h.IndexService, guild, "line_bot")
+	if err != nil {
+		if statusCode == http.StatusFound {
+			http.Redirect(w, r, "/auth/discord", http.StatusFound)
+			return
+		}
+		http.Error(w, "Not permission", statusCode)
+		return
+	}
 	// 暗号化キーの取得
 	privateKey := config.PrivateKey()
 	lineBot, lineBotIv, err := lineBotJsonEncrypt(privateKey, &lineTokenJson)

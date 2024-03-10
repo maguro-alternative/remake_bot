@@ -33,6 +33,10 @@ func MustInit() {
 	}
 }
 
+func CsrfAuthKey() string {
+	return cfg.CsrfAuthKey
+}
+
 func DatabaseName() string {
 	return cfg.DBName
 }

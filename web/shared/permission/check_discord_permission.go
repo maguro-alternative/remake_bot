@@ -19,7 +19,7 @@ func CheckDiscordPermission(
 	indexService *service.IndexService,
 	guild *discordgo.Guild,
 	permissionType string,
-) (int, error) {
+) (statusCode int, permission int64, err error) {
 	var userPermissionCode int64
 	userPermissionCode = 0
 	repo := internal.NewRepository(indexService.DB)
@@ -32,23 +32,23 @@ func CheckDiscordPermission(
 		config.SessionSecret(),
 	)
 	if err != nil {
-		return http.StatusFound, err
+		return http.StatusFound, 0, err
 	}
 	permissionCode, err := repo.GetPermissionCode(ctx, guild.ID, permissionType)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, userPermissionCode, err
 	}
 	permissionIDs, err := repo.GetPermissionIDs(ctx, guild.ID, permissionType)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, userPermissionCode, err
 	}
 	discordGuildMember, err := indexService.DiscordSession.GuildMember(guild.ID, discordLoginUser.User.ID)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, userPermissionCode, err
 	}
 	guildRoles, err := indexService.DiscordSession.GuildRoles(guild.ID)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, userPermissionCode, err
 	}
 
 	for _, role := range discordGuildMember.Roles {
@@ -62,7 +62,7 @@ func CheckDiscordPermission(
 	// discordgoの場合guildMemberから正しく権限を取得できないため、UserChannelPermissionsを使用
 	memberPermission, err := indexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, guild.Channels[0].ID)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, userPermissionCode, err
 	}
 	// 権限のチェック
 	if (permissionCode & (memberPermission | userPermissionCode)) == 0 {
@@ -82,8 +82,8 @@ func CheckDiscordPermission(
 			}
 		}
 		if !permissionFlag {
-			return http.StatusForbidden, nil
+			return http.StatusForbidden, userPermissionCode, nil
 		}
 	}
-	return 200, nil
+	return 200, memberPermission | userPermissionCode, nil
 }

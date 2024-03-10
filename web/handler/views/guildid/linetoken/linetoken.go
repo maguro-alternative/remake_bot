@@ -37,17 +37,13 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not get guild id", http.StatusInternalServerError)
 		return
 	}
-	statusCode, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/auth/discord", http.StatusFound)
 			return
 		}
-		if statusCode != 200 {
-			http.Error(w, "Not get guild id", statusCode)
-			return
-		}
-		http.Error(w, "Not get permission", http.StatusInternalServerError)
+		http.Error(w, "Not get permission", statusCode)
 		return
 	}
 	// カテゴリーのチャンネルを取得

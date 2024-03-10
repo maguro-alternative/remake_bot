@@ -16,6 +16,7 @@ import (
 	linePostDiscordChannelView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel"
 	linetokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken"
 	guildsView "github.com/maguro-alternative/remake_bot/web/handler/views/guilds"
+	guildIdView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid"
 	"github.com/maguro-alternative/remake_bot/web/service"
 
 	"golang.org/x/oauth2"
@@ -63,6 +64,7 @@ func NewWebRouter(
 	mux.Handle("/api/{guildId}/line-post-discord-channel", middleChain.Then(linePostDiscordChannel.NewLineChannelHandler(indexService)))
 
 	mux.Handle("/guilds", middleChain.ThenFunc(guildsView.NewGuildsViewHandler(indexService).Index))
+	mux.Handle("/guild/{guildId}", middleChain.ThenFunc(guildIdView.NewGuildIDViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/linetoken", middleChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/line-post-discord-channel", middleChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService).Index))
 	http.ListenAndServe(":"+config.Port(), mux)

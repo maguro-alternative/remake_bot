@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
-	"github.com/maguro-alternative/remake_bot/pkg/middleware"
+	"github.com/maguro-alternative/remake_bot/web/middleware"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	linePostDiscordChannel "github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"

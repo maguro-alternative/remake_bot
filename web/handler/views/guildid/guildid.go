@@ -44,6 +44,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		settingLinks += `
 			管理者です。<br/>
 			<a href="/guild/` + guild.ID + `/admin" class="btn btn-primary">管理者設定</a>
+			<br/>
 		`
 	}
 	settingLinks += `

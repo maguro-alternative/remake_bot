@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
@@ -34,8 +35,9 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	var channel onMessageCreate.LineChannel
 	var lineMessageTypes []*line.LineMessageType
 	var imageUrls []string
-	var sendText string
 	var videoCount, voiceCount int
+
+	sendTextBuilder := strings.Builder{}
 
 	ctx := context.Background()
 	repo := onMessageCreate.NewRepository(h.DB)
@@ -139,22 +141,22 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	// メッセージの種類によって処理を分岐
 	switch vs.Message.Type {
 	case discordgo.MessageTypeUserPremiumGuildSubscription:
-		sendText = vs.Message.Author.Username + "がサーバーブーストしました。"
+		sendTextBuilder.WriteString(vs.Message.Author.Username + "がサーバーブーストしました。")
 	case discordgo.MessageTypeUserPremiumGuildSubscriptionTierOne:
-		sendText = vs.Message.Author.Username + "がサーバーブーストし、レベル1になりました！！！！！！！！"
+		sendTextBuilder.WriteString(vs.Message.Author.Username + "がサーバーブーストし、レベル1になりました！！！！！！！！")
 	case discordgo.MessageTypeUserPremiumGuildSubscriptionTierTwo:
-		sendText = vs.Message.Author.Username + "がサーバーブーストし、レベル2になりました！！！！！！！！"
+		sendTextBuilder.WriteString(vs.Message.Author.Username + "がサーバーブーストし、レベル2になりました！！！！！！！！")
 	case discordgo.MessageTypeUserPremiumGuildSubscriptionTierThree:
-		sendText = vs.Message.Author.Username + "がサーバーブーストし、レベル3になりました！！！！！！！！"
+		sendTextBuilder.WriteString(vs.Message.Author.Username + "がサーバーブーストし、レベル3になりました！！！！！！！！")
 	case discordgo.MessageTypeGuildMemberJoin:
-		sendText = vs.Message.Author.Username + "が参加しました。"
+		sendTextBuilder.WriteString(vs.Message.Author.Username + "が参加しました。")
 	default:
 		st, err := s.Channel(vs.ChannelID)
 		if err != nil {
 			slog.InfoContext(ctx, err.Error())
 			return
 		}
-		sendText = st.Name + "にて、" + vs.Message.Author.Username
+		sendTextBuilder.WriteString(st.Name + "にて、" + vs.Message.Author.Username)
 	}
 
 	// スタンプが送信されていた場合、画像URLを取得
@@ -252,28 +254,28 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 			voiceCount++
 		default:
 			slog.InfoContext(ctx, "未対応のファイル形式です。")
-			sendText += attachment.URL + "\n"
+			sendTextBuilder.WriteString(attachment.URL + "\n")
 		}
 	}
 
 	if len(imageUrls) > 0 {
-		sendText += " 画像を" + strconv.Itoa(len(imageUrls)) + "枚、"
+		sendTextBuilder.WriteString(" 画像を" + strconv.Itoa(len(imageUrls)) + "枚、")
 	}
 	if videoCount > 0 {
-		sendText += " 動画を" + strconv.Itoa(videoCount) + "個、"
+		sendTextBuilder.WriteString(" 動画を" + strconv.Itoa(videoCount) + "個、")
 	}
 	if voiceCount > 0 {
-		sendText += " 音声を" + strconv.Itoa(voiceCount) + "個、"
+		sendTextBuilder.WriteString(" 音声を" + strconv.Itoa(voiceCount) + "個、")
 	}
 	if len(imageUrls) > 0 || videoCount > 0 || voiceCount > 0 {
-		sendText += "送信しました。"
+		sendTextBuilder.WriteString(" 送信しました。")
 	}
 
-	sendText += "「 " + vs.Message.Content + " 」"
+	sendTextBuilder.WriteString("「 " + vs.Message.Content + " 」")
 
 	// LINEに送信
 	for _, url := range imageUrls {
-		err = lineRequ.PushImageNotify(ctx, sendText, url)
+		err = lineRequ.PushImageNotify(ctx, sendTextBuilder.String(), url)
 		if err != nil {
 			slog.InfoContext(ctx, err.Error())
 			return
@@ -291,7 +293,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	if len(imageUrls) > 0 || videoCount > 0 || voiceCount > 0 {
 		return
 	}
-	err = lineRequ.PushMessageNotify(ctx, sendText)
+	err = lineRequ.PushMessageNotify(ctx, sendTextBuilder.String())
 	if err != nil {
 		slog.InfoContext(ctx, err.Error())
 		return

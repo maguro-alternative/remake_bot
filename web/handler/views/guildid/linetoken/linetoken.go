@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -141,8 +142,8 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if lineBot.LineClientSecret != nil {
 		lineClientSecretEntered = "入力済み"
 	}
-	htmlSelectChannels := ``
-	categoryOptions := make([]string, len(categoryIDTmps)+1)
+	htmlSelectChannelBuilders := strings.Builder{}
+	categoryOptions := make([]strings.Builder, len(categoryIDTmps)+1)
 	var categoryIndex int
 	for categoryID, channels := range channelsInCategory {
 		for i, categoryIDTmp := range categoryIDTmps {
@@ -160,14 +161,14 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 			if lineBot.DefaultChannelID == channelSelect.ID {
-				categoryOptions[categoryIndex] += fmt.Sprintf(`<option value="%s" selected>%s</option>`, channelSelect.ID, channelSelect.Name)
+				categoryOptions[categoryIndex].WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, channelSelect.ID, channelSelect.Name))
 				continue
 			}
-			categoryOptions[categoryIndex] += fmt.Sprintf(`<option value="%s">%s</option>`, channelSelect.ID, channelSelect.Name)
+			categoryOptions[categoryIndex].WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, channelSelect.ID, channelSelect.Name))
 		}
 	}
 	for _, categoryOption := range categoryOptions {
-		htmlSelectChannels += categoryOption
+		htmlSelectChannelBuilders.WriteString(categoryOption.String())
 	}
 	data := struct {
 		Title                   string
@@ -188,7 +189,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		LineGroupIDEntered:      lineGroupIDEntered,
 		LineClientIDEntered:     lineClientIDEntered,
 		LineClientSecretEntered: lineClientSecretEntered,
-		Channels:                template.HTML(htmlSelectChannels),
+		Channels:                template.HTML(htmlSelectChannelBuilders.String()),
 	}
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/linetoken.html"))
 	if err := tmpl.Execute(w, data); err != nil {

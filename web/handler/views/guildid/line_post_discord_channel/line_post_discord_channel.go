@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -150,8 +151,8 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		}
 	}
 
-	htmlForm := ``
-	categoryComponents := make([]string, len(categoryIDTmps)+1)
+	htmlFormBuilder := strings.Builder{}
+	categoryComponentBuilders := make([]strings.Builder, len(categoryIDTmps)+1)
 	var categoryIndex int
 	for categoryID, channels := range channelsInCategory {
 		for i, categoryIDTmp := range categoryIDTmps {
@@ -168,10 +169,10 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		if categoryID == "" {
 			categoryChannelName = "カテゴリーなし"
 		}
-		categoryComponents[categoryIndex] = fmt.Sprintf(`
+		categoryComponentBuilders[categoryIndex].WriteString(fmt.Sprintf(`
 		<details>
             <summary>%s</summary>
-		`, categoryChannelName)
+		`, categoryChannelName))
 		for _, channel := range channels {
 			if channel.ID == "" {
 				continue
@@ -184,7 +185,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 			if channel.BotMessage {
 				botNgFlag = "checked"
 			}
-			categoryComponents[categoryIndex] += `
+			categoryComponentBuilders[categoryIndex].WriteString(`
 			<details>
                 <summary>` + channel.Name + `</summary>
 				<label for="ng_` + channel.ID + `">LINEへ送信しない</label>
@@ -209,13 +210,13 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 				</select>
 				<br/>
 			</details>
-			`
+			`)
 		}
-		categoryComponents[categoryIndex] += `
-		</details>`
+		categoryComponentBuilders[categoryIndex].WriteString(`
+		</details>`)
 	}
-	for _, categoryComponent := range categoryComponents {
-		htmlForm += categoryComponent
+	for _, categoryComponent := range categoryComponentBuilders {
+		htmlFormBuilder.WriteString(categoryComponent.String())
 	}
 
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/line_post_discord_channel.html"))
@@ -228,7 +229,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		Title:       "DiscordからLINEへの送信設定",
 		JsScriptTag: template.HTML(`<script src="/static/js/line_post_discord_channel.js"></script>`),
 		GuildName:   guild.Name,
-		HTMLForm:    template.HTML(htmlForm),
+		HTMLForm:    template.HTML(htmlFormBuilder.String()),
 	}); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "テンプレートの実行に失敗しました:"+err.Error())
@@ -236,7 +237,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 }
 
 func createSelectForm(guild *discordgo.Guild, channel internal.DiscordChannelSet, messageTypes []string) (member string, role string, messageType string) {
-	selectMemberForm := ""
+	selectMemberFormBuilder := strings.Builder{}
 	for _, member := range guild.Members {
 		selectedFlag := false
 		for _, ngUserID := range channel.NgUsers {
@@ -246,12 +247,12 @@ func createSelectForm(guild *discordgo.Guild, channel internal.DiscordChannelSet
 			}
 		}
 		if selectedFlag {
-			selectMemberForm += fmt.Sprintf(`<option value="%s" selected>%s</option>`, member.User.ID, member.User.Username)
+			selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, member.User.ID, member.User.Username))
 			continue
 		}
-		selectMemberForm += fmt.Sprintf(`<option value="%s">%s</option>`, member.User.ID, member.User.Username)
+		selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, member.User.ID, member.User.Username))
 	}
-	selectRoleForm := ""
+	selectRoleFormBuilder := strings.Builder{}
 	for _, role := range guild.Roles {
 		selectedFlag := false
 		for _, ngRoleID := range channel.NgRoles {
@@ -261,12 +262,12 @@ func createSelectForm(guild *discordgo.Guild, channel internal.DiscordChannelSet
 			}
 		}
 		if selectedFlag {
-			selectRoleForm += fmt.Sprintf(`<option value="%s" selected>%s</option>`, role.ID, role.Name)
+			selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, role.ID, role.Name))
 			continue
 		}
-		selectRoleForm += fmt.Sprintf(`<option value="%s">%s</option>`, role.ID, role.Name)
+		selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, role.ID, role.Name))
 	}
-	selectMessageTypeForm := ""
+	selectMessageTypeFormBuilder := strings.Builder{}
 	for i, messageType := range messageTypes {
 		selectedFlag := false
 		for _, ngType := range channel.NgTypes {
@@ -276,10 +277,10 @@ func createSelectForm(guild *discordgo.Guild, channel internal.DiscordChannelSet
 			}
 		}
 		if selectedFlag {
-			selectMessageTypeForm += fmt.Sprintf(`<option value=%d selected>%s</option>`, i, messageType)
+			selectMessageTypeFormBuilder.WriteString(fmt.Sprintf(`<option value=%d selected>%s</option>`, i, messageType))
 			continue
 		}
-		selectMessageTypeForm += fmt.Sprintf(`<option value=%d>%s</option>`, i, messageType)
+		selectMessageTypeFormBuilder.WriteString(fmt.Sprintf(`<option value=%d>%s</option>`, i, messageType))
 	}
-	return selectMemberForm, selectRoleForm, selectMessageTypeForm
+	return selectMemberFormBuilder.String(), selectRoleFormBuilder.String(), selectMessageTypeFormBuilder.String()
 }

@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -69,22 +70,22 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	htmlGuilds := ``
+	htmlGuildBuilders := strings.Builder{}
 	for _, guild := range matchGuilds {
 		if guild.Icon == "" {
-			htmlGuilds += `
+			htmlGuildBuilders.WriteString(`
 			<a href="/guild/` + guild.ID + `">
 				<li>` + guild.Name + `</li>
 			</a><br>
-			`
+			`)
 			continue
 		}
-		htmlGuilds += `
+		htmlGuildBuilders.WriteString(`
 		<a href="/guild/` + guild.ID + `">
 			<img src="https://cdn.discordapp.com/icons/` + guild.ID + `/` + guild.Icon + `.png" alt="` + guild.Name + `">
 			<li>` + guild.Name + `</li>
 		</a><br>
-		`
+		`)
 	}
 	data := struct {
 		Title       string
@@ -93,7 +94,7 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}{
 		Title:       "サーバー一覧",
 		JsScriptTag: template.HTML(``),
-		Guilds:      template.HTML(htmlGuilds),
+		Guilds:      template.HTML(htmlGuildBuilders.String()),
 	}
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guilds/guilds.html"))
 	if err := tmpl.Execute(w, data); err != nil {
@@ -102,6 +103,7 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// discordgo.UserGuildをそのまま使用すると、jsonデコード時にエラーが発生するため、userGuildを使用する
 func getUserGuilds(token string) ([]discordgo.UserGuild, error) {
 	url := "https://discord.com/api/users/@me/guilds"
 	req, err := http.NewRequest("GET", url, nil)

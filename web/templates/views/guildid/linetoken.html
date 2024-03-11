@@ -5,26 +5,32 @@
             <form action="#" id="form">
                 <label for="lineNotifyToken">LINE Notifyのトークン</label>
                 <input id="lineNotifyToken" type="password" name="line_notify_token">
+                {{ .LineNotifyTokenEntered }}
                 <br/>
 
                 <label for="lineBotToken">LINE Botのトークン</label>
                 <input id="lineBotToken" type="password" name="line_bot_token">
+                {{ .LineBotTokenEntered }}
                 <br/>
 
                 <label for="lineBotSecret">LINE Botのシークレット</label>
                 <input id="lineBotSecret" type="password" name="line_bot_secret">
+                {{ .LineBotSecretEntered }}
                 <br/>
 
                 <label for="lineGroupId">LINEグループID</label>
                 <input id="lineGroupId" type="password" name="line_group_id">
+                {{ .LineGroupIDEntered }}
                 <br/>
 
                 <label for="lineClientId">LINEのクライアントID</label>
                 <input id="lineClientId" type="password" name="line_client_id">
+                {{ .LineClientIDEntered }}
                 <br/>
 
                 <label for="lineClientSecret">LINEのクライアントシークレット</label>
                 <input id="lineClientSecret" type="password" name="line_client_secret">
+                {{ .LineClientSecretEntered }}
                 <br/>
 
                 <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>

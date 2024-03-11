@@ -21,6 +21,8 @@ type LineBot struct {
 	LineBotToken     pq.ByteaArray `db:"line_bot_token"`
 	LineBotSecret    pq.ByteaArray `db:"line_bot_secret"`
 	LineGroupID      pq.ByteaArray `db:"line_group_id"`
+	LineClientID     pq.ByteaArray `db:"line_client_id"`
+	LineClientSecret pq.ByteaArray `db:"line_client_secret"`
 	DefaultChannelID string        `db:"default_channel_id"`
 	DebugMode        bool          `db:"debug_mode"`
 }

@@ -90,6 +90,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	var lineNotifyTokenEntered, lineBotTokenEntered, lineBotSecretEntered, lineGroupIDEntered, lineClientIDEntered, lineClientSecretEntered string
 	lineBot, err := repo.GetLineBot(ctx, guildId)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		err = repo.InsertLineBot(ctx, &internal.LineBot{
@@ -111,6 +112,24 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+	if lineBot.LineNotifyToken != nil {
+		lineNotifyTokenEntered = "入力済み"
+	}
+	if lineBot.LineBotToken != nil {
+		lineBotTokenEntered = "入力済み"
+	}
+	if lineBot.LineBotSecret != nil {
+		lineBotSecretEntered = "入力済み"
+	}
+	if lineBot.LineGroupID != nil {
+		lineGroupIDEntered = "入力済み"
+	}
+	if lineBot.LineClientID != nil {
+		lineClientIDEntered = "入力済み"
+	}
+	if lineBot.LineClientSecret != nil {
+		lineClientSecretEntered = "入力済み"
 	}
 	htmlSelectChannels := ``
 	categoryOptions := make([]string, len(categoryIDTmps)+1)
@@ -141,15 +160,27 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		htmlSelectChannels += categoryOption
 	}
 	data := struct {
-		Title    string
-		GuildID  string
-		Channels template.HTML
+		Title                   string
+		GuildID                 string
+		LineNotifyTokenEntered  string
+		LineBotTokenEntered     string
+		LineBotSecretEntered    string
+		LineGroupIDEntered      string
+		LineClientIDEntered     string
+		LineClientSecretEntered string
+		Channels                template.HTML
 	}{
-		Title:    "LineBotの設定",
-		GuildID:  guildId,
-		Channels: template.HTML(htmlSelectChannels),
+		Title:                   "LineBotの設定",
+		GuildID:                 guildId,
+		LineNotifyTokenEntered:  lineNotifyTokenEntered,
+		LineBotTokenEntered:     lineBotTokenEntered,
+		LineBotSecretEntered:    lineBotSecretEntered,
+		LineGroupIDEntered:      lineGroupIDEntered,
+		LineClientIDEntered:     lineClientIDEntered,
+		LineClientSecretEntered: lineClientSecretEntered,
+		Channels:                template.HTML(htmlSelectChannels),
 	}
-	tmpl := template.Must(template.ParseFiles("web/templates/layout.html","web/templates/views/guildid/linetoken.html"))
+	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/linetoken.html"))
 	if err := tmpl.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

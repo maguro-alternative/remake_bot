@@ -24,6 +24,8 @@ func (r *Repository) GetLineBot(ctx context.Context, guildID string) (LineBot, e
 			line_bot_token,
 			line_bot_secret,
 			line_group_id,
+			line_client_id,
+			line_client_secret,
 			default_channel_id,
 			debug_mode
 		FROM

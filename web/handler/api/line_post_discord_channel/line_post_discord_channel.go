@@ -3,6 +3,7 @@ package linechannel
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel/internal"
@@ -21,38 +22,45 @@ func NewLineChannelHandler(indexService *service.IndexService) *LineChannelHandl
 }
 
 func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	// Post以外のリクエストは受け付けない
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		slog.ErrorContext(ctx, "Method Not Allowed")
+		return
+	}
 	var lineChannelJson internal.LineChannelJson
 	if err := json.NewDecoder(r.Body).Decode(&lineChannelJson); err != nil {
-		http.Error(w, "Json読み取りに失敗しました。", http.StatusBadRequest)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "Json読み取りに失敗しました。 "+err.Error())
 		return
 	}
 
 	if err := lineChannelJson.Validate(); err != nil {
-		http.Error(w, "バリデーションチェックに失敗しました。", http.StatusBadRequest)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "Jsonバリデーションに失敗しました。 "+err.Error())
 		return
 	}
 
 	lineChannelJson.GuildID = r.PathValue("guildId")
 	guild, err := h.IndexService.DiscordSession.State.Guild(lineChannelJson.GuildID)
 	if err != nil {
-		http.Error(w, "Not get guild id", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "Guild情報取得に失敗しました。 "+err.Error())
 		return
 	}
 	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, h.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
+			slog.InfoContext(ctx, "Redirect to /auth/discord")
 			http.Redirect(w, r, "/auth/discord", http.StatusFound)
 			return
 		}
 		http.Error(w, "Not permission", statusCode)
+		slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
 		return
 	}
 
@@ -61,28 +69,33 @@ func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for _, lineChannel := range lineChannels {
 		if err := repo.UpdateLinePostDiscordChannel(ctx, lineChannel); err != nil {
-			http.Error(w, "line_post_discord_channel更新に失敗しました。", http.StatusInternalServerError)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "line_post_discord_channel更新に失敗しました。 "+err.Error())
 			return
 		}
 	}
 
 	if err := repo.InsertLineNgDiscordMessageTypes(ctx, lineNgTypes); err != nil {
-		http.Error(w, "line_ng_discord_message_type更新に失敗しました。", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "line_ng_discord_message_type更新に失敗しました。 "+err.Error())
 		return
 	}
 
 	if err := repo.DeleteNotInsertLineNgDiscordMessageTypes(ctx, lineNgTypes); err != nil {
-		http.Error(w, "line_ng_discord_message_type更新に失敗しました。", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "line_ng_discord_message_type更新に失敗しました。 "+err.Error())
 		return
 	}
 
 	if err := repo.InsertLineNgDiscordIDs(ctx, lineNgIDs); err != nil {
-		http.Error(w, "line_ng_discord_id更新(挿入)に失敗しました。", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "line_ng_discord_id更新に失敗しました。 "+err.Error())
 		return
 	}
 
 	if err := repo.DeleteNotInsertLineNgDiscordIDs(ctx, lineNgIDs); err != nil {
-		http.Error(w, "line_ng_discord_id更新(削除)に失敗しました。"+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "line_ng_discord_id更新に失敗しました。 "+err.Error())
 		return
 	}
 

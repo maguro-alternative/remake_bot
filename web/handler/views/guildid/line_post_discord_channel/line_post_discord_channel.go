@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 
 	"github.com/bwmarrin/discordgo"
@@ -56,16 +57,19 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
-		http.Error(w, "Not get guild id", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました:"+err.Error())
 		return
 	}
 	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/auth/discord", http.StatusFound)
+			slog.InfoContext(ctx, "Redirect to /auth/discord")
 			return
 		}
 		http.Error(w, "Not permission", statusCode)
+		slog.WarnContext(ctx, "権限のないアクセスがありました:"+err.Error())
 		return
 	}
 	//[categoryID]map[channelPosition]channelName
@@ -102,10 +106,13 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		discordChannel, err := repo.GetLineChannel(ctx, channel.ID)
 		if err != nil && err.Error() != "sql: no rows in result set" {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "line_post_discord_channelの読み取りに失敗しました:"+err.Error())
 			return
 		} else if err != nil {
+			// チャンネルが存在しない場合は追加
 			if err := repo.InsertLineChannel(ctx, channel.ID, guildId); err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "line_post_discord_channelの追加に失敗しました:"+err.Error())
 				return
 			}
 			discordChannel = internal.LineChannel{
@@ -118,11 +125,13 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		ngTypes, err := repo.GetLineNgType(ctx, channel.ID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "line_ng_typeの読み取りに失敗しました:"+err.Error())
 			return
 		}
 		ngDiscordIDs, err := repo.GetLineNgDiscordID(ctx, channel.ID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "line_ng_discord_idの読み取りに失敗しました:"+err.Error())
 			return
 		}
 		channelsInCategory[categoryPosition.ID][channel.Position] = internal.DiscordChannelSet{
@@ -222,6 +231,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		HTMLForm:    template.HTML(htmlForm),
 	}); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "テンプレートの実行に失敗しました:"+err.Error())
 	}
 }
 

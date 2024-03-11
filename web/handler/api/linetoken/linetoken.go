@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	"github.com/lib/pq"
@@ -26,39 +27,42 @@ func NewLineTokenHandler(indexService *service.IndexService) *LineTokenHandler {
 }
 
 func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode("Method Not Allowed")
+		slog.ErrorContext(ctx, "/api/line-bot Method Not Allowed")
 		return
 	}
 	var lineTokenJson internal.LineBotJson
 	if err := json.NewDecoder(r.Body).Decode(&lineTokenJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
-		json.NewEncoder(w).Encode(err.Error())
+		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました:"+err.Error())
 		return
 	}
 	if err := lineTokenJson.Validate(); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
-		json.NewEncoder(w).Encode(err.Error())
+		slog.ErrorContext(ctx, "jsonのバリデーションに失敗しました:"+err.Error())
 		return
-	}
-	ctx := r.Context()
-	if ctx == nil {
-		ctx = context.Background()
 	}
 	lineTokenJson.GuildID = r.PathValue("guildId")
 	guild, err := h.IndexService.DiscordSession.State.Guild(lineTokenJson.GuildID)
 	if err != nil {
 		http.Error(w, "Not get guild id", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "guild idの取得に失敗しました:"+err.Error())
 		return
 	}
 	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, h.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/auth/discord", http.StatusFound)
+			slog.InfoContext(ctx, "Redirect to /auth/discord")
 			return
 		}
 		http.Error(w, "Not permission", statusCode)
+		slog.WarnContext(ctx, "権限のないアクセスがありました:"+err.Error())
 		return
 	}
 	// 暗号化キーの取得
@@ -66,19 +70,19 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	lineBot, lineBotIv, err := lineBotJsonEncrypt(privateKey, &lineTokenJson)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
+		slog.ErrorContext(ctx, "暗号化に失敗しました:"+err.Error())
 		return
 	}
 	// 暗号化
 	repo := internal.NewRepository(h.IndexService.DB)
 	if err := repo.UpdateLineBot(ctx, lineBot); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
+		slog.ErrorContext(ctx, "line_botの更新に失敗しました:"+err.Error())
 		return
 	}
 	if err := repo.UpdateLineBotIv(ctx, lineBotIv); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
+		slog.ErrorContext(ctx, "line_bot_ivの更新に失敗しました:"+err.Error())
 		return
 	}
 	w.WriteHeader(http.StatusOK)

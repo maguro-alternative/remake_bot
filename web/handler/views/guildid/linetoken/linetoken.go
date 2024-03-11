@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"html/template"
+	"log/slog"
 	"net/http"
 
 	"github.com/bwmarrin/discordgo"
@@ -34,16 +35,19 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
-		http.Error(w, "Not get guild id", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "Not get guild id: "+err.Error())
 		return
 	}
 	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/auth/discord", http.StatusFound)
+			slog.InfoContext(ctx, "Redirect to /auth/discord "+err.Error())
 			return
 		}
 		http.Error(w, "Not get permission", statusCode)
+		slog.WarnContext(ctx, "権限のないアクセスがありました: "+err.Error())
 		return
 	}
 	// カテゴリーのチャンネルを取得
@@ -54,7 +58,9 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue
 		}
+		// カテゴリーIDの順番を一時保存(Goではmapの順番が保証されないため)
 		categoryIDTmps = append(categoryIDTmps, channel.ID)
+		// カテゴリーごとに連想配列を作成
 		categoryPositions[channel.ID] = internal.DiscordChannel{
 			ID:       channel.ID,
 			Name:     channel.Name,
@@ -64,6 +70,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	// カテゴリーなしのチャンネルを追加
 	//channelsInCategory[""] = make([]internal.DiscordChannelSelect, len(guild.Channels)-1, len(guild.Channels))
 	for _, channel := range guild.Channels {
+		// カテゴリー、フォーラムチャンネルはスキップ
 		if channel.Type == discordgo.ChannelTypeGuildForum {
 			continue
 		}
@@ -99,18 +106,21 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			DebugMode:        false,
 		})
 		if err != nil {
-			http.Error(w, "line_bot:"+err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "line_botの作成に失敗しました:"+err.Error())
 			return
 		}
 		err = repo.InsertLineBotIv(ctx, &internal.LineBotIv{
 			GuildID: guildId,
 		})
 		if err != nil {
-			http.Error(w, "line_bot_iv:"+err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "line_bot_ivの作成に失敗しました:"+err.Error())
 			return
 		}
 	} else if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "line_botの取得に失敗しました:"+err.Error())
 		return
 	}
 	if lineBot.LineNotifyToken != nil {
@@ -161,7 +171,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	data := struct {
 		Title                   string
-		JsScriptTag				template.HTML
+		JsScriptTag             template.HTML
 		LineNotifyTokenEntered  string
 		LineBotTokenEntered     string
 		LineBotSecretEntered    string
@@ -182,6 +192,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/linetoken.html"))
 	if err := tmpl.Execute(w, data); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "テンプレートの実行に失敗しました:"+err.Error())
 	}
 }

@@ -3,6 +3,7 @@ package guildid
 import (
 	"context"
 	"html/template"
+	"log/slog"
 	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -28,16 +29,19 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	guildId := r.PathValue("guildId")
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
-		http.Error(w, "Not get guild id", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: "+err.Error())
 		return
 	}
 	statusCode, permissionCode, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == 302 {
 			http.Redirect(w, r, "/auth/discord", http.StatusFound)
+			slog.InfoContext(ctx, "Redirect to /auth/discord")
 			return
 		}
 		http.Error(w, "Not get guild id", statusCode)
+		slog.WarnContext(ctx, "権限のないアクセスがありました: "+err.Error())
 		return
 	}
 	if permissionCode&8 != 0 {
@@ -70,6 +74,8 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		SettingLinks: template.HTML(settingLinks),
 	})
 	if err != nil {
-		http.Error(w, "Template error "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "テンプレートの実行に失敗しました: "+err.Error())
+		return
 	}
 }

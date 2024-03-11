@@ -57,6 +57,9 @@ func NewWebRouter(
 	// register routes
 	mux := http.NewServeMux()
 	middleChain := alice.New(middleware.LogMiddleware)
+	// 静的ファイルのハンドリング
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/templates/static/"))))
+
 	mux.Handle("/api/line-bot", middleChain.Then(linebot.NewLineBotHandler(indexService)))
 	mux.Handle("/auth/discord", middleChain.Then(discordOAuth.NewDiscordOAuth2Handler(discordOAuth2Service)))
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))

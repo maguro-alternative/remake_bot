@@ -1,84 +1,49 @@
 {{ define "content" }}
-    <body>
-        <main>
-            <!-- 入力フォーム -->
-            <form action="#" id="form">
-                <label for="lineNotifyToken">LINE Notifyのトークン</label>
-                <input id="lineNotifyToken" type="password" name="line_notify_token">
-                {{ .LineNotifyTokenEntered }}
-                <br/>
+    <main>
+        <!-- 入力フォーム -->
+        <form action="#" id="form">
+            <label for="lineNotifyToken">LINE Notifyのトークン</label>
+            <input id="lineNotifyToken" type="password" name="line_notify_token">
+            {{ .LineNotifyTokenEntered }}
+            <br/>
 
-                <label for="lineBotToken">LINE Botのトークン</label>
-                <input id="lineBotToken" type="password" name="line_bot_token">
-                {{ .LineBotTokenEntered }}
-                <br/>
+            <label for="lineBotToken">LINE Botのトークン</label>
+            <input id="lineBotToken" type="password" name="line_bot_token">
+            {{ .LineBotTokenEntered }}
+            <br/>
 
-                <label for="lineBotSecret">LINE Botのシークレット</label>
-                <input id="lineBotSecret" type="password" name="line_bot_secret">
-                {{ .LineBotSecretEntered }}
-                <br/>
+            <label for="lineBotSecret">LINE Botのシークレット</label>
+            <input id="lineBotSecret" type="password" name="line_bot_secret">
+            {{ .LineBotSecretEntered }}
+            <br/>
 
-                <label for="lineGroupId">LINEグループID</label>
-                <input id="lineGroupId" type="password" name="line_group_id">
-                {{ .LineGroupIDEntered }}
-                <br/>
+            <label for="lineGroupId">LINEグループID</label>
+            <input id="lineGroupId" type="password" name="line_group_id">
+            {{ .LineGroupIDEntered }}
+            <br/>
 
-                <label for="lineClientId">LINEのクライアントID</label>
-                <input id="lineClientId" type="password" name="line_client_id">
-                {{ .LineClientIDEntered }}
-                <br/>
+            <label for="lineClientId">LINEのクライアントID</label>
+            <input id="lineClientId" type="password" name="line_client_id">
+            {{ .LineClientIDEntered }}
+            <br/>
 
-                <label for="lineClientSecret">LINEのクライアントシークレット</label>
-                <input id="lineClientSecret" type="password" name="line_client_secret">
-                {{ .LineClientSecretEntered }}
-                <br/>
+            <label for="lineClientSecret">LINEのクライアントシークレット</label>
+            <input id="lineClientSecret" type="password" name="line_client_secret">
+            {{ .LineClientSecretEntered }}
+            <br/>
 
-                <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>
-                <select id="defaultChannel" name="default_channel_id" >
-                    {{ .Channels }}
-                </select>
-                <br/>
+            <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>
+            <select id="defaultChannel" name="default_channel_id" >
+                {{ .Channels }}
+            </select>
+            <br/>
 
-                <label for="debugMode">デバッグモード</label>
-                <input id="debugMode" type="checkbox" name="debug_mode" value="true">
-                <br/>
+            <label for="debugMode">デバッグモード</label>
+            <input id="debugMode" type="checkbox" name="debug_mode" value="true">
+            <br/>
 
-                <input type="submit" value="送信">
-            </form>
-        </main>
-    </body>
+            <input type="submit" value="送信">
+        </form>
+    </main>
     <!-- 以下JavaScriptを記述 -->
-    <script>
-        // submit時にイベント実行をする関数
-        document.getElementById('form').onsubmit = async function (event) {
-            let check = window.confirm('送信します。よろしいですか？');
-            if (check === false) {
-                event.preventDefault();
-                return;
-            }
-            // 再読み込み防止
-            event.preventDefault();
-            const formData = new FormData(document.getElementById('form'));
-            const data = Object.fromEntries(formData.entries());
-
-            const jsonData = JSON.stringify(data);
-
-            // データを送信
-            await fetch('/api/{{ .GuildID }}/linetoken', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: jsonData
-            }).then((res) => {
-                if (res.ok && res.status === 200) {
-                    alert('設定を保存しました');
-                    window.location.href = '/guild/{{ .GuildID }}';
-                } else {
-                    alert('設定の保存に失敗しました');
-                }
-            });
-
-        }
-    </script>
 {{ end }}

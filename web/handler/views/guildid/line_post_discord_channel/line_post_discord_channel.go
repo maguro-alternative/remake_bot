@@ -209,17 +209,17 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		htmlForm += categoryComponent
 	}
 
-	tmpl := template.Must(template.ParseFiles("web/templates/layout.html","web/templates/views/guildid/line_post_discord_channel.html"))
+	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/line_post_discord_channel.html"))
 	if err := tmpl.Execute(w, struct {
-		Title     string
-		GuildName string
-		GuildID   string
-		HTMLForm  template.HTML
+		Title       string
+		JsScriptTag template.HTML
+		GuildName   string
+		HTMLForm    template.HTML
 	}{
-		Title:     "DiscordからLINEへの送信設定",
-		GuildName: guild.Name,
-		GuildID:   guildId,
-		HTMLForm:  template.HTML(htmlForm),
+		Title:       "DiscordからLINEへの送信設定",
+		JsScriptTag: template.HTML(`<script src="/static/js/line_post_discord_channel.js"></script>`),
+		GuildName:   guild.Name,
+		HTMLForm:    template.HTML(htmlForm),
 	}); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}

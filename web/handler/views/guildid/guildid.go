@@ -56,12 +56,14 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid.html"))
 	err = tmpl.Execute(w, struct {
 		Title        string
+		JsScriptTag  template.HTML
 		GuildID      string
 		GuildName    string
 		GuildIcon    string
 		SettingLinks template.HTML
 	}{
-		Title:        guild.Name+"の設定項目一覧",
+		Title:        guild.Name + "の設定項目一覧",
+		JsScriptTag:  template.HTML(``),
 		GuildID:      guild.ID,
 		GuildName:    guild.Name,
 		GuildIcon:    guild.Icon,

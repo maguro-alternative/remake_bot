@@ -161,7 +161,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	data := struct {
 		Title                   string
-		GuildID                 string
+		JsScriptTag				template.HTML
 		LineNotifyTokenEntered  string
 		LineBotTokenEntered     string
 		LineBotSecretEntered    string
@@ -171,7 +171,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		Channels                template.HTML
 	}{
 		Title:                   "LineBotの設定",
-		GuildID:                 guildId,
+		JsScriptTag:             template.HTML(`<script src="/static/js/linetoken.js"></script>`),
 		LineNotifyTokenEntered:  lineNotifyTokenEntered,
 		LineBotTokenEntered:     lineBotTokenEntered,
 		LineBotSecretEntered:    lineBotSecretEntered,

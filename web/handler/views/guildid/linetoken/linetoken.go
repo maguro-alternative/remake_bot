@@ -141,15 +141,16 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		htmlSelectChannels += categoryOption
 	}
 	data := struct {
+		Title    string
 		GuildID  string
 		Channels template.HTML
 	}{
+		Title:    "LineBotの設定",
 		GuildID:  guildId,
 		Channels: template.HTML(htmlSelectChannels),
 	}
-	t := template.Must(template.New("linetoken.html").ParseFiles("web/templates/views/guildid/linetoken.html"))
-	err = t.ExecuteTemplate(w, "linetoken.html", data)
-	if err != nil {
+	tmpl := template.Must(template.ParseFiles("web/templates/layout.html","web/templates/views/guildid/linetoken.html"))
+	if err := tmpl.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

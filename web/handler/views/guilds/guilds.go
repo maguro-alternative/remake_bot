@@ -86,11 +86,13 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		`
 	}
 	data := struct {
+		Title  string
 		Guilds template.HTML
 	}{
+		Title:  "サーバー一覧",
 		Guilds: template.HTML(htmlGuilds),
 	}
-	tmpl := template.Must(template.ParseFiles("web/templates/views/guilds/guilds.html"))
+	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guilds/guilds.html"))
 	if err := tmpl.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

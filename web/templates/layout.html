@@ -12,8 +12,33 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{{ .Title }}</title>
     </head>
-    <body bgcolor="#252525" text="#ffffff">
-        {{template "content" . }}
+    <body style="background-color: #36393F; color: #FFF;">
+        <!-- display: flex: 要素を並列に
+        flex-direction: column:はみ出たコンテナを横に -->
+        <div style="display: flex; flex-direction: column; min-height: 100vim;">
+            <div class="container">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-2 col-sm-10 col-md-10" style="width: 50%;">
+                            <a href="/" class="btn btn-primary">top</a>
+                        </div>
+                        <div class="col-xs-2 col-sm-2 col-md-2" style="width: 50%;">
+                            <button type="button" id="popover-btn" class="btn btn-primary">
+                                アカウント
+                            </button>
+                            <!-- ポップバー 上記のbuttonが押されると表示される -->
+                            <div id="popover-content" style="display: none;position: absolute;background-color: #fff;border: 1px solid #ccc;padding: 10px; margin: 0 0 0 auto; color: black;">
+                                {{ .LineAccountVer }}
+                                {{ .DiscordAccountVer }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{template "content" . }}
+            </div>
+        </div>
     </body>
     {{ .JsScriptTag }}
+    <!-- login logoutの折り畳み -->
+    <script src="/static/js/popover.js"></script>
 </html>

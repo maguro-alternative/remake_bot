@@ -52,7 +52,7 @@ func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Guild情報取得に失敗しました。 "+err.Error())
 		return
 	}
-	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, h.IndexService, guild, "line_bot")
+	statusCode, _, _, err := permission.CheckDiscordPermission(ctx, w, r, h.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			slog.InfoContext(ctx, "Redirect to /auth/discord")

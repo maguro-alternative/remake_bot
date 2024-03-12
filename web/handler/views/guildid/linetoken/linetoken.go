@@ -40,7 +40,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Not get guild id: "+err.Error())
 		return
 	}
-	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	statusCode, _, discordUserSession, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/auth/discord", http.StatusFound)
@@ -142,6 +142,15 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if lineBot.LineClientSecret != nil {
 		lineClientSecretEntered = "入力済み"
 	}
+
+	discordAccountVer := strings.Builder{}
+	discordAccountVer.WriteString(fmt.Sprintf(`
+	<p>Discordアカウント: %s</p>
+	<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
+	<button type="button" id="popover-btn" class="btn btn-primary">
+		<a href="/" class="btn btn-primary">ログアウト</a>
+	</button>
+	`, discordUserSession.Username, discordUserSession.ID, discordUserSession.Avatar))
 	htmlSelectChannelBuilders := strings.Builder{}
 	categoryOptions := make([]strings.Builder, len(categoryIDTmps)+1)
 	var categoryIndex int
@@ -172,6 +181,8 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	data := struct {
 		Title                   string
+		LineAccountVer          template.HTML
+		DiscordAccountVer       template.HTML
 		JsScriptTag             template.HTML
 		LineNotifyTokenEntered  string
 		LineBotTokenEntered     string
@@ -183,6 +194,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}{
 		Title:                   "LineBotの設定",
 		JsScriptTag:             template.HTML(`<script src="/static/js/linetoken.js"></script>`),
+		DiscordAccountVer:       template.HTML(discordAccountVer.String()),
 		LineNotifyTokenEntered:  lineNotifyTokenEntered,
 		LineBotTokenEntered:     lineBotTokenEntered,
 		LineBotSecretEntered:    lineBotSecretEntered,

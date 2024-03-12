@@ -8,8 +8,9 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 	"github.com/maguro-alternative/remake_bot/web/shared/permission/internal"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 func CheckDiscordPermission(
@@ -19,9 +20,10 @@ func CheckDiscordPermission(
 	indexService *service.IndexService,
 	guild *discordgo.Guild,
 	permissionType string,
-) (statusCode int, permission int64, err error) {
+) (statusCode int, permission int64, discordUserSession *model.DiscordUser, err error) {
 	var userPermissionCode int64
 	userPermissionCode = 0
+	client := &http.Client{}
 	repo := internal.NewRepository(indexService.DB)
 
 	// ログインユーザーの取得
@@ -32,23 +34,38 @@ func CheckDiscordPermission(
 		config.SessionSecret(),
 	)
 	if err != nil {
-		return http.StatusFound, 0, err
+		return http.StatusFound, 0, nil, err
+	}
+
+	// アクセストークンの検証
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://discord.com/api/users/@me", nil)
+	if err != nil {
+		return http.StatusFound, 0, nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+discordLoginUser.Token)
+	resp, err := client.Do(req)
+	if err != nil {
+		return http.StatusFound, 0, nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return http.StatusFound, 0, nil, nil
 	}
 	permissionCode, err := repo.GetPermissionCode(ctx, guild.ID, permissionType)
 	if err != nil {
-		return http.StatusInternalServerError, userPermissionCode, err
+		return http.StatusInternalServerError, userPermissionCode, nil, err
 	}
 	permissionIDs, err := repo.GetPermissionIDs(ctx, guild.ID, permissionType)
 	if err != nil {
-		return http.StatusInternalServerError, userPermissionCode, err
+		return http.StatusInternalServerError, userPermissionCode, nil, err
 	}
 	discordGuildMember, err := indexService.DiscordSession.GuildMember(guild.ID, discordLoginUser.User.ID)
 	if err != nil {
-		return http.StatusInternalServerError, userPermissionCode, err
+		return http.StatusInternalServerError, userPermissionCode, nil, err
 	}
 	guildRoles, err := indexService.DiscordSession.GuildRoles(guild.ID)
 	if err != nil {
-		return http.StatusInternalServerError, userPermissionCode, err
+		return http.StatusInternalServerError, userPermissionCode, nil, err
 	}
 
 	for _, role := range discordGuildMember.Roles {
@@ -62,7 +79,7 @@ func CheckDiscordPermission(
 	// discordgoの場合guildMemberから正しく権限を取得できないため、UserChannelPermissionsを使用
 	memberPermission, err := indexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, guild.Channels[0].ID)
 	if err != nil {
-		return http.StatusInternalServerError, userPermissionCode, err
+		return http.StatusInternalServerError, userPermissionCode, nil, err
 	}
 	// 権限のチェック
 	if (permissionCode & (memberPermission | userPermissionCode)) == 0 {
@@ -82,8 +99,8 @@ func CheckDiscordPermission(
 			}
 		}
 		if !permissionFlag {
-			return http.StatusForbidden, userPermissionCode, nil
+			return http.StatusForbidden, userPermissionCode, &discordLoginUser.User, nil
 		}
 	}
-	return 200, memberPermission | userPermissionCode, nil
+	return 200, memberPermission | userPermissionCode, &discordLoginUser.User, nil
 }

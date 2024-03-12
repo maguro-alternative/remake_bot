@@ -3,6 +3,7 @@ package guilds
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -70,6 +71,15 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+
+	discordAccountVer := strings.Builder{}
+	discordAccountVer.WriteString(fmt.Sprintf(`
+	<p>Discordアカウント: %s</p>
+	<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
+	<button type="button" id="popover-btn" class="btn btn-primary">
+		<a href="/" class="btn btn-primary">ログアウト</a>
+	</button>
+	`, discordLoginUser.User.Username, discordLoginUser.User.ID, discordLoginUser.User.Avatar))
 	htmlGuildBuilders := strings.Builder{}
 	for _, guild := range matchGuilds {
 		if guild.Icon == "" {
@@ -89,13 +99,15 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		`)
 	}
 	data := struct {
-		Title       string
-		JsScriptTag template.HTML
-		Guilds      template.HTML
+		Title             string
+		LineAccountVer    template.HTML
+		DiscordAccountVer template.HTML
+		JsScriptTag       template.HTML
+		Guilds            template.HTML
 	}{
-		Title:       "サーバー一覧",
-		JsScriptTag: template.HTML(``),
-		Guilds:      template.HTML(htmlGuildBuilders.String()),
+		Title:             "サーバー一覧",
+		DiscordAccountVer: template.HTML(discordAccountVer.String()),
+		Guilds:            template.HTML(htmlGuildBuilders.String()),
 	}
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guilds/guilds.html"))
 	if err := tmpl.Execute(w, data); err != nil {

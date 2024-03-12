@@ -62,7 +62,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました:"+err.Error())
 		return
 	}
-	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	statusCode, _, discordUserSession, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/auth/discord", http.StatusFound)
@@ -151,6 +151,15 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		}
 	}
 
+	discordAccountVer := strings.Builder{}
+	discordAccountVer.WriteString(fmt.Sprintf(`
+	<p>Discordアカウント: %s</p>
+	<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
+	<button type="button" id="popover-btn" class="btn btn-primary">
+		<a href="/" class="btn btn-primary">ログアウト</a>
+	</button>
+	`, discordUserSession.Username, discordUserSession.ID, discordUserSession.Avatar))
+
 	htmlFormBuilder := strings.Builder{}
 	categoryComponentBuilders := make([]strings.Builder, len(categoryIDTmps)+1)
 	var categoryIndex int
@@ -221,15 +230,18 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/line_post_discord_channel.html"))
 	if err := tmpl.Execute(w, struct {
-		Title       string
-		JsScriptTag template.HTML
-		GuildName   string
-		HTMLForm    template.HTML
+		Title             string
+		LineAccountVer    template.HTML
+		DiscordAccountVer template.HTML
+		JsScriptTag       template.HTML
+		GuildName         string
+		HTMLForm          template.HTML
 	}{
-		Title:       "DiscordからLINEへの送信設定",
-		JsScriptTag: template.HTML(`<script src="/static/js/line_post_discord_channel.js"></script>`),
-		GuildName:   guild.Name,
-		HTMLForm:    template.HTML(htmlFormBuilder.String()),
+		Title:             "DiscordからLINEへの送信設定",
+		DiscordAccountVer: template.HTML(discordAccountVer.String()),
+		JsScriptTag:       template.HTML(`<script src="/static/js/line_post_discord_channel.js"></script>`),
+		GuildName:         guild.Name,
+		HTMLForm:          template.HTML(htmlFormBuilder.String()),
 	}); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "テンプレートの実行に失敗しました:"+err.Error())

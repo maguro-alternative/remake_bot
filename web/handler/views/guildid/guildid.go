@@ -2,9 +2,11 @@ package guildid
 
 import (
 	"context"
+	"fmt"
 	"html/template"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
@@ -33,7 +35,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: "+err.Error())
 		return
 	}
-	statusCode, permissionCode, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	statusCode, permissionCode, discordUserSession, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == 302 {
 			http.Redirect(w, r, "/auth/discord", http.StatusFound)
@@ -44,6 +46,14 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.WarnContext(ctx, "権限のないアクセスがありました: "+err.Error())
 		return
 	}
+	discordAccountVer := strings.Builder{}
+	discordAccountVer.WriteString(fmt.Sprintf(`
+	<p>Discordアカウント: %s</p>
+	<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
+	<button type="button" id="popover-btn" class="btn btn-primary">
+		<a href="/" class="btn btn-primary">ログアウト</a>
+	</button>
+	`, discordUserSession.Username, discordUserSession.ID, discordUserSession.Avatar))
 	guildIconUrl := "https://cdn.discordapp.com/icons/" + guild.ID + "/" + guild.Icon + ".png"
 	if guild.Icon == "" {
 		guildIconUrl = "/static/img/discord-icon.jpg"
@@ -63,19 +73,21 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	`
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid.html"))
 	err = tmpl.Execute(w, struct {
-		Title        string
-		JsScriptTag  template.HTML
-		GuildID      string
-		GuildName    string
-		GuildIconUrl string
-		SettingLinks template.HTML
+		Title             string
+		LineAccountVer    template.HTML
+		DiscordAccountVer template.HTML
+		JsScriptTag       template.HTML
+		GuildID           string
+		GuildName         string
+		GuildIconUrl      string
+		SettingLinks      template.HTML
 	}{
-		Title:        guild.Name + "の設定項目一覧",
-		JsScriptTag:  template.HTML(``),
-		GuildID:      guild.ID,
-		GuildName:    guild.Name,
-		GuildIconUrl: guildIconUrl,
-		SettingLinks: template.HTML(settingLinks),
+		Title:             guild.Name + "の設定項目一覧",
+		DiscordAccountVer: template.HTML(discordAccountVer.String()),
+		GuildID:           guild.ID,
+		GuildName:         guild.Name,
+		GuildIconUrl:      guildIconUrl,
+		SettingLinks:      template.HTML(settingLinks),
 	})
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

@@ -1,5 +1,8 @@
 {{ define "content" }}
     <main>
+        <h1>ようこそ！！！！！！！</h1>
+        ここは{{ .BotName }}の設定とかできるサイトです！！！！！
         <a href="/guilds" class="btn btn-primary">サーバ一覧へ</a>
+        <a href="/group/{{ .GuildId }}" class="btn btn-primary">Discordチャンネル送信先変更</a>
     </main>
 {{ end }}

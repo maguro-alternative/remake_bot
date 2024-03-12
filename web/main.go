@@ -11,7 +11,7 @@ import (
 	linePostDiscordChannel "github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken"
-	discordLogin "github.com/maguro-alternative/remake_bot/web/handler/login/discord_oauth"
+	discordLogin "github.com/maguro-alternative/remake_bot/web/handler/login/discord_login"
 	discordCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback"
 
 	indexView "github.com/maguro-alternative/remake_bot/web/handler/views"

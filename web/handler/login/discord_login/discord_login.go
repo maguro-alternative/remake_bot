@@ -1,4 +1,4 @@
-package discordoauth
+package discordlogin
 
 import (
 	"encoding/gob"

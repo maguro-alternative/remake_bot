@@ -156,7 +156,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	<p>Discordアカウント: %s</p>
 	<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
 	<button type="button" id="popover-btn" class="btn btn-primary">
-		<a href="/" class="btn btn-primary">ログアウト</a>
+		<a href="/logout/discord" class="btn btn-primary">ログアウト</a>
 	</button>
 	`, discordUserSession.Username, discordUserSession.ID, discordUserSession.Avatar))
 

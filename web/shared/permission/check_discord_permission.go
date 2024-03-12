@@ -2,6 +2,7 @@ package permission
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/bwmarrin/discordgo"
@@ -49,7 +50,7 @@ func CheckDiscordPermission(
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return http.StatusFound, 0, nil, nil
+		return http.StatusFound, 0, nil, errors.New("status code is not 200")
 	}
 	permissionCode, err := repo.GetPermissionCode(ctx, guild.ID, permissionType)
 	if err != nil {

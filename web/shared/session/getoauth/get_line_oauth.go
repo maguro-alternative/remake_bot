@@ -8,8 +8,9 @@ import (
 )
 
 type LineOAuthSession struct {
-	Token string   `json:"token"`
-	User  LineUser `json:"user"`
+	Token          string   `json:"token"`
+	DiscordGuildID string   `json:"discord_guild_id"`
+	User           LineUser `json:"user"`
 }
 
 type LineToken struct {
@@ -35,7 +36,7 @@ type LineUser struct {
 	Email    string   `json:"email"`
 }
 
-func GetLineOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*LineUser, error) {
+func GetLineOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*LineOAuthSession, error) {
 	session, err := store.Get(r, sessionSecret)
 	if err != nil {
 		return nil, err
@@ -45,5 +46,18 @@ func GetLineOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret st
 	if !ok {
 		return nil, errors.New("session not found")
 	}
-	return lineUser, nil
+	lineToken, ok := session.Values["line_token"].(*LineToken)
+	if !ok {
+		return nil, errors.New("session not found")
+	}
+	guildId, ok := session.Values["discord_guild_id"].(string)
+	if !ok {
+		return nil, errors.New("session not found")
+	}
+	lineSession := LineOAuthSession{
+		Token:          lineToken.AccessToken,
+		DiscordGuildID: guildId,
+		User:           *lineUser,
+	}
+	return &lineSession, nil
 }

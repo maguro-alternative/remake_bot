@@ -12,6 +12,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken"
 	discordLogin "github.com/maguro-alternative/remake_bot/web/handler/login/discord_login"
+	discordLogout "github.com/maguro-alternative/remake_bot/web/handler/logout/discord_logout"
 	discordCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback"
 
 	indexView "github.com/maguro-alternative/remake_bot/web/handler/views"
@@ -70,6 +71,7 @@ func NewWebRouter(
 
 	mux.Handle("/api/line-bot", middleChain.Then(linebot.NewLineBotHandler(indexService)))
 	mux.Handle("/login/discord", middleChain.Then(discordLogin.NewDiscordOAuth2Handler(discordOAuth2Service)))
+	mux.Handle("/logout/discord", middleChain.Then(discordLogout.NewDiscordOAuth2Handler(discordOAuth2Service)))
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
 	mux.Handle("/api/{guildId}/linetoken", middleChain.Then(linetoken.NewLineTokenHandler(indexService)))
 	mux.Handle("/api/{guildId}/line-post-discord-channel", middleChain.Then(linePostDiscordChannel.NewLineChannelHandler(indexService)))

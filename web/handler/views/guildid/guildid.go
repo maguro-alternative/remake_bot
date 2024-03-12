@@ -44,6 +44,10 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.WarnContext(ctx, "権限のないアクセスがありました: "+err.Error())
 		return
 	}
+	guildIconUrl := "https://cdn.discordapp.com/icons/" + guild.ID + "/" + guild.Icon + ".png"
+	if guild.Icon == "" {
+		guildIconUrl = "/static/img/discord-icon.jpg"
+	}
 	if permissionCode&8 != 0 {
 		settingLinks += `
 			管理者です。<br/>
@@ -63,14 +67,14 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		JsScriptTag  template.HTML
 		GuildID      string
 		GuildName    string
-		GuildIcon    string
+		GuildIconUrl string
 		SettingLinks template.HTML
 	}{
 		Title:        guild.Name + "の設定項目一覧",
 		JsScriptTag:  template.HTML(``),
 		GuildID:      guild.ID,
 		GuildName:    guild.Name,
-		GuildIcon:    guild.Icon,
+		GuildIconUrl: guildIconUrl,
 		SettingLinks: template.HTML(settingLinks),
 	})
 	if err != nil {

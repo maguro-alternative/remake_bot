@@ -1,9 +1,8 @@
 {{ define "content" }}
-    <h1>編集、閲覧可能なサーバ一覧</h1>
     <ul>
         <li>
             <a href="/guild/{{ .GuildID }}">
-                <img src="https://cdn.discordapp.com/icons/{{ .GuildID }}/{{ .GuildIcon }}.png" alt="{{ .GuildName }}">
+                <img src="{{ .GuildIconUrl }}" alt="{{ .GuildName }}">
             </a>
         </li>
         <li>

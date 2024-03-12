@@ -75,6 +75,7 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		if guild.Icon == "" {
 			htmlGuildBuilders.WriteString(`
 			<a href="/guild/` + guild.ID + `">
+				<img src="/static/discord-icon.jpg" alt="` + guild.Name + `">
 				<li>` + guild.Name + `</li>
 			</a><br>
 			`)

@@ -43,8 +43,8 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	statusCode, _, discordUserSession, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
-			http.Redirect(w, r, "/auth/discord", http.StatusFound)
-			slog.InfoContext(ctx, "Redirect to /auth/discord "+err.Error())
+			http.Redirect(w, r, "/login/discord", http.StatusFound)
+			slog.InfoContext(ctx, "Redirect to /login/discord "+err.Error())
 			return
 		}
 		http.Error(w, "Not get permission", statusCode)

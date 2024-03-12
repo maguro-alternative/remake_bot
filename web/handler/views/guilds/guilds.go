@@ -47,7 +47,7 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		config.SessionSecret(),
 	)
 	if err != nil {
-		http.Redirect(w, r, "/auth/discord", http.StatusFound)
+		http.Redirect(w, r, "/login/discord", http.StatusFound)
 		return
 	}
 	var matchGuilds []discordgo.UserGuild

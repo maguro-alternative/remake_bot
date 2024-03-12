@@ -38,8 +38,8 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	statusCode, permissionCode, discordUserSession, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == 302 {
-			http.Redirect(w, r, "/auth/discord", http.StatusFound)
-			slog.InfoContext(ctx, "Redirect to /auth/discord")
+			http.Redirect(w, r, "/login/discord", http.StatusFound)
+			slog.InfoContext(ctx, "Redirect to /login/discord")
 			return
 		}
 		http.Error(w, "Not get guild id", statusCode)

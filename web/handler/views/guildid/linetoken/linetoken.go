@@ -47,9 +47,11 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			slog.InfoContext(ctx, "Redirect to /login/discord "+err.Error())
 			return
 		}
-		http.Error(w, "Not get permission", statusCode)
-		slog.WarnContext(ctx, "権限のないアクセスがありました: "+err.Error())
-		return
+		if discordPermissionData.Permission == "" {
+			http.Error(w, "Not permission", statusCode)
+			slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
+			return
+		}
 	}
 	// カテゴリーのチャンネルを取得
 	//[categoryID]map[channelPosition]channelName

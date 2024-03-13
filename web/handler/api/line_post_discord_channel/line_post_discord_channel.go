@@ -52,16 +52,18 @@ func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Guild情報取得に失敗しました。 "+err.Error())
 		return
 	}
-	statusCode, _, err := permission.CheckDiscordPermission(ctx, w, r, h.IndexService, guild, "line_post_discord_channel")
+	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, h.IndexService, guild, "line_post_discord_channel")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			slog.InfoContext(ctx, "Redirect to /login/discord")
 			http.Redirect(w, r, "/login/discord", http.StatusFound)
 			return
 		}
-		http.Error(w, "Not permission", statusCode)
-		slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
-		return
+		if discordPermissionData.Permission == "" {
+			http.Error(w, "Not permission", statusCode)
+			slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
+			return
+		}
 	}
 
 	repo := internal.NewRepository(h.IndexService.DB)

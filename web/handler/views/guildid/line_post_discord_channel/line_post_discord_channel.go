@@ -69,9 +69,11 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 			slog.InfoContext(ctx, "Redirect to /login/discord")
 			return
 		}
-		http.Error(w, "Not permission", statusCode)
-		slog.WarnContext(ctx, "権限のないアクセスがありました:"+err.Error())
-		return
+		if discordPermissionData.Permission == "" {
+			http.Error(w, "Not permission", statusCode)
+			slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
+			return
+		}
 	}
 	//[categoryID]map[channelPosition]channelName
 	channelsInCategory := make(map[string][]internal.DiscordChannelSet)

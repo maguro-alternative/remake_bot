@@ -24,7 +24,7 @@ func CheckDiscordPermission(
 ) (statusCode int, discordPermissionData *model.DiscordPermissionData, err error) {
 	var userPermissionCode int64
 	var permissionData model.DiscordPermissionData
-	permissionData.Permission = "all"
+	permissionData.Permission = ""
 	userPermissionCode = 0
 	client := &http.Client{}
 	repo := internal.NewRepository(indexService.DB)

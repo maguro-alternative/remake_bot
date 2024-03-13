@@ -42,9 +42,11 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			slog.InfoContext(ctx, "Redirect to /login/discord")
 			return
 		}
-		http.Error(w, "Not get guild id", statusCode)
-		slog.WarnContext(ctx, "権限のないアクセスがありました: "+err.Error())
-		return
+		if discordPermissionData.Permission == "" {
+			http.Error(w, "Not permission", statusCode)
+			slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
+			return
+		}
 	}
 	discordAccountVer := strings.Builder{}
 	discordAccountVer.WriteString(fmt.Sprintf(`

@@ -39,22 +39,22 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	state, ok := session.Values["state"].(string)
+	state, ok := session.Values["discord_state"].(string)
 	if !ok {
-		stateType := reflect.TypeOf(session.Values["state"]).String()
+		stateType := reflect.TypeOf(session.Values["discord_state"]).String()
 		slog.InfoContext(ctx, stateType)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	// 2. 認可ページからリダイレクトされてきたときに送られてくるstateパラメータ
-	if r.URL.Query().Get("state") != state {
+	if r.URL.Query().Get("discord_state") != state {
 		slog.InfoContext(ctx, "stateが一致しません。")
-		session.Values["state"] = ""
+		session.Values["discord_state"] = ""
 		h.svc.CookieStore.Save(r, w, session)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	session.Values["state"] = ""
+	session.Values["discord_state"] = ""
 	// 1. 認可ページのURL
 	code := r.URL.Query().Get("code")
 	conf := h.svc.OAuth2Conf

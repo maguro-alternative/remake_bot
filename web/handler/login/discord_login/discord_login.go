@@ -35,7 +35,7 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	session.Values["state"] = uuid
+	session.Values["discord_state"] = uuid
 	// セッションに保存
 	session.Save(r, w)
 	h.DiscordOAuth2Service.CookieStore.Save(r, w, session)

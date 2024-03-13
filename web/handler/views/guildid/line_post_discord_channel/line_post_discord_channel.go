@@ -62,7 +62,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました:"+err.Error())
 		return
 	}
-	statusCode, _, discordUserSession, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/login/discord", http.StatusFound)
@@ -158,7 +158,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	<button type="button" id="popover-btn" class="btn btn-primary">
 		<a href="/logout/discord" class="btn btn-primary">ログアウト</a>
 	</button>
-	`, discordUserSession.Username, discordUserSession.ID, discordUserSession.Avatar))
+	`, discordPermissionData.User.Username, discordPermissionData.User.ID, discordPermissionData.User.Avatar))
 
 	htmlFormBuilder := strings.Builder{}
 	categoryComponentBuilders := make([]strings.Builder, len(categoryIDTmps)+1)

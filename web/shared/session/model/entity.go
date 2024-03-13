@@ -1,8 +1,14 @@
 package model
 
+type DiscordPermissionData struct {
+	PermissionCode int64
+	User           DiscordUser
+	Permission     string
+}
+
 type DiscordOAuthSession struct {
-	Token string      `json:"token"`
-	User  DiscordUser `json:"user"`
+	Token string
+	User  DiscordUser
 }
 
 type DiscordUser struct {
@@ -27,9 +33,9 @@ type DiscordUser struct {
 }
 
 type LineOAuthSession struct {
-	Token          string   `json:"token"`
-	DiscordGuildID string   `json:"discord_guild_id"`
-	User           LineUser `json:"user"`
+	Token          string          `json:"token"`
+	DiscordGuildID string          `json:"guild_id"`
+	User           LineIdTokenUser `json:"user"`
 }
 
 type LineToken struct {
@@ -41,14 +47,14 @@ type LineToken struct {
 	Scope        string `json:"scope"`
 }
 
-type LineUser struct {
+type LineIdTokenUser struct {
 	Iss      string   `json:"iss"`
 	Sub      string   `json:"sub"`
 	Aud      string   `json:"aud"`
 	Exp      int      `json:"exp"`
 	Iat      int      `json:"iat"`
 	AuthTime int      `json:"auth_time"`
-	Nonce    int      `json:"nonce"`
+	Nonce    string   `json:"nonce"`
 	Amr      []string `json:"amr"`
 	Name     string   `json:"name"`
 	Picture  string   `json:"picture"`

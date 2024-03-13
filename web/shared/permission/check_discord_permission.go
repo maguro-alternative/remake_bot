@@ -21,8 +21,10 @@ func CheckDiscordPermission(
 	indexService *service.IndexService,
 	guild *discordgo.Guild,
 	permissionType string,
-) (statusCode int, permission int64, discordUserSession *model.DiscordUser, err error) {
+) (statusCode int, discordPermissionData *model.DiscordPermissionData, err error) {
 	var userPermissionCode int64
+	var permissionData model.DiscordPermissionData
+	permissionData.Permission = "all"
 	userPermissionCode = 0
 	client := &http.Client{}
 	repo := internal.NewRepository(indexService.DB)
@@ -35,38 +37,38 @@ func CheckDiscordPermission(
 		config.SessionSecret(),
 	)
 	if err != nil {
-		return http.StatusFound, 0, nil, err
+		return http.StatusFound, nil, err
 	}
 
 	// アクセストークンの検証
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://discord.com/api/users/@me", nil)
 	if err != nil {
-		return http.StatusFound, 0, nil, err
+		return http.StatusFound, nil, err
 	}
 	req.Header.Set("Authorization", "Bearer "+discordLoginUser.Token)
 	resp, err := client.Do(req)
 	if err != nil {
-		return http.StatusFound, 0, nil, err
+		return http.StatusFound, nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return http.StatusFound, 0, nil, errors.New("status code is not 200")
+		return http.StatusFound, nil, errors.New("status code is not 200")
 	}
 	permissionCode, err := repo.GetPermissionCode(ctx, guild.ID, permissionType)
 	if err != nil {
-		return http.StatusInternalServerError, userPermissionCode, nil, err
+		return http.StatusInternalServerError, nil, err
 	}
 	permissionIDs, err := repo.GetPermissionIDs(ctx, guild.ID, permissionType)
 	if err != nil {
-		return http.StatusInternalServerError, userPermissionCode, nil, err
+		return http.StatusInternalServerError, nil, err
 	}
 	discordGuildMember, err := indexService.DiscordSession.GuildMember(guild.ID, discordLoginUser.User.ID)
 	if err != nil {
-		return http.StatusInternalServerError, userPermissionCode, nil, err
+		return http.StatusInternalServerError, nil, err
 	}
 	guildRoles, err := indexService.DiscordSession.GuildRoles(guild.ID)
 	if err != nil {
-		return http.StatusInternalServerError, userPermissionCode, nil, err
+		return http.StatusInternalServerError, nil, err
 	}
 
 	for _, role := range discordGuildMember.Roles {
@@ -80,7 +82,7 @@ func CheckDiscordPermission(
 	// discordgoの場合guildMemberから正しく権限を取得できないため、UserChannelPermissionsを使用
 	memberPermission, err := indexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, guild.Channels[0].ID)
 	if err != nil {
-		return http.StatusInternalServerError, userPermissionCode, nil, err
+		return http.StatusInternalServerError, nil, err
 	}
 	// 権限のチェック
 	if (permissionCode & (memberPermission | userPermissionCode)) == 0 {
@@ -88,20 +90,24 @@ func CheckDiscordPermission(
 		for _, permissionId := range permissionIDs {
 			if permissionId.TargetType == "user" && permissionId.TargetID == discordLoginUser.User.ID {
 				permissionFlag = true
+				permissionData.Permission = permissionId.Permission
 				break
 			}
 			if permissionId.TargetType == "role" && discordGuildMember.Roles != nil {
 				for _, role := range discordGuildMember.Roles {
 					if permissionId.TargetID == role {
 						permissionFlag = true
+						permissionData.Permission = permissionId.Permission
 						break
 					}
 				}
 			}
 		}
 		if !permissionFlag {
-			return http.StatusForbidden, userPermissionCode, &discordLoginUser.User, errors.New("permission denied")
+			return http.StatusForbidden, &permissionData, errors.New("permission denied")
 		}
 	}
-	return 200, memberPermission | userPermissionCode, &discordLoginUser.User, nil
+	permissionData.PermissionCode = memberPermission | userPermissionCode
+	permissionData.User = discordLoginUser.User
+	return 200, &permissionData, nil
 }

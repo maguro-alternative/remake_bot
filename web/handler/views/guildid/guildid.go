@@ -35,7 +35,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: "+err.Error())
 		return
 	}
-	statusCode, permissionCode, discordUserSession, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
 	if err != nil {
 		if statusCode == 302 {
 			http.Redirect(w, r, "/login/discord", http.StatusFound)
@@ -53,12 +53,12 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	<button type="button" id="popover-btn" class="btn btn-primary">
 		<a href="/logout/discord" class="btn btn-primary">ログアウト</a>
 	</button>
-	`, discordUserSession.Username, discordUserSession.ID, discordUserSession.Avatar))
+	`, discordPermissionData.User.Username, discordPermissionData.User.ID, discordPermissionData.User.Avatar))
 	guildIconUrl := "https://cdn.discordapp.com/icons/" + guild.ID + "/" + guild.Icon + ".png"
 	if guild.Icon == "" {
 		guildIconUrl = "/static/img/discord-icon.jpg"
 	}
-	if permissionCode&8 != 0 {
+	if discordPermissionData.PermissionCode&8 != 0 {
 		settingLinks += `
 			管理者です。<br/>
 			<a href="/guild/` + guild.ID + `/admin" class="btn btn-primary">管理者設定</a>

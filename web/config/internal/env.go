@@ -11,6 +11,7 @@ type Config struct {
 	DiscordClientSecret string `env:"DISCORD_CLIENT_SECRET" envDefault:""`
 	DiscordCallbackUrl  string `env:"DISCORD_CALLBACK_URL" envDefault:""`
 	DiscordScopes       string `env:"DISCORD_SCOPE" envDefault:""`
+	LineCallBackUrl     string `env:"LINE_CALLBACK_URL" envDefault:""`
 	PrivateKey          string `env:"PRIVATE_KEY" envDefault:""`
 	Port                string `env:"PORT" envDefault:"8080"`
 	ServerUrl           string `env:"SERVER_URL" envDefault:"http://localhost:8080"`

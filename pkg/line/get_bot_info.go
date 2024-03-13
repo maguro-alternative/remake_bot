@@ -13,7 +13,7 @@ type LineBotInfo struct {
 	BasicID        string `json:"basicId"`
 	ChatMode       string `json:"chatMode"`
 	MarkAsReadMode string `json:"markAsReadMode"`
-	PremiumID      string `json:"premiumId"`
+	PremiumID      string `json:"premiumId,omitempty"`
 	PictureURL     string `json:"pictureUrl"`
 	DisplayName    string `json:"displayName"`
 	UserID         string `json:"userId"`
@@ -29,7 +29,6 @@ func (l *LineBotInfo) Validate() error {
 		validation.Field(&l.BasicID, validation.Required),
 		validation.Field(&l.ChatMode, validation.Required),
 		validation.Field(&l.MarkAsReadMode, validation.Required),
-		validation.Field(&l.PremiumID, validation.Required),
 		validation.Field(&l.PictureURL, validation.Required),
 		validation.Field(&l.DisplayName, validation.Required),
 		validation.Field(&l.UserID, validation.Required),
@@ -37,26 +36,26 @@ func (l *LineBotInfo) Validate() error {
 }
 
 // LINEBotのプロフィール情報を取得
-func (r *LineRequest) GetBotInfo(ctx context.Context) (LineProfile, error) {
-	var lineProfile LineProfile
+func (r *LineRequest) GetBotInfo(ctx context.Context) (LineBotInfo, error) {
+	var lineBotProfile LineBotInfo
 	client := &http.Client{}
 	url := "https://api.line.me/v2/bot/info"
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return lineProfile, err
+		return lineBotProfile, err
 	}
 
 	req.Header.Set("Authorization", "Bearer "+r.lineBotToken)
 	resp, err := client.Do(req)
 	if err != nil {
-		return lineProfile, err
+		return lineBotProfile, err
 	}
 	defer resp.Body.Close()
 
-	err = json.NewDecoder(resp.Body).Decode(&lineProfile)
+	err = json.NewDecoder(resp.Body).Decode(&lineBotProfile)
 	if err != nil {
-		return lineProfile, err
+		return lineBotProfile, err
 	}
-	err = lineProfile.Validate()
-	return lineProfile, err
+	err = lineBotProfile.Validate()
+	return lineBotProfile, err
 }

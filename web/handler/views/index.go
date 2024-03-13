@@ -60,7 +60,7 @@ func (g *IndexViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		BotName           string
 		GuildId           string
 	}{
-		Title:             "Remake Bot",
+		Title:             "トップページ",
 		DiscordAccountVer: template.HTML(discordAccountVer.String()),
 		BotName:           g.IndexService.DiscordSession.State.User.Username,
 	})

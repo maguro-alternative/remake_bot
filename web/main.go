@@ -14,6 +14,7 @@ import (
 	discordLogin "github.com/maguro-alternative/remake_bot/web/handler/login/discord_login"
 	discordLogout "github.com/maguro-alternative/remake_bot/web/handler/logout/discord_logout"
 	discordCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback"
+	lineLogin "github.com/maguro-alternative/remake_bot/web/handler/login/line_login"
 
 	indexView "github.com/maguro-alternative/remake_bot/web/handler/views"
 	linePostDiscordChannelView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel"
@@ -64,6 +65,8 @@ func NewWebRouter(
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/templates/static/"))))
 
 	mux.Handle("/", middleChain.ThenFunc(indexView.NewIndexViewHandler(indexService).Index))
+	mux.Handle("/login/line", middleChain.ThenFunc(lineLogin.NewLineLoginHandler(indexService).Index))
+	mux.Handle("/login/line/{guildId}", middleChain.ThenFunc(lineLogin.NewLineLoginHandler(indexService).LineLogin))
 	mux.Handle("/guilds", middleChain.ThenFunc(guildsView.NewGuildsViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}", middleChain.ThenFunc(guildIdView.NewGuildIDViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/linetoken", middleChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService).Index))

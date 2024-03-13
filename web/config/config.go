@@ -78,6 +78,10 @@ func DiscordScopes() string {
 	return cfg.DiscordScopes
 }
 
+func LineCallBackUrl() string {
+	return cfg.LineCallBackUrl
+}
+
 func PrivateKey() string {
 	return cfg.PrivateKey
 }

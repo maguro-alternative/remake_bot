@@ -20,7 +20,7 @@ type LineBotIv struct {
 	LineBotSecretIv    pq.ByteaArray `db:"line_bot_secret_iv"`
 	LineGroupIDIv      pq.ByteaArray `db:"line_group_id_iv"`
 	LineClientIDIv     pq.ByteaArray `db:"line_client_id_iv"`
-	LineClientSecretIv pq.ByteaArray `db:"line_client_sercret_iv"`
+	LineClientSecretIv pq.ByteaArray `db:"line_client_secret_iv"`
 }
 
 type LineBotDecrypt struct {

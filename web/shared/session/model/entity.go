@@ -25,3 +25,32 @@ type DiscordUser struct {
 	Verified         bool   `json:"verified"`
 	Bio              string `json:"bio"`
 }
+
+type LineOAuthSession struct {
+	Token          string   `json:"token"`
+	DiscordGuildID string   `json:"discord_guild_id"`
+	User           LineUser `json:"user"`
+}
+
+type LineToken struct {
+	AccessToken  string `json:"access_token"`
+	IDToken      string `json:"id_token"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int    `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	Scope        string `json:"scope"`
+}
+
+type LineUser struct {
+	Iss      string   `json:"iss"`
+	Sub      string   `json:"sub"`
+	Aud      string   `json:"aud"`
+	Exp      int      `json:"exp"`
+	Iat      int      `json:"iat"`
+	AuthTime int      `json:"auth_time"`
+	Nonce    int      `json:"nonce"`
+	Amr      []string `json:"amr"`
+	Name     string   `json:"name"`
+	Picture  string   `json:"picture"`
+	Email    string   `json:"email"`
+}

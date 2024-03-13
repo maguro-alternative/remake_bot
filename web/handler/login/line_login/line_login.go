@@ -23,6 +23,7 @@ import (
 
 type Repository interface {
 	GetLineBots(ctx context.Context) ([]*internal.LineBot, error)
+	GetLineBot(ctx context.Context, guildID string) (internal.LineBot, error)
 	GetLineBotIv(ctx context.Context) (internal.LineBotIv, error)
 }
 
@@ -102,7 +103,7 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		lineLoginHtmlBuilder.WriteString(fmt.Sprintf(`
-			<a href="/line-login/%s">
+			<a href="/login/line/%s">
 				<img src="%s"/>
 				<li>%s</li>
 			</a>
@@ -190,6 +191,27 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 	lineClientIDByte, err := crypto.Decrypt(lineBot.LineClientID[0], keyBytes, lineBotIv.LineClientIDIv[0])
 	if err != nil {
 		slog.InfoContext(ctx, "line_client_idの復号に失敗しました。")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	session, err := h.IndexService.CookieStore.Get(r, config.SessionSecret())
+	if err != nil {
+		slog.InfoContext(ctx, "sessionの取得に失敗しました。"+err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	session.Values["line_state"] = state
+	session.Values["line_nonce"] = nonce
+	session.Values["guild_id"] = guildID
+	err = session.Save(r, w)
+	if err != nil {
+		slog.InfoContext(ctx, "セッションの初期化に失敗しました。"+err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	err = h.IndexService.CookieStore.Save(r, w, session)
+	if err != nil {
+		slog.InfoContext(ctx, "セッションの保存に失敗しました。"+err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

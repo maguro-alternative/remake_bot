@@ -35,7 +35,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: "+err.Error())
 		return
 	}
-	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "")
 	if err != nil {
 		if statusCode == 302 {
 			http.Redirect(w, r, "/login/discord", http.StatusFound)

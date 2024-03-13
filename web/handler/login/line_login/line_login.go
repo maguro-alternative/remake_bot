@@ -2,6 +2,7 @@ package linelogin
 
 import (
 	"context"
+	"encoding/gob"
 	"encoding/hex"
 	"fmt"
 	"html/template"
@@ -19,6 +20,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/handler/login/line_login/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 type Repository interface {
@@ -42,7 +44,9 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	//var lineBotDecrypts []internal.LineBotDecrypt
+	// セッションに保存する構造体の型を登録
+	// これがない場合、エラーが発生する
+	gob.Register(&model.LineIdTokenUser{})
 	var lineBotIv internal.LineBotIv
 	var lineLoginHtmlBuilder strings.Builder
 	ctx := r.Context()
@@ -215,7 +219,7 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	redirectUriEncode := url.QueryEscape(config.LineCallBackUrl())
+	redirectUriEncode := url.QueryEscape(config.ServerUrl() + "/callback/line-callback/")
 	lineOAuthUrl := fmt.Sprintf("https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=%s&redirect_uri=%s&state=%s&scope=profile%%20openid%%20email&nonce=%s", string(lineClientIDByte), redirectUriEncode, state, nonce)
 	http.Redirect(w, r, lineOAuthUrl, http.StatusSeeOther)
 }

@@ -1,6 +1,7 @@
 package getoauth
 
 import (
+	"encoding/gob"
 	"errors"
 	"net/http"
 
@@ -10,12 +11,15 @@ import (
 )
 
 func GetLineOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*model.LineOAuthSession, error) {
+	// セッションに保存する構造体の型を登録
+	// これがない場合、エラーが発生する
+	gob.Register(&model.LineIdTokenUser{})
 	session, err := store.Get(r, sessionSecret)
 	if err != nil {
 		return nil, err
 	}
 	// セッションに保存されているlineuserを取得
-	lineUser, ok := session.Values["line_user"].(*model.LineUser)
+	lineUser, ok := session.Values["line_user"].(*model.LineIdTokenUser)
 	if !ok {
 		return nil, errors.New("session not found")
 	}

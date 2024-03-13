@@ -100,7 +100,7 @@ func CheckDiscordPermission(
 			}
 		}
 		if !permissionFlag {
-			return http.StatusForbidden, userPermissionCode, &discordLoginUser.User, nil
+			return http.StatusForbidden, userPermissionCode, &discordLoginUser.User, errors.New("permission denied")
 		}
 	}
 	return 200, memberPermission | userPermissionCode, &discordLoginUser.User, nil

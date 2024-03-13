@@ -62,7 +62,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました:"+err.Error())
 		return
 	}
-	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_post_discord_channel")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/login/discord", http.StatusFound)

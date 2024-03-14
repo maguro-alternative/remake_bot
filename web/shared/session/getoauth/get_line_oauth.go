@@ -25,7 +25,7 @@ func GetLineOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret st
 	if !ok {
 		return nil, errors.New("session not found")
 	}
-	lineToken, ok := session.Values["line_oauth_token"].(*model.LineToken)
+	lineToken, ok := session.Values["line_oauth_token"].(string)
 	if !ok {
 		return nil, errors.New("session not found")
 	}
@@ -34,7 +34,7 @@ func GetLineOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret st
 		return nil, errors.New("session not found")
 	}
 	lineSession := model.LineOAuthSession{
-		Token:          lineToken.AccessToken,
+		Token:          lineToken,
 		DiscordGuildID: guildId,
 		User:           *lineUser,
 	}

@@ -10,9 +10,13 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/web/components"
+	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 type LinePostDiscordChannelViewHandler struct {
@@ -75,6 +79,11 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 			slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
 			return
 		}
+	}
+	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
+	lineSession, err := getoauth.GetLineOAuth(g.IndexService.CookieStore, r, config.SessionSecret())
+	if err != nil {
+		lineSession = &model.LineOAuthSession{}
 	}
 	//[categoryID]map[channelPosition]channelName
 	channelsInCategory := make(map[string][]internal.DiscordChannelSet)
@@ -158,14 +167,9 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		submitTag = `<input type="submit" value="送信">`
 	}
 
-	discordAccountVer := strings.Builder{}
-	discordAccountVer.WriteString(fmt.Sprintf(`
-	<p>Discordアカウント: %s</p>
-	<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
-	<button type="button" id="popover-btn" class="btn btn-primary">
-		<a href="/logout/discord" class="btn btn-primary">ログアウト</a>
-	</button>
-	`, discordPermissionData.User.Username, discordPermissionData.User.ID, discordPermissionData.User.Avatar))
+	accountVer := strings.Builder{}
+	accountVer.WriteString(components.CreateDiscordAccountVer(discordPermissionData.User))
+	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 
 	htmlFormBuilder := strings.Builder{}
 	categoryComponentBuilders := make([]strings.Builder, len(categoryIDTmps)+1)
@@ -237,20 +241,19 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/line_post_discord_channel.html"))
 	if err := tmpl.Execute(w, struct {
-		Title             string
-		LineAccountVer    template.HTML
-		DiscordAccountVer template.HTML
-		JsScriptTag       template.HTML
-		SubmitTag         template.HTML
-		GuildName         string
-		HTMLForm          template.HTML
+		Title       string
+		AccountVer  template.HTML
+		JsScriptTag template.HTML
+		SubmitTag   template.HTML
+		GuildName   string
+		HTMLForm    template.HTML
 	}{
-		Title:             "DiscordからLINEへの送信設定",
-		DiscordAccountVer: template.HTML(discordAccountVer.String()),
-		JsScriptTag:       template.HTML(`<script src="/static/js/line_post_discord_channel.js"></script>`),
-		SubmitTag:         template.HTML(submitTag),
-		GuildName:         guild.Name,
-		HTMLForm:          template.HTML(htmlFormBuilder.String()),
+		Title:       "DiscordからLINEへの送信設定",
+		AccountVer:  template.HTML(accountVer.String()),
+		JsScriptTag: template.HTML(`<script src="/static/js/line_post_discord_channel.js"></script>`),
+		SubmitTag:   template.HTML(submitTag),
+		GuildName:   guild.Name,
+		HTMLForm:    template.HTML(htmlFormBuilder.String()),
 	}); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "テンプレートの実行に失敗しました:"+err.Error())

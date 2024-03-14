@@ -3,7 +3,6 @@ package guilds
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -11,9 +10,11 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 type userGuild struct {
@@ -50,6 +51,12 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login/discord", http.StatusFound)
 		return
 	}
+	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
+	lineSession, err := getoauth.GetLineOAuth(g.IndexService.CookieStore, r, config.SessionSecret())
+	if err != nil {
+		lineSession = &model.LineOAuthSession{}
+	}
+
 	var matchGuilds []discordgo.UserGuild
 	botGuilds, err := g.IndexService.DiscordSession.UserGuilds(100, "", "")
 	if err != nil {
@@ -72,14 +79,9 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	discordAccountVer := strings.Builder{}
-	discordAccountVer.WriteString(fmt.Sprintf(`
-	<p>Discordアカウント: %s</p>
-	<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
-	<button type="button" id="popover-btn" class="btn btn-primary">
-		<a href="/logout/discord" class="btn btn-primary">ログアウト</a>
-	</button>
-	`, discordLoginUser.User.Username, discordLoginUser.User.ID, discordLoginUser.User.Avatar))
+	accountVer := strings.Builder{}
+	accountVer.WriteString(components.CreateDiscordAccountVer(discordLoginUser.User))
+	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 	htmlGuildBuilders := strings.Builder{}
 	for _, guild := range matchGuilds {
 		if guild.Icon == "" {
@@ -99,15 +101,14 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		`)
 	}
 	data := struct {
-		Title             string
-		LineAccountVer    template.HTML
-		DiscordAccountVer template.HTML
-		JsScriptTag       template.HTML
-		Guilds            template.HTML
+		Title       string
+		AccountVer  template.HTML
+		JsScriptTag template.HTML
+		Guilds      template.HTML
 	}{
-		Title:             "サーバー一覧",
-		DiscordAccountVer: template.HTML(discordAccountVer.String()),
-		Guilds:            template.HTML(htmlGuildBuilders.String()),
+		Title:      "サーバー一覧",
+		AccountVer: template.HTML(accountVer.String()),
+		Guilds:     template.HTML(htmlGuildBuilders.String()),
 	}
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guilds/guilds.html"))
 	if err := tmpl.Execute(w, data); err != nil {

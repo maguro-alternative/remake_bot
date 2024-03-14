@@ -10,9 +10,13 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/web/components"
+	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 type LineTokenViewHandler struct {
@@ -53,6 +57,11 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
 			return
 		}
+	}
+	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
+	lineSession, err := getoauth.GetLineOAuth(g.IndexService.CookieStore, r, config.SessionSecret())
+	if err != nil {
+		lineSession = &model.LineOAuthSession{}
 	}
 	// カテゴリーのチャンネルを取得
 	//[categoryID]map[channelPosition]channelName
@@ -150,14 +159,9 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		submitTag = `<input type="submit" value="送信">`
 	}
 
-	discordAccountVer := strings.Builder{}
-	discordAccountVer.WriteString(fmt.Sprintf(`
-	<p>Discordアカウント: %s</p>
-	<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
-	<button type="button" id="popover-btn" class="btn btn-primary">
-		<a href="/logout/discord" class="btn btn-primary">ログアウト</a>
-	</button>
-	`, discordPermissionData.User.Username, discordPermissionData.User.ID, discordPermissionData.User.Avatar))
+	accountVer := strings.Builder{}
+	accountVer.WriteString(components.CreateDiscordAccountVer(discordPermissionData.User))
+	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 	htmlSelectChannelBuilders := strings.Builder{}
 	categoryOptions := make([]strings.Builder, len(categoryIDTmps)+1)
 	var categoryIndex int
@@ -188,8 +192,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	data := struct {
 		Title                   string
-		LineAccountVer          template.HTML
-		DiscordAccountVer       template.HTML
+		AccountVer              template.HTML
 		JsScriptTag             template.HTML
 		SubmitTag               template.HTML
 		LineNotifyTokenEntered  string
@@ -202,7 +205,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}{
 		Title:                   "LineBotの設定",
 		JsScriptTag:             template.HTML(`<script src="/static/js/linetoken.js"></script>`),
-		DiscordAccountVer:       template.HTML(discordAccountVer.String()),
+		AccountVer:              template.HTML(accountVer.String()),
 		SubmitTag:               template.HTML(submitTag),
 		LineNotifyTokenEntered:  lineNotifyTokenEntered,
 		LineBotTokenEntered:     lineBotTokenEntered,

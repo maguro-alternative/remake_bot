@@ -2,15 +2,16 @@ package views
 
 import (
 	"context"
-	"fmt"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"strings"
 
+	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 type IndexViewHandler struct {
@@ -28,7 +29,7 @@ func (g *IndexViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	discordAccountVer := strings.Builder{}
+	// Discordの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
 	discordLoginUser, err := getoauth.GetDiscordOAuth(
 		ctx,
 		g.IndexService.CookieStore,
@@ -36,33 +37,27 @@ func (g *IndexViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		config.SessionSecret(),
 	)
 	if err != nil {
-		discordAccountVer.WriteString(`
-		<p>Discordアカウント</p>
-		<button type="button" id="popover-btn" class="btn btn-primary">
-			<a href="/" class="btn btn-primary">ログイン</a>
-		</button>
-		`)
-	} else {
-		discordAccountVer.WriteString(fmt.Sprintf(`
-		<p>Discordアカウント: %s</p>
-		<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
-		<button type="button" id="popover-btn" class="btn btn-primary">
-			<a href="/logout/discord" class="btn btn-primary">ログアウト</a>
-		</button>
-		`, discordLoginUser.User.Username, discordLoginUser.User.ID, discordLoginUser.User.Avatar))
+		discordLoginUser = &model.DiscordOAuthSession{}
 	}
+	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
+	lineSession, err := getoauth.GetLineOAuth(g.IndexService.CookieStore, r, config.SessionSecret())
+	if err != nil {
+		lineSession = &model.LineOAuthSession{}
+	}
+	accountVer := strings.Builder{}
+	accountVer.WriteString(components.CreateDiscordAccountVer(discordLoginUser.User))
+	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/index.html"))
 	err = tmpl.Execute(w, struct {
-		Title             string
-		LineAccountVer    template.HTML
-		DiscordAccountVer template.HTML
-		JsScriptTag       template.HTML
-		BotName           string
-		GuildId           string
+		Title       string
+		AccountVer  template.HTML
+		JsScriptTag template.HTML
+		BotName     string
+		GuildId     string
 	}{
-		Title:             "トップページ",
-		DiscordAccountVer: template.HTML(discordAccountVer.String()),
-		BotName:           g.IndexService.DiscordSession.State.User.Username,
+		Title:      "トップページ",
+		AccountVer: template.HTML(accountVer.String()),
+		BotName:    g.IndexService.DiscordSession.State.User.Username,
 	})
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

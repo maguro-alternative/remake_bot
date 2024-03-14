@@ -7,7 +7,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
-func CreateDiscordAccountPop(discordUser model.DiscordUser) string {
+func CreateDiscordAccountVer(discordUser model.DiscordUser) string {
 	discordAccountVer := strings.Builder{}
 	discordAccountVer.WriteString(fmt.Sprintf(`
 	<p>Discordアカウント: %s</p>

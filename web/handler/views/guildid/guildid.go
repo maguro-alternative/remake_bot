@@ -2,14 +2,17 @@ package guildid
 
 import (
 	"context"
-	"fmt"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"strings"
 
+	"github.com/maguro-alternative/remake_bot/web/components"
+	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 type GuildIDViewHandler struct {
@@ -48,14 +51,14 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	discordAccountVer := strings.Builder{}
-	discordAccountVer.WriteString(fmt.Sprintf(`
-	<p>Discordアカウント: %s</p>
-	<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
-	<button type="button" id="popover-btn" class="btn btn-primary">
-		<a href="/logout/discord" class="btn btn-primary">ログアウト</a>
-	</button>
-	`, discordPermissionData.User.Username, discordPermissionData.User.ID, discordPermissionData.User.Avatar))
+	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
+	lineSession, err := getoauth.GetLineOAuth(g.IndexService.CookieStore, r, config.SessionSecret())
+	if err != nil {
+		lineSession = &model.LineOAuthSession{}
+	}
+	accountVer := strings.Builder{}
+	accountVer.WriteString(components.CreateDiscordAccountVer(discordPermissionData.User))
+	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 	guildIconUrl := "https://cdn.discordapp.com/icons/" + guild.ID + "/" + guild.Icon + ".png"
 	if guild.Icon == "" {
 		guildIconUrl = "/static/img/discord-icon.jpg"
@@ -75,21 +78,20 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	`
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid.html"))
 	err = tmpl.Execute(w, struct {
-		Title             string
-		LineAccountVer    template.HTML
-		DiscordAccountVer template.HTML
-		JsScriptTag       template.HTML
-		GuildID           string
-		GuildName         string
-		GuildIconUrl      string
-		SettingLinks      template.HTML
+		Title        string
+		AccountVer   template.HTML
+		JsScriptTag  template.HTML
+		GuildID      string
+		GuildName    string
+		GuildIconUrl string
+		SettingLinks template.HTML
 	}{
-		Title:             guild.Name + "の設定項目一覧",
-		DiscordAccountVer: template.HTML(discordAccountVer.String()),
-		GuildID:           guild.ID,
-		GuildName:         guild.Name,
-		GuildIconUrl:      guildIconUrl,
-		SettingLinks:      template.HTML(settingLinks),
+		Title:        guild.Name + "の設定項目一覧",
+		AccountVer:   template.HTML(accountVer.String()),
+		GuildID:      guild.ID,
+		GuildName:    guild.Name,
+		GuildIconUrl: guildIconUrl,
+		SettingLinks: template.HTML(settingLinks),
 	})
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

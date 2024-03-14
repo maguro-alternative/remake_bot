@@ -17,6 +17,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
+	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/handler/login/line_login/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
@@ -114,8 +115,7 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 			<br><br>
 		`, lineBot.GuildID, lineBotProfile.PictureURL, lineBotProfile.DisplayName))
 	}
-
-	discordAccountVer := strings.Builder{}
+	// Discordの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
 	discordLoginUser, err := getoauth.GetDiscordOAuth(
 		ctx,
 		h.IndexService.CookieStore,
@@ -123,31 +123,24 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		config.SessionSecret(),
 	)
 	if err != nil {
-		discordAccountVer.WriteString(`
-		<p>Discordアカウント</p>
-		<button type="button" id="popover-btn" class="btn btn-primary">
-			<a href="/" class="btn btn-primary">ログイン</a>
-		</button>
-		`)
-	} else {
-		discordAccountVer.WriteString(fmt.Sprintf(`
-		<p>Discordアカウント: %s</p>
-		<img src="https://cdn.discordapp.com/avatars/%s/%s.webp?size=64" alt="Discordアイコン">
-		<button type="button" id="popover-btn" class="btn btn-primary">
-			<a href="/logout/discord" class="btn btn-primary">ログアウト</a>
-		</button>
-		`, discordLoginUser.User.Username, discordLoginUser.User.ID, discordLoginUser.User.Avatar))
+		discordLoginUser = &model.DiscordOAuthSession{}
 	}
+	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
+	lineSession, err := getoauth.GetLineOAuth(h.IndexService.CookieStore, r, config.SessionSecret())
+	if err != nil {
+		lineSession = &model.LineOAuthSession{}
+	}
+	accountVer := strings.Builder{}
+	accountVer.WriteString(components.CreateDiscordAccountVer(discordLoginUser.User))
+	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/login/line_login.html"))
 	err = tmpl.Execute(w, struct {
 		Title             string
-		LineAccountVer    template.HTML
-		DiscordAccountVer template.HTML
+		AccountVer    template.HTML
 		JsScriptTag       template.HTML
 		LineLoginList     template.HTML
 	}{
 		Title:             "LINEログイン選択",
-		DiscordAccountVer: template.HTML(discordAccountVer.String()),
 		LineLoginList:     template.HTML(lineLoginHtmlBuilder.String()),
 	})
 	if err != nil {

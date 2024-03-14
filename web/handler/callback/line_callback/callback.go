@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -109,18 +110,20 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	lineClientID := string(lineClientIDByte)
 	lineClientSecret := string(lineClientSecretByte)
 	// 3. アクセストークンを取得するためのリクエスト
-	token, err := getIdToken(ctx, code, lineClientID, lineClientSecret)
+	token, cleanupTokenBody, err := getIdToken(ctx, code, lineClientID, lineClientSecret)
 	if err != nil {
 		slog.InfoContext(ctx, "ユーザー情報の取得に失敗しました。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	user, err := verifyIdToken(ctx, token.IDToken, lineClientID, nonce)
+	defer cleanupTokenBody()
+	user, cleanupIdtokenBody, err := verifyIdToken(ctx, token.IDToken, lineClientID, nonce)
 	if err != nil {
 		slog.InfoContext(ctx, "id_tokenの検証に失敗しました。"+err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	defer cleanupIdtokenBody()
 	session.Values["line_user"] = user
 	session.Values["line_oauth_token"] = token.AccessToken
 	err = session.Save(r, w)
@@ -129,14 +132,20 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	err = h.svc.CookieStore.Save(r, w, session)
+	if err != nil {
+		slog.InfoContext(ctx, "sessionの保存に失敗しました。")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 	http.Redirect(w, r, config.ServerUrl()+"/group/"+guildId, http.StatusFound)
 }
 
-func getIdToken(ctx context.Context, code, clientID, clientSecret string) (*model.LineToken, error) {
+func getIdToken(ctx context.Context, code, clientID, clientSecret string) (*model.LineToken, func(), error) {
 	client := &http.Client{}
 	u, err := url.ParseRequestURI("https://api.line.me/oauth2/v2.1/token")
 	if err != nil {
-		return nil, err
+		return nil, func(){}, err
 	}
 	form := url.Values{}
 	form.Add("grant_type", "authorization_code")
@@ -147,27 +156,26 @@ func getIdToken(ctx context.Context, code, clientID, clientSecret string) (*mode
 	body := strings.NewReader(form.Encode())
 	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), body)
 	if err != nil {
-		return nil, err
+		return nil, func(){}, err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, func(){}, err
 	}
-	defer resp.Body.Close()
 	var token model.LineToken
 	if err := json.NewDecoder(resp.Body).Decode(&token); err != nil {
-		return nil, err
+		return nil, func(){}, err
 	}
-	return &token, nil
+	return &token, func(){resp.Body.Close()}, nil
 }
 
-func verifyIdToken(ctx context.Context, idToken, clientID, nonce string) (*model.LineIdTokenUser, error) {
+func verifyIdToken(ctx context.Context, idToken, clientID, nonce string) (*model.LineIdTokenUser, func(), error) {
 	nonceClient := &http.Client{}
 	verifyUrl := "https://api.line.me/oauth2/v2.1/verify"
 	u, err := url.ParseRequestURI(verifyUrl)
 	if err != nil {
-		return nil, err
+		return nil, func(){}, err
 	}
 	form := url.Values{}
 	form.Add("id_token", idToken)
@@ -177,13 +185,13 @@ func verifyIdToken(ctx context.Context, idToken, clientID, nonce string) (*model
 	body := strings.NewReader(form.Encode())
 	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), body)
 	if err != nil {
-		return nil, err
+		return nil, func(){}, err
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := nonceClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, func(){}, err
 	}
 	if resp.StatusCode != http.StatusOK {
 		slog.InfoContext(ctx, resp.Status)
@@ -193,12 +201,12 @@ func verifyIdToken(ctx context.Context, idToken, clientID, nonce string) (*model
 			ErrorDescription string `json:"error_description"`
 		}
 		json.NewDecoder(resp.Body).Decode(&e)
-		return nil, errors.New(e.ErrorDescription)
+		return nil, func(){}, errors.New(e.ErrorDescription)
 	}
-	defer resp.Body.Close()
 	var user model.LineIdTokenUser
 	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
-		return nil, err
+		return nil, func(){}, err
 	}
-	return &user, nil
+	slog.InfoContext(ctx, fmt.Sprintf("ユーザー情報: %+v", user))
+	return &user, func(){resp.Body.Close()}, nil
 }

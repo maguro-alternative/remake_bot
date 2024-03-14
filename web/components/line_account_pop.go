@@ -7,7 +7,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
-func CreateLineAccountPop(lineUser model.LineIdTokenUser) string {
+func CreateLineAccountVer(lineUser model.LineIdTokenUser) string {
 	lineAccountVer := strings.Builder{}
 	lineAccountVer.WriteString(fmt.Sprintf(`
 	<p>LINEアカウント: %s</p>

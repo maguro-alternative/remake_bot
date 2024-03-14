@@ -16,8 +16,8 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 
-	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/components"
+	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/login/line_login/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
@@ -135,13 +135,13 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/login/line_login.html"))
 	err = tmpl.Execute(w, struct {
-		Title             string
+		Title         string
 		AccountVer    template.HTML
-		JsScriptTag       template.HTML
-		LineLoginList     template.HTML
+		JsScriptTag   template.HTML
+		LineLoginList template.HTML
 	}{
-		Title:             "LINEログイン選択",
-		LineLoginList:     template.HTML(lineLoginHtmlBuilder.String()),
+		Title:         "LINEログイン選択",
+		LineLoginList: template.HTML(lineLoginHtmlBuilder.String()),
 	})
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

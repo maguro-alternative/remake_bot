@@ -10,10 +10,12 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-func GetLineOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*model.LineOAuthSession, error) {
-	// セッションに保存する構造体の型を登録
-	// これがない場合、エラーが発生する
+func init() {
+	// 本番では削除すること
 	gob.Register(&model.LineIdTokenUser{})
+}
+
+func GetLineOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*model.LineOAuthSession, error) {
 	session, err := store.Get(r, sessionSecret)
 	if err != nil {
 		return nil, err

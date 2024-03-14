@@ -84,8 +84,14 @@ func CheckDiscordPermission(
 	if err != nil {
 		return http.StatusInternalServerError, nil, err
 	}
+	// 設定ページの場合所属していればアクセスを許可
+	permissionData.User = discordLoginUser.User
+	permissionData.PermissionCode = memberPermission | userPermissionCode
+	if permissionType == "" {
+		return http.StatusOK, &permissionData, nil
+	}
 	// 権限のチェック
-	if (permissionCode & (memberPermission | userPermissionCode)) == 0 {
+	if (permissionCode & permissionData.PermissionCode) == 0 {
 		permissionFlag := false
 		for _, permissionId := range permissionIDs {
 			if permissionId.TargetType == "user" && permissionId.TargetID == discordLoginUser.User.ID {
@@ -107,7 +113,8 @@ func CheckDiscordPermission(
 			return http.StatusForbidden, &permissionData, errors.New("permission denied")
 		}
 	}
-	permissionData.PermissionCode = memberPermission | userPermissionCode
-	permissionData.User = discordLoginUser.User
+	if permissionData.Permission == "" {
+		permissionData.Permission = "all"
+	}
 	return 200, &permissionData, nil
 }

@@ -29,6 +29,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	repo := internal.NewRepository(g.IndexService.DB)
 	categoryPositions := make(map[string]internal.DiscordChannel)
 	guildId := r.PathValue("guildId")
+	var submitTag string
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -145,6 +146,10 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		lineClientSecretEntered = "入力済み"
 	}
 
+	if discordPermissionData.Permission == "write" || discordPermissionData.Permission == "all" {
+		submitTag = `<input type="submit" value="送信">`
+	}
+
 	discordAccountVer := strings.Builder{}
 	discordAccountVer.WriteString(fmt.Sprintf(`
 	<p>Discordアカウント: %s</p>
@@ -186,6 +191,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		LineAccountVer          template.HTML
 		DiscordAccountVer       template.HTML
 		JsScriptTag             template.HTML
+		SubmitTag               template.HTML
 		LineNotifyTokenEntered  string
 		LineBotTokenEntered     string
 		LineBotSecretEntered    string
@@ -197,6 +203,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		Title:                   "LineBotの設定",
 		JsScriptTag:             template.HTML(`<script src="/static/js/linetoken.js"></script>`),
 		DiscordAccountVer:       template.HTML(discordAccountVer.String()),
+		SubmitTag:               template.HTML(submitTag),
 		LineNotifyTokenEntered:  lineNotifyTokenEntered,
 		LineBotTokenEntered:     lineBotTokenEntered,
 		LineBotSecretEntered:    lineBotSecretEntered,

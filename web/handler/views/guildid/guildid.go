@@ -32,7 +32,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: "+err.Error())
+		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: ", "エラーメッセージ:", err.Error())
 		return
 	}
 	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "")
@@ -44,7 +44,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		}
 		if discordPermissionData.Permission == "" {
 			http.Error(w, "Not permission", statusCode)
-			slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
+			slog.WarnContext(ctx, "権限のないアクセスがありました。", "エラーメッセージ:", err.Error(), "権限コード:", discordPermissionData.PermissionCode, "権限:", discordPermissionData.Permission)
 			return
 		}
 	}
@@ -93,7 +93,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "テンプレートの実行に失敗しました: "+err.Error())
+		slog.ErrorContext(ctx, "テンプレートの実行に失敗しました: ", "エラーメッセージ:", err.Error())
 		return
 	}
 }

@@ -83,7 +83,7 @@ func (r *Repository) InsertLineBotIv(ctx context.Context, lineBotIv *LineBotIv) 
 func (r *Repository) GetPermissionCode(ctx context.Context, guildID, permissionType string) (int64, error) {
 	var code int64
 	if permissionType == "" {
-		return code, nil
+		return 8, nil
 	}
 	query := `
 		SELECT

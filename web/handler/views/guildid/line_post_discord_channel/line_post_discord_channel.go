@@ -50,6 +50,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	}
 	categoryPositions := make(map[string]internal.DiscordChannel)
 	var categoryIDTmps []string
+	var submitTag string
 	guildId := r.PathValue("guildId")
 	ctx := r.Context()
 	if ctx == nil {
@@ -153,6 +154,10 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		}
 	}
 
+	if discordPermissionData.Permission == "write" || discordPermissionData.Permission == "all" {
+		submitTag = `<input type="submit" value="送信">`
+	}
+
 	discordAccountVer := strings.Builder{}
 	discordAccountVer.WriteString(fmt.Sprintf(`
 	<p>Discordアカウント: %s</p>
@@ -236,12 +241,14 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		LineAccountVer    template.HTML
 		DiscordAccountVer template.HTML
 		JsScriptTag       template.HTML
+		SubmitTag         template.HTML
 		GuildName         string
 		HTMLForm          template.HTML
 	}{
 		Title:             "DiscordからLINEへの送信設定",
 		DiscordAccountVer: template.HTML(discordAccountVer.String()),
 		JsScriptTag:       template.HTML(`<script src="/static/js/line_post_discord_channel.js"></script>`),
+		SubmitTag:         template.HTML(submitTag),
 		GuildName:         guild.Name,
 		HTMLForm:          template.HTML(htmlFormBuilder.String()),
 	}); err != nil {

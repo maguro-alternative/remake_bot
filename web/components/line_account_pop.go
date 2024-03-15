@@ -11,7 +11,7 @@ func CreateLineAccountVer(lineUser model.LineIdTokenUser) string {
 	lineAccountVer := strings.Builder{}
 	lineAccountVer.WriteString(fmt.Sprintf(`
 	<p>LINEアカウント: %s</p>
-	<img src="%s" style="right: 70px;" alt="LINEアイコン">
+	<img src="%s" style="height:64px;" alt="LINEアイコン">
 	<button type="button" id="popover-btn" class="btn btn-primary">
 		<a href="/logout/line" class="btn btn-primary">ログアウト</a>
 	</button>

@@ -4,32 +4,32 @@
         <form action="#" id="form">
             <label for="lineNotifyToken">LINE Notifyのトークン</label>
             <input id="lineNotifyToken" type="password" name="line_notify_token">
-            {{ .LineNotifyTokenEntered }}
+            {{ .LineEntered.LineNotifyToken }}
             <br/>
 
             <label for="lineBotToken">LINE Botのトークン</label>
             <input id="lineBotToken" type="password" name="line_bot_token">
-            {{ .LineBotTokenEntered }}
+            {{ .LineEntered.LineBotToken }}
             <br/>
 
             <label for="lineBotSecret">LINE Botのシークレット</label>
             <input id="lineBotSecret" type="password" name="line_bot_secret">
-            {{ .LineBotSecretEntered }}
+            {{ .LineEntered.LineBotSecret }}
             <br/>
 
             <label for="lineGroupId">LINEグループID</label>
             <input id="lineGroupId" type="password" name="line_group_id">
-            {{ .LineGroupIDEntered }}
+            {{ .LineEntered.LineGroupID }}
             <br/>
 
             <label for="lineClientId">LINEのクライアントID</label>
             <input id="lineClientId" type="password" name="line_client_id">
-            {{ .LineClientIDEntered }}
+            {{ .LineEntered.LineClientID }}
             <br/>
 
             <label for="lineClientSecret">LINEのクライアントシークレット</label>
             <input id="lineClientSecret" type="password" name="line_client_secret">
-            {{ .LineClientSecretEntered }}
+            {{ .LineEntered.LineClientSecret }}
             <br/>
 
             <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>

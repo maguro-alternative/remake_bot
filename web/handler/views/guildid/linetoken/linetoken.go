@@ -31,9 +31,8 @@ func NewLineTokenViewHandler(indexService *service.IndexService) *LineTokenViewH
 
 func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	repo := internal.NewRepository(g.IndexService.DB)
-	categoryPositions := make(map[string]internal.DiscordChannel)
+	categoryPositions := make(map[string]components.DiscordChannel)
 	guildId := r.PathValue("guildId")
-	var submitTag string
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -65,7 +64,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	// カテゴリーのチャンネルを取得
 	//[categoryID]map[channelPosition]channelName
-	channelsInCategory := make(map[string][]internal.DiscordChannelSelect)
+	channelsInCategory := make(map[string][]components.DiscordChannelSelect)
 	var categoryIDTmps []string
 	for _, channel := range guild.Channels {
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
@@ -74,43 +73,22 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		// カテゴリーIDの順番を一時保存(Goではmapの順番が保証されないため)
 		categoryIDTmps = append(categoryIDTmps, channel.ID)
 		// カテゴリーごとに連想配列を作成
-		categoryPositions[channel.ID] = internal.DiscordChannel{
+		categoryPositions[channel.ID] = components.DiscordChannel{
 			ID:       channel.ID,
 			Name:     channel.Name,
 			Position: channel.Position,
 		}
 	}
 	// カテゴリーなしのチャンネルを追加
-	//channelsInCategory[""] = make([]internal.DiscordChannelSelect, len(guild.Channels)-1, len(guild.Channels))
+	//channelsInCategory[""] = make([]components.DiscordChannelSelect, len(guild.Channels)-1, len(guild.Channels))
 	for _, channel := range guild.Channels {
-		// カテゴリー、フォーラムチャンネルはスキップ
-		if channel.Type == discordgo.ChannelTypeGuildForum {
-			continue
-		}
-		if channel.Type == discordgo.ChannelTypeGuildCategory {
-			continue
-		}
-		typeIcon := "🔊"
-		if channel.Type == discordgo.ChannelTypeGuildText {
-			typeIcon = "📝"
-		}
-		categoryPosition := categoryPositions[channel.ParentID]
-		// まだチャンネルがない場合は初期化
-		if len(channelsInCategory[categoryPosition.ID]) == 0 {
-			channelsInCategory[categoryPosition.ID] = make([]internal.DiscordChannelSelect, len(guild.Channels)-2, len(guild.Channels))
-		}
-		channelsInCategory[categoryPosition.ID][channel.Position] = internal.DiscordChannelSelect{
-			ID:   channel.ID,
-			Name: fmt.Sprintf("%s:%s:%s", categoryPosition.Name, typeIcon, channel.Name),
-		}
-		if categoryPosition.ID == "" {
-			channelsInCategory[categoryPosition.ID][channel.Position] = internal.DiscordChannelSelect{
-				ID:   channel.ID,
-				Name: fmt.Sprintf("カテゴリーなし:%s:%s", typeIcon, channel.Name),
-			}
-		}
+		createChannelsInCategory(
+			guild,
+			channel,
+			categoryPositions,
+			channelsInCategory,
+		)
 	}
-	var lineNotifyTokenEntered, lineBotTokenEntered, lineBotSecretEntered, lineGroupIDEntered, lineClientIDEntered, lineClientSecretEntered string
 	lineBot, err := repo.GetLineBot(ctx, guildId)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		err = repo.InsertLineBot(ctx, &internal.LineBot{
@@ -136,88 +114,78 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました:"+err.Error())
 		return
 	}
-	if lineBot.LineNotifyToken != nil {
-		lineNotifyTokenEntered = "入力済み"
+	lineBotByte := components.LineBotByteEntered{
+		LineNotifyToken:  lineBot.LineNotifyToken,
+		LineBotToken:     lineBot.LineBotToken,
+		LineBotSecret:    lineBot.LineBotSecret,
+		LineGroupID:      lineBot.LineGroupID,
+		LineClientID:     lineBot.LineClientID,
+		LineClientSecret: lineBot.LineClientSecret,
 	}
-	if lineBot.LineBotToken != nil {
-		lineBotTokenEntered = "入力済み"
-	}
-	if lineBot.LineBotSecret != nil {
-		lineBotSecretEntered = "入力済み"
-	}
-	if lineBot.LineGroupID != nil {
-		lineGroupIDEntered = "入力済み"
-	}
-	if lineBot.LineClientID != nil {
-		lineClientIDEntered = "入力済み"
-	}
-	if lineBot.LineClientSecret != nil {
-		lineClientSecretEntered = "入力済み"
-	}
+	lineEntered := components.EnteredLineBotForm(lineBotByte)
 
-	if discordPermissionData.Permission == "write" || discordPermissionData.Permission == "all" {
-		submitTag = `<input type="submit" value="送信">`
-	}
-
+	submitTag := components.CreateSubmitTag(discordPermissionData.Permission)
 	accountVer := strings.Builder{}
 	accountVer.WriteString(components.CreateDiscordAccountVer(discordPermissionData.User))
 	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
-	htmlSelectChannelBuilders := strings.Builder{}
-	categoryOptions := make([]strings.Builder, len(categoryIDTmps)+1)
-	var categoryIndex int
-	for categoryID, channels := range channelsInCategory {
-		for i, categoryIDTmp := range categoryIDTmps {
-			if categoryID == "" {
-				categoryIndex = len(categoryIDTmps)
-				break
-			}
-			if categoryIDTmp == categoryID {
-				categoryIndex = i
-				break
-			}
-		}
-		for _, channelSelect := range channels {
-			if channelSelect.ID == "" {
-				continue
-			}
-			if lineBot.DefaultChannelID == channelSelect.ID {
-				categoryOptions[categoryIndex].WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, channelSelect.ID, channelSelect.Name))
-				continue
-			}
-			categoryOptions[categoryIndex].WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, channelSelect.ID, channelSelect.Name))
-		}
-	}
-	for _, categoryOption := range categoryOptions {
-		htmlSelectChannelBuilders.WriteString(categoryOption.String())
-	}
+	htmlSelectChannelBuilders := components.CreateSelectChennelOptions(
+		categoryIDTmps,
+		lineBot.DefaultChannelID,
+		channelsInCategory,
+		categoryPositions,
+	)
 	data := struct {
-		Title                   string
-		AccountVer              template.HTML
-		JsScriptTag             template.HTML
-		SubmitTag               template.HTML
-		LineNotifyTokenEntered  string
-		LineBotTokenEntered     string
-		LineBotSecretEntered    string
-		LineGroupIDEntered      string
-		LineClientIDEntered     string
-		LineClientSecretEntered string
-		Channels                template.HTML
+		Title       string
+		AccountVer  template.HTML
+		JsScriptTag template.HTML
+		SubmitTag   template.HTML
+		LineEntered components.LineEntered
+		Channels    template.HTML
 	}{
-		Title:                   "LineBotの設定",
-		JsScriptTag:             template.HTML(`<script src="/static/js/linetoken.js"></script>`),
-		AccountVer:              template.HTML(accountVer.String()),
-		SubmitTag:               template.HTML(submitTag),
-		LineNotifyTokenEntered:  lineNotifyTokenEntered,
-		LineBotTokenEntered:     lineBotTokenEntered,
-		LineBotSecretEntered:    lineBotSecretEntered,
-		LineGroupIDEntered:      lineGroupIDEntered,
-		LineClientIDEntered:     lineClientIDEntered,
-		LineClientSecretEntered: lineClientSecretEntered,
-		Channels:                template.HTML(htmlSelectChannelBuilders.String()),
+		Title:       "LineBotの設定",
+		JsScriptTag: template.HTML(`<script src="/static/js/linetoken.js"></script>`),
+		AccountVer:  template.HTML(accountVer.String()),
+		SubmitTag:   template.HTML(submitTag),
+		LineEntered: lineEntered,
+		Channels:    template.HTML(htmlSelectChannelBuilders),
 	}
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/linetoken.html"))
 	if err := tmpl.Execute(w, data); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "テンプレートの実行に失敗しました:"+err.Error())
+	}
+}
+
+func createChannelsInCategory(
+	guild *discordgo.Guild,
+	channel *discordgo.Channel,
+	categoryPositions map[string]components.DiscordChannel,
+	channelsInCategory map[string][]components.DiscordChannelSelect,
+) {
+	// カテゴリー、フォーラムチャンネルはスキップ
+	if channel.Type == discordgo.ChannelTypeGuildForum {
+		return
+	}
+	if channel.Type == discordgo.ChannelTypeGuildCategory {
+		return
+	}
+	typeIcon := "🔊"
+	if channel.Type == discordgo.ChannelTypeGuildText {
+		typeIcon = "📝"
+	}
+	categoryPosition := categoryPositions[channel.ParentID]
+	// まだチャンネルがない場合は初期化
+	if len(channelsInCategory[categoryPosition.ID]) == 0 {
+		channelsInCategory[categoryPosition.ID] = make([]components.DiscordChannelSelect, len(guild.Channels)-2, len(guild.Channels))
+	}
+	channelsInCategory[categoryPosition.ID][channel.Position] = components.DiscordChannelSelect{
+		ID:   channel.ID,
+		Name: fmt.Sprintf("%s:%s:%s", categoryPosition.Name, typeIcon, channel.Name),
+	}
+	if categoryPosition.ID == "" {
+		channelsInCategory[categoryPosition.ID][channel.Position] = components.DiscordChannelSelect{
+			ID:   channel.ID,
+			Name: fmt.Sprintf("カテゴリーなし:%s:%s", typeIcon, channel.Name),
+		}
 	}
 }

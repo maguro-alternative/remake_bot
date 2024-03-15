@@ -57,7 +57,6 @@ func NewLinePostDiscordChannelViewHandler(indexService *service.IndexService) *L
 func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	categoryPositions := make(map[string]components.DiscordChannel)
 	var categoryIDTmps []string
-	var submitTag string
 	guildId := r.PathValue("guildId")
 	ctx := r.Context()
 	if ctx == nil {
@@ -120,10 +119,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		}
 	}
 
-	if discordPermissionData.Permission == "write" || discordPermissionData.Permission == "all" {
-		submitTag = `<input type="submit" value="送信">`
-	}
-
+	submitTag := components.CreateSubmitTag(discordPermissionData.Permission)
 	accountVer := strings.Builder{}
 	accountVer.WriteString(components.CreateDiscordAccountVer(discordPermissionData.User))
 	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))

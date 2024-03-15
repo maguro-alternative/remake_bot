@@ -7,22 +7,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type DiscordChannelSet struct {
-	ID         string
-	Name       string
-	Ng         bool
-	BotMessage bool
-	NgTypes    []int
-	NgUsers    []string
-	NgRoles    []string
-}
-
-type DiscordChannel struct {
-	ID       string
-	Name     string
-	Position int
-}
-
 func CreateLinePostDiscordChannelForm(
 	categoryIDTmps []string,
 	channelsInCategory map[string][]DiscordChannelSet,

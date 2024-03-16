@@ -64,5 +64,6 @@ func EnteredLineBotForm(
 	if lineBotByte.LineGroupID != nil {
 		lineEntered.LineGroupID = "入力済み"
 	}
+	lineEntered.LineDebugMode = lineBotByte.LineDebugMode
 	return lineEntered
 }

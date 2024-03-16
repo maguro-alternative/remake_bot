@@ -28,6 +28,7 @@ type LineBotByteEntered struct {
 	LineGroupID      [][]byte
 	LineClientID     [][]byte
 	LineClientSecret [][]byte
+	LineDebugMode    bool
 }
 
 type LineEntered struct {
@@ -37,4 +38,5 @@ type LineEntered struct {
 	LineGroupID      string
 	LineClientID     string
 	LineClientSecret string
+	LineDebugMode    bool
 }

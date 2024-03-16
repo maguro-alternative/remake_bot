@@ -121,6 +121,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		LineGroupID:      lineBot.LineGroupID,
 		LineClientID:     lineBot.LineClientID,
 		LineClientSecret: lineBot.LineClientSecret,
+		LineDebugMode:    lineBot.DebugMode,
 	}
 	lineEntered := components.EnteredLineBotForm(lineBotByte)
 

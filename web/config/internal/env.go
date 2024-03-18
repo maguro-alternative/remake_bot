@@ -1,7 +1,6 @@
 package internal
 
 type Config struct {
-	CsrfAuthKey         string `env:"CSRF_AUTH_KEY" envDefault:""`
 	DBName              string `env:"DB_NAME" envDefault:"postgres"`
 	DBUser              string `env:"DB_USER" envDefault:"postgres"`
 	DBPassword          string `env:"DB_PASSWORD" envDefault:"postgres"`

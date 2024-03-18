@@ -48,9 +48,19 @@ go mod tidy
 go run core/main.go
 ```
 
-![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/0ae11602-a95a-4bee-b324-0afd1d6ecf57)
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/0ae11602-a95a-4bee-b324-0afd1d6ecf57)  
 起動時に所属サーバーを読み取り、自動的にデータベースに必要なものをInsertしてくれます。  
 テーブルがない場合も自動的に作成されます。
+
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/f6e8d05c-83a6-42ca-b41f-95b5b62642d8)  
+サーバーが立ち上がったらアクセスしてみましょう。  
+上記のようなページが表示されます。  
+
+アカウントのところをクリックするとログインページへ遷移できます。  
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/8fcfa72a-aa57-4005-b227-63429a3f67d2)  
+認可されると右のような画面になります。  
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/f7c6079b-b13c-43dc-9840-b893acbd439e)
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/2e3c69bf-e097-49a8-a1ad-711107e5f446)
 
 
 # 進捗

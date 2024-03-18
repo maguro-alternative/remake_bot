@@ -58,6 +58,7 @@ func (g *IndexViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		Title:      "トップページ",
 		AccountVer: template.HTML(accountVer.String()),
 		BotName:    g.IndexService.DiscordSession.State.User.Username,
+		GuildId:    lineSession.DiscordGuildID,
 	})
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

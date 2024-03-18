@@ -28,28 +28,28 @@ https://github.com/maguro-alternative/discordfast
 .
 ├── bot
 │   ├── cogs
-│   │   ├── on_message_create       // メッセージが送信されたときのデータベースの操作
+│   │   ├── on_message_create                       // メッセージが送信されたときのデータベースの操作
 │   │   │   ├── entity.go
 │   │   │   ├── repository_test.go
 │   │   │   └── repository.go
-│   │   ├── cog_handler.go          // ここでcogを登録
-│   │   ├── on_message_create.go    // discord内でメッセージが送信されたときの処理
-│   │   └── vc_signal.go            // ボイスチャンネルのステータス変化時の処理
+│   │   ├── cog_handler.go                          // ここでcogを登録
+│   │   ├── on_message_create.go                    // discord内でメッセージが送信されたときの処理
+│   │   └── vc_signal.go                            // ボイスチャンネルのステータス変化時の処理
 |   ├── commands
-|   |   ├── command_handler.go      // ここでコマンドを登録
-|   |   └── ping.go                 // pingコマンド
-│   ├── config                      // 環境変数設定ファイル
+|   |   ├── command_handler.go                      // ここでコマンドを登録
+|   |   └── ping.go                                 // pingコマンド
+│   ├── config                                      // 環境変数設定ファイル
 │   │   ├── internal
 │   │   │   └── env.go
 │   │   └── config.go
-│   └── main.go                     // Botメイン関数
+│   └── main.go                                     // Botメイン関数
 ├── core
-│   ├── config                      // 環境変数設定ファイル
+│   ├── config                                      // 環境変数設定ファイル
 │   │   ├── internal
 │   │   │   └── env.go
 │   │   └── config.go
 |   ├── main.go
-│   └── schema.sql                  // データベースのスキーマ
+│   └── schema.sql                                  // データベースのスキーマ
 ├── fixtures
 │   ├── fixtures.go
 │   ├── line_bot_iv.go
@@ -116,6 +116,7 @@ https://github.com/maguro-alternative/discordfast
 │   │   │   ├── line_bot
 │   │   │   │   ├── internal
 │   │   │   │   │   ├── entity.go
+│   │   │   │   │   ├── hmac.go
 │   │   │   │   │   ├── repository_test.go
 │   │   │   │   │   └── repository.go
 │   │   │   │   ├── entity.go

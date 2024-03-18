@@ -1,0 +1,13 @@
+{{ define "content" }}
+    <main>
+        <!-- 入力フォーム -->
+        <form action="#" id="form">
+            <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>
+            <select id="defaultChannel" name="default_channel_id" >
+                {{ .Channels }}
+            </select>
+            <br/>
+            <button type="submit" class="btn btn-primary">送信</button>
+        </form>
+    </main>
+{{ end }}

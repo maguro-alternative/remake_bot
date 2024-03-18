@@ -22,6 +22,7 @@ import (
 	linetokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken"
 	guildsView "github.com/maguro-alternative/remake_bot/web/handler/views/guilds"
 	guildIdView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid"
+	groupView "github.com/maguro-alternative/remake_bot/web/handler/views/group"
 	"github.com/maguro-alternative/remake_bot/web/service"
 
 	"golang.org/x/oauth2"
@@ -72,6 +73,7 @@ func NewWebRouter(
 	mux.Handle("/guild/{guildId}", middleChain.ThenFunc(guildIdView.NewGuildIDViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/linetoken", middleChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/line-post-discord-channel", middleChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService).Index))
+	mux.Handle("/group/{guildId}", middleChain.ThenFunc(groupView.NewLineGroupViewHandler(indexService).Index))
 
 	mux.Handle("/api/line-bot", middleChain.Then(linebot.NewLineBotHandler(indexService)))
 	mux.Handle("/login/discord", middleChain.Then(discordLogin.NewDiscordOAuth2Handler(discordOAuth2Service)))

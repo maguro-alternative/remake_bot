@@ -45,7 +45,6 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		discordPermissionData = &model.DiscordPermissionData{}
 	}
-	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
 	_, lineSession, err := permission.CheckLinePermission(
 		ctx,
 		w,
@@ -111,6 +110,7 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}{
 		Title:      "グループ",
 		AccountVer: template.HTML(accountVer.String()),
+		JsScriptTag: template.HTML(`<script src="/static/js/group.js"></script>`),
 		Channels:   template.HTML(htmlSelectChannels),
 	})
 	if err != nil {

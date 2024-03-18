@@ -22,7 +22,47 @@ https://github.com/maguro-alternative/discordfast
 # ディレクトリ構造
 
 <details>
-    <summary>長すぎるので折り畳み</summary>
+    <summary>ディレクトリ概要(折り畳み)</summary>
+
+```plaintext
+.
+├── bot                         // DiscordBotを動かすためのディレクトリ
+│   ├── cogs                    // DiscordBotのコグ
+│   │   └── on_message_create   // メッセージが送信されたときのデータベースの操作
+|   ├── commands                // スラッシュコマンド
+│   ├── config                  // 環境変数設定ファイル
+│   └── main.go
+├── core                        // サーバーとBotを動かすためのディレクトリ
+│   ├── config                  // 環境変数設定ファイル
+│   │   ├── internal
+│   │   │   └── env.go
+│   │   └── config.go
+|   ├── main.go
+│   └── schema.sql              // データベースのスキーマ
+├── fixtures                    // データベースのテスト用のフィクスチャ
+├── pkg                         // 共通のパッケージ
+│   ├── crypto                  // 暗号化関連のパッケージ
+│   ├── db                      // データベース関連のパッケージ
+│   ├── line                    // LINEBot関連のパッケージ
+│   └── youtube                 // YouTube関連のパッケージ
+├── web                         // Webサーバーを動かすためのディレクトリ
+│   ├── components              // Webサーバーのコンポーネント
+│   ├── config                  // 環境変数設定ファイル
+│   ├── handler                 // Webサーバーのハンドラ
+│   ├── middleware              // Webサーバーのミドルウェア
+│   ├── service                 // Webサーバーのサービス
+│   ├── shared                  // Webサーバー内での共通のパッケージ
+│   └── templates               // WebサーバーのHTMLテンプレート
+├── .gitignore
+├── go.mod
+├── go.sum
+└── README.md
+```
+
+</details>
+
+<details>
+    <summary>全体(長すぎるので折り畳み)</summary>
 
 ```plaintext
 .

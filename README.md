@@ -272,8 +272,8 @@ https://github.com/maguro-alternative/discordfast
 
 |カラム名|型|説明|
 |---|---|---|
-|**guild_id**|TEXT|DiscordサーバーのID|
-|**type**|TEXT|権限の種類 (line_post_discord_channel, line_bot, vc_signal, webhook)|
+|***guild_id***|TEXT|DiscordサーバーのID|
+|***type***|TEXT|権限の種類 (line_post_discord_channel, line_bot, vc_signal, webhook)|
 |code|BIGINT|Discordの権限コード、詳細は[こちら](https://discord.com/developers/docs/topics/permissions)|
 
 </details>
@@ -286,10 +286,10 @@ https://github.com/maguro-alternative/discordfast
 
 |カラム名|型|説明|
 |---|---|---|
-|**guild_id**|TEXT|DiscordサーバーのID|
-|**type**|TEXT|権限の種類 (line_post_discord_channel, line_bot, vc_signal, webhook)|
-|**target_type**|TEXT|権限の対象の種類 (role, user)|
-|**target_id**|TEXT|権限の対象ID (ユーザーID、ロールID)|
+|***guild_id***|TEXT|DiscordサーバーのID|
+|***type***|TEXT|権限の種類 (line_post_discord_channel, line_bot, vc_signal, webhook)|
+|***target_type***|TEXT|権限の対象の種類 (role, user)|
+|***target_id***|TEXT|権限の対象ID (ユーザーID、ロールID)|
 |permission|TEXT|権限レベル(read, write, all)|
 
 </details>
@@ -301,7 +301,7 @@ DiscordからLINEグループにメッセージを送信するための設定を
 
 |カラム名|型|説明|
 |---|---|---|
-|**channel_id**|TEXT|DiscordのチャンネルID|
+|***channel_id***|TEXT|DiscordのチャンネルID|
 |guild_id|TEXT|DiscordのサーバーID|
 |ng|BOOLEAN|LINEに送信NGのチャンネルかどうか|
 |bot_message|BOOLEAN|DiscordBotのメッセージを送信するかどうか|
@@ -316,9 +316,9 @@ discordgo.MessageTypeで使用されている定数(0~23)と同じ値を使用�
 
 |カラム名|型|説明|
 |---|---|---|
-|**channel**|TEXT|DiscordのチャンネルID|
+|***channel***|TEXT|DiscordのチャンネルID|
 |guild_id|TEXT|DiscordのサーバーID|
-|**type**|INTEGER|メッセージの種類(ピン止め、スレッド、スレッドの返信)|
+|***type***|INTEGER|メッセージの種類(ピン止め、スレッド、スレッドの返信)|
 
 </details>
 
@@ -330,9 +330,9 @@ LINEへ送信しないDiscordユーザー、ロールを保存するテーブル
 
 |カラム名|型|説明|
 |---|---|---|
-|**channel**|TEXT|DiscordのチャンネルID|
+|***channel***|TEXT|DiscordのチャンネルID|
 |guild_id|TEXT|DiscordのサーバーID|
-|**id**|TEXT|ID|
+|***id***|TEXT|ID|
 |id_type|TEXT|IDの種類 (user, role)|
 
 </details>
@@ -344,7 +344,7 @@ LINEへ送信しないDiscordユーザー、ロールを保存するテーブル
 
 |カラム名|型|説明|
 |---|---|---|
-|**vc_channel_id**|TEXT|DiscordのボイスチャンネルID|
+|***vc_channel_id***|TEXT|DiscordのボイスチャンネルID|
 |guild_id|TEXT|DiscordのサーバーID|
 |send_signal|BOOLEAN|L通知を送信するかどうか|
 |send_channel_id|TEXT|通知を送信するチャンネルID|
@@ -360,9 +360,9 @@ LINEへ送信しないDiscordユーザー、ロールを保存するテーブル
 
 |カラム名|型|説明|
 |---|---|---|
-|**vc_channel_id**|TEXT|DiscordのボイスチャンネルID|
+|***vc_channel_id***|TEXT|DiscordのボイスチャンネルID|
 |guild_id|TEXT|DiscordのサーバーID|
-|**id**|TEXT|ID|
+|***id***|TEXT|ID|
 |id_type|TEXT|IDの種類 (user, role)|
 
 </details>
@@ -374,9 +374,9 @@ LINEへ送信しないDiscordユーザー、ロールを保存するテーブル
 
 |カラム名|型|説明|
 |---|---|---|
-|**vc_channel_id**|TEXT|DiscordのボイスチャンネルID|
+|***vc_channel_id***|TEXT|DiscordのボイスチャンネルID|
 |guild_id|TEXT|DiscordのサーバーID|
-|**id**|TEXT|ID|
+|***id***|TEXT|ID|
 |id_type|TEXT|IDの種類 (user, role)|
 
 </details>
@@ -388,7 +388,7 @@ DiscordのWebhookの送信設定を保存するテーブル
 
 |カラム名|型|説明|
 |---|---|---|
-|**webhook_serial_id**|SERIAL|Webhookの投稿内容の識別ID|
+|***webhook_serial_id***|SERIAL|Webhookの投稿内容の識別ID|
 |guild_id|TEXT|DiscordのサーバーID|
 |webhook_id|TEXT|WebhookのID|
 |subscription_type|TEXT|読み取るもの(YouTube,NicoNico)|
@@ -404,8 +404,8 @@ Webhookの送信時にメンションするユーザー、ロールを保存す�
 
 |カラム名|型|説明|
 |---|---|---|
-|**webhook_serial_id**|SERIAL|Webhookの投稿内容の識別ID|
-|**id**|TEXT|ID|
+|***webhook_serial_id***|SERIAL|Webhookの投稿内容の識別ID|
+|***id***|TEXT|ID|
 |id_type|TEXT|IDの種類 (user, role)|
 
 </details>
@@ -419,8 +419,8 @@ conditionsは投稿時の条件を示す(ng_orはいずれかの単語が含ま�
 
 |カラム名|型|説明|
 |---|---|---|
-|**webhook_serial_id**|SERIAL|Webhookの投稿内容の識別ID|
-|**word**|TEXT|メンションする単語|
+|***webhook_serial_id***|SERIAL|Webhookの投稿内容の識別ID|
+|***word***|TEXT|メンションする単語|
 |conditions|TEXT|投稿時の条件(ng_or ng_and search_or search_and mention_or mention_and)|
 
 </details>
@@ -433,7 +433,7 @@ LINEBotのアクセストークン、チャンネルシークレットなどをA
 
 |カラム名|型|説明|
 |---|---|---|
-|**guild_id**|TEXT|DiscordのサーバーID|
+|***guild_id***|TEXT|DiscordのサーバーID|
 |line_notify_token|BYTEA|LINE Notifyのトークン(AESで暗号化)|
 |line_bot_token|BYTEA|LINEBotのアクセストークン(AESで暗号化)|
 |line_bot_secret|BYTEA|LINEBotのチャンネルシークレット(AESで暗号化)|
@@ -452,7 +452,7 @@ LINEBotの復号化に使用するIVを保存するテーブル
 
 |カラム名|型|説明|
 |---|---|---|
-|**guild_id**|TEXT|DiscordのサーバーID|
+|***guild_id***|TEXT|DiscordのサーバーID|
 |line_notify_token_iv|BYTEA|LINE NotifyトークンのIV|
 |line_bot_token_iv|BYTEA|LINEBotのアクセストークンのIV|
 |line_bot_secret_iv|BYTEA|LINEBotのチャンネルシークレットのIV|

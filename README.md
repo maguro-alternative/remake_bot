@@ -47,6 +47,12 @@ go mod tidy
 ```bash
 go run core/main.go
 ```
+
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/0ae11602-a95a-4bee-b324-0afd1d6ecf57)
+起動時に所属サーバーを読み取り、自動的にデータベースに必要なものをInsertしてくれます。  
+テーブルがない場合も自動的に作成されます。
+
+
 # 進捗
 
 - [x] LINE→Discordのメッセージの送信

@@ -4,6 +4,49 @@ https://github.com/maguro-alternative/discordfast
 
 上記のリポジトリのリプレイスです。
 
+# 使い方
+以下の環境変数を設定してください。  
+PostgresSQLのデータベースを使用します。  
+Windowsの場合```go.mod```のディレクトリに```.env```ファイルを作成し、記述してください。  
+
+```plaintext
+# DiscordのBotのトークン
+DISCORD_BOT_TOKEN=your_discord_bot_token
+DISCORD_CLIENT_ID=your_discord_client_id
+DISCORD_CLIENT_SECRET=your_discord_client_secret
+DISCORD_SCOPE=identify%20guilds.join%20guilds%20guilds.members.read%20applications.builds.read%20connections
+
+DB_NAME=your_db_name
+DB_HOST=your_db_host
+DB_PASSWORD=your_db_password
+DB_PORT=your_db_port
+DB_USER=your_db_user
+
+PORT=5000
+# AES暗号化のためのキー(128bit,00~FFの16進数32文字)
+PRIVATE_KEY=your_private_key
+SERVER_URL=your_server_url
+
+# gorrila/sessionsのためのキー
+SESSION_SECRET=your_session_secret
+YOUTUBE_API_KEY=your_youtube_api_key
+YOUTUBE_ACCESS_TOKEN=your_youtube_access_token
+YOUTUBE_CLIENT_ID=your_youtube_client_id
+YOUTUBE_CLIENT_SECRET=your_youtube_client_secret
+YOUTUBE_PROJECT_ID=your_youtube_project_id
+YOUTUBE_REFRESH_TOKEN=your_youtube_refresh_token
+YOUTUBE_TOKEN_EXPIRY=your_youtube_token_expiry
+```
+
+以下のコマンドで依存関係を解決します。
+```
+go mod tidy
+```
+
+以下のコマンドでサーバーとBotを起動します。  
+```bash
+go run core/main.go
+```
 # 進捗
 
 - [x] LINE→Discordのメッセージの送信

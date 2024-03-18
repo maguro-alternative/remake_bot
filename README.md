@@ -446,7 +446,7 @@ LINEBotのアクセストークン、チャンネルシークレットなどをA
 </details>
 
 <details>
-    <summaty>line_bot_iv</summary>
+    <summary>line_bot_iv</summary>
 
 LINEBotの復号化に使用するIVを保存するテーブル
 

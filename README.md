@@ -259,3 +259,205 @@ https://github.com/maguro-alternative/discordfast
 
 </details>
 
+# データベース
+
+太文字は主キー  
+複数のカラムが太文字になっている場合は複合主キー  
+
+<details>
+    <summary>permissions_code</summary>
+
+サーバーの権限設定を保存するテーブル  
+権限コードをすべて満たすユーザーが設定変更を行える  
+
+|カラム名|型|説明|
+|---|---|---|
+|**guild_id**|TEXT|DiscordサーバーのID|
+|**type**|TEXT|権限の種類 (line_post_discord_channel, line_bot, vc_signal, webhook)|
+|code|BIGINT|Discordの権限コード、詳細は[こちら](https://discord.com/developers/docs/topics/permissions)|
+
+</details>
+
+<details>
+    <summary>permissions_id</summary>
+
+サーバーの権限設定を保存するテーブル
+ここに保存されているユーザーやロールは、```permission```と同じ権限を持っているということになる
+
+|カラム名|型|説明|
+|---|---|---|
+|**guild_id**|TEXT|DiscordサーバーのID|
+|**type**|TEXT|権限の種類 (line_post_discord_channel, line_bot, vc_signal, webhook)|
+|**target_type**|TEXT|権限の対象の種類 (role, user)|
+|**target_id**|TEXT|権限の対象ID (ユーザーID、ロールID)|
+|permission|TEXT|権限レベル(read, write, all)|
+
+</details>
+
+<details>
+    <summary>line_post_discord_channel</summary>
+
+DiscordからLINEグループにメッセージを送信するための設定を保存するテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|**channel_id**|TEXT|DiscordのチャンネルID|
+|guild_id|TEXT|DiscordのサーバーID|
+|ng|BOOLEAN|LINEに送信NGのチャンネルかどうか|
+|bot_message|BOOLEAN|DiscordBotのメッセージを送信するかどうか|
+
+</details>
+
+<details>
+    <summary>line_ng_discord_message_type</summary>
+
+LINEに送信NGのDiscordメッセージの種類を保存するテーブル  
+discordgo.MessageTypeで使用されている定数(0~23)と同じ値を使用する  
+
+|カラム名|型|説明|
+|---|---|---|
+|**channel**|TEXT|DiscordのチャンネルID|
+|guild_id|TEXT|DiscordのサーバーID|
+|**type**|INTEGER|メッセージの種類(ピン止め、スレッド、スレッドの返信)|
+
+</details>
+
+<details>
+    <summary>line_ng_discord_id</summary>
+
+LINEへ送信しないDiscordユーザー、ロールを保存するテーブル  
+ここに保存されているユーザー、ロールを持つユーザーはLINEにメッセージが送信されない  
+
+|カラム名|型|説明|
+|---|---|---|
+|**channel**|TEXT|DiscordのチャンネルID|
+|guild_id|TEXT|DiscordのサーバーID|
+|**id**|TEXT|ID|
+|id_type|TEXT|IDの種類 (user, role)|
+
+</details>
+
+<details>
+    <summary>vc_signal_channel</summary>
+
+ボイスチャンネル入退出の通知設定を保存するテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|**vc_channel_id**|TEXT|DiscordのボイスチャンネルID|
+|guild_id|TEXT|DiscordのサーバーID|
+|send_signal|BOOLEAN|L通知を送信するかどうか|
+|send_channel_id|TEXT|通知を送信するチャンネルID|
+|join_bot|BOOLEAN|ボイスチャンネルにBotが入室したときの通知を送信するかどうか|
+|everyone_mention|BOOLEAN|通知を送信するときに@everyoneを使用するかどうか|
+
+</details>
+
+<details>
+    <summary>vc_signal_ng_id</summary>
+
+指定されたユーザー、ロールがボイスチャンネルに参加した場合通知しない
+
+|カラム名|型|説明|
+|---|---|---|
+|**vc_channel_id**|TEXT|DiscordのボイスチャンネルID|
+|guild_id|TEXT|DiscordのサーバーID|
+|**id**|TEXT|ID|
+|id_type|TEXT|IDの種類 (user, role)|
+
+</details>
+
+<details>
+    <summary>vc_signal_mention_id</summary>
+
+ボイスチャンネルの通知の際にメンションするユーザー、ロールを保存するテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|**vc_channel_id**|TEXT|DiscordのボイスチャンネルID|
+|guild_id|TEXT|DiscordのサーバーID|
+|**id**|TEXT|ID|
+|id_type|TEXT|IDの種類 (user, role)|
+
+</details>
+
+<details>
+    <summary>webhook</summary>
+
+DiscordのWebhookの送信設定を保存するテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|**webhook_serial_id**|SERIAL|Webhookの投稿内容の識別ID|
+|guild_id|TEXT|DiscordのサーバーID|
+|webhook_id|TEXT|WebhookのID|
+|subscription_type|TEXT|読み取るもの(YouTube,NicoNico)|
+|subscription_id|TEXT|上記のサービスで投稿者を識別できるもの|
+|last_posted_at|TIMESTAMP|最後に投稿した日時|
+
+</details>
+
+<details>
+    <summary>webhook_mention</summary>
+
+Webhookの送信時にメンションするユーザー、ロールを保存するテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|**webhook_serial_id**|SERIAL|Webhookの投稿内容の識別ID|
+|**id**|TEXT|ID|
+|id_type|TEXT|IDの種類 (user, role)|
+
+</details>
+
+<details>
+    <summary>webhook_word</summary>
+
+Webhookの送信時に特定の単語が含まれていた場合にメンションするユーザー、ロールを保存するテーブル  
+Twitter運用時使用していたが現在死に要素  
+conditionsは投稿時の条件を示す(ng_orはいずれかの単語が含まれていれば投稿しない。search_andは全ての単語が含まれていれば投稿する。mention_orはいずれかの単語が含まれていればメンションする。)
+
+|カラム名|型|説明|
+|---|---|---|
+|**webhook_serial_id**|SERIAL|Webhookの投稿内容の識別ID|
+|**word**|TEXT|メンションする単語|
+|conditions|TEXT|投稿時の条件(ng_or ng_and search_or search_and mention_or mention_and)|
+
+</details>
+
+<details>
+    <summary>line_bot</summary>
+
+LINEBotの設定を保存するテーブル  
+LINEBotのアクセストークン、チャンネルシークレットなどをAES暗号化して保存する
+
+|カラム名|型|説明|
+|---|---|---|
+|**guild_id**|TEXT|DiscordのサーバーID|
+|line_notify_token|BYTEA|LINE Notifyのトークン(AESで暗号化)|
+|line_bot_token|BYTEA|LINEBotのアクセストークン(AESで暗号化)|
+|line_bot_secret|BYTEA|LINEBotのチャンネルシークレット(AESで暗号化)|
+|line_group_id|BYTEA|LINEのグループID(AESで暗号化)|
+|line_client_id|BYTEA|LINEのクライアントID(AESで暗号化)|
+|line_client_secret|BYTEA|LINEのクライアントシークレット(AESで暗号化)|
+|default_channel_id|TEXT|LINEに送信するチャンネルID|
+|debug_mode|BOOLEAN|デバッグモードかどうか(オンにするとLINEグループにメッセージを送信するたびLINEのグループIDが返ってくる)|
+
+</details>
+
+<details>
+    <summaty>line_bot_iv</summary>
+
+LINEBotの復号化に使用するIVを保存するテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|**guild_id**|TEXT|DiscordのサーバーID|
+|line_notify_token_iv|BYTEA|LINE NotifyトークンのIV|
+|line_bot_token_iv|BYTEA|LINEBotのアクセストークンのIV|
+|line_bot_secret_iv|BYTEA|LINEBotのチャンネルシークレットのIV|
+|line_group_id_iv|BYTEA|LINEのグループIDのIV|
+|line_client_id_iv|BYTEA|LINEのクライアントIDのIV|
+|line_client_secret_iv|BYTEA|LINEのクライアントシークレットのIV|
+
+</details>

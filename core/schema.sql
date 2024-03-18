@@ -4,7 +4,7 @@
 カラム:
 
     guild_id (TEXT PRIMARY KEY): サーバーID
-    type (TEXT): 権限の種類 (line, line_bot, vc, webhook)
+    type (TEXT): 権限の種類 (line_post_discord_channel, line_bot, vc, webhook)
     code (BIGINT): Discord上での権限コード
 */
 CREATE TABLE IF NOT EXISTS permissions_code (
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS permissions_code (
 カラム:
 
     guild_id (TEXT PRIMARY KEY): サーバーID
-    type (TEXT): 権限の種類 (line, line_bot, vc, webhook)
+    type (TEXT): 権限の種類 (line_post_discord_channel, line_bot, vc, webhook)
     target_type (TEXT): 対象の種類 (user, role)
     target_id (TEXT): 対象ID (ユーザーID、ロールID)
     permission (TEXT): 権限レベル(read, write, admin)

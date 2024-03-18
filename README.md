@@ -62,6 +62,15 @@ go run core/main.go
 ![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/f7c6079b-b13c-43dc-9840-b893acbd439e)
 ![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/2e3c69bf-e097-49a8-a1ad-711107e5f446)
 
+認可を基に設定情報にアクセスできます。  
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/9819323a-e123-4dcc-a77c-df96335d570b)  
+
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/6ac0cbcf-608d-4ad3-9fd8-2a4013307432)  
+
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/57ae58ec-92fc-4e63-aaec-4f7a0ec4077d)
+
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/4fef03cd-4a18-4691-a388-c33cf333221c)
+
 
 # 進捗
 

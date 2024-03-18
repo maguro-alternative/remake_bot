@@ -20,7 +20,10 @@ https://github.com/maguro-alternative/discordfast
 - [] Discord→LINEのファイルの送信
 
 # ディレクトリ構造
-<datails><summary>長すぎるので折り畳み</summary>
+
+<datails>
+<summary>長すぎるので折り畳み</summary>
+
 ```plaintext
 .
 ├── bot
@@ -212,5 +215,6 @@ https://github.com/maguro-alternative/discordfast
 ├── go.sum
 └── README.md
 ```
+
 </details>
 

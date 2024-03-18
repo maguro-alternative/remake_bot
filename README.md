@@ -39,8 +39,8 @@ YOUTUBE_TOKEN_EXPIRY=your_youtube_token_expiry
 ```
 
 以下のコマンドで依存関係を解決します。
-```
-go mod tidy
+```bash
+go mod download
 ```
 
 以下のコマンドでサーバーとBotを起動します。  

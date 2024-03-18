@@ -22,7 +22,7 @@ https://github.com/maguro-alternative/discordfast
 # ディレクトリ構造
 
 <datails>
-<summary>長すぎるので折り畳み</summary>
+    <summary>長すぎるので折り畳み</summary>
 
 ```plaintext
 .

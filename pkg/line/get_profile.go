@@ -22,7 +22,6 @@ func (l *LineProfile) Validate() error {
 		validation.Field(&l.DisplayName, validation.Required),
 		validation.Field(&l.UserID, validation.Required),
 		validation.Field(&l.PictureUrl, validation.Required),
-		validation.Field(&l.StatusMessage, validation.Required),
 	)
 }
 

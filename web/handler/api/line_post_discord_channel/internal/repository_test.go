@@ -24,7 +24,7 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 
 		f := &fixtures.Fixture{DBv1: tx}
 		f.Build(t,
-			fixtures.NewLineChannel(ctx, func(lc *fixtures.LineChannel) {
+			fixtures.NewLinePostDiscordChannel(ctx, func(lc *fixtures.LinePostDiscordChannel) {
 				lc.ChannelID = "123456789"
 				lc.GuildID = "987654321"
 				lc.Ng = false
@@ -33,16 +33,16 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		updateLineChannel := LineChannel{
+		updateLinePostDiscordChannel := LinePostDiscordChannel{
 			ChannelID:  "123456789",
 			GuildID:    "987654321",
 			Ng:         true,
 			BotMessage: true,
 		}
-		err = repo.UpdateLinePostDiscordChannel(ctx, updateLineChannel)
+		err = repo.UpdateLinePostDiscordChannel(ctx, updateLinePostDiscordChannel)
 		assert.NoError(t, err)
 
-		var lineChannel LineChannel
+		var lineChannel LinePostDiscordChannel
 		err = tx.GetContext(ctx, &lineChannel, "SELECT * FROM line_post_discord_channel WHERE channel_id = $1", "123456789")
 		assert.NoError(t, err)
 
@@ -68,7 +68,7 @@ func TestRepository_InsertLineNgDiscordMessageTypes(t *testing.T) {
 		assert.NoError(t, err)
 
 		repo := NewRepository(tx)
-		lineNgDiscordTypes := []LineNgType{
+		lineNgDiscordTypes := []LineNgDiscordMessageType{
 			{
 				ChannelID: "123456789",
 				GuildID:   "987654321",
@@ -112,22 +112,22 @@ func TestRepository_DeleteLineNgDiscordMessageTypes(t *testing.T) {
 
 		f := &fixtures.Fixture{DBv1: tx}
 		f.Build(t,
-			fixtures.NewLineNgType(ctx, func(lnt *fixtures.LineNgType) {
+			fixtures.NewLineNgDiscordMessageType(ctx, func(lnt *fixtures.LineNgDiscordMessageType) {
 				lnt.ChannelID = "123456789"
 				lnt.Type = 6
 			}),
-			fixtures.NewLineNgType(ctx, func(lnt *fixtures.LineNgType) {
+			fixtures.NewLineNgDiscordMessageType(ctx, func(lnt *fixtures.LineNgDiscordMessageType) {
 				lnt.ChannelID = "123456789"
 				lnt.Type = 7
 			}),
-			fixtures.NewLineNgType(ctx, func(lnt *fixtures.LineNgType) {
+			fixtures.NewLineNgDiscordMessageType(ctx, func(lnt *fixtures.LineNgDiscordMessageType) {
 				lnt.ChannelID = "987654321"
 				lnt.Type = 6
 			}),
 		)
 
 		repo := NewRepository(tx)
-		insertLineNgDiscordTypes := []LineNgType{
+		insertLineNgDiscordTypes := []LineNgDiscordMessageType{
 			{
 				ChannelID: "123456789",
 				Type:      6,

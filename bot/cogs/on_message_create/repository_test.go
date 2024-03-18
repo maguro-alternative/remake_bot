@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetLineChannel(t *testing.T) {
+func TestGetLinePostDiscordChannel(t *testing.T) {
 	ctx := context.Background()
 	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
 	assert.NoError(t, err)
@@ -27,7 +27,7 @@ func TestGetLineChannel(t *testing.T) {
 
 	f := &fixtures.Fixture{DBv1: tx}
 	f.Build(t,
-		fixtures.NewLineChannel(ctx, func(lc *fixtures.LineChannel) {
+		fixtures.NewLinePostDiscordChannel(ctx, func(lc *fixtures.LinePostDiscordChannel) {
 			lc.ChannelID = "123456789"
 			lc.GuildID = "987654321"
 			lc.Ng = false
@@ -36,14 +36,14 @@ func TestGetLineChannel(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("ChannelIDから送信しないかどうか取得できること", func(t *testing.T) {
-		channel, err := repo.GetLineChannel(ctx, "123456789")
+		channel, err := repo.GetLinePostDiscordChannel(ctx, "123456789")
 		assert.NoError(t, err)
 		assert.Equal(t, false, channel.Ng)
 		assert.Equal(t, false, channel.BotMessage)
 	})
 }
 
-func TestInsertLineChannel(t *testing.T) {
+func TestInsertLinePostDiscordChannel(t *testing.T) {
 	ctx := context.Background()
 	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
 	assert.NoError(t, err)
@@ -55,9 +55,9 @@ func TestInsertLineChannel(t *testing.T) {
 
 	repo := NewRepository(tx)
 
-	var channels []TestLineChannel
+	var channels []TestLinePostDiscordChannel
 	t.Run("ChannelIDを追加できること", func(t *testing.T) {
-		err := repo.InsertLineChannel(ctx, "123456789", "987654321")
+		err := repo.InsertLinePostDiscordChannel(ctx, "123456789", "987654321")
 		assert.NoError(t, err)
 		query := `
 			SELECT
@@ -77,7 +77,7 @@ func TestInsertLineChannel(t *testing.T) {
 	})
 }
 
-func TestGetLineNgType(t *testing.T) {
+func TestGetLineNgDiscordMessageType(t *testing.T) {
 	ctx := context.Background()
 	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
 	assert.NoError(t, err)
@@ -89,14 +89,14 @@ func TestGetLineNgType(t *testing.T) {
 
 	f := &fixtures.Fixture{DBv1: tx}
 	f.Build(t,
-		fixtures.NewLineNgType(ctx, func(lnt *fixtures.LineNgType) {
+		fixtures.NewLineNgDiscordMessageType(ctx, func(lnt *fixtures.LineNgDiscordMessageType) {
 			lnt.ChannelID = "987654321"
 			lnt.Type = 6
 		}),
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからNGタイプを取得できること", func(t *testing.T) {
-		ngTypes, err := repo.GetLineNgType(ctx, "987654321")
+		ngTypes, err := repo.GetLineNgDiscordMessageType(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, []int{6}, ngTypes)
 	})
@@ -162,7 +162,7 @@ func TestGetLineBot(t *testing.T) {
 		}),
 		fixtures.NewLineBot(ctx, func(lb *fixtures.LineBot) {
 			lb.GuildID = "123456789"
-			lb.LineNotifyToken = pq.ByteaArray{[]byte("X+P6kmO6DnEjM3TVqXkwNA==")}//95 227 250 146 99 186 14 113 35 51 116 213 169 121 48 52
+			lb.LineNotifyToken = pq.ByteaArray{[]byte("X+P6kmO6DnEjM3TVqXkwNA==")} //95 227 250 146 99 186 14 113 35 51 116 213 169 121 48 52
 			lb.LineBotToken = pq.ByteaArray{[]byte("uy2qtvYTnSoB5qIntwUdVQ==")}
 			lb.LineBotSecret = pq.ByteaArray{[]byte("i2uHQCyn58wRR/b03fRw6w==")}
 			lb.LineGroupID = pq.ByteaArray{[]byte("YgexFQQlLcaXmsw9mFN35Q==")}

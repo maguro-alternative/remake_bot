@@ -23,16 +23,16 @@ import (
 )
 
 type Repository interface {
-	GetLineChannel(ctx context.Context, channelID string) (onMessageCreate.LineChannel, error)
-	InsertLineChannel(ctx context.Context, channelID string, guildID string) error
-	GetLineNgType(ctx context.Context, channelID string) ([]int, error)
+	GetLinePostDiscordChannel(ctx context.Context, channelID string) (onMessageCreate.LinePostDiscordChannel, error)
+	InsertLinePostDiscordChannel(ctx context.Context, channelID string, guildID string) error
+	GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error)
 	GetLineNgDiscordID(ctx context.Context, channelID string) ([]onMessageCreate.LineNgID, error)
 	GetLineBot(ctx context.Context, guildID string) (onMessageCreate.LineBot, error)
 	GetLineBotIv(ctx context.Context, guildID string) (onMessageCreate.LineBotIv, error)
 }
 
 func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.MessageCreate) {
-	var channel onMessageCreate.LineChannel
+	var channel onMessageCreate.LinePostDiscordChannel
 	var lineMessageTypes []*line.LineMessageType
 	var imageUrls []string
 	var videoCount, voiceCount int
@@ -41,22 +41,22 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 
 	ctx := context.Background()
 	repo := onMessageCreate.NewRepository(h.DB)
-	channel, err := repo.GetLineChannel(ctx, vs.ChannelID)
+	channel, err := repo.GetLinePostDiscordChannel(ctx, vs.ChannelID)
 	if err != nil && err.Error() != "sql: no rows in result set" {
 		slog.InfoContext(ctx, err.Error())
 		return
 	} else if err != nil {
-		err = repo.InsertLineChannel(ctx, vs.ChannelID, vs.GuildID)
+		err = repo.InsertLinePostDiscordChannel(ctx, vs.ChannelID, vs.GuildID)
 		if err != nil {
 			slog.InfoContext(ctx, err.Error())
 			return
 		}
-		channel = onMessageCreate.LineChannel{
+		channel = onMessageCreate.LinePostDiscordChannel{
 			Ng:         false,
 			BotMessage: false,
 		}
 	}
-	ngTypes, err := repo.GetLineNgType(ctx, vs.ChannelID)
+	ngTypes, err := repo.GetLineNgDiscordMessageType(ctx, vs.ChannelID)
 	if err != nil {
 		slog.InfoContext(ctx, err.Error())
 		return
@@ -300,7 +300,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	}
 }
 
-func downloadFile(tmpFilePath, url string) (error) {
+func downloadFile(tmpFilePath, url string) error {
 	f, err := os.Create(tmpFilePath)
 	if err != nil {
 		return err

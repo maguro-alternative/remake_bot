@@ -16,8 +16,8 @@ func NewRepository(db db.Driver) *Repository {
 	}
 }
 
-func (r *Repository) GetLineChannel(ctx context.Context, channelID string) (LineChannel, error) {
-	var channel LineChannel
+func (r *Repository) GetLinePostDiscordChannel(ctx context.Context, channelID string) (LinePostDiscordChannel, error) {
+	var channel LinePostDiscordChannel
 	query := `
 		SELECT
 			ng,
@@ -31,7 +31,7 @@ func (r *Repository) GetLineChannel(ctx context.Context, channelID string) (Line
 	return channel, err
 }
 
-func (r *Repository) InsertLineChannel(ctx context.Context, channelID string, guildID string) error {
+func (r *Repository) InsertLinePostDiscordChannel(ctx context.Context, channelID string, guildID string) error {
 	query := `
 		INSERT INTO line_post_discord_channel (
 			channel_id,
@@ -49,7 +49,7 @@ func (r *Repository) InsertLineChannel(ctx context.Context, channelID string, gu
 	return err
 }
 
-func (r *Repository) GetLineNgType(ctx context.Context, channelID string) ([]int, error) {
+func (r *Repository) GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error) {
 	var ngTypes []int
 	query := `
 		SELECT

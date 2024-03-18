@@ -11,17 +11,17 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 )
 
-type LineChannelHandler struct {
+type LinePostDiscordChannelHandler struct {
 	IndexService *service.IndexService
 }
 
-func NewLineChannelHandler(indexService *service.IndexService) *LineChannelHandler {
-	return &LineChannelHandler{
+func NewLinePostDiscordChannelHandler(indexService *service.IndexService) *LinePostDiscordChannelHandler {
+	return &LinePostDiscordChannelHandler{
 		IndexService: indexService,
 	}
 }
 
-func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -32,7 +32,7 @@ func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Method Not Allowed")
 		return
 	}
-	var lineChannelJson internal.LineChannelJson
+	var lineChannelJson internal.LinePostDiscordChannelJson
 	if err := json.NewDecoder(r.Body).Decode(&lineChannelJson); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Json読み取りに失敗しました。 "+err.Error())
@@ -105,12 +105,12 @@ func (h *LineChannelHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("OK")
 }
 
-func lineChannelJsonRead(lineChannelJson internal.LineChannelJson) (channels []internal.LineChannel, ngTypes []internal.LineNgType, ngIDs []internal.LineNgID) {
-	var lineChannels []internal.LineChannel
-	var lineNgTypes []internal.LineNgType
+func lineChannelJsonRead(lineChannelJson internal.LinePostDiscordChannelJson) (channels []internal.LinePostDiscordChannel, ngTypes []internal.LineNgDiscordMessageType, ngIDs []internal.LineNgID) {
+	var lineChannels []internal.LinePostDiscordChannel
+	var lineNgTypes []internal.LineNgDiscordMessageType
 	var lineNgIDs []internal.LineNgID
 	for _, lineChannel := range lineChannelJson.Channels {
-		lineChannels = append(lineChannels, internal.LineChannel{
+		lineChannels = append(lineChannels, internal.LinePostDiscordChannel{
 			ChannelID:  lineChannel.ChannelID,
 			GuildID:    lineChannelJson.GuildID,
 			Ng:         lineChannel.Ng,
@@ -118,7 +118,7 @@ func lineChannelJsonRead(lineChannelJson internal.LineChannelJson) (channels []i
 		})
 		if len(lineChannel.NgTypes) > 0 {
 			for _, ngType := range lineChannel.NgTypes {
-				lineNgTypes = append(lineNgTypes, internal.LineNgType{
+				lineNgTypes = append(lineNgTypes, internal.LineNgDiscordMessageType{
 					ChannelID: lineChannel.ChannelID,
 					GuildID:   lineChannelJson.GuildID,
 					Type:      ngType,

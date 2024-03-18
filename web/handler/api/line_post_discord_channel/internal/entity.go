@@ -5,7 +5,7 @@ import (
 	//"github.com/go-ozzo/ozzo-validation/is"
 )
 
-type LineChannelJson struct {
+type LinePostDiscordChannelJson struct {
 	GuildID  string `json:"guild_id"`
 	Channels []struct {
 		ChannelID  string   `json:"channel_id"`
@@ -17,21 +17,21 @@ type LineChannelJson struct {
 	} `json:"channels"`
 }
 
-func (g LineChannelJson) Validate() error {
+func (g LinePostDiscordChannelJson) Validate() error {
 	return validation.ValidateStruct(&g,
 		//validation.Field(&g.GuildID, validation.Required),
 		validation.Field(&g.Channels, validation.Required),
 	)
 }
 
-type LineChannel struct {
+type LinePostDiscordChannel struct {
 	ChannelID  string `db:"channel_id"`
 	GuildID    string `db:"guild_id"`
 	Ng         bool   `db:"ng"`
 	BotMessage bool   `db:"bot_message"`
 }
 
-type LineNgType struct {
+type LineNgDiscordMessageType struct {
 	ChannelID string `db:"channel_id"`
 	GuildID   string `db:"guild_id"`
 	Type      int    `db:"type"`

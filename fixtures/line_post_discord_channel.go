@@ -5,15 +5,15 @@ import (
 	"testing"
 )
 
-type LineChannel struct {
+type LinePostDiscordChannel struct {
 	ChannelID  string `db:"channel_id"`
 	GuildID    string `db:"guild_id"`
 	Ng         bool   `db:"ng"`
 	BotMessage bool   `db:"bot_message"`
 }
 
-func NewLineChannel(ctx context.Context, setter ...func(b *LineChannel)) *ModelConnector {
-	lineChannel := &LineChannel{
+func NewLinePostDiscordChannel(ctx context.Context, setter ...func(b *LinePostDiscordChannel)) *ModelConnector {
+	lineChannel := &LinePostDiscordChannel{
 		ChannelID:  "1111111111111",
 		GuildID:    "1111111111111",
 		Ng:         false,
@@ -28,7 +28,7 @@ func NewLineChannel(ctx context.Context, setter ...func(b *LineChannel)) *ModelC
 			}
 		},
 		addToFixture: func(t *testing.T, f *Fixture) {
-			f.LineChannels = append(f.LineChannels, lineChannel)
+			f.LinePostDiscordChannels = append(f.LinePostDiscordChannels, lineChannel)
 		},
 		connect: func(t *testing.T, f *Fixture, connectingModel interface{}) {
 			switch connectingModel.(type) {

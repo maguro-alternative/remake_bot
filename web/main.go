@@ -5,24 +5,24 @@ import (
 	"strings"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
-	"github.com/maguro-alternative/remake_bot/web/middleware"
 	"github.com/maguro-alternative/remake_bot/web/config"
+	"github.com/maguro-alternative/remake_bot/web/middleware"
 
 	linePostDiscordChannel "github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken"
-	discordLogin "github.com/maguro-alternative/remake_bot/web/handler/login/discord_login"
-	discordLogout "github.com/maguro-alternative/remake_bot/web/handler/logout/discord_logout"
 	discordCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback"
-	lineLogin "github.com/maguro-alternative/remake_bot/web/handler/login/line_login"
 	lineCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/line_callback"
+	discordLogin "github.com/maguro-alternative/remake_bot/web/handler/login/discord_login"
+	lineLogin "github.com/maguro-alternative/remake_bot/web/handler/login/line_login"
+	discordLogout "github.com/maguro-alternative/remake_bot/web/handler/logout/discord_logout"
 
 	indexView "github.com/maguro-alternative/remake_bot/web/handler/views"
+	groupView "github.com/maguro-alternative/remake_bot/web/handler/views/group"
+	guildIdView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid"
 	linePostDiscordChannelView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel"
 	linetokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken"
 	guildsView "github.com/maguro-alternative/remake_bot/web/handler/views/guilds"
-	guildIdView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid"
-	groupView "github.com/maguro-alternative/remake_bot/web/handler/views/group"
 	"github.com/maguro-alternative/remake_bot/web/service"
 
 	"golang.org/x/oauth2"
@@ -81,7 +81,7 @@ func NewWebRouter(
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
 	mux.Handle("/callback/line-callback/", middleChain.Then(lineCallback.NewLineCallbackHandler(indexService)))
 	mux.Handle("/api/{guildId}/linetoken", middleChain.Then(linetoken.NewLineTokenHandler(indexService)))
-	mux.Handle("/api/{guildId}/line-post-discord-channel", middleChain.Then(linePostDiscordChannel.NewLineChannelHandler(indexService)))
+	mux.Handle("/api/{guildId}/line-post-discord-channel", middleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(indexService)))
 
 	http.ListenAndServe(":"+config.Port(), mux)
 }

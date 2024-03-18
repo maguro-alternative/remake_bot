@@ -18,7 +18,7 @@ func NewRepository(db db.Driver) *Repository {
 	}
 }
 
-func (r *Repository) UpdateLinePostDiscordChannel(ctx context.Context, lineChannel LineChannel) error {
+func (r *Repository) UpdateLinePostDiscordChannel(ctx context.Context, lineChannel LinePostDiscordChannel) error {
 	query := `
 		UPDATE
 			line_post_discord_channel
@@ -32,7 +32,7 @@ func (r *Repository) UpdateLinePostDiscordChannel(ctx context.Context, lineChann
 	return err
 }
 
-func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgTypes []LineNgType) error {
+func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgTypes []LineNgDiscordMessageType) error {
 	query := `
 		INSERT INTO line_ng_discord_message_type (
 			channel_id,
@@ -53,7 +53,7 @@ func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNg
 	return nil
 }
 
-func (r *Repository) DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgTypes []LineNgType) error {
+func (r *Repository) DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgTypes []LineNgDiscordMessageType) error {
 	var values []string
 	for _, lineNgType := range lineNgTypes {
 		values = append(values, fmt.Sprintf("('%s', '%s', %d)", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.Type))

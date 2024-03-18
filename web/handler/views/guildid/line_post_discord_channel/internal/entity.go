@@ -1,20 +1,20 @@
 package internal
 
-type TestLineChannel struct {
+type TestLinePostDiscordChannel struct {
 	ChannelID  string `db:"channel_id"`
 	GuildID    string `db:"guild_id"`
 	Ng         bool   `db:"ng"`
 	BotMessage bool   `db:"bot_message"`
 }
 
-type LineChannel struct {
+type LinePostDiscordChannel struct {
 	ChannelID  string `db:"channel_id"`
 	GuildID    string `db:"guild_id"`
 	Ng         bool   `db:"ng"`
 	BotMessage bool   `db:"bot_message"`
 }
 
-type LineNgType struct {
+type LineNgDiscordMessageType struct {
 	ChannelID string `db:"channel_id"`
 	GuildID   string `db:"guild_id"`
 	Type      int    `db:"type"`

@@ -5,14 +5,14 @@ import (
 	"testing"
 )
 
-type LineNgType struct {
+type LineNgDiscordMessageType struct {
 	ChannelID string `db:"channel_id"`
 	GuildID   string `db:"guild_id"`
 	Type      int    `db:"type"`
 }
 
-func NewLineNgType(ctx context.Context, setter ...func(b *LineNgType)) *ModelConnector {
-	lineNgType := &LineNgType{
+func NewLineNgDiscordMessageType(ctx context.Context, setter ...func(b *LineNgDiscordMessageType)) *ModelConnector {
+	lineNgType := &LineNgDiscordMessageType{
 		ChannelID: "1111111111111",
 		GuildID:   "2222222222222",
 		Type:      6,
@@ -26,7 +26,7 @@ func NewLineNgType(ctx context.Context, setter ...func(b *LineNgType)) *ModelCon
 			}
 		},
 		addToFixture: func(t *testing.T, f *Fixture) {
-			f.LineNgTypes = append(f.LineNgTypes, lineNgType)
+			f.LineNgDiscordMessageTypes = append(f.LineNgDiscordMessageTypes, lineNgType)
 		},
 		connect: func(t *testing.T, f *Fixture, connectingModel interface{}) {
 			switch connectingModel.(type) {

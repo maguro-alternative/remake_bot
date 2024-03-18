@@ -7,19 +7,19 @@ import (
 )
 
 type Fixture struct {
-	PermissionsCodes   []*PermissionsCode
-	PermissionsIDs     []*PermissionsID
-	LineChannels       []*LineChannel
-	LineNgTypes        []*LineNgType
-	LineNgDiscordIDs   []*LineNgDiscordID
-	LineBots           []*LineBot
-	LineBotIvs         []*LineBotIv
-	VcSignalChannels   []*VcSignalChannel
-	VcSignalNgIDs      []*VcSignalNgID
-	VcSignalMentionIDs []*VcSignalMentionID
-	Webhooks           []*Webhook
-	WebhookMentions    []*WebhookMention
-	WebhookWords       []*WebhookWord
+	PermissionsCodes          []*PermissionsCode
+	PermissionsIDs            []*PermissionsID
+	LinePostDiscordChannels   []*LinePostDiscordChannel
+	LineNgDiscordMessageTypes []*LineNgDiscordMessageType
+	LineNgDiscordIDs          []*LineNgDiscordID
+	LineBots                  []*LineBot
+	LineBotIvs                []*LineBotIv
+	VcSignalChannels          []*VcSignalChannel
+	VcSignalNgIDs             []*VcSignalNgID
+	VcSignalMentionIDs        []*VcSignalMentionID
+	Webhooks                  []*Webhook
+	WebhookMentions           []*WebhookMention
+	WebhookWords              []*WebhookWord
 
 	DBv1 db.Driver
 }

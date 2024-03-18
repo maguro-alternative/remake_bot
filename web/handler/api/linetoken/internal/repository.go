@@ -22,22 +22,22 @@ func (r *Repository) UpdateLineBot(ctx context.Context, lineBot *LineBot) error 
 	var setNameQuery string
 	var setQueryArray []string
 
-	if len(lineBot.LineNotifyToken) > 0 {
+	if len(lineBot.LineNotifyToken) > 0 && len(lineBot.LineNotifyToken[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_notify_token = :line_notify_token")
 	}
-	if len(lineBot.LineBotToken) > 0 {
+	if len(lineBot.LineBotToken) > 0 && len(lineBot.LineBotToken[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_bot_token = :line_bot_token")
 	}
-	if len(lineBot.LineBotSecret) > 0 {
+	if len(lineBot.LineBotSecret) > 0 && len(lineBot.LineBotSecret[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_bot_secret = :line_bot_secret")
 	}
-	if len(lineBot.LineGroupID) > 0 {
+	if len(lineBot.LineGroupID) > 0 && len(lineBot.LineGroupID[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_group_id = :line_group_id")
 	}
-	if len(lineBot.LineClientID) > 0 {
+	if len(lineBot.LineClientID) > 0 && len(lineBot.LineClientID[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_client_id = :line_client_id")
 	}
-	if len(lineBot.LineClientSecret) > 0 {
+	if len(lineBot.LineClientSecret) > 0 && len(lineBot.LineClientSecret[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_client_secret = :line_client_secret")
 	}
 	if lineBot.DefaultChannelID != "" {
@@ -67,22 +67,22 @@ func (r *Repository) UpdateLineBotIv(ctx context.Context, lineBotIv *LineBotIv) 
 	var setNameQuery string
 	var setQueryArray []string
 
-	if len(lineBotIv.LineNotifyTokenIv) > 0 {
+	if len(lineBotIv.LineNotifyTokenIv) > 0 && len(lineBotIv.LineNotifyTokenIv[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_notify_token_iv = :line_notify_token_iv")
 	}
-	if len(lineBotIv.LineBotTokenIv) > 0 {
+	if len(lineBotIv.LineBotTokenIv) > 0 && len(lineBotIv.LineBotTokenIv[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_bot_token_iv = :line_bot_token_iv")
 	}
-	if len(lineBotIv.LineBotSecretIv) > 0 {
+	if len(lineBotIv.LineBotSecretIv) > 0 && len(lineBotIv.LineBotSecretIv[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_bot_secret_iv = :line_bot_secret_iv")
 	}
-	if len(lineBotIv.LineGroupIDIv) > 0 {
+	if len(lineBotIv.LineGroupIDIv) > 0 && len(lineBotIv.LineGroupIDIv[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_group_id_iv = :line_group_id_iv")
 	}
-	if len(lineBotIv.LineClientIDIv) > 0 {
+	if len(lineBotIv.LineClientIDIv) > 0 && len(lineBotIv.LineClientIDIv[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_client_id_iv = :line_client_id_iv")
 	}
-	if len(lineBotIv.LineClientSecretIv) > 0 {
+	if len(lineBotIv.LineClientSecretIv) > 0 && len(lineBotIv.LineClientSecretIv[0]) > 0 {
 		setQueryArray = append(setQueryArray, "line_client_secret_iv = :line_client_secret_iv")
 	}
 	setNameQuery = strings.Join(setQueryArray, ",")

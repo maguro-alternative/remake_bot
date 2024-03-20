@@ -51,31 +51,31 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	repo := internal.NewRepository(h.IndexService.DB)
 	lineBots, err := repo.GetLineBots(ctx)
 	if err != nil {
-		slog.InfoContext(ctx, "line_botの取得に失敗しました。")
-		http.Error(w, "line_botの取得に失敗しました。", http.StatusBadRequest)
+		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
 	// リクエストボディの読み込み
 	requestBodyByte, err := io.ReadAll(r.Body)
 	if err != nil {
-		slog.InfoContext(ctx, "リクエストの読み込みに失敗しました。")
-		http.Error(w, "リクエストの読み込みに失敗しました。", http.StatusBadRequest)
+		slog.ErrorContext(ctx, "リクエストの読み込みに失敗しました。", "エラー:", err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
 	for _, lineBot := range lineBots {
 		lineBotIv, err = repo.GetLineBotIv(ctx, lineBot.GuildID)
 		if err != nil {
-			slog.InfoContext(ctx, "line_bot_ivの取得に失敗しました。")
-			http.Error(w, "line_bot_ivの取得に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		// リクエストボディの検証
 		lineBotDecrypt, err = internal.LineHmac(privateKey, requestBodyByte, *lineBot, lineBotIv, r.Header.Get("X-Line-Signature"))
 		if err != nil {
-			slog.InfoContext(ctx, "署名の検証に失敗しました。")
-			http.Error(w, "署名の検証に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "署名の検証に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 		// 署名が一致した場合はループを抜ける
@@ -87,14 +87,15 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// リクエストボディのバイトから構造体への変換
 	err = json.Unmarshal(requestBodyByte, &lineResponses)
 	if err != nil {
-		slog.InfoContext(ctx, "jsonの読み込みに失敗しました。")
-		http.Error(w, "jsonの読み込みに失敗しました。", http.StatusBadRequest)
+		slog.ErrorContext(ctx, "jsonの読み込みに失敗しました。", "エラー:", err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	// バリデーションチェック
-	if err := lineResponses.Validate(); err != nil {
-		slog.InfoContext(ctx, "バリデーションチェックに失敗しました。")
-		http.Error(w, "バリデーションチェックに失敗しました。", http.StatusBadRequest)
+	err = lineResponses.Validate();
+	if err != nil {
+		slog.ErrorContext(ctx, "バリデーションチェックに失敗しました。", "エラー:", err.Error())
+		http.Error(w, "Unprocessable Entity", http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -110,8 +111,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// ユーザー情報の取得
 	lineProfile, err := lineRequ.GetProfile(ctx, lineEvent.Source.UserID)
 	if err != nil {
-		slog.InfoContext(ctx, "LINEユーザー情報の取得に失敗しました。")
-		http.Error(w, "LINEユーザー情報の取得に失敗しました。", http.StatusBadRequest)
+		slog.ErrorContext(ctx, "LINEユーザー情報の取得に失敗しました。", "エラー:", err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -125,8 +126,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			lineProfile.DisplayName+"\n「 "+lineResponses.Events[0].Message.Text+" 」",
 		)
 		if err != nil {
-			slog.InfoContext(ctx, "discordへのメッセージ送信に失敗しました。")
-			http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "discordへのメッセージ送信に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 	case "sticker":
@@ -135,15 +136,15 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			lineProfile.DisplayName+"\nスタンプを送信しました\nhttps://stickershop.line-scdn.net/stickershop/v1/sticker/"+lineResponses.Events[0].Message.StickerID+"/iPhone/sticker.png",
 		)
 		if err != nil {
-			slog.InfoContext(ctx, "discordへのメッセージ送信に失敗しました。")
-			http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "discordへのメッセージ送信に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 	case "image":
 		imageContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
-			slog.InfoContext(ctx, "LINE画像の取得に失敗しました。")
-			http.Error(w, "LINE画像の取得に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "LINE画像の取得に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		defer imageContent.Content.Close()
@@ -151,16 +152,16 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// close()後にバイトデータを使用するため、コピーしておく
 		imageBytes, err := io.ReadAll(imageContent.Content)
 		if err != nil {
-			slog.InfoContext(ctx, "画像の読み込みに失敗しました。")
-			http.Error(w, "画像の読み込みに失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "画像の読み込みに失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		imageData := bytes.NewReader(imageBytes)
 		// 画像の種類の取得
 		imageType, err := magicNumberRead(imageData)
 		if err != nil {
-			slog.InfoContext(ctx, "マジックナンバーの取得に失敗しました。")
-			http.Error(w, "マジックナンバーの取得に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "マジックナンバーの取得に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
@@ -170,22 +171,22 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			imageData,
 		)
 		if err != nil {
-			slog.InfoContext(ctx, "discordへのメッセージ送信に失敗しました。")
-			http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "discordへのメッセージ送信に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 	case "video":
 		videoContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
-			slog.InfoContext(ctx, "LINE動画の取得に失敗しました。")
-			http.Error(w, "LINE動画の取得に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "LINE動画の取得に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		defer videoContent.Content.Close()
 		videoBytes, err := io.ReadAll(videoContent.Content)
 		if err != nil {
-			slog.InfoContext(ctx, "動画の読み込みに失敗しました。")
-			http.Error(w, "動画の読み込みに失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "動画の読み込みに失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		videoData := bytes.NewReader(videoBytes)
@@ -194,8 +195,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			// 動画の種類の取得
 			videoType, err := magicNumberRead(videoData)
 			if err != nil {
-				slog.InfoContext(ctx, "マジックナンバーの取得に失敗しました。")
-				http.Error(w, "マジックナンバーの取得に失敗しました。", http.StatusBadRequest)
+				slog.ErrorContext(ctx, "マジックナンバーの取得に失敗しました。", "エラー:", err.Error())
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 			_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
@@ -205,8 +206,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				videoContent.Content,
 			)
 			if err != nil {
-				slog.InfoContext(ctx, "discordへのメッセージ送信に失敗しました。")
-				http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
+				slog.ErrorContext(ctx, "discordへのメッセージ送信に失敗しました。", "エラー:", err.Error())
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 		} else {
@@ -229,8 +230,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				[]string{"LINE", "動画"},
 			)
 			if err != nil {
-				slog.InfoContext(ctx, "Youtubeへの動画アップロードに失敗しました。")
-				http.Error(w, "Youtubeへの動画アップロードに失敗しました。", http.StatusBadRequest)
+				slog.ErrorContext(ctx, "Youtubeへの動画アップロードに失敗しました。", "エラー:", err.Error())
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 			_, err = h.IndexService.DiscordSession.ChannelMessageSend(
@@ -238,31 +239,31 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				lineProfile.DisplayName+"\nhttps://www.youtube.com/watch?v="+videoID,
 			)
 			if err != nil {
-				slog.InfoContext(ctx, "discordへのメッセージ送信に失敗しました。")
-				http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
+				slog.ErrorContext(ctx, "discordへのメッセージ送信に失敗しました。", "エラー:", err.Error())
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 		}
 	case "audio":
 		audioContent, err := lineRequ.GetContent(ctx, lineResponses.Events[0].Message.ID)
 		if err != nil {
-			slog.InfoContext(ctx, "LINE音声の取得に失敗しました。")
-			http.Error(w, "LINE音声の取得に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "LINE音声の取得に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		defer audioContent.Content.Close()
 		audioBytes, err := io.ReadAll(audioContent.Content)
 		if err != nil {
-			slog.InfoContext(ctx, "動画の読み込みに失敗しました。")
-			http.Error(w, "動画の読み込みに失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "音声の読み込みに失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		audioData := bytes.NewReader(audioBytes)
 		// 音声の種類の取得
 		audioType, err := magicNumberRead(audioData)
 		if err != nil {
-			slog.InfoContext(ctx, "マジックナンバーの取得に失敗しました。")
-			http.Error(w, "マジックナンバーの取得に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "マジックナンバーの取得に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
@@ -272,8 +273,8 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			audioData,
 		)
 		if err != nil {
-			slog.InfoContext(ctx, "discordへのメッセージ送信に失敗しました。")
-			http.Error(w, "discordへのメッセージ送信に失敗しました。", http.StatusBadRequest)
+			slog.ErrorContext(ctx, "discordへのメッセージ送信に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 	}

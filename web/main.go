@@ -8,6 +8,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/middleware"
 
+	"github.com/maguro-alternative/remake_bot/web/handler/api/group"
 	linePostDiscordChannel "github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken"
@@ -80,6 +81,7 @@ func NewWebRouter(
 	mux.Handle("/logout/discord", middleChain.Then(discordLogout.NewDiscordOAuth2Handler(discordOAuth2Service)))
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
 	mux.Handle("/callback/line-callback/", middleChain.Then(lineCallback.NewLineCallbackHandler(indexService)))
+	mux.Handle("/api/{guildId}/group", middleChain.Then(group.NewLineGroupHandler(indexService)))
 	mux.Handle("/api/{guildId}/linetoken", middleChain.Then(linetoken.NewLineTokenHandler(indexService)))
 	mux.Handle("/api/{guildId}/line-post-discord-channel", middleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(indexService)))
 

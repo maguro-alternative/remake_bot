@@ -297,28 +297,29 @@ go run core/main.go
 │   │       │   └── get_line_oauth.go
 │   │       └── model
 │   │           └── entity.go
-│   └── templates
-│       ├── static
-│       │   ├── img
-│       │   │   └── logo.png
-│       │   └── js
-│       │       ├── group.js
-│       │       ├── line_post_discord_chennel.js
-│       │       ├── linetoken.js
-│       │       └── popover.js
-│       ├── views
-│       │   ├── group
-│       │   │   └── group.html
-│       │   ├── guildid
-│       │   │   ├── line_post_discord_chennel.html
-│       │   │   └── linetoken.html
-│       │   ├── guilds
-│       │   │   └── guilds.html
-|       │   ├── login
-│       │   │   └── line_login.html
-│       │   └── guildid.html
-│       ├── index.html
-│       └── layout.html
+│   ├── templates
+│   │   ├── static
+│   │   │   ├── img
+│   │   │   │   └── logo.png
+│   │   │   └── js
+│   │   │       ├── group.js
+│   │   │       ├── line_post_discord_chennel.js
+│   │   │       ├── linetoken.js
+│   │   │       └── popover.js
+│   │   ├── views
+│   │   │   ├── group
+│   │   │   │   └── group.html
+│   │   │   ├── guildid
+│   │   │   │   ├── line_post_discord_chennel.html
+│   │   │   │   └── linetoken.html
+│   │   │   ├── guilds
+│   │   │   │   └── guilds.html
+|   │   │   ├── login
+│   │   │   │   └── line_login.html
+│   │   │   └── guildid.html
+│   │   ├── index.html
+│   │   └── layout.html
+│   └── main.go
 ├── .gitignore
 ├── go.mod
 ├── go.sum

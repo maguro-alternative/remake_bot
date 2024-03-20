@@ -31,7 +31,7 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	uuid := uuid.New().String()
 	session, err := h.DiscordOAuth2Service.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
-		slog.InfoContext(r.Context(), "sessionの取得に失敗しました。"+err.Error())
+		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

@@ -32,7 +32,7 @@ func (h *LineLogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	gob.Register(&model.LineOAuthSession{})
 	session, err := h.LineLogoutService.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
-		slog.InfoContext(ctx, "sessionの取得に失敗しました。"+err.Error())
+		slog.ErrorContext(ctx, "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -41,13 +41,13 @@ func (h *LineLogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session.Values["line_user"] = model.LineOAuthSession{}
 	err = session.Save(r, w)
 	if err != nil {
-		slog.InfoContext(ctx, "セッションの初期化に失敗しました。"+err.Error())
+		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	err = h.LineLogoutService.CookieStore.Save(r, w, session)
 	if err != nil {
-		slog.InfoContext(ctx, "セッションの初期化に失敗しました。"+err.Error())
+		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

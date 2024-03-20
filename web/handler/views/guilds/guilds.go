@@ -60,13 +60,13 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	var matchGuilds []discordgo.UserGuild
 	botGuilds, err := g.IndexService.DiscordSession.UserGuilds(100, "", "")
 	if err != nil {
+		slog.ErrorContext(ctx, "Botサーバー取得に失敗しました。", "エラー: ", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "user guilds error: "+err.Error())
 		return
 	}
 	userGuilds, err := getUserGuilds(discordLoginUser.Token)
 	if err != nil {
-		slog.InfoContext(ctx, "user guilds error: "+err.Error())
+		slog.ErrorContext(ctx, "ユーザーサーバー取得に失敗しました。", "エラー: ", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

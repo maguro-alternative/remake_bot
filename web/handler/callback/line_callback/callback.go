@@ -38,7 +38,7 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	privateKey := config.PrivateKey()
 	keyBytes, err := hex.DecodeString(privateKey)
 	if err != nil {
-		slog.ErrorContext(ctx, "暗号化キーのバイトへの変換に失敗しました。")
+		slog.ErrorContext(ctx, "暗号化キーのバイトへの変換に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -48,32 +48,32 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	gob.Register(&model.LineIdTokenUser{})
 	session, err := h.svc.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
-		slog.InfoContext(ctx, "sessionの取得に失敗しました。")
+		slog.ErrorContext(ctx, "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	state, ok := session.Values["line_state"].(string)
 	if !ok {
 		stateType := reflect.TypeOf(session.Values["line_state"]).String()
-		slog.InfoContext(ctx, stateType)
+		slog.ErrorContext(ctx, stateType+"型のstateが取得できませんでした。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	nonce, ok := session.Values["line_nonce"].(string)
 	if !ok {
-		slog.InfoContext(ctx, "nonceが取得できませんでした。")
+		slog.ErrorContext(ctx, "nonceが取得できませんでした。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	guildId, ok := session.Values["guild_id"].(string)
 	if !ok {
-		slog.InfoContext(ctx, "guild_idが取得できませんでした。")
+		slog.ErrorContext(ctx, "guild_idが取得できませんでした。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	// 2. 認可ページからリダイレクトされてきたときに送られてくるstateパラメータ
 	if r.URL.Query().Get("state") != state {
-		slog.InfoContext(ctx, "stateが一致しません。")
+		slog.ErrorContext(ctx, "stateが一致しません。")
 		session.Values["line_state"] = ""
 		h.svc.CookieStore.Save(r, w, session)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -85,25 +85,25 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	code := r.URL.Query().Get("code")
 	lineBot, err := repo.GetLineBot(ctx, guildId)
 	if err != nil {
-		slog.InfoContext(ctx, "line_botの取得に失敗しました。")
+		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	lineBotIv, err := repo.GetLineBotIv(ctx, lineBot.GuildID)
 	if err != nil {
-		slog.InfoContext(ctx, "line_bot_ivの取得に失敗しました。")
+		slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	lineClientIDByte, err := crypto.Decrypt(lineBot.LineClientID[0], keyBytes, lineBotIv.LineClientIDIv[0])
 	if err != nil {
-		slog.InfoContext(ctx, "line_client_idの復号に失敗しました。")
+		slog.ErrorContext(ctx, "line_client_idの復号に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	lineClientSecretByte, err := crypto.Decrypt(lineBot.LineClientSecret[0], keyBytes, lineBotIv.LineClientSecretIv[0])
 	if err != nil {
-		slog.InfoContext(ctx, "line_client_secretの復号に失敗しました。")
+		slog.ErrorContext(ctx, "line_client_secretの復号に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -112,14 +112,14 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	// 3. アクセストークンを取得するためのリクエスト
 	token, cleanupTokenBody, err := getIdToken(ctx, code, lineClientID, lineClientSecret)
 	if err != nil {
-		slog.InfoContext(ctx, "ユーザー情報の取得に失敗しました。")
+		slog.ErrorContext(ctx, "ユーザー情報の取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	defer cleanupTokenBody()
 	user, cleanupIdtokenBody, err := verifyIdToken(ctx, token.IDToken, lineClientID, nonce)
 	if err != nil {
-		slog.InfoContext(ctx, "id_tokenの検証に失敗しました。"+err.Error())
+		slog.ErrorContext(ctx, "id_tokenの検証に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -128,13 +128,13 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	session.Values["line_oauth_token"] = token.AccessToken
 	err = session.Save(r, w)
 	if err != nil {
-		slog.InfoContext(ctx, "sessionの保存に失敗しました。")
+		slog.ErrorContext(ctx, "sessionの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	err = h.svc.CookieStore.Save(r, w, session)
 	if err != nil {
-		slog.InfoContext(ctx, "sessionの保存に失敗しました。")
+		slog.ErrorContext(ctx, "sessionの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

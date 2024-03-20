@@ -168,32 +168,32 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 	// 暗号化キーのバイトへの変換
 	keyBytes, err := hex.DecodeString(privateKey)
 	if err != nil {
-		slog.InfoContext(ctx, "暗号化キーのバイトへの変換に失敗しました。")
+		slog.ErrorContext(ctx, "暗号化キーのバイトへの変換に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	repo := internal.NewRepository(h.IndexService.DB)
 	lineBot, err := repo.GetLineBot(ctx, guildID)
 	if err != nil {
-		slog.InfoContext(ctx, "line_botの取得に失敗しました。")
+		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	lineBotIv, err = repo.GetLineBotIv(ctx, lineBot.GuildID)
 	if err != nil {
-		slog.InfoContext(ctx, "line_bot_ivの取得に失敗しました。")
+		slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	lineClientIDByte, err := crypto.Decrypt(lineBot.LineClientID[0], keyBytes, lineBotIv.LineClientIDIv[0])
 	if err != nil {
-		slog.InfoContext(ctx, "line_client_idの復号に失敗しました。")
+		slog.ErrorContext(ctx, "line_client_idの復号に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	session, err := h.IndexService.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
-		slog.InfoContext(ctx, "sessionの取得に失敗しました。"+err.Error())
+		slog.ErrorContext(ctx, "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -202,13 +202,13 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 	session.Values["guild_id"] = guildID
 	err = session.Save(r, w)
 	if err != nil {
-		slog.InfoContext(ctx, "セッションの初期化に失敗しました。"+err.Error())
+		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	err = h.IndexService.CookieStore.Save(r, w, session)
 	if err != nil {
-		slog.InfoContext(ctx, "セッションの保存に失敗しました。"+err.Error())
+		slog.ErrorContext(ctx, "セッションの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

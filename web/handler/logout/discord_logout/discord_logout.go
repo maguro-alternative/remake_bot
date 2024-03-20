@@ -32,7 +32,7 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	gob.Register(&model.DiscordUser{})
 	session, err := h.DiscordOAuth2Service.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
-		slog.InfoContext(ctx, "sessionの取得に失敗しました。"+err.Error())
+		slog.ErrorContext(ctx, "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -40,13 +40,13 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	session.Values["discord_user"] = model.DiscordUser{}
 	err = session.Save(r, w)
 	if err != nil {
-		slog.InfoContext(ctx, "セッションの初期化に失敗しました。"+err.Error())
+		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	err = h.DiscordOAuth2Service.CookieStore.Save(r, w, session)
 	if err != nil {
-		slog.InfoContext(ctx, "セッションの初期化に失敗しました。"+err.Error())
+		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

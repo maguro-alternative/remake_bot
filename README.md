@@ -254,30 +254,30 @@ go run core/main.go
 │   │   │   │   └── discord_logout.go
 │   │   │   └── line_logout
 │   │   │       └── line_logout.go
-│   │   ├── views
-│   │   │   ├── group
-│   │   │   │   ├── internal
-│   │   │   │   │   ├── entity.go
-│   │   │   │   │   ├── repository_test.go
-│   │   │   │   │   └── repository.go
-│   │   │   │   └── group.go
-│   │   │   ├── guildid
-│   │   │   │   ├── line_post_discord_chennel
-│   │   │   │   │   ├── internal
-│   │   │   │   │   │   ├── entity.go
-│   │   │   │   │   │   ├── repository_test.go
-│   │   │   │   │   │   └── repository.go
-│   │   │   │   │   └── line_post_discord_chennel.go
-│   │   │   │   ├── line_token
-│   │   │   │   │   ├── internal
-│   │   │   │   │   │   ├── entity.go
-│   │   │   │   │   │   ├── repository_test.go
-│   │   │   │   │   │   └── repository.go
-│   │   │   │   │   └── linetoken.go
-│   │   │   │   └── guildid.go
-│   │   │   ├── guilds
-│   │   │   │   └── guilds.go
-│   │   │   └── index.go
+│   │   └── views
+│   │       ├── group
+│   │       │   ├── internal
+│   │       │   │   ├── entity.go
+│   │       │   │   ├── repository_test.go
+│   │       │   │   └── repository.go
+│   │       │   └── group.go
+│   │       ├── guildid
+│   │       │   ├── line_post_discord_chennel
+│   │       │   │   ├── internal
+│   │       │   │   │   ├── entity.go
+│   │       │   │   │   ├── repository_test.go
+│   │       │   │   │   └── repository.go
+│   │       │   │   └── line_post_discord_chennel.go
+│   │       │   ├── line_token
+│   │       │   │   ├── internal
+│   │       │   │   │   ├── entity.go
+│   │       │   │   │   ├── repository_test.go
+│   │       │   │   │   └── repository.go
+│   │       │   │   └── linetoken.go
+│   │       │   └── guildid.go
+│   │       ├── guilds
+│   │       │   └── guilds.go
+│   │       └── index.go
 │   ├── middleware
 │   │   └── middleware.go
 │   ├── service

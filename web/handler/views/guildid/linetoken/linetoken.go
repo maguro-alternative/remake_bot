@@ -132,6 +132,11 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	lineEntered := components.EnteredLineBotForm(lineBotByte)
 
+	guildIconUrl := "https://cdn.discordapp.com/icons/" + guild.ID + "/" + guild.Icon + ".png"
+	if guild.Icon == "" {
+		guildIconUrl = "/static/img/discord-icon.jpg"
+	}
+
 	submitTag := components.CreateSubmitTag(discordPermissionData.Permission)
 	accountVer := strings.Builder{}
 	accountVer.WriteString(components.CreateDiscordAccountVer(discordPermissionData.User))
@@ -143,19 +148,25 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		categoryPositions,
 	)
 	data := struct {
-		Title       string
-		AccountVer  template.HTML
-		JsScriptTag template.HTML
-		SubmitTag   template.HTML
-		LineEntered components.LineEntered
-		Channels    template.HTML
+		Title        string
+		AccountVer   template.HTML
+		JsScriptTag  template.HTML
+		SubmitTag    template.HTML
+		GuildName    string
+		GuildIconUrl string
+		GuildID      string
+		LineEntered  components.LineEntered
+		Channels     template.HTML
 	}{
-		Title:       "LineBotの設定",
-		JsScriptTag: template.HTML(`<script src="/static/js/linetoken.js"></script>`),
-		AccountVer:  template.HTML(accountVer.String()),
-		SubmitTag:   template.HTML(submitTag),
-		LineEntered: lineEntered,
-		Channels:    template.HTML(htmlSelectChannelBuilders),
+		Title:        "LineBotの設定",
+		JsScriptTag:  template.HTML(`<script src="/static/js/linetoken.js"></script>`),
+		AccountVer:   template.HTML(accountVer.String()),
+		SubmitTag:    template.HTML(submitTag),
+		GuildIconUrl: guildIconUrl,
+		GuildName:    guild.Name,
+		GuildID:      guild.ID,
+		LineEntered:  lineEntered,
+		Channels:     template.HTML(htmlSelectChannelBuilders),
 	}
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/linetoken.html"))
 	if err := tmpl.Execute(w, data); err != nil {

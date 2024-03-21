@@ -1,5 +1,18 @@
 {{ define "content" }}
     <main>
+        <ul>
+            <li>
+                <a href="/guild/{{ .GuildID }}">
+                    <img src="{{ .GuildIconUrl }}" alt="{{ .GuildName }}">
+                </a>
+            </li>
+            <li>
+                <a href="/guild/{{ .GuildID }}">
+                    {{ .GuildName }}
+                </a>
+            </li>
+        </ul>
+        <h1>LINEからDiscordへの送信設定</h1>
         <!-- 入力フォーム -->
         <form action="#" id="form">
             <label for="lineNotifyToken">LINE Notifyのトークン</label>

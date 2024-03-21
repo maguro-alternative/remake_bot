@@ -1,5 +1,17 @@
 {{ define "content" }}
         <main>
+            <ul>
+                <li>
+                    <a href="/guild/{{ .GuildID }}">
+                        <img src="{{ .GuildIconUrl }}" alt="{{ .GuildName }}">
+                    </a>
+                </li>
+                <li>
+                    <a href="/guild/{{ .GuildID }}">
+                        {{ .GuildName }}
+                    </a>
+                </li>
+            </ul>
             <h1>LINEへの送信設定</h1>
             <h4>チェックマークがついている条件を満たしている場合、そのメッセージは送信されません。</h4>
             <!-- 入力フォーム -->

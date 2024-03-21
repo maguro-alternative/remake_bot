@@ -127,28 +127,43 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		}
 	}
 
+	guildIconUrl := "https://cdn.discordapp.com/icons/" + guild.ID + "/" + guild.Icon + ".png"
+	if guild.Icon == "" {
+		guildIconUrl = "/static/img/discord-icon.jpg"
+	}
+
 	submitTag := components.CreateSubmitTag(discordPermissionData.Permission)
 	accountVer := strings.Builder{}
 	accountVer.WriteString(components.CreateDiscordAccountVer(discordPermissionData.User))
 	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 
-	htmlFormBuilder := components.CreateLinePostDiscordChannelForm(categoryIDTmps, channelsInCategory, categoryPositions, guild, messageTypes)
+	htmlFormBuilder := components.CreateLinePostDiscordChannelForm(
+		categoryIDTmps,
+		channelsInCategory,
+		categoryPositions,
+		guild,
+		messageTypes,
+	)
 
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/line_post_discord_channel.html"))
 	if err := tmpl.Execute(w, struct {
-		Title       string
-		AccountVer  template.HTML
-		JsScriptTag template.HTML
-		SubmitTag   template.HTML
-		GuildName   string
-		HTMLForm    template.HTML
+		Title        string
+		AccountVer   template.HTML
+		JsScriptTag  template.HTML
+		SubmitTag    template.HTML
+		GuildName    string
+		GuildIconUrl string
+		GuildID      string
+		HTMLForm     template.HTML
 	}{
-		Title:       "DiscordからLINEへの送信設定",
-		AccountVer:  template.HTML(accountVer.String()),
-		JsScriptTag: template.HTML(`<script src="/static/js/line_post_discord_channel.js"></script>`),
-		SubmitTag:   template.HTML(submitTag),
-		GuildName:   guild.Name,
-		HTMLForm:    template.HTML(htmlFormBuilder),
+		Title:        "DiscordからLINEへの送信設定",
+		AccountVer:   template.HTML(accountVer.String()),
+		JsScriptTag:  template.HTML(`<script src="/static/js/line_post_discord_channel.js"></script>`),
+		SubmitTag:    template.HTML(submitTag),
+		GuildName:    guild.Name,
+		GuildIconUrl: guildIconUrl,
+		GuildID:      guild.ID,
+		HTMLForm:     template.HTML(htmlFormBuilder),
 	}); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "テンプレートの実行に失敗しました:"+err.Error())

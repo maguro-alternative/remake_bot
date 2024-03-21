@@ -51,27 +51,29 @@ func CreateLinePostDiscordChannelForm(
 			categoryComponentBuilders[categoryIndex].WriteString(`
 			<details style="margin: 0 0 0 1em;">
                 <summary>` + channel.Name + `</summary>
-				<label for="ng_` + channel.ID + `">LINEへ送信しない</label>
-				<input type="checkbox" id="ng_` + channel.ID + `" name="ng_` + channel.ID + `" ` + messageNgFlag + ` />
-				<br/>
-				<label for="bot_message_` + channel.ID + `">Botのメッセージを送信しない</label>
-				<input type="checkbox" id="bot_message_` + channel.ID + `" name="bot_message_` + channel.ID + `"` + botNgFlag + ` />
-				<br/>
-				<label for="ng_types_` + channel.ID + `[]">NGタイプ</label>
-				<select id="ng_types_` + channel.ID + `[]" name="ng_types_` + channel.ID + `[]" multiple>
-					` + selectMessageTypeForm + `
-				</select>
-				<br/>
-				<label for="ng_users_` + channel.ID + `[]">NGユーザー</label>
-				<select id="ng_users_` + channel.ID + `[]" name="ng_users_` + channel.ID + `[]" multiple>
-					` + selectMemberForm + `
-				</select>
-				<br/>
-				<label for="ng_roles_` + channel.ID + `[]">NGロール</label>
-				<select id="ng_roles_` + channel.ID + `[]" name="ng_roles_` + channel.ID + `[]" multiple>
-					` + selectRoleForm + `
-				</select>
-				<br/>
+				<div style="margin: 0 0 0 1em;">
+					<label for="ng_` + channel.ID + `">LINEへ送信しない</label>
+					<input type="checkbox" id="ng_` + channel.ID + `" name="ng_` + channel.ID + `" ` + messageNgFlag + ` />
+					<br/>
+					<label for="bot_message_` + channel.ID + `">Botのメッセージを送信しない</label>
+					<input type="checkbox" id="bot_message_` + channel.ID + `" name="bot_message_` + channel.ID + `"` + botNgFlag + ` />
+					<br/>
+					<label for="ng_types_` + channel.ID + `[]">NGタイプ</label><br/>
+					<select id="ng_types_` + channel.ID + `[]" name="ng_types_` + channel.ID + `[]" multiple>
+						` + selectMessageTypeForm + `
+					</select>
+					<br/>
+					<label for="ng_users_` + channel.ID + `[]">NGユーザー</label><br/>
+					<select id="ng_users_` + channel.ID + `[]" name="ng_users_` + channel.ID + `[]" multiple>
+						` + selectMemberForm + `
+					</select>
+					<br/>
+					<label for="ng_roles_` + channel.ID + `[]">NGロール</label><br/>
+					<select id="ng_roles_` + channel.ID + `[]" name="ng_roles_` + channel.ID + `[]" multiple>
+						` + selectRoleForm + `
+					</select>
+					<br/>
+				</div>
 			</details>
 			`)
 		}

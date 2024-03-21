@@ -36,11 +36,12 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	var lineMessageTypes []*line.LineMessageType
 	var imageUrls []string
 	var videoCount, voiceCount int
+	var repo Repository
 
 	sendTextBuilder := strings.Builder{}
 
 	ctx := context.Background()
-	repo := onMessageCreate.NewRepository(h.DB)
+	repo = onMessageCreate.NewRepository(h.DB)
 	channel, err := repo.GetLinePostDiscordChannel(ctx, vs.ChannelID)
 	if err != nil && err.Error() != "sql: no rows in result set" {
 		slog.ErrorContext(ctx, "line_post_discord_channelの取得に失敗しました", "エラー:", err.Error())

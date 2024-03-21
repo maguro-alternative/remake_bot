@@ -49,7 +49,7 @@ func CreateLinePostDiscordChannelForm(
 				botNgFlag = "checked"
 			}
 			categoryComponentBuilders[categoryIndex].WriteString(`
-			<details>
+			<details style="margin: 0 0 0 1em;">
                 <summary>` + channel.Name + `</summary>
 				<label for="ng_` + channel.ID + `">LINEへ送信しない</label>
 				<input type="checkbox" id="ng_` + channel.ID + `" name="ng_` + channel.ID + `" ` + messageNgFlag + ` />

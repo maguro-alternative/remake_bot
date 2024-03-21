@@ -18,7 +18,7 @@ import (
 
 type Repository interface {
 	GetLineBots(ctx context.Context) ([]*internal.LineBot, error)
-	GetLineBotIv(ctx context.Context) (internal.LineBotIv, error)
+	GetLineBotIv(ctx context.Context, guildID string) (internal.LineBotIv, error)
 }
 
 // A LineBotHandler handles requests for the line bot.
@@ -39,16 +39,17 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	var lineResponses LineResponses
+	var lineResponses internal.LineResponses
 	var lineBotDecrypt *internal.LineBotDecrypt
 	var lineBotIv internal.LineBotIv
+	var repo Repository
 	// 暗号化キーの取得
 	privateKey := config.PrivateKey()
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	repo := internal.NewRepository(h.IndexService.DB)
+	repo = internal.NewRepository(h.IndexService.DB)
 	lineBots, err := repo.GetLineBots(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())

@@ -19,6 +19,12 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
+type Repository interface {
+	GetLineBot(ctx context.Context, guildID string) (internal.LineBot, error)
+	InsertLineBot(ctx context.Context, lineBot *internal.LineBot) error
+	InsertLineBotIv(ctx context.Context, lineBotIv *internal.LineBotIv) error
+}
+
 type LineTokenViewHandler struct {
 	IndexService *service.IndexService
 }
@@ -30,13 +36,14 @@ func NewLineTokenViewHandler(indexService *service.IndexService) *LineTokenViewH
 }
 
 func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
-	repo := internal.NewRepository(g.IndexService.DB)
+	var repo Repository
 	categoryPositions := make(map[string]components.DiscordChannel)
 	guildId := r.PathValue("guildId")
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	repo = internal.NewRepository(g.IndexService.DB)
 
 	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
 	if err != nil {

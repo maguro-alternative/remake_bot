@@ -14,6 +14,13 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
+type Repository interface {
+	GetPermissionCode(ctx context.Context, guildID string, permissionType string) (int64, error)
+	GetPermissionIDs(ctx context.Context, guildID string, permissionType string) ([]internal.PermissionID, error)
+	GetLineBot(ctx context.Context, guildID string) (internal.LineBot, error)
+	GetLineBotIv(ctx context.Context, guildID string) (internal.LineBotIv, error)
+}
+
 func CheckDiscordPermission(
 	ctx context.Context,
 	w http.ResponseWriter,
@@ -24,10 +31,11 @@ func CheckDiscordPermission(
 ) (statusCode int, discordPermissionData *model.DiscordPermissionData, err error) {
 	var userPermissionCode int64
 	var permissionData model.DiscordPermissionData
+	var repo Repository
 	permissionData.Permission = ""
 	userPermissionCode = 0
 	client := &http.Client{}
-	repo := internal.NewRepository(indexService.DB)
+	repo = internal.NewRepository(indexService.DB)
 
 	// ログインユーザーの取得
 	discordLoginUser, err := getoauth.GetDiscordOAuth(

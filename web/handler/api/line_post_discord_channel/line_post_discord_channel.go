@@ -11,6 +11,14 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 )
 
+type Repository interface {
+	UpdateLinePostDiscordChannel(ctx context.Context, linePostDiscordChannel internal.LinePostDiscordChannel) error
+	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordMessageTypes []internal.LineNgDiscordMessageType) error
+	DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordMessageTypes []internal.LineNgDiscordMessageType) error
+	InsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []internal.LineNgID) error
+	DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []internal.LineNgID) error
+}
+
 type LinePostDiscordChannelHandler struct {
 	IndexService *service.IndexService
 }
@@ -33,6 +41,7 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 		return
 	}
 	var lineChannelJson internal.LinePostDiscordChannelJson
+	var repo Repository
 	if err := json.NewDecoder(r.Body).Decode(&lineChannelJson); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Json読み取りに失敗しました。 "+err.Error())
@@ -66,7 +75,7 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 		}
 	}
 
-	repo := internal.NewRepository(h.IndexService.DB)
+	repo = internal.NewRepository(h.IndexService.DB)
 	lineChannels, lineNgTypes, lineNgIDs := lineChannelJsonRead(lineChannelJson)
 
 	for _, lineChannel := range lineChannels {

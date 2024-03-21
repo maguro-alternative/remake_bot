@@ -20,6 +20,12 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
+type Repository interface {
+	GetLineBot(ctx context.Context, guildID string) (internal.LineBot, error)
+	GetLineBots(ctx context.Context) ([]*internal.LineBot, error)
+	GetLineBotIv(ctx context.Context, guildID string) (internal.LineBotIv, error)
+}
+
 type LineCallbackHandler struct {
 	svc *service.IndexService
 }
@@ -35,6 +41,7 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	var repo Repository
 	privateKey := config.PrivateKey()
 	keyBytes, err := hex.DecodeString(privateKey)
 	if err != nil {
@@ -42,7 +49,7 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	repo := internal.NewRepository(h.svc.DB)
+	repo = internal.NewRepository(h.svc.DB)
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
 	gob.Register(&model.LineIdTokenUser{})

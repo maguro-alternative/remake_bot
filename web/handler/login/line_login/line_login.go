@@ -27,7 +27,7 @@ import (
 type Repository interface {
 	GetLineBots(ctx context.Context) ([]*internal.LineBot, error)
 	GetLineBot(ctx context.Context, guildID string) (internal.LineBot, error)
-	GetLineBotIv(ctx context.Context) (internal.LineBotIv, error)
+	GetLineBotIv(ctx context.Context, guildID string) (internal.LineBotIv, error)
 }
 
 type LineLoginHandler struct {
@@ -50,6 +50,7 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 	gob.Register(&model.LineIdTokenUser{})
 	var lineBotIv internal.LineBotIv
 	var lineLoginHtmlBuilder strings.Builder
+	var repo Repository
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -63,7 +64,7 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	repo := internal.NewRepository(h.IndexService.DB)
+	repo = internal.NewRepository(h.IndexService.DB)
 	lineBots, err := repo.GetLineBots(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。")

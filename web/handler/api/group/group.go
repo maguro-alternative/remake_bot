@@ -11,6 +11,10 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
+type Repository interface {
+	UpdateLineBot(ctx context.Context, lineBot *internal.LineBot) error
+}
+
 type LineGroupHandler struct {
 	IndexService *service.IndexService
 }
@@ -32,6 +36,7 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var lineGroupJson internal.LineBotJson
+	var repo Repository
 	if err := json.NewDecoder(r.Body).Decode(&lineGroupJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました:"+err.Error())
@@ -55,7 +60,7 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.InfoContext(ctx, "Redirect to /login/line")
 		return
 	}
-	repo := internal.NewRepository(g.IndexService.DB)
+	repo = internal.NewRepository(g.IndexService.DB)
 	err = repo.UpdateLineBot(ctx, &internal.LineBot{
 		GuildID: guildId,
 		DefaultChannelID: lineGroupJson.DefaultChannelID,

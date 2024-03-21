@@ -1,8 +1,8 @@
 package permission
 
 import (
-	//"context"
-	//"log/slog"
+	"context"
+	"log/slog"
 	"net/http"
 
 	//"github.com/maguro-alternative/remake_bot/web/config"
@@ -21,4 +21,14 @@ func NewPermissionViewHandler(indexService *service.IndexService) *PermissionVie
 	}
 }
 
-func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {}
+func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		slog.ErrorContext(ctx, "/api/line-bot Method Not Allowed")
+		return
+	}
+}

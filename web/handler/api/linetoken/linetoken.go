@@ -16,6 +16,11 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 )
 
+type Repository interface {
+	UpdateLineBot(ctx context.Context, lineBot *internal.LineBot) error
+	UpdateLineBotIv(ctx context.Context, lineBotIv *internal.LineBotIv) error
+}
+
 type LineTokenHandler struct {
 	IndexService *service.IndexService
 }
@@ -37,6 +42,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var lineTokenJson internal.LineBotJson
+	var repo Repository
 	if err := json.NewDecoder(r.Body).Decode(&lineTokenJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました:"+err.Error())
@@ -76,7 +82,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// 暗号化
-	repo := internal.NewRepository(h.IndexService.DB)
+	repo = internal.NewRepository(h.IndexService.DB)
 	if err := repo.UpdateLineBot(ctx, lineBot); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "line_botの更新に失敗しました:"+err.Error())

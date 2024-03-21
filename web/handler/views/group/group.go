@@ -17,6 +17,10 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
+type Repository interface {
+	GetLineBot(ctx context.Context, guildID string) (internal.LineBot, error)
+}
+
 type LineGroupViewHandler struct {
 	IndexService *service.IndexService
 }
@@ -28,7 +32,7 @@ func NewLineGroupViewHandler(indexService *service.IndexService) *LineGroupViewH
 }
 
 func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
-	repo := internal.NewRepository(g.IndexService.DB)
+	var repo Repository
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -85,6 +89,7 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			channelsInCategory,
 		)
 	}
+	repo = internal.NewRepository(g.IndexService.DB)
 	lineBot, err := repo.GetLineBot(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

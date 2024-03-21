@@ -22,8 +22,7 @@ func CheckLinePermission(
 	indexService *service.IndexService,
 	guildId string,
 ) (lineProfile line.LineProfile, lineLoginUser *model.LineOAuthSession, err error) {
-	repo := internal.NewRepository(indexService.DB)
-
+	var repo Repository
 	// ログインユーザーの取得
 	lineLoginUser, err = getoauth.GetLineOAuth(
 		indexService.CookieStore,
@@ -34,6 +33,8 @@ func CheckLinePermission(
 		slog.ErrorContext(ctx, "lineのユーザー取得に失敗しました", "エラー:", err.Error())
 		return lineProfile, lineLoginUser, err
 	}
+
+	repo = internal.NewRepository(indexService.DB)
 
 	lineBotApi, err := repo.GetLineBot(ctx, guildId)
 	if err != nil {

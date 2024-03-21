@@ -1,0 +1,25 @@
+{{ define "content" }}
+    <main>
+        <ul>
+            <li>
+                <a href="/guild/{{ .GuildID }}">
+                    <img src="{{ .GuildIconUrl }}" alt="{{ .GuildName }}">
+                </a>
+            </li>
+            <li>
+                <a href="/guild/{{ .GuildID }}">
+                    {{ .GuildName }}
+                </a>
+            </li>
+        </ul>
+        <h1>{{ .GuildName }}の権限設定</h1>
+        <h4>各項目にアクセスできる権限を設定できます。</h4>
+        <form action="#" id="form">
+
+            {{ .PermissionForm }}
+
+            <br/>
+            <input type="submit" value="送信">
+        </form>
+    </main>
+{{ end }}

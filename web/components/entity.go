@@ -40,3 +40,17 @@ type LineEntered struct {
 	LineClientSecret string
 	LineDebugMode    bool
 }
+
+type PermissionCode struct {
+	GuildID string
+	Type    string
+	Code    int64
+}
+
+type PermissionID struct {
+	GuildID    string
+	Type       string
+	TargetType string
+	TargetID   string
+	Permission string
+}

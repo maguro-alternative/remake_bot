@@ -21,6 +21,7 @@ import (
 	indexView "github.com/maguro-alternative/remake_bot/web/handler/views"
 	groupView "github.com/maguro-alternative/remake_bot/web/handler/views/group"
 	guildIdView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid"
+	permissionView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/permission"
 	linePostDiscordChannelView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel"
 	linetokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken"
 	guildsView "github.com/maguro-alternative/remake_bot/web/handler/views/guilds"
@@ -72,6 +73,7 @@ func NewWebRouter(
 	mux.Handle("/login/line/{guildId}", middleChain.ThenFunc(lineLogin.NewLineLoginHandler(indexService).LineLogin))
 	mux.Handle("/guilds", middleChain.ThenFunc(guildsView.NewGuildsViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}", middleChain.ThenFunc(guildIdView.NewGuildIDViewHandler(indexService).Index))
+	mux.Handle("/guild/{guildId}/permission", middleChain.ThenFunc(permissionView.NewPermissionViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/linetoken", middleChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/line-post-discord-channel", middleChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService).Index))
 	mux.Handle("/group/{guildId}", middleChain.ThenFunc(groupView.NewLineGroupViewHandler(indexService).Index))

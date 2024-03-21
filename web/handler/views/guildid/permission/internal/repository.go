@@ -16,8 +16,8 @@ func NewRepository(db db.Driver) *Repository {
 	}
 }
 
-func (r *Repository) GetPermissionCode(ctx context.Context, guildID string) (PermissionCode, error) {
-	var permissionCode PermissionCode
+func (r *Repository) GetPermissionCodes(ctx context.Context, guildID string) ([]PermissionCode, error) {
+	var permissionsCode []PermissionCode
 	query := `
 		SELECT
 			*
@@ -26,12 +26,12 @@ func (r *Repository) GetPermissionCode(ctx context.Context, guildID string) (Per
 		WHERE
 			guild_id = $1
 	`
-	err := r.db.GetContext(ctx, &permissionCode, query, guildID)
-	return permissionCode, err
+	err := r.db.SelectContext(ctx, &permissionsCode, query, guildID)
+	return permissionsCode, err
 }
 
-func (r *Repository) GetPermissionID(ctx context.Context, guildID string) (PermissionID, error) {
-	var permissionID PermissionID
+func (r *Repository) GetPermissionIDs(ctx context.Context, guildID string) ([]PermissionID, error) {
+	var permissionsID []PermissionID
 	query := `
 		SELECT
 			*
@@ -40,6 +40,6 @@ func (r *Repository) GetPermissionID(ctx context.Context, guildID string) (Permi
 		WHERE
 			guild_id = $1
 	`
-	err := r.db.GetContext(ctx, &permissionID, query, guildID)
-	return permissionID, err
+	err := r.db.SelectContext(ctx, &permissionsID, query, guildID)
+	return permissionsID, err
 }

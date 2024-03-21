@@ -66,7 +66,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if discordPermissionData.PermissionCode&8 != 0 {
 		settingLinks += `
 			管理者です。<br/>
-			<a href="/guild/` + guild.ID + `/admin" class="btn btn-primary">管理者設定</a>
+			<a href="/guild/` + guild.ID + `/permission" class="btn btn-primary">管理者設定</a>
 			<br/>
 		`
 	}

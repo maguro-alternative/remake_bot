@@ -38,7 +38,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		slog.ErrorContext(ctx, "/api/line-bot Method Not Allowed")
+		slog.ErrorContext(ctx, "/api/linetoken Method Not Allowed")
 		return
 	}
 	var lineTokenJson internal.LineBotJson

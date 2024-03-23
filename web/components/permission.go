@@ -11,7 +11,7 @@ func CreatePermissionCodeForm(guildID string, permissionCode PermissionCode) str
 	return fmt.Sprintf(`
 	<h3>%s</h3>
 	<h6>編集を許可する権限コード</h6>
-	<input type="number" name="%s_permission_code" value="%d" min="0" max="1099511627775"/>
+	<input type="number" name="%s_permission_code" value=%d min=0 max=1099511627775/>
 	`, permissionCode.Type, permissionCode.Type, permissionCode.Code)
 }
 
@@ -20,7 +20,7 @@ func CreatePermissionSelectForm(guild *discordgo.Guild, permissionIDs []Permissi
 	for _, member := range guild.Members {
 		selectedFlag := false
 		for _, permissionID := range permissionIDs {
-			if permissionID.TargetID == member.User.ID && permissionID.TargetType == "user" && permissionID.Permission == permission {
+			if permissionID.TargetID == member.User.ID && permissionID.TargetType == "user" && permissionID.Type == permission {
 				selectedFlag = true
 				break
 			}
@@ -35,7 +35,7 @@ func CreatePermissionSelectForm(guild *discordgo.Guild, permissionIDs []Permissi
 	for _, role := range guild.Roles {
 		selectedFlag := false
 		for _, permissionID := range permissionIDs {
-			if permissionID.TargetID == role.ID && permissionID.TargetType == "role" && permissionID.Permission == permission {
+			if permissionID.TargetID == role.ID && permissionID.TargetType == "role" && permissionID.Type == permission {
 				selectedFlag = true
 				break
 			}

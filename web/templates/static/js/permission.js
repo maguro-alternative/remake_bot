@@ -15,39 +15,47 @@ document.getElementById('form').onsubmit = async function (event) {
         "permission_codes": [],
         "permission_ids": [],
     };
+    console.log(formElements)
     // 各formのkeyを取得
     for (let i = 0; i < formElements.length; i++) {
         formKey = formElements[i].name;
+        console.log(formKey);
         if (formKey.includes('permission_code')) {
-            permissionName = formKey.substr(0, str.indexOf('_permission_code'));
+            permissionName = formKey.substr(0, formKey.indexOf('_permission_code'));
             jsonTmp['permission_codes'].push({
+                "guild_id": guildId,
                 "type": permissionName,
-                "code": formData.get(formKey)
+                "code": parseInt(formData.get(formKey))
             })
         } else if (formKey.includes('member_permission_id')) {
-            permissionName = formKey.substr(0, str.indexOf('_member_permission_id'));
+            permissionName = formKey.substr(0, formKey.indexOf('_member_permission_id'));
             for (let user of formData.getAll(formKey)) {
-                jsonTmp['permission_codes'].push({
+                console.log(user);
+                jsonTmp['permission_ids'].push({
+                    "guild_id": guildId,
                     "type": permissionName,
                     "target_type": "user",
                     "target_id": user,
-                    "permssion": "all"
+                    "permission": "all"
                 })
             }
         } else if (formKey.includes('role_permission_id')) {
-            permissionName = formKey.substr(0, str.indexOf('_role_permission_id'));
+            permissionName = formKey.substr(0, formKey.indexOf('_role_permission_id'));
             for (let role of formData.getAll(formKey)) {
-                jsonTmp['permission_codes'].push({
+                jsonTmp['permission_ids'].push({
+                    "guild_id": guildId,
                     "type": permissionName,
                     "target_type": "role",
                     "target_id": role,
-                    "permssion": "all"
+                    "permission": "all"
                 })
             }
         }
     }
 
     const jsonData = JSON.stringify(jsonTmp);
+
+    console.log(jsonData)
 
     // データを送信
     await fetch(`/api/${guildId}/permission`, {

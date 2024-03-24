@@ -1,7 +1,9 @@
 package permission
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -9,7 +11,6 @@ import (
 	"github.com/maguro-alternative/remake_bot/fixtures"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/web/config"
-	//"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 
@@ -37,6 +38,26 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 			pi.Permission = "all"
 		}),
 	)
+
+	bodyJson, err := json.Marshal(internal.PermissionJson{
+		PermissionIDs: []internal.PermissionID{
+			{
+				GuildID: "987654321",
+				Type:    "line_bot",
+				TargetType: "user",
+				TargetID: "123456789",
+				Permission: "all",
+			},
+		},
+		PermissionCodes: []internal.PermissionCode{
+			{
+				GuildID: "987654321",
+				Type:    "line_bot",
+				Code: int64(8),
+			},
+		},
+	})
+	assert.NoError(t, err)
 
 	t.Run("MethodがPOST以外の場合、Method Not Allowedが返ること", func(t *testing.T) {
 		h := &PermissionHandler{}
@@ -103,7 +124,7 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 			},
 		}
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest(http.MethodPost, "/api/987654321/permission", nil)
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/permission", bytes.NewBuffer(bodyJson))
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})

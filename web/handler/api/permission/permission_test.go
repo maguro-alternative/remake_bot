@@ -51,10 +51,29 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 			IndexService: IndexService{
 				DiscordSession: &SessionMock{
 					GuildFunc: func(guildID string, options ...discordgo.RequestOption) (*discordgo.Guild, error) {
-						return nil, nil
+						return &discordgo.Guild{
+							ID: "987654321",
+						}, nil
+					},
+					GuildChannelsFunc: func(guildID string, options ...discordgo.RequestOption) ([]*discordgo.Channel, error) {
+						return []*discordgo.Channel{
+							{
+								ID: "123456789",
+							},
+						}, nil
 					},
 					GuildMemberFunc: func(guildID string, userID string, options ...discordgo.RequestOption) (*discordgo.Member, error) {
-						return nil, nil
+						return &discordgo.Member{
+							User: &discordgo.User{
+								ID: "123456789",
+							},
+						}, nil
+					},
+					GuildRolesFunc: func(guildID string, options ...discordgo.RequestOption) ([]*discordgo.Role, error) {
+						return []*discordgo.Role{}, nil
+					},
+					UserChannelPermissionsFunc: func(userID, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error) {
+						return 8, nil
 					},
 				},
 			},
@@ -71,7 +90,12 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 			},
 			oauthStore: &OAuthStoreMock{
 				GetDiscordOAuthFunc: func(ctx context.Context, r *http.Request) (*model.DiscordOAuthSession, error) {
-					return nil, nil
+					return &model.DiscordOAuthSession{
+						User: model.DiscordUser{
+							ID: "123456789",
+						},
+						Token: "token",
+					}, nil
 				},
 				GetLineOAuthFunc: func(r *http.Request) (*model.LineOAuthSession, error) {
 					return nil, nil

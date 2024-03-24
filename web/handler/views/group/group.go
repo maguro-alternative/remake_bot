@@ -45,15 +45,15 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: ", "エラーメッセージ:", err.Error())
 		return
 	}
-	_, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "")
+
+	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)
+	_, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "")
 	if err != nil {
 		discordPermissionData = &model.DiscordPermissionData{}
 	}
-	_, lineSession, err := permission.CheckLinePermission(
+	_, lineSession, err := oauthPermission.CheckLinePermission(
 		ctx,
-		w,
 		r,
-		g.IndexService,
 		guildId,
 	)
 	if err != nil {

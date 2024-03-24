@@ -51,11 +51,11 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	discordSession, err := getoauth.GetDiscordOAuth(
+	oauthStore := getoauth.NewOAuthStore(h.IndexService.CookieStore, config.SessionSecret())
+
+	discordSession, err := oauthStore.GetDiscordOAuth(
 		ctx,
-		h.IndexService.CookieStore,
 		r,
-		config.SessionSecret(),
 	)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -63,11 +63,7 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := getoauth.GetLineOAuth(
-		h.IndexService.CookieStore,
-		r,
-		config.SessionSecret(),
-	)
+	lineSession, err := oauthStore.GetLineOAuth(r)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

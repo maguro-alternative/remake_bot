@@ -61,7 +61,8 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 		slog.ErrorContext(ctx, "Guild情報取得に失敗しました。 "+err.Error())
 		return
 	}
-	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, h.IndexService, guild, "line_post_discord_channel")
+	oauthPermission := permission.NewPermissionHandler(r, h.IndexService)
+	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_post_discord_channel")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			slog.InfoContext(ctx, "Redirect to /login/discord")

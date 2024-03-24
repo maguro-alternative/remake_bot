@@ -41,18 +41,14 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	discordLoginUser, err := getoauth.GetDiscordOAuth(
-		ctx,
-		g.IndexService.CookieStore,
-		r,
-		config.SessionSecret(),
-	)
+	oauthStore := getoauth.NewOAuthStore(g.IndexService.CookieStore, config.SessionSecret())
+	discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, r)
 	if err != nil || discordLoginUser.Token == "" {
 		http.Redirect(w, r, "/login/discord", http.StatusFound)
 		return
 	}
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := getoauth.GetLineOAuth(g.IndexService.CookieStore, r, config.SessionSecret())
+	lineSession, err := oauthStore.GetLineOAuth(r)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

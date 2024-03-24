@@ -9,32 +9,26 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 	"github.com/maguro-alternative/remake_bot/web/config"
-	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/permission/internal"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
-func CheckLinePermission(
+func (p *PermissionHandler) CheckLinePermission(
 	ctx context.Context,
-	w http.ResponseWriter,
 	r *http.Request,
-	indexService *service.IndexService,
 	guildId string,
 ) (lineProfile line.LineProfile, lineLoginUser *model.LineOAuthSession, err error) {
 	var repo Repository
+	oauthStore := getoauth.NewOAuthStore(p.IndexService.CookieStore, config.SessionSecret())
 	// ログインユーザーの取得
-	lineLoginUser, err = getoauth.GetLineOAuth(
-		indexService.CookieStore,
-		r,
-		config.SessionSecret(),
-	)
+	lineLoginUser, err = oauthStore.GetLineOAuth(r)
 	if err != nil {
 		slog.ErrorContext(ctx, "lineのユーザー取得に失敗しました", "エラー:", err.Error())
 		return lineProfile, lineLoginUser, err
 	}
 
-	repo = internal.NewRepository(indexService.DB)
+	repo = internal.NewRepository(p.IndexService.DB)
 
 	lineBotApi, err := repo.GetLineBot(ctx, guildId)
 	if err != nil {

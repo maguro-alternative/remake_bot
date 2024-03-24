@@ -48,11 +48,10 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	guildId := r.PathValue("guildId")
-	_, _, err := permission.CheckLinePermission(
+	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)
+	_, _, err := oauthPermission.CheckLinePermission(
 		ctx,
-		w,
 		r,
-		g.IndexService,
 		guildId,
 	)
 	if err != nil {

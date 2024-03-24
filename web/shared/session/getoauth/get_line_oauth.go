@@ -6,8 +6,6 @@ import (
 	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
-
-	"github.com/gorilla/sessions"
 )
 
 func init() {
@@ -15,8 +13,8 @@ func init() {
 	gob.Register(&model.LineIdTokenUser{})
 }
 
-func GetLineOAuth(store *sessions.CookieStore, r *http.Request, sessionSecret string) (*model.LineOAuthSession, error) {
-	session, err := store.Get(r, sessionSecret)
+func (o *OAuthStore) GetLineOAuth(r *http.Request) (*model.LineOAuthSession, error) {
+	session, err := o.Store.Get(r, o.Secret)
 	if err != nil {
 		return nil, err
 	}

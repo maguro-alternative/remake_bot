@@ -11,8 +11,20 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-func GetDiscordOAuth(ctx context.Context, store *sessions.CookieStore, r *http.Request, sessionSecret string) (*model.DiscordOAuthSession, error) {
-	session, err := store.Get(r, sessionSecret)
+type OAuthStore struct {
+	Store *sessions.CookieStore
+	Secret string
+}
+
+func NewOAuthStore(store *sessions.CookieStore, secret string) *OAuthStore {
+	return &OAuthStore{
+		Store: store,
+		Secret: secret,
+	}
+}
+
+func (o *OAuthStore) GetDiscordOAuth(ctx context.Context, r *http.Request) (*model.DiscordOAuthSession, error) {
+	session, err := o.Store.Get(r, o.Secret)
 	if err != nil {
 		slog.ErrorContext(ctx, "sessionの取得に失敗しました。", "エラー:", err.Error())
 		return nil, err

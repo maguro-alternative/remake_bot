@@ -51,7 +51,8 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Not get guild id: "+err.Error())
 		return
 	}
-	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_bot")
+	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)
+	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/login/discord", http.StatusFound)
@@ -64,8 +65,9 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	oauthStore := getoauth.NewOAuthStore(g.IndexService.CookieStore, config.SessionSecret())
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := getoauth.GetLineOAuth(g.IndexService.CookieStore, r, config.SessionSecret())
+	lineSession, err := oauthStore.GetLineOAuth(r)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

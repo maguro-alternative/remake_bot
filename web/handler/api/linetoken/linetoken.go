@@ -60,7 +60,8 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "guild idの取得に失敗しました:"+err.Error())
 		return
 	}
-	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, h.IndexService, guild, "line_bot")
+	oauthPermission := permission.NewPermissionHandler(r, h.IndexService)
+	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/login/discord", http.StatusFound)

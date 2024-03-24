@@ -45,12 +45,8 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var permissionJson internal.PermissionJson
 
-	discordSession, err := getoauth.GetDiscordOAuth(
-		ctx,
-		h.IndexService.CookieStore,
-		r,
-		config.SessionSecret(),
-	)
+	oauthStore := getoauth.NewOAuthStore(h.IndexService.CookieStore, config.SessionSecret())
+	discordSession, err := oauthStore.GetDiscordOAuth(ctx, r)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordの認証情報の取得に失敗しました。", "エラー:", err.Error())

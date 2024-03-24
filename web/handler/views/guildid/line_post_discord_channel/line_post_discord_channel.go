@@ -77,7 +77,9 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました:"+err.Error())
 		return
 	}
-	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "line_post_discord_channel")
+
+	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)
+	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_post_discord_channel")
 	if err != nil {
 		if statusCode == http.StatusFound {
 			http.Redirect(w, r, "/login/discord", http.StatusFound)
@@ -90,8 +92,9 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 			return
 		}
 	}
+	oauthStore := getoauth.NewOAuthStore(g.IndexService.CookieStore, config.SessionSecret())
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := getoauth.GetLineOAuth(g.IndexService.CookieStore, r, config.SessionSecret())
+	lineSession, err := oauthStore.GetLineOAuth(r)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

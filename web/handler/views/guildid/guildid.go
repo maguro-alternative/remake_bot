@@ -38,7 +38,8 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: ", "エラーメッセージ:", err.Error())
 		return
 	}
-	statusCode, discordPermissionData, err := permission.CheckDiscordPermission(ctx, w, r, g.IndexService, guild, "")
+	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)
+	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "")
 	if err != nil {
 		if statusCode == 302 {
 			http.Redirect(w, r, "/login/discord", http.StatusFound)
@@ -51,8 +52,9 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	oauthStore := getoauth.NewOAuthStore(g.IndexService.CookieStore, config.SessionSecret())
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := getoauth.GetLineOAuth(g.IndexService.CookieStore, r, config.SessionSecret())
+	lineSession, err := oauthStore.GetLineOAuth(r)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

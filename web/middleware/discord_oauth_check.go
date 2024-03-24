@@ -25,12 +25,8 @@ func DiscordOAuthCheckMiddleware(indexService service.IndexService) func(http.Ha
 				ctx = context.Background()
 			}
 			client := &http.Client{}
-			discordLoginUser, err := getoauth.GetDiscordOAuth(
-				ctx,
-				indexService.CookieStore,
-				r,
-				config.SessionSecret(),
-			)
+			oauthStore := getoauth.NewOAuthStore(indexService.CookieStore, config.SessionSecret())
+			discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, r)
 			if err != nil {
 				http.Redirect(w, r, "/login/discord", http.StatusFound)
 				return

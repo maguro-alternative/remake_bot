@@ -117,17 +117,13 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		`, lineBot.GuildID, lineBotProfile.PictureURL, lineBotProfile.DisplayName))
 	}
 	// Discordの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	discordLoginUser, err := getoauth.GetDiscordOAuth(
-		ctx,
-		h.IndexService.CookieStore,
-		r,
-		config.SessionSecret(),
-	)
+	oauthStore := getoauth.NewOAuthStore(h.IndexService.CookieStore, config.SessionSecret())
+	discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, r)
 	if err != nil {
 		discordLoginUser = &model.DiscordOAuthSession{}
 	}
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := getoauth.GetLineOAuth(h.IndexService.CookieStore, r, config.SessionSecret())
+	lineSession, err := oauthStore.GetLineOAuth(r)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

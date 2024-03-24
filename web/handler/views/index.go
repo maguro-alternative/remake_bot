@@ -29,18 +29,14 @@ func (g *IndexViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	oauthStore := getoauth.NewOAuthStore(g.IndexService.CookieStore, config.SessionSecret())
 	// Discordの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	discordLoginUser, err := getoauth.GetDiscordOAuth(
-		ctx,
-		g.IndexService.CookieStore,
-		r,
-		config.SessionSecret(),
-	)
+	discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, r)
 	if err != nil {
 		discordLoginUser = &model.DiscordOAuthSession{}
 	}
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := getoauth.GetLineOAuth(g.IndexService.CookieStore, r, config.SessionSecret())
+	lineSession, err := oauthStore.GetLineOAuth(r)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

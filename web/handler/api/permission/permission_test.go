@@ -8,9 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/maguro-alternative/remake_bot/fixtures"
-	"github.com/maguro-alternative/remake_bot/pkg/db"
-	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 
@@ -19,33 +16,13 @@ import (
 )
 
 func TestPermissionHandler_ServeHTTP(t *testing.T) {
-	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
-	assert.NoError(t, err)
-	defer cleanup()
-	tx, err := dbV1.BeginTxx(ctx, nil)
-	assert.NoError(t, err)
-
-	defer tx.RollbackCtx(ctx)
-
-	f := &fixtures.Fixture{DBv1: tx}
-	f.Build(t,
-		fixtures.NewPermissionsID(ctx, func(pi *fixtures.PermissionsID) {
-			pi.GuildID = "987654321"
-			pi.Type = "line_bot"
-			pi.TargetType = "user"
-			pi.TargetID = "123456789"
-			pi.Permission = "all"
-		}),
-	)
-
 	bodyJson, err := json.Marshal(internal.PermissionJson{
 		PermissionIDs: []internal.PermissionID{
 			{
-				GuildID: "987654321",
-				Type:    "line_bot",
+				GuildID:    "987654321",
+				Type:       "line_bot",
 				TargetType: "user",
-				TargetID: "123456789",
+				TargetID:   "123456789",
 				Permission: "all",
 			},
 		},
@@ -53,7 +30,7 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 			{
 				GuildID: "987654321",
 				Type:    "line_bot",
-				Code: int64(8),
+				Code:    int64(8),
 			},
 		},
 	})

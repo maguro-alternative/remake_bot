@@ -10,7 +10,10 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	//"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,5 +44,43 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 		r := httptest.NewRequest(http.MethodGet, "/api/987654321/permission", nil)
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusMethodNotAllowed, w.Code)
+	})
+
+	t.Run("パーミッションの更新が成功すること", func(t *testing.T) {
+		h := &PermissionHandler{
+			IndexService: IndexService{
+				DiscordSession: &SessionMock{
+					GuildFunc: func(guildID string, options ...discordgo.RequestOption) (*discordgo.Guild, error) {
+						return nil, nil
+					},
+					GuildMemberFunc: func(guildID string, userID string, options ...discordgo.RequestOption) (*discordgo.Member, error) {
+						return nil, nil
+					},
+				},
+			},
+			repo: &RepositoryMock{
+				UpdatePermissionCodesFunc: func(ctx context.Context, permissionsCode []internal.PermissionCode) error {
+					return nil
+				},
+				DeletePermissionIDsFunc: func(ctx context.Context, guildId string) error {
+					return nil
+				},
+				InsertPermissionIDsFunc: func(ctx context.Context, permissionsID []internal.PermissionID) error {
+					return nil
+				},
+			},
+			oauthStore: &OAuthStoreMock{
+				GetDiscordOAuthFunc: func(ctx context.Context, r *http.Request) (*model.DiscordOAuthSession, error) {
+					return nil, nil
+				},
+				GetLineOAuthFunc: func(r *http.Request) (*model.LineOAuthSession, error) {
+					return nil, nil
+				},
+			},
+		}
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/permission", nil)
+		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusOK, w.Code)
 	})
 }

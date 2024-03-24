@@ -7,24 +7,59 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/maguro-alternative/remake_bot/pkg/db"
+
 	"github.com/maguro-alternative/remake_bot/web/config"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
-	"github.com/maguro-alternative/remake_bot/web/service"
+	//"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/gorilla/sessions"
 )
 
+//go:generate go run github.com/matryer/moq -out discordsession_mock_test.go . Session
+type Session interface {
+	Guild(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error);
+	GuildChannels(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Channel, err error);
+	GuildMember(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error);
+	GuildRoles(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Role, err error);
+	UserChannelPermissions(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error);
+}
+
+type IndexService struct {
+	DB             db.Driver
+	CookieStore    *sessions.CookieStore
+	DiscordSession Session
+}
+
+
+var (
+	_ Session = (*discordgo.Session)(nil)
+)
+
+//go:generate go run github.com/matryer/moq -out mock_test.go . Repository
 type Repository interface {
 	UpdatePermissionCodes(ctx context.Context, permissionsCode []internal.PermissionCode) error
 	DeletePermissionIDs(ctx context.Context, guildId string) error
 	InsertPermissionIDs(ctx context.Context, permissionsID []internal.PermissionID) error
 }
 
-type PermissionHandler struct {
-	IndexService *service.IndexService
+//go:generate go run github.com/matryer/moq -out oauth_mock_test.go . OAuthStore
+type OAuthStore interface {
+	GetDiscordOAuth(ctx context.Context, r *http.Request) (*model.DiscordOAuthSession, error)
+	GetLineOAuth(r *http.Request) (*model.LineOAuthSession, error)
 }
 
-func NewPermissionHandler(indexService *service.IndexService) *PermissionHandler {
+type PermissionHandler struct {
+	IndexService IndexService
+	repo         Repository
+	oauthStore   OAuthStore
+}
+
+func NewPermissionHandler(indexService IndexService) *PermissionHandler {
 	return &PermissionHandler{
 		IndexService: indexService,
 	}
@@ -33,6 +68,7 @@ func NewPermissionHandler(indexService *service.IndexService) *PermissionHandler
 func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var userPermissionCode int64
 	var repo Repository
+	var oauthStore OAuthStore
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -45,7 +81,18 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var permissionJson internal.PermissionJson
 
-	oauthStore := getoauth.NewOAuthStore(h.IndexService.CookieStore, config.SessionSecret())
+	// パーミッションの更新
+	repo = internal.NewRepository(h.IndexService.DB)
+	// mockの場合はmockを使用
+	if h.repo != nil {
+		repo = h.repo
+	}
+
+	oauthStore = getoauth.NewOAuthStore(h.IndexService.CookieStore, config.SessionSecret())
+	// mockの場合はmockを使用
+	if h.oauthStore != nil {
+		oauthStore = h.oauthStore
+	}
 	discordSession, err := oauthStore.GetDiscordOAuth(ctx, r)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -54,10 +101,18 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// ギルド情報を取得
-	guild, err := h.IndexService.DiscordSession.State.Guild(guildId)
+	guild, err := h.IndexService.DiscordSession.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "ギルド情報の取得に失敗しました。", "エラー:", err.Error())
+		return
+	}
+
+	// チャンネル一覧を取得
+	channels, err := h.IndexService.DiscordSession.GuildChannels(guild.ID)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "チャンネルの取得に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
@@ -84,7 +139,7 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// メンバーの権限を取得
 	// discordgoの場合guildMemberから正しく権限を取得できないため、UserChannelPermissionsを使用
-	memberPermission, err := h.IndexService.DiscordSession.UserChannelPermissions(discordSession.User.ID, guild.Channels[0].ID)
+	memberPermission, err := h.IndexService.DiscordSession.UserChannelPermissions(discordSession.User.ID, channels[0].ID)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "メンバーの権限の取得に失敗しました。", "エラー:", err.Error())
@@ -109,8 +164,6 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// パーミッションの更新
-	repo = internal.NewRepository(h.IndexService.DB)
 	if err := repo.UpdatePermissionCodes(ctx, permissionJson.PermissionCodes); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの更新に失敗しました。", "エラー:", err.Error())

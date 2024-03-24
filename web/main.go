@@ -85,7 +85,7 @@ func NewWebRouter(
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
 	mux.Handle("/callback/line-callback/", middleChain.Then(lineCallback.NewLineCallbackHandler(indexService)))
 	mux.Handle("/api/{guildId}/group", middleChain.Then(group.NewLineGroupHandler(indexService)))
-	mux.Handle("/api/{guildId}/permission", middleChain.Then(permission.NewPermissionHandler(indexService)))
+	mux.Handle("/api/{guildId}/permission", middleChain.Then(permission.NewPermissionHandler(permission.IndexService{DB:indexDB, CookieStore:cookieStore, DiscordSession:discordSession})))
 	mux.Handle("/api/{guildId}/linetoken", middleChain.Then(linetoken.NewLineTokenHandler(indexService)))
 	mux.Handle("/api/{guildId}/line-post-discord-channel", middleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(indexService)))
 

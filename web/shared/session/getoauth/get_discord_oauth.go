@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+//go:generate go run github.com/matryer/moq -out mock_test.go . OAuthStore
 type OAuthStore struct {
 	Store *sessions.CookieStore
 	Secret string

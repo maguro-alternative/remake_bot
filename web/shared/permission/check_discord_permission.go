@@ -96,9 +96,16 @@ func (p *PermissionHandler) CheckDiscordPermission(
 			}
 		}
 	}
+
+	// チャンネル一覧を取得
+	channels, err := p.IndexService.DiscordSession.GuildChannels(guild.ID)
+	if err != nil {
+		return http.StatusInternalServerError, nil, err
+	}
+
 	// メンバーの権限を取得
 	// discordgoの場合guildMemberから正しく権限を取得できないため、UserChannelPermissionsを使用
-	memberPermission, err := p.IndexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, guild.Channels[0].ID)
+	memberPermission, err := p.IndexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, channels[0].ID)
 	if err != nil {
 		return http.StatusInternalServerError, nil, err
 	}

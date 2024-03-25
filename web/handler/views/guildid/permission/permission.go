@@ -44,19 +44,25 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	var repo Repository
 	var componentPermissionIDs []components.PermissionID
 
-	guild, err := h.IndexService.DiscordSession.State.Guild(guildId)
+	guild, err := h.IndexService.DiscordSession.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Not get guild id: "+err.Error())
 		return
 	}
 
+	if guild.Members == nil {
+		guild.Members, err = h.IndexService.DiscordSession.GuildMembers(guildId, "", 1000)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "Not get guild members: "+err.Error())
+			return
+		}
+	}
+
 	oauthStore := getoauth.NewOAuthStore(h.IndexService.CookieStore, config.SessionSecret())
 
-	discordSession, err := oauthStore.GetDiscordOAuth(
-		ctx,
-		r,
-	)
+	discordSession, err := oauthStore.GetDiscordOAuth(ctx, r)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordの認証情報の取得に失敗しました。", "エラー:", err.Error())

@@ -32,7 +32,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		ctx = context.Background()
 	}
 	guildId := r.PathValue("guildId")
-	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
+	guild, err := g.IndexService.DiscordSession.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: ", "エラーメッセージ:", err.Error())

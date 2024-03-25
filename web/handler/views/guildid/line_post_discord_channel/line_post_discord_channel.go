@@ -71,11 +71,29 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		ctx = context.Background()
 	}
 
-	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
+	guild, err := g.IndexService.DiscordSession.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました:"+err.Error())
 		return
+	}
+
+	if guild.Members == nil {
+		guild.Members, err = g.IndexService.DiscordSession.GuildMembers(guildId, "", 1000)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "Not get guild members: "+err.Error())
+			return
+		}
+	}
+
+	if guild.Channels == nil {
+		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
+			return
+		}
 	}
 
 	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)

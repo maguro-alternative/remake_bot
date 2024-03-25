@@ -6,38 +6,15 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-
-	"github.com/maguro-alternative/remake_bot/pkg/db"
-
-	"github.com/maguro-alternative/remake_bot/web/config"
-
-	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
-	//"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
+	"io"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/gorilla/sessions"
-)
 
-//go:generate go run github.com/matryer/moq -out discordsession_mock_test.go . Session
-type Session interface {
-	Guild(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error);
-	GuildChannels(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Channel, err error);
-	GuildMember(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error);
-	GuildRoles(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Role, err error);
-	UserChannelPermissions(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error);
-}
-
-type IndexService struct {
-	DB             db.Driver
-	CookieStore    *sessions.CookieStore
-	DiscordSession Session
-}
-
-
-var (
-	_ Session = (*discordgo.Session)(nil)
+	"github.com/maguro-alternative/remake_bot/web/config"
+	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 //go:generate go run github.com/matryer/moq -out mock_test.go . Repository
@@ -47,6 +24,24 @@ type Repository interface {
 	InsertPermissionIDs(ctx context.Context, permissionsID []internal.PermissionID) error
 }
 
+//go:generate go run github.com/matryer/moq -out discordsession_mock_test.go . Session
+type Session interface {
+	ChannelMessageSend(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error)
+	ChannelFileSendWithMessage(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error)
+	Guild(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error)
+	GuildChannels(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Channel, err error)
+	GuildMember(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error)
+	GuildMembers(guildID string, after string, limit int, options ...discordgo.RequestOption) (st []*discordgo.Member, err error)
+	GuildRoles(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Role, err error)
+	UserChannelPermissions(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error)
+	UserGuilds(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
+}
+
+var (
+	_ Session = (*discordgo.Session)(nil)
+	_ Session = (service.Session)(nil)
+)
+
 //go:generate go run github.com/matryer/moq -out oauth_mock_test.go . OAuthStore
 type OAuthStore interface {
 	GetDiscordOAuth(ctx context.Context, r *http.Request) (*model.DiscordOAuthSession, error)
@@ -54,12 +49,12 @@ type OAuthStore interface {
 }
 
 type PermissionHandler struct {
-	IndexService IndexService
+	IndexService *service.IndexService
 	repo         Repository
 	oauthStore   OAuthStore
 }
 
-func NewPermissionHandler(indexService IndexService) *PermissionHandler {
+func NewPermissionHandler(indexService *service.IndexService) *PermissionHandler {
 	return &PermissionHandler{
 		IndexService: indexService,
 	}

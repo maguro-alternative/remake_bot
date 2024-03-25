@@ -55,12 +55,13 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 	}
 
 	lineChannelJson.GuildID = r.PathValue("guildId")
-	guild, err := h.IndexService.DiscordSession.State.Guild(lineChannelJson.GuildID)
+	guild, err := h.IndexService.DiscordSession.Guild(lineChannelJson.GuildID)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Guild情報取得に失敗しました。 "+err.Error())
 		return
 	}
+
 	oauthPermission := permission.NewPermissionHandler(r, h.IndexService)
 	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_post_discord_channel")
 	if err != nil {

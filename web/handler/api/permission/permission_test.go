@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 
@@ -46,7 +47,7 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 
 	t.Run("パーミッションの更新が成功すること", func(t *testing.T) {
 		h := &PermissionHandler{
-			IndexService: IndexService{
+			IndexService: &service.IndexService{
 				DiscordSession: &SessionMock{
 					GuildFunc: func(guildID string, options ...discordgo.RequestOption) (*discordgo.Guild, error) {
 						return &discordgo.Guild{

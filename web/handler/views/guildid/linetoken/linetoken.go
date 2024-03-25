@@ -45,12 +45,22 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	repo = internal.NewRepository(g.IndexService.DB)
 
-	guild, err := g.IndexService.DiscordSession.State.Guild(guildId)
+	guild, err := g.IndexService.DiscordSession.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Not get guild id: "+err.Error())
 		return
 	}
+
+	if guild.Channels == nil {
+		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
+			return
+		}
+	}
+
 	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)
 	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_bot")
 	if err != nil {

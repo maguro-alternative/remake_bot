@@ -54,7 +54,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lineTokenJson.GuildID = r.PathValue("guildId")
-	guild, err := h.IndexService.DiscordSession.State.Guild(lineTokenJson.GuildID)
+	guild, err := h.IndexService.DiscordSession.Guild(lineTokenJson.GuildID)
 	if err != nil {
 		http.Error(w, "Not get guild id", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "guild idの取得に失敗しました:"+err.Error())

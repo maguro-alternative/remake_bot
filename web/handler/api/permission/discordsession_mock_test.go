@@ -5,6 +5,7 @@ package permission
 
 import (
 	"github.com/bwmarrin/discordgo"
+	"io"
 	"sync"
 )
 
@@ -18,6 +19,12 @@ var _ Session = &SessionMock{}
 //
 //		// make and configure a mocked Session
 //		mockedSession := &SessionMock{
+//			ChannelFileSendWithMessageFunc: func(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+//				panic("mock out the ChannelFileSendWithMessage method")
+//			},
+//			ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+//				panic("mock out the ChannelMessageSend method")
+//			},
 //			GuildFunc: func(guildID string, options ...discordgo.RequestOption) (*discordgo.Guild, error) {
 //				panic("mock out the Guild method")
 //			},
@@ -27,11 +34,17 @@ var _ Session = &SessionMock{}
 //			GuildMemberFunc: func(guildID string, userID string, options ...discordgo.RequestOption) (*discordgo.Member, error) {
 //				panic("mock out the GuildMember method")
 //			},
+//			GuildMembersFunc: func(guildID string, after string, limit int, options ...discordgo.RequestOption) ([]*discordgo.Member, error) {
+//				panic("mock out the GuildMembers method")
+//			},
 //			GuildRolesFunc: func(guildID string, options ...discordgo.RequestOption) ([]*discordgo.Role, error) {
 //				panic("mock out the GuildRoles method")
 //			},
 //			UserChannelPermissionsFunc: func(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (int64, error) {
 //				panic("mock out the UserChannelPermissions method")
+//			},
+//			UserGuildsFunc: func(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) ([]*discordgo.UserGuild, error) {
+//				panic("mock out the UserGuilds method")
 //			},
 //		}
 //
@@ -40,6 +53,12 @@ var _ Session = &SessionMock{}
 //
 //	}
 type SessionMock struct {
+	// ChannelFileSendWithMessageFunc mocks the ChannelFileSendWithMessage method.
+	ChannelFileSendWithMessageFunc func(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error)
+
+	// ChannelMessageSendFunc mocks the ChannelMessageSend method.
+	ChannelMessageSendFunc func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error)
+
 	// GuildFunc mocks the Guild method.
 	GuildFunc func(guildID string, options ...discordgo.RequestOption) (*discordgo.Guild, error)
 
@@ -49,14 +68,42 @@ type SessionMock struct {
 	// GuildMemberFunc mocks the GuildMember method.
 	GuildMemberFunc func(guildID string, userID string, options ...discordgo.RequestOption) (*discordgo.Member, error)
 
+	// GuildMembersFunc mocks the GuildMembers method.
+	GuildMembersFunc func(guildID string, after string, limit int, options ...discordgo.RequestOption) ([]*discordgo.Member, error)
+
 	// GuildRolesFunc mocks the GuildRoles method.
 	GuildRolesFunc func(guildID string, options ...discordgo.RequestOption) ([]*discordgo.Role, error)
 
 	// UserChannelPermissionsFunc mocks the UserChannelPermissions method.
 	UserChannelPermissionsFunc func(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (int64, error)
 
+	// UserGuildsFunc mocks the UserGuilds method.
+	UserGuildsFunc func(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) ([]*discordgo.UserGuild, error)
+
 	// calls tracks calls to the methods.
 	calls struct {
+		// ChannelFileSendWithMessage holds details about calls to the ChannelFileSendWithMessage method.
+		ChannelFileSendWithMessage []struct {
+			// ChannelID is the channelID argument value.
+			ChannelID string
+			// Content is the content argument value.
+			Content string
+			// Name is the name argument value.
+			Name string
+			// R is the r argument value.
+			R io.Reader
+			// Options is the options argument value.
+			Options []discordgo.RequestOption
+		}
+		// ChannelMessageSend holds details about calls to the ChannelMessageSend method.
+		ChannelMessageSend []struct {
+			// ChannelID is the channelID argument value.
+			ChannelID string
+			// Content is the content argument value.
+			Content string
+			// Options is the options argument value.
+			Options []discordgo.RequestOption
+		}
 		// Guild holds details about calls to the Guild method.
 		Guild []struct {
 			// GuildID is the guildID argument value.
@@ -80,6 +127,17 @@ type SessionMock struct {
 			// Options is the options argument value.
 			Options []discordgo.RequestOption
 		}
+		// GuildMembers holds details about calls to the GuildMembers method.
+		GuildMembers []struct {
+			// GuildID is the guildID argument value.
+			GuildID string
+			// After is the after argument value.
+			After string
+			// Limit is the limit argument value.
+			Limit int
+			// Options is the options argument value.
+			Options []discordgo.RequestOption
+		}
 		// GuildRoles holds details about calls to the GuildRoles method.
 		GuildRoles []struct {
 			// GuildID is the guildID argument value.
@@ -96,12 +154,115 @@ type SessionMock struct {
 			// FetchOptions is the fetchOptions argument value.
 			FetchOptions []discordgo.RequestOption
 		}
+		// UserGuilds holds details about calls to the UserGuilds method.
+		UserGuilds []struct {
+			// Limit is the limit argument value.
+			Limit int
+			// BeforeID is the beforeID argument value.
+			BeforeID string
+			// AfterID is the afterID argument value.
+			AfterID string
+			// Options is the options argument value.
+			Options []discordgo.RequestOption
+		}
 	}
-	lockGuild                  sync.RWMutex
-	lockGuildChannels          sync.RWMutex
-	lockGuildMember            sync.RWMutex
-	lockGuildRoles             sync.RWMutex
-	lockUserChannelPermissions sync.RWMutex
+	lockChannelFileSendWithMessage sync.RWMutex
+	lockChannelMessageSend         sync.RWMutex
+	lockGuild                      sync.RWMutex
+	lockGuildChannels              sync.RWMutex
+	lockGuildMember                sync.RWMutex
+	lockGuildMembers               sync.RWMutex
+	lockGuildRoles                 sync.RWMutex
+	lockUserChannelPermissions     sync.RWMutex
+	lockUserGuilds                 sync.RWMutex
+}
+
+// ChannelFileSendWithMessage calls ChannelFileSendWithMessageFunc.
+func (mock *SessionMock) ChannelFileSendWithMessage(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+	if mock.ChannelFileSendWithMessageFunc == nil {
+		panic("SessionMock.ChannelFileSendWithMessageFunc: method is nil but Session.ChannelFileSendWithMessage was just called")
+	}
+	callInfo := struct {
+		ChannelID string
+		Content   string
+		Name      string
+		R         io.Reader
+		Options   []discordgo.RequestOption
+	}{
+		ChannelID: channelID,
+		Content:   content,
+		Name:      name,
+		R:         r,
+		Options:   options,
+	}
+	mock.lockChannelFileSendWithMessage.Lock()
+	mock.calls.ChannelFileSendWithMessage = append(mock.calls.ChannelFileSendWithMessage, callInfo)
+	mock.lockChannelFileSendWithMessage.Unlock()
+	return mock.ChannelFileSendWithMessageFunc(channelID, content, name, r, options...)
+}
+
+// ChannelFileSendWithMessageCalls gets all the calls that were made to ChannelFileSendWithMessage.
+// Check the length with:
+//
+//	len(mockedSession.ChannelFileSendWithMessageCalls())
+func (mock *SessionMock) ChannelFileSendWithMessageCalls() []struct {
+	ChannelID string
+	Content   string
+	Name      string
+	R         io.Reader
+	Options   []discordgo.RequestOption
+} {
+	var calls []struct {
+		ChannelID string
+		Content   string
+		Name      string
+		R         io.Reader
+		Options   []discordgo.RequestOption
+	}
+	mock.lockChannelFileSendWithMessage.RLock()
+	calls = mock.calls.ChannelFileSendWithMessage
+	mock.lockChannelFileSendWithMessage.RUnlock()
+	return calls
+}
+
+// ChannelMessageSend calls ChannelMessageSendFunc.
+func (mock *SessionMock) ChannelMessageSend(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+	if mock.ChannelMessageSendFunc == nil {
+		panic("SessionMock.ChannelMessageSendFunc: method is nil but Session.ChannelMessageSend was just called")
+	}
+	callInfo := struct {
+		ChannelID string
+		Content   string
+		Options   []discordgo.RequestOption
+	}{
+		ChannelID: channelID,
+		Content:   content,
+		Options:   options,
+	}
+	mock.lockChannelMessageSend.Lock()
+	mock.calls.ChannelMessageSend = append(mock.calls.ChannelMessageSend, callInfo)
+	mock.lockChannelMessageSend.Unlock()
+	return mock.ChannelMessageSendFunc(channelID, content, options...)
+}
+
+// ChannelMessageSendCalls gets all the calls that were made to ChannelMessageSend.
+// Check the length with:
+//
+//	len(mockedSession.ChannelMessageSendCalls())
+func (mock *SessionMock) ChannelMessageSendCalls() []struct {
+	ChannelID string
+	Content   string
+	Options   []discordgo.RequestOption
+} {
+	var calls []struct {
+		ChannelID string
+		Content   string
+		Options   []discordgo.RequestOption
+	}
+	mock.lockChannelMessageSend.RLock()
+	calls = mock.calls.ChannelMessageSend
+	mock.lockChannelMessageSend.RUnlock()
+	return calls
 }
 
 // Guild calls GuildFunc.
@@ -216,6 +377,50 @@ func (mock *SessionMock) GuildMemberCalls() []struct {
 	return calls
 }
 
+// GuildMembers calls GuildMembersFunc.
+func (mock *SessionMock) GuildMembers(guildID string, after string, limit int, options ...discordgo.RequestOption) ([]*discordgo.Member, error) {
+	if mock.GuildMembersFunc == nil {
+		panic("SessionMock.GuildMembersFunc: method is nil but Session.GuildMembers was just called")
+	}
+	callInfo := struct {
+		GuildID string
+		After   string
+		Limit   int
+		Options []discordgo.RequestOption
+	}{
+		GuildID: guildID,
+		After:   after,
+		Limit:   limit,
+		Options: options,
+	}
+	mock.lockGuildMembers.Lock()
+	mock.calls.GuildMembers = append(mock.calls.GuildMembers, callInfo)
+	mock.lockGuildMembers.Unlock()
+	return mock.GuildMembersFunc(guildID, after, limit, options...)
+}
+
+// GuildMembersCalls gets all the calls that were made to GuildMembers.
+// Check the length with:
+//
+//	len(mockedSession.GuildMembersCalls())
+func (mock *SessionMock) GuildMembersCalls() []struct {
+	GuildID string
+	After   string
+	Limit   int
+	Options []discordgo.RequestOption
+} {
+	var calls []struct {
+		GuildID string
+		After   string
+		Limit   int
+		Options []discordgo.RequestOption
+	}
+	mock.lockGuildMembers.RLock()
+	calls = mock.calls.GuildMembers
+	mock.lockGuildMembers.RUnlock()
+	return calls
+}
+
 // GuildRoles calls GuildRolesFunc.
 func (mock *SessionMock) GuildRoles(guildID string, options ...discordgo.RequestOption) ([]*discordgo.Role, error) {
 	if mock.GuildRolesFunc == nil {
@@ -289,5 +494,49 @@ func (mock *SessionMock) UserChannelPermissionsCalls() []struct {
 	mock.lockUserChannelPermissions.RLock()
 	calls = mock.calls.UserChannelPermissions
 	mock.lockUserChannelPermissions.RUnlock()
+	return calls
+}
+
+// UserGuilds calls UserGuildsFunc.
+func (mock *SessionMock) UserGuilds(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) ([]*discordgo.UserGuild, error) {
+	if mock.UserGuildsFunc == nil {
+		panic("SessionMock.UserGuildsFunc: method is nil but Session.UserGuilds was just called")
+	}
+	callInfo := struct {
+		Limit    int
+		BeforeID string
+		AfterID  string
+		Options  []discordgo.RequestOption
+	}{
+		Limit:    limit,
+		BeforeID: beforeID,
+		AfterID:  afterID,
+		Options:  options,
+	}
+	mock.lockUserGuilds.Lock()
+	mock.calls.UserGuilds = append(mock.calls.UserGuilds, callInfo)
+	mock.lockUserGuilds.Unlock()
+	return mock.UserGuildsFunc(limit, beforeID, afterID, options...)
+}
+
+// UserGuildsCalls gets all the calls that were made to UserGuilds.
+// Check the length with:
+//
+//	len(mockedSession.UserGuildsCalls())
+func (mock *SessionMock) UserGuildsCalls() []struct {
+	Limit    int
+	BeforeID string
+	AfterID  string
+	Options  []discordgo.RequestOption
+} {
+	var calls []struct {
+		Limit    int
+		BeforeID string
+		AfterID  string
+		Options  []discordgo.RequestOption
+	}
+	mock.lockUserGuilds.RLock()
+	calls = mock.calls.UserGuilds
+	mock.lockUserGuilds.RUnlock()
 	return calls
 }

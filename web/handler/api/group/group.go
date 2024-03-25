@@ -6,17 +6,28 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/maguro-alternative/remake_bot/pkg/line"
+
 	"github.com/maguro-alternative/remake_bot/web/handler/api/group/internal"
-	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/shared/permission"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
+//go:generate go run github.com/matryer/moq -out mock_test.go . Repository
 type Repository interface {
 	UpdateLineBot(ctx context.Context, lineBot *internal.LineBot) error
 }
 
+//go:generate go run github.com/matryer/moq -out permission_mock_test.go . OAuthPermission
+type OAuthPermission interface {
+	CheckLinePermission(ctx context.Context, r *http.Request, guildId string) (lineProfile line.LineProfile, lineLoginUser *model.LineOAuthSession, err error)
+}
+
 type LineGroupHandler struct {
-	IndexService *service.IndexService
+	IndexService    *service.IndexService
+	repo            Repository
+	oauthPermission OAuthPermission
 }
 
 func NewLineGroupHandler(indexService *service.IndexService) *LineGroupHandler {
@@ -37,6 +48,7 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var lineGroupJson internal.LineBotJson
 	var repo Repository
+	var oauthPermission OAuthPermission
 	if err := json.NewDecoder(r.Body).Decode(&lineGroupJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました:"+err.Error())
@@ -48,7 +60,10 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	guildId := r.PathValue("guildId")
-	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)
+	oauthPermission = permission.NewPermissionHandler(r, g.IndexService)
+	if g.oauthPermission != nil {
+		oauthPermission = g.oauthPermission
+	}
 	_, _, err := oauthPermission.CheckLinePermission(
 		ctx,
 		r,
@@ -60,8 +75,12 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	repo = internal.NewRepository(g.IndexService.DB)
+	// mockの場合はmockを使用
+	if g.repo != nil {
+		repo = g.repo
+	}
 	err = repo.UpdateLineBot(ctx, &internal.LineBot{
-		GuildID: guildId,
+		GuildID:          guildId,
 		DefaultChannelID: lineGroupJson.DefaultChannelID,
 	})
 	if err != nil {
@@ -72,4 +91,3 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("OK")
 }
-

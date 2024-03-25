@@ -55,7 +55,7 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := lineGroupJson.Validate(); err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		http.Error(w, "Unprocessable Entity", http.StatusUnprocessableEntity)
 		slog.ErrorContext(ctx, "jsonのバリデーションに失敗しました:"+err.Error())
 		return
 	}

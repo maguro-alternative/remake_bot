@@ -13,6 +13,7 @@ type LineBotJson struct {
 func (g LineBotJson) Validate() error {
 	return validation.ValidateStruct(&g,
 		validation.Field(&g.DefaultChannelID, is.Digit),
+		validation.Field(&g.DefaultChannelID, validation.Required),
 	)
 }
 

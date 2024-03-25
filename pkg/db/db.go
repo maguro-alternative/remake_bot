@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"log/slog"
 	"fmt"
 	"time"
 
@@ -54,7 +55,7 @@ func retryOperation(ctx context.Context, operation func() error) error {
 		err = backoff.Permanent(err)
 		return errors.WithStack(err)
 	}, retryBackoff, func(err error, duration time.Duration) {
-		//slog.WarnContext(ctx, fmt.Sprintf("%v retrying in %v...", err, duration))
+		slog.WarnContext(ctx, fmt.Sprintf("%v retrying in %v...", err, duration))
 	})
 	return errors.WithStack(err)
 }

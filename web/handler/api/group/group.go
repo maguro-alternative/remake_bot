@@ -49,6 +49,7 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var lineGroupJson internal.LineBotJson
 	var repo Repository
 	var oauthPermission OAuthPermission
+	var client http.Client
 	if err := json.NewDecoder(r.Body).Decode(&lineGroupJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました:"+err.Error())
@@ -60,7 +61,7 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	guildId := r.PathValue("guildId")
-	oauthPermission = permission.NewPermissionHandler(r, g.IndexService)
+	oauthPermission = permission.NewPermissionHandler(r, &client, g.IndexService)
 	if g.oauthPermission != nil {
 		oauthPermission = g.oauthPermission
 	}

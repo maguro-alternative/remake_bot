@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/bwmarrin/discordgo"
+
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/permission/internal"
@@ -43,8 +45,9 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	var repo Repository
 	var componentPermissionIDs []components.PermissionID
+	var client http.Client
 
-	guild, err := h.IndexService.DiscordSession.Guild(guildId)
+	guild, err := h.IndexService.DiscordSession.Guild(guildId, discordgo.WithClient(&client))
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Not get guild id: "+err.Error())
@@ -52,7 +55,7 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if guild.Members == nil {
-		guild.Members, err = h.IndexService.DiscordSession.GuildMembers(guildId, "", 1000)
+		guild.Members, err = h.IndexService.DiscordSession.GuildMembers(guildId, "", 1000, discordgo.WithClient(&client))
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild members: "+err.Error())

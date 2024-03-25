@@ -1,16 +1,21 @@
-package linechannel
+package linepostdiscordchannel
 
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"log/slog"
 	"net/http"
+
+	"github.com/bwmarrin/discordgo"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
+//go:generate go run github.com/matryer/moq -out mock_test.go . Repository
 type Repository interface {
 	UpdateLinePostDiscordChannel(ctx context.Context, linePostDiscordChannel internal.LinePostDiscordChannel) error
 	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordMessageTypes []internal.LineNgDiscordMessageType) error
@@ -19,9 +24,34 @@ type Repository interface {
 	DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []internal.LineNgID) error
 }
 
-type LinePostDiscordChannelHandler struct {
-	IndexService *service.IndexService
+//go:generate go run github.com/matryer/moq -out permission_mock_test.go . OAuthPermission
+type OAuthPermission interface {
+	CheckDiscordPermission(ctx context.Context, guild *discordgo.Guild, permissionType string) (statusCode int, discordPermissionData *model.DiscordPermissionData, err error)
 }
+
+type LinePostDiscordChannelHandler struct {
+	IndexService    *service.IndexService
+	repo            Repository
+	oauthPermission OAuthPermission
+}
+
+//go:generate go run github.com/matryer/moq -out discordsession_mock_test.go . Session
+type Session interface {
+	ChannelMessageSend(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error)
+	ChannelFileSendWithMessage(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error)
+	Guild(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error)
+	GuildChannels(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Channel, err error)
+	GuildMember(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error)
+	GuildMembers(guildID string, after string, limit int, options ...discordgo.RequestOption) (st []*discordgo.Member, err error)
+	GuildRoles(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Role, err error)
+	UserChannelPermissions(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error)
+	UserGuilds(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
+}
+
+var (
+	_ Session = (*discordgo.Session)(nil)
+	_ Session = (service.Session)(nil)
+)
 
 func NewLinePostDiscordChannelHandler(indexService *service.IndexService) *LinePostDiscordChannelHandler {
 	return &LinePostDiscordChannelHandler{
@@ -42,6 +72,8 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 	}
 	var lineChannelJson internal.LinePostDiscordChannelJson
 	var repo Repository
+	var oauthPermission OAuthPermission
+	var client http.Client
 	if err := json.NewDecoder(r.Body).Decode(&lineChannelJson); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Json読み取りに失敗しました。 "+err.Error())
@@ -55,14 +87,18 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 	}
 
 	lineChannelJson.GuildID = r.PathValue("guildId")
-	guild, err := h.IndexService.DiscordSession.Guild(lineChannelJson.GuildID)
+	guild, err := h.IndexService.DiscordSession.Guild(lineChannelJson.GuildID, discordgo.WithClient(&client))
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Guild情報取得に失敗しました。 "+err.Error())
 		return
 	}
 
-	oauthPermission := permission.NewPermissionHandler(r, h.IndexService)
+	oauthPermission = permission.NewPermissionHandler(r, &client, h.IndexService)
+	// テスト用
+	if h.oauthPermission != nil {
+		oauthPermission = h.oauthPermission
+	}
 	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_post_discord_channel")
 	if err != nil {
 		if statusCode == http.StatusFound {
@@ -78,6 +114,10 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 	}
 
 	repo = internal.NewRepository(h.IndexService.DB)
+	// mockの場合はmockを使用
+	if h.repo != nil {
+		repo = h.repo
+	}
 	lineChannels, lineNgTypes, lineNgIDs := lineChannelJsonRead(lineChannelJson)
 
 	for _, lineChannel := range lineChannels {

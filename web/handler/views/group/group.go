@@ -11,8 +11,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
-	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/handler/views/group/internal"
+	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
@@ -33,13 +33,14 @@ func NewLineGroupViewHandler(indexService *service.IndexService) *LineGroupViewH
 
 func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	var repo Repository
+	var client http.Client
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	guildId := r.PathValue("guildId")
 	categoryPositions := make(map[string]components.DiscordChannel)
-	guild, err := g.IndexService.DiscordSession.Guild(guildId)
+	guild, err := g.IndexService.DiscordSession.Guild(guildId, discordgo.WithClient(&client))
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: ", "エラーメッセージ:", err.Error())
@@ -47,7 +48,7 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if guild.Channels == nil {
-		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId)
+		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId, discordgo.WithClient(&client))
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
@@ -55,7 +56,7 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)
+	oauthPermission := permission.NewPermissionHandler(r, &client, g.IndexService)
 	_, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "")
 	if err != nil {
 		discordPermissionData = &model.DiscordPermissionData{}
@@ -122,10 +123,10 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		JsScriptTag template.HTML
 		Channels    template.HTML
 	}{
-		Title:      "グループ",
-		AccountVer: template.HTML(accountVer.String()),
+		Title:       "グループ",
+		AccountVer:  template.HTML(accountVer.String()),
 		JsScriptTag: template.HTML(`<script src="/static/js/group.js"></script>`),
-		Channels:   template.HTML(htmlSelectChannels),
+		Channels:    template.HTML(htmlSelectChannels),
 	})
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -166,4 +167,3 @@ func createChannelsInCategory(
 		}
 	}
 }
-

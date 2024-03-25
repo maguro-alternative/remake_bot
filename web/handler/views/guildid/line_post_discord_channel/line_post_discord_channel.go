@@ -65,13 +65,14 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	categoryPositions := make(map[string]components.DiscordChannel)
 	var categoryIDTmps []string
 	var repo Repository
+	var client http.Client
 	guildId := r.PathValue("guildId")
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
-	guild, err := g.IndexService.DiscordSession.Guild(guildId)
+	guild, err := g.IndexService.DiscordSession.Guild(guildId, discordgo.WithClient(&client))
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました:"+err.Error())
@@ -88,7 +89,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	}
 
 	if guild.Channels == nil {
-		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId)
+		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId, discordgo.WithClient(&client))
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
@@ -96,7 +97,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		}
 	}
 
-	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)
+	oauthPermission := permission.NewPermissionHandler(r, &client, g.IndexService)
 	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_post_discord_channel")
 	if err != nil {
 		if statusCode == http.StatusFound {

@@ -23,12 +23,14 @@ type Repository interface {
 
 type PermissionHandler struct {
 	Request      *http.Request
+	Client       *http.Client
 	IndexService *service.IndexService
 }
 
-func NewPermissionHandler(r *http.Request, indexService *service.IndexService) *PermissionHandler {
+func NewPermissionHandler(r *http.Request, c *http.Client, indexService *service.IndexService) *PermissionHandler {
 	return &PermissionHandler{
 		Request:      r,
+		Client:       c,
 		IndexService: indexService,
 	}
 }
@@ -43,17 +45,13 @@ func (p *PermissionHandler) CheckDiscordPermission(
 	var repo Repository
 	permissionData.Permission = ""
 	userPermissionCode = 0
-	client := &http.Client{}
 
 	repo = internal.NewRepository(p.IndexService.DB)
 
 	oauthStore := getoauth.NewOAuthStore(p.IndexService.CookieStore, config.SessionSecret())
 
 	// ログインユーザーの取得
-	discordLoginUser, err := oauthStore.GetDiscordOAuth(
-		ctx,
-		p.Request,
-	)
+	discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, p.Request)
 	if err != nil {
 		return http.StatusFound, nil, err
 	}
@@ -64,7 +62,7 @@ func (p *PermissionHandler) CheckDiscordPermission(
 		return http.StatusFound, nil, err
 	}
 	req.Header.Set("Authorization", "Bearer "+discordLoginUser.Token)
-	resp, err := client.Do(req)
+	resp, err := p.Client.Do(req)
 	if err != nil {
 		return http.StatusFound, nil, err
 	}
@@ -80,11 +78,11 @@ func (p *PermissionHandler) CheckDiscordPermission(
 	if err != nil {
 		return http.StatusInternalServerError, nil, err
 	}
-	discordGuildMember, err := p.IndexService.DiscordSession.GuildMember(guild.ID, discordLoginUser.User.ID, discordgo.WithClient(client))
+	discordGuildMember, err := p.IndexService.DiscordSession.GuildMember(guild.ID, discordLoginUser.User.ID, discordgo.WithClient(p.Client))
 	if err != nil {
 		return http.StatusInternalServerError, nil, err
 	}
-	guildRoles, err := p.IndexService.DiscordSession.GuildRoles(guild.ID)
+	guildRoles, err := p.IndexService.DiscordSession.GuildRoles(guild.ID, discordgo.WithClient(p.Client))
 	if err != nil {
 		return http.StatusInternalServerError, nil, err
 	}
@@ -98,14 +96,14 @@ func (p *PermissionHandler) CheckDiscordPermission(
 	}
 
 	// チャンネル一覧を取得
-	channels, err := p.IndexService.DiscordSession.GuildChannels(guild.ID)
+	channels, err := p.IndexService.DiscordSession.GuildChannels(guild.ID, discordgo.WithClient(p.Client))
 	if err != nil {
 		return http.StatusInternalServerError, nil, err
 	}
 
 	// メンバーの権限を取得
 	// discordgoの場合guildMemberから正しく権限を取得できないため、UserChannelPermissionsを使用
-	memberPermission, err := p.IndexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, channels[0].ID)
+	memberPermission, err := p.IndexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, channels[0].ID, discordgo.WithClient(p.Client))
 	if err != nil {
 		return http.StatusInternalServerError, nil, err
 	}

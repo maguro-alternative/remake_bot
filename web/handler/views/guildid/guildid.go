@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/bwmarrin/discordgo"
+
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -27,18 +29,19 @@ func NewGuildIDViewHandler(indexService *service.IndexService) *GuildIDViewHandl
 
 func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	var settingLinks string
+	var client http.Client
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	guildId := r.PathValue("guildId")
-	guild, err := g.IndexService.DiscordSession.Guild(guildId)
+	guild, err := g.IndexService.DiscordSession.Guild(guildId, discordgo.WithClient(&client))
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: ", "エラーメッセージ:", err.Error())
 		return
 	}
-	oauthPermission := permission.NewPermissionHandler(r, g.IndexService)
+	oauthPermission := permission.NewPermissionHandler(r, &client, g.IndexService)
 	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "")
 	if err != nil {
 		if statusCode == 302 {

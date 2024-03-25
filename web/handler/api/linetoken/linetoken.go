@@ -43,6 +43,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var lineTokenJson internal.LineBotJson
 	var repo Repository
+	var client http.Client
 	if err := json.NewDecoder(r.Body).Decode(&lineTokenJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました:"+err.Error())
@@ -60,7 +61,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "guild idの取得に失敗しました:"+err.Error())
 		return
 	}
-	oauthPermission := permission.NewPermissionHandler(r, h.IndexService)
+	oauthPermission := permission.NewPermissionHandler(r, &client, h.IndexService)
 	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_bot")
 	if err != nil {
 		if statusCode == http.StatusFound {

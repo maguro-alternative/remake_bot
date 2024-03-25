@@ -54,13 +54,14 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var matchGuilds []discordgo.UserGuild
-	botGuilds, err := g.IndexService.DiscordSession.UserGuilds(100, "", "")
+	var client http.Client
+	botGuilds, err := g.IndexService.DiscordSession.UserGuilds(100, "", "", discordgo.WithClient(&client))
 	if err != nil {
 		slog.ErrorContext(ctx, "Botサーバー取得に失敗しました。", "エラー: ", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	userGuilds, err := getUserGuilds(discordLoginUser.Token)
+	userGuilds, err := getUserGuilds(discordLoginUser.Token, client)
 	if err != nil {
 		slog.ErrorContext(ctx, "ユーザーサーバー取得に失敗しました。", "エラー: ", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -114,14 +115,13 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 }
 
 // discordgo.UserGuildをそのまま使用すると、jsonデコード時にエラーが発生するため、userGuildを使用する
-func getUserGuilds(token string) ([]discordgo.UserGuild, error) {
+func getUserGuilds(token string, client http.Client) ([]discordgo.UserGuild, error) {
 	url := "https://discord.com/api/users/@me/guilds"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
-	client := new(http.Client)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err

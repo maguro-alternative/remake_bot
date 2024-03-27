@@ -34,6 +34,22 @@ type LineBotDefaultChannelID struct {
 	DefaultChannelID string `db:"default_channel_id"`
 }
 
+func (r *Repository) InsertLineBot(ctx context.Context, lineBot *LineBot)  error {
+	query := `
+		INSERT INTO line_bot (
+			guild_id,
+			default_channel_id,
+			debug_mode
+		) VALUES (
+			:guild_id,
+			:default_channel_id,
+			:debug_mode
+		) ON CONFLICT (guild_id) DO NOTHING
+	`
+	_, err := r.db.NamedExecContext(ctx, query, lineBot)
+	return err
+}
+
 func (r *Repository) GetAllColumnsLineBots(ctx context.Context) ([]*LineBot, error) {
 	var lineBots []*LineBot
 	query := `

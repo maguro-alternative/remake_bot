@@ -15,6 +15,43 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestRepository_InsertLineBots(t *testing.T) {
+	ctx := context.Background()
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	assert.NoError(t, err)
+	defer cleanup()
+	tx, err := dbV1.BeginTxx(ctx, nil)
+	assert.NoError(t, err)
+
+	defer tx.RollbackCtx(ctx)
+
+	tx.ExecContext(ctx, "DELETE FROM line_bot")
+
+	repo := NewRepository(tx)
+	t.Run("LineBotが正しく登録されること", func(t *testing.T) {
+		lineBot := LineBot{
+			GuildID:          "987654321",
+			LineNotifyToken:  pq.ByteaArray{[]byte("123456789")},
+			LineBotToken:     pq.ByteaArray{[]byte("123456789")},
+			LineBotSecret:    pq.ByteaArray{[]byte("123456789")},
+			LineGroupID:      pq.ByteaArray{[]byte("987654321")},
+			LineClientID:     pq.ByteaArray{[]byte("123456789")},
+			LineClientSecret: pq.ByteaArray{[]byte("123456789")},
+			DefaultChannelID: "987654321",
+			DebugMode:        false,
+		}
+		err := repo.InsertLineBot(ctx, &lineBot)
+		assert.NoError(t, err)
+
+		var lineBotRes LineBot
+		err = tx.GetContext(ctx, &lineBotRes, "SELECT * FROM line_bot WHERE guild_id = $1", "987654321")
+		assert.NoError(t, err)
+		assert.Equal(t, "987654321", lineBotRes.GuildID)
+		assert.Equal(t, "987654321", lineBotRes.DefaultChannelID)
+		assert.Equal(t, false, lineBotRes.DebugMode)
+	})
+}
+
 func TestRepository_GetLineBots(t *testing.T) {
 	ctx := context.Background()
 	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())

@@ -241,7 +241,12 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 				slog.ErrorContext(ctx, "ffmpegの実行に失敗しました", "エラー:", err.Error())
 				return
 			}
-			match := regexp.MustCompile(`(\d+\.\d+)`).FindStringSubmatch(string(out))
+			re, err := regexp.Compile(`(\d+\.\d+)`)
+			if err != nil {
+				slog.ErrorContext(ctx, "正規表現のコンパイルに失敗しました", "エラー:", err.Error())
+				return
+			}
+			match := re.FindStringSubmatch(string(out))
 			slog.InfoContext(ctx, "秒数:"+match[0])
 			audioLen, err := strconv.ParseFloat(match[0], 64)
 			if err != nil {

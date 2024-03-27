@@ -9,19 +9,20 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 //go:generate go run github.com/matryer/moq -out mock_test.go . Repository
 type Repository interface {
-	UpdateLinePostDiscordChannel(ctx context.Context, linePostDiscordChannel internal.LinePostDiscordChannel) error
-	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordMessageTypes []internal.LineNgDiscordMessageType) error
-	DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordMessageTypes []internal.LineNgDiscordMessageType) error
-	InsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []internal.LineNgID) error
-	DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []internal.LineNgID) error
+	UpdateLinePostDiscordChannel(ctx context.Context, linePostDiscordChannel repository.LinePostDiscordChannelAllColumns) error
+	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordMessageTypes []repository.LineNgDiscordMessageType) error
+	DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordMessageTypes []repository.LineNgDiscordMessageType) error
+	InsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordIDAllCoulmns) error
+	DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordIDAllCoulmns) error
 }
 
 //go:generate go run github.com/matryer/moq -out permission_mock_test.go . OAuthPermission
@@ -30,9 +31,9 @@ type OAuthPermission interface {
 }
 
 type LinePostDiscordChannelHandler struct {
-	IndexService    *service.IndexService
-	repo            Repository
-	oauthPermission OAuthPermission
+	IndexService          *service.IndexService
+	Repo                  Repository
+	DiscordPermissiondata *model.DiscordPermissionData
 }
 
 //go:generate go run github.com/matryer/moq -out discordsession_mock_test.go . Session
@@ -49,13 +50,20 @@ type Session interface {
 }
 
 var (
-	_ Session = (*discordgo.Session)(nil)
-	_ Session = (service.Session)(nil)
+	_ Session    = (*discordgo.Session)(nil)
+	_ Session    = (service.Session)(nil)
+	_ Repository = (*repository.Repository)(nil)
 )
 
-func NewLinePostDiscordChannelHandler(indexService *service.IndexService) *LinePostDiscordChannelHandler {
+func NewLinePostDiscordChannelHandler(
+	indexService *service.IndexService,
+	repo Repository,
+	DiscordPermissionData *model.DiscordPermissionData,
+) *LinePostDiscordChannelHandler {
 	return &LinePostDiscordChannelHandler{
-		IndexService: indexService,
+		IndexService:          indexService,
+		Repo:                  repo,
+		DiscordPermissiondata: DiscordPermissionData,
 	}
 }
 
@@ -72,8 +80,6 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 	}
 	var lineChannelJson internal.LinePostDiscordChannelJson
 	var repo Repository
-	var oauthPermission OAuthPermission
-	var client http.Client
 	if err := json.NewDecoder(r.Body).Decode(&lineChannelJson); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Json読み取りに失敗しました。 "+err.Error())
@@ -87,41 +93,18 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 	}
 
 	lineChannelJson.GuildID = r.PathValue("guildId")
-	guild, err := h.IndexService.DiscordSession.Guild(lineChannelJson.GuildID, discordgo.WithClient(&client))
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "Guild情報取得に失敗しました。 "+err.Error())
-		return
-	}
 
-	oauthPermission = permission.NewPermissionHandler(r, &client, h.IndexService)
-	// テスト用
-	if h.oauthPermission != nil {
-		oauthPermission = h.oauthPermission
-	}
-	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_post_discord_channel")
-	if err != nil {
-		if statusCode == http.StatusFound {
-			slog.InfoContext(ctx, "Redirect to /login/discord")
-			http.Redirect(w, r, "/login/discord", http.StatusFound)
-			return
-		}
-		if discordPermissionData.Permission == "" {
-			http.Error(w, "Not permission", statusCode)
-			slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
-			return
-		}
-	}
-
-	repo = internal.NewRepository(h.IndexService.DB)
-	// mockの場合はmockを使用
-	if h.repo != nil {
-		repo = h.repo
-	}
+	repo = h.Repo
 	lineChannels, lineNgTypes, lineNgIDs := lineChannelJsonRead(lineChannelJson)
 
 	for _, lineChannel := range lineChannels {
-		if err := repo.UpdateLinePostDiscordChannel(ctx, lineChannel); err != nil {
+		linePostDiscordChannel := repository.NewLinePostDiscordChannel(
+			lineChannel.ChannelID,
+			lineChannel.GuildID,
+			lineChannel.Ng,
+			lineChannel.BotMessage,
+		)
+		if err := repo.UpdateLinePostDiscordChannel(ctx, *linePostDiscordChannel); err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "line_post_discord_channel更新に失敗しました。 "+err.Error())
 			return
@@ -156,44 +139,52 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 	json.NewEncoder(w).Encode("OK")
 }
 
-func lineChannelJsonRead(lineChannelJson internal.LinePostDiscordChannelJson) (channels []internal.LinePostDiscordChannel, ngTypes []internal.LineNgDiscordMessageType, ngIDs []internal.LineNgID) {
-	var lineChannels []internal.LinePostDiscordChannel
-	var lineNgTypes []internal.LineNgDiscordMessageType
-	var lineNgIDs []internal.LineNgID
+func lineChannelJsonRead(lineChannelJson internal.LinePostDiscordChannelJson) (
+	channels []repository.LinePostDiscordChannelAllColumns,
+	ngTypes []repository.LineNgDiscordMessageType,
+	ngIDs []repository.LineNgDiscordIDAllCoulmns,
+) {
+	var lineChannels []repository.LinePostDiscordChannelAllColumns
+	var lineNgTypes []repository.LineNgDiscordMessageType
+	var lineNgIDs []repository.LineNgDiscordIDAllCoulmns
 	for _, lineChannel := range lineChannelJson.Channels {
-		lineChannels = append(lineChannels, internal.LinePostDiscordChannel{
-			ChannelID:  lineChannel.ChannelID,
-			GuildID:    lineChannelJson.GuildID,
-			Ng:         lineChannel.Ng,
-			BotMessage: lineChannel.BotMessage,
-		})
+		channel := repository.NewLinePostDiscordChannel(
+			lineChannel.ChannelID,
+			lineChannelJson.GuildID,
+			lineChannel.Ng,
+			lineChannel.BotMessage,
+		)
+		lineChannels = append(lineChannels, *channel)
 		if len(lineChannel.NgTypes) > 0 {
 			for _, ngType := range lineChannel.NgTypes {
-				lineNgTypes = append(lineNgTypes, internal.LineNgDiscordMessageType{
-					ChannelID: lineChannel.ChannelID,
-					GuildID:   lineChannelJson.GuildID,
-					Type:      ngType,
-				})
+				messageType := repository.NewLineNgDiscordMessageType(
+					lineChannel.ChannelID,
+					lineChannelJson.GuildID,
+					ngType,
+				)
+				lineNgTypes = append(lineNgTypes, *messageType)
 			}
 		}
 		if len(lineChannel.NgUsers) > 0 {
 			for _, ngUser := range lineChannel.NgUsers {
-				lineNgIDs = append(lineNgIDs, internal.LineNgID{
-					ChannelID: lineChannel.ChannelID,
-					GuildID:   lineChannelJson.GuildID,
-					ID:        ngUser,
-					IDType:    "user",
-				})
+				user := repository.NewLineNgDiscordID(
+					lineChannel.ChannelID,
+					lineChannelJson.GuildID,
+					ngUser,
+					"user",
+				)
+				lineNgIDs = append(lineNgIDs, *user)
 			}
 		}
 		if len(lineChannel.NgRoles) > 0 {
 			for _, ngRole := range lineChannel.NgRoles {
-				lineNgIDs = append(lineNgIDs, internal.LineNgID{
-					ChannelID: lineChannel.ChannelID,
-					GuildID:   lineChannelJson.GuildID,
-					ID:        ngRole,
-					IDType:    "role",
-				})
+				role := repository.NewLineNgDiscordID(
+					lineChannel.ChannelID,
+					lineChannelJson.GuildID,
+					ngRole,
+					"role",
+				)
+				lineNgIDs = append(lineNgIDs, *role)
 			}
 		}
 	}

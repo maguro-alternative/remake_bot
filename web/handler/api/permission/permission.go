@@ -4,24 +4,26 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
-	"io"
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/web/config"
-	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
+	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 //go:generate go run github.com/matryer/moq -out mock_test.go . Repository
 type Repository interface {
-	UpdatePermissionCodes(ctx context.Context, permissionsCode []internal.PermissionCode) error
+	UpdatePermissionCodes(ctx context.Context, permissionsCode []repository.PermissionCode) error
 	DeletePermissionIDs(ctx context.Context, guildId string) error
-	InsertPermissionIDs(ctx context.Context, permissionsID []internal.PermissionID) error
+	InsertPermissionIDs(ctx context.Context, permissionsID []repository.PermissionIDAllColumns) error
 }
 
 //go:generate go run github.com/matryer/moq -out discordsession_mock_test.go . Session
@@ -50,13 +52,14 @@ type OAuthStore interface {
 
 type PermissionHandler struct {
 	IndexService *service.IndexService
-	repo         Repository
+	Repo         Repository
 	oauthStore   OAuthStore
 }
 
-func NewPermissionHandler(indexService *service.IndexService) *PermissionHandler {
+func NewPermissionHandler(indexService *service.IndexService, repo service.Repository,) *PermissionHandler {
 	return &PermissionHandler{
 		IndexService: indexService,
+		Repo:         repo,
 	}
 }
 
@@ -76,13 +79,11 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var permissionJson internal.PermissionJson
+	var permissionCodes []repository.PermissionCode
+	var permissionIDs []repository.PermissionIDAllColumns
 
 	// パーミッションの更新
-	repo = internal.NewRepository(h.IndexService.DB)
-	// mockの場合はmockを使用
-	if h.repo != nil {
-		repo = h.repo
-	}
+	repo = h.Repo
 
 	oauthStore = getoauth.NewOAuthStore(h.IndexService.CookieStore, config.SessionSecret())
 	// mockの場合はmockを使用
@@ -160,7 +161,25 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := repo.UpdatePermissionCodes(ctx, permissionJson.PermissionCodes); err != nil {
+	for _, permissionCode := range permissionJson.PermissionCodes {
+		permissionCodes = append(permissionCodes, repository.PermissionCode{
+			GuildID: guildId,
+			Type:    permissionCode.Type,
+			Code:    permissionCode.Code,
+		})
+	}
+
+	for _, permissionID := range permissionJson.PermissionIDs {
+		permissionIDs = append(permissionIDs, repository.PermissionIDAllColumns{
+			GuildID:    guildId,
+			Type:       permissionID.Type,
+			TargetType: permissionID.TargetType,
+			TargetID:   permissionID.TargetID,
+			Permission: permissionID.Permission,
+		})
+	}
+
+	if err := repo.UpdatePermissionCodes(ctx, permissionCodes); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの更新に失敗しました。", "エラー:", err.Error())
 		return
@@ -172,7 +191,7 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := repo.InsertPermissionIDs(ctx, permissionJson.PermissionIDs); err != nil {
+	if err := repo.InsertPermissionIDs(ctx, permissionIDs); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの追加に失敗しました。", "エラー:", err.Error())
 		return

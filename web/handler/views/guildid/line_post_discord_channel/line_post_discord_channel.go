@@ -10,9 +10,10 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/config"
-	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
@@ -45,19 +46,31 @@ var (
 )
 
 type Repository interface {
-	GetLinePostDiscordChannel(ctx context.Context, channelID string) (internal.LinePostDiscordChannel, error)
+	GetLinePostDiscordChannel(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error)
 	InsertLinePostDiscordChannel(ctx context.Context, channelID, guildID string) error
 	GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error)
-	GetLineNgDiscordID(ctx context.Context, channelID string) ([]internal.LineNgID, error)
+	GetLineNgDiscordID(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error)
 }
+
+var (
+	_ Repository = (*repository.Repository)(nil)
+)
 
 type LinePostDiscordChannelViewHandler struct {
-	IndexService *service.IndexService
+	IndexService          *service.IndexService
+	Repo                  Repository
+	DiscordPermissiondata *model.DiscordPermissionData
 }
 
-func NewLinePostDiscordChannelViewHandler(indexService *service.IndexService) *LinePostDiscordChannelViewHandler {
+func NewLinePostDiscordChannelViewHandler(
+	indexService *service.IndexService,
+	repo Repository,
+	permissionData *model.DiscordPermissionData,
+) *LinePostDiscordChannelViewHandler {
 	return &LinePostDiscordChannelViewHandler{
-		IndexService: indexService,
+		IndexService:          indexService,
+		Repo:                  repo,
+		DiscordPermissiondata: permissionData,
 	}
 }
 
@@ -119,7 +132,8 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	}
 	//[categoryID]map[channelPosition]channelName
 	channelsInCategory := make(map[string][]components.DiscordChannelSet)
-	repo = internal.NewRepository(g.IndexService.DB)
+	repo = g.Repo
+	fmt.Printf("(%%#v) %#v\n", repo)
 	for _, channel := range guild.Channels {
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue
@@ -224,9 +238,7 @@ func createCategoryInChannels(
 			slog.ErrorContext(ctx, "line_post_discord_channelの追加に失敗しました:"+err.Error())
 			return err
 		}
-		discordChannel = internal.LinePostDiscordChannel{
-			ChannelID:  channel.ID,
-			GuildID:    guild.ID,
+		discordChannel = repository.LinePostDiscordChannel{
 			Ng:         false,
 			BotMessage: false,
 		}

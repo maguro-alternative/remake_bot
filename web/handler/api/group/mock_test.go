@@ -5,7 +5,7 @@ package group
 
 import (
 	"context"
-	"github.com/maguro-alternative/remake_bot/web/handler/api/group/internal"
+	"github.com/maguro-alternative/remake_bot/repository"
 	"sync"
 )
 
@@ -19,7 +19,7 @@ var _ Repository = &RepositoryMock{}
 //
 //		// make and configure a mocked Repository
 //		mockedRepository := &RepositoryMock{
-//			UpdateLineBotFunc: func(ctx context.Context, lineBot *internal.LineBot) error {
+//			UpdateLineBotFunc: func(ctx context.Context, lineBot *repository.LineBot) error {
 //				panic("mock out the UpdateLineBot method")
 //			},
 //		}
@@ -30,7 +30,7 @@ var _ Repository = &RepositoryMock{}
 //	}
 type RepositoryMock struct {
 	// UpdateLineBotFunc mocks the UpdateLineBot method.
-	UpdateLineBotFunc func(ctx context.Context, lineBot *internal.LineBot) error
+	UpdateLineBotFunc func(ctx context.Context, lineBot *repository.LineBot) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -39,20 +39,20 @@ type RepositoryMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// LineBot is the lineBot argument value.
-			LineBot *internal.LineBot
+			LineBot *repository.LineBot
 		}
 	}
 	lockUpdateLineBot sync.RWMutex
 }
 
 // UpdateLineBot calls UpdateLineBotFunc.
-func (mock *RepositoryMock) UpdateLineBot(ctx context.Context, lineBot *internal.LineBot) error {
+func (mock *RepositoryMock) UpdateLineBot(ctx context.Context, lineBot *repository.LineBot) error {
 	if mock.UpdateLineBotFunc == nil {
 		panic("RepositoryMock.UpdateLineBotFunc: method is nil but Repository.UpdateLineBot was just called")
 	}
 	callInfo := struct {
 		Ctx     context.Context
-		LineBot *internal.LineBot
+		LineBot *repository.LineBot
 	}{
 		Ctx:     ctx,
 		LineBot: lineBot,
@@ -69,11 +69,11 @@ func (mock *RepositoryMock) UpdateLineBot(ctx context.Context, lineBot *internal
 //	len(mockedRepository.UpdateLineBotCalls())
 func (mock *RepositoryMock) UpdateLineBotCalls() []struct {
 	Ctx     context.Context
-	LineBot *internal.LineBot
+	LineBot *repository.LineBot
 } {
 	var calls []struct {
 		Ctx     context.Context
-		LineBot *internal.LineBot
+		LineBot *repository.LineBot
 	}
 	mock.lockUpdateLineBot.RLock()
 	calls = mock.calls.UpdateLineBot

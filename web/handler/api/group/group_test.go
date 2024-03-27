@@ -8,6 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bwmarrin/discordgo"
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/group/internal"
@@ -43,11 +46,6 @@ func TestLineGroupHandler_ServeHTTP(t *testing.T) {
 	t.Run("jsonのバリデーションに失敗すると、Unprocessable Entityが返ること", func(t *testing.T) {
 		h := &LineGroupHandler{
 			IndexService: &service.IndexService{},
-			repo: &RepositoryMock{
-				UpdateLineBotFunc: func(ctx context.Context, lineBot *internal.LineBot) error {
-					return nil
-				},
-			},
 			oauthPermission: &OAuthPermissionMock{
 				CheckLinePermissionFunc: func(ctx context.Context, r *http.Request, guildId string) (lineProfile line.LineProfile, lineLoginUser *model.LineOAuthSession, err error) {
 					return line.LineProfile{}, &model.LineOAuthSession{}, nil
@@ -62,9 +60,11 @@ func TestLineGroupHandler_ServeHTTP(t *testing.T) {
 
 	t.Run("LineBotの更新が成功すること", func(t *testing.T) {
 		h := &LineGroupHandler{
-			IndexService: &service.IndexService{},
-			repo: &RepositoryMock{
-				UpdateLineBotFunc: func(ctx context.Context, lineBot *internal.LineBot) error {
+			IndexService: &service.IndexService{
+				DiscordSession: &discordgo.Session{},
+			},
+			Repo: &RepositoryMock{
+				UpdateLineBotFunc: func(ctx context.Context, lineBot *repository.LineBot) error {
 					return nil
 				},
 			},

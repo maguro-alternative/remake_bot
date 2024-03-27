@@ -17,15 +17,15 @@ func (g PermissionJson) Validate() error {
 }
 
 type PermissionCode struct {
-	GuildID string `db:"guild_id" json:"guild_id"`
-	Type    string `db:"type" json:"type"`
-	Code    int64  `db:"code" json:"code"`
+	GuildID string `json:"guild_id"`
+	Type    string `json:"type"`
+	Code    int64  `json:"code"`
 }
 
 type PermissionID struct {
-	GuildID    string `db:"guild_id" json:"guild_id"`
-	Type       string `db:"type" json:"type"`
-	TargetType string `db:"target_type" json:"target_type"`
-	TargetID   string `db:"target_id" json:"target_id"`
-	Permission string `db:"permission" json:"permission"`
+	GuildID    string `json:"guild_id"`
+	Type       string `json:"type"`
+	TargetType string `json:"target_type"`
+	TargetID   string `json:"target_id"`
+	Permission string `json:"permission"`
 }

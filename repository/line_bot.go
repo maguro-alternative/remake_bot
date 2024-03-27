@@ -58,7 +58,7 @@ func NewLineBot(
 	}
 }
 
-func (r *Repository) InsertLineBot(ctx context.Context, lineBot *LineBot)  error {
+func (r *Repository) InsertLineBot(ctx context.Context, lineBot *LineBot) error {
 	query := `
 		INSERT INTO line_bot (
 			guild_id,

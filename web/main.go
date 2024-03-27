@@ -4,15 +4,18 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/middleware"
+	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/group"
 	linePostDiscordChannel "github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel"
-	"github.com/maguro-alternative/remake_bot/web/handler/api/permission"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken"
+	"github.com/maguro-alternative/remake_bot/web/handler/api/permission"
 	discordCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback"
 	lineCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/line_callback"
 	discordLogin "github.com/maguro-alternative/remake_bot/web/handler/login/discord_login"
@@ -22,9 +25,9 @@ import (
 	indexView "github.com/maguro-alternative/remake_bot/web/handler/views"
 	groupView "github.com/maguro-alternative/remake_bot/web/handler/views/group"
 	guildIdView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid"
-	permissionView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/permission"
 	linePostDiscordChannelView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel"
 	linetokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken"
+	permissionView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/permission"
 	guildsView "github.com/maguro-alternative/remake_bot/web/handler/views/guilds"
 	"github.com/maguro-alternative/remake_bot/web/service"
 
@@ -51,6 +54,14 @@ func NewWebRouter(
 		},
 		RedirectURL: config.ServerUrl() + "/callback/discord-callback/",
 	}
+	discordPermissionData := &model.DiscordPermissionData{
+		PermissionCode: 0,
+		User:           model.DiscordUser{},
+		Permission:     "",
+	}
+
+	repo := repository.NewRepository(indexDB)
+
 	// create a *service.TODOService type variable using the *sql.DB type variable
 	var indexService = service.NewIndexService(
 		indexDB,
@@ -67,6 +78,7 @@ func NewWebRouter(
 	// register routes
 	mux := http.NewServeMux()
 	middleChain := alice.New(middleware.LogMiddleware)
+	discordMiddleChain := alice.New(middleware.DiscordOAuthCheckMiddleware(*indexService, repo, discordPermissionData), middleware.LogMiddleware)
 	// 静的ファイルのハンドリング
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/templates/static/"))))
 
@@ -77,7 +89,7 @@ func NewWebRouter(
 	mux.Handle("/guild/{guildId}", middleChain.ThenFunc(guildIdView.NewGuildIDViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/permission", middleChain.ThenFunc(permissionView.NewPermissionViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/linetoken", middleChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService).Index))
-	mux.Handle("/guild/{guildId}/line-post-discord-channel", middleChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService).Index))
+	mux.Handle("/guild/{guildId}/line-post-discord-channel", discordMiddleChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService, repo, discordPermissionData).Index))
 	mux.Handle("/group/{guildId}", middleChain.ThenFunc(groupView.NewLineGroupViewHandler(indexService).Index))
 
 	mux.Handle("/api/line-bot", middleChain.Then(linebot.NewLineBotHandler(indexService)))
@@ -85,10 +97,10 @@ func NewWebRouter(
 	mux.Handle("/logout/discord", middleChain.Then(discordLogout.NewDiscordOAuth2Handler(discordOAuth2Service)))
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
 	mux.Handle("/callback/line-callback/", middleChain.Then(lineCallback.NewLineCallbackHandler(indexService)))
-	mux.Handle("/api/{guildId}/group", middleChain.Then(group.NewLineGroupHandler(indexService)))
-	mux.Handle("/api/{guildId}/permission", middleChain.Then(permission.NewPermissionHandler(indexService)))
+	mux.Handle("/api/{guildId}/group", middleChain.Then(group.NewLineGroupHandler(indexService, repo)))
+	mux.Handle("/api/{guildId}/permission", middleChain.Then(permission.NewPermissionHandler(indexService, repo)))
 	mux.Handle("/api/{guildId}/linetoken", middleChain.Then(linetoken.NewLineTokenHandler(indexService)))
-	mux.Handle("/api/{guildId}/line-post-discord-channel", middleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(indexService)))
+	mux.Handle("/api/{guildId}/line-post-discord-channel", discordMiddleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(indexService, repo, discordPermissionData)))
 
 	http.ListenAndServe(":"+config.Port(), mux)
 }

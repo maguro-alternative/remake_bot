@@ -8,6 +8,8 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/web/handler/api/group/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/permission"
@@ -16,7 +18,7 @@ import (
 
 //go:generate go run github.com/matryer/moq -out mock_test.go . Repository
 type Repository interface {
-	UpdateLineBot(ctx context.Context, lineBot *internal.LineBot) error
+	UpdateLineBot(ctx context.Context, lineBot *repository.LineBot) error
 }
 
 //go:generate go run github.com/matryer/moq -out permission_mock_test.go . OAuthPermission
@@ -26,13 +28,23 @@ type OAuthPermission interface {
 
 type LineGroupHandler struct {
 	IndexService    *service.IndexService
-	repo            Repository
-	oauthPermission OAuthPermission
+	Repo            Repository
+	OAuthPermission OAuthPermission
 }
 
-func NewLineGroupHandler(indexService *service.IndexService) *LineGroupHandler {
+var (
+	_ Repository = (*repository.Repository)(nil)
+)
+
+func NewLineGroupHandler(
+	indexService *service.IndexService,
+	repo service.Repository,
+	//oauthPermission OAuthPermission,
+) *LineGroupHandler {
 	return &LineGroupHandler{
-		IndexService: indexService,
+		IndexService:    indexService,
+		Repo:            repo,
+		//OAuthPermission: oauthPermission,
 	}
 }
 
@@ -62,9 +74,6 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	guildId := r.PathValue("guildId")
 	oauthPermission = permission.NewPermissionHandler(r, &client, g.IndexService)
-	if g.oauthPermission != nil {
-		oauthPermission = g.oauthPermission
-	}
 	_, _, err := oauthPermission.CheckLinePermission(
 		ctx,
 		r,
@@ -75,12 +84,8 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.InfoContext(ctx, "Redirect to /login/line")
 		return
 	}
-	repo = internal.NewRepository(g.IndexService.DB)
-	// mockの場合はmockを使用
-	if g.repo != nil {
-		repo = g.repo
-	}
-	err = repo.UpdateLineBot(ctx, &internal.LineBot{
+	repo = g.Repo
+	err = repo.UpdateLineBot(ctx, &repository.LineBot{
 		GuildID:          guildId,
 		DefaultChannelID: lineGroupJson.DefaultChannelID,
 	})

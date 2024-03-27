@@ -16,8 +16,3 @@ func (g LineBotJson) Validate() error {
 		validation.Field(&g.DefaultChannelID, validation.Required),
 	)
 }
-
-type LineBot struct {
-	GuildID          string        `db:"guild_id"`
-	DefaultChannelID string        `db:"default_channel_id"`
-}

@@ -55,7 +55,7 @@ func TestInsertLinePostDiscordChannel(t *testing.T) {
 
 	repo := NewRepository(tx)
 
-	var channels []TestLinePostDiscordChannel
+	var channels []LinePostDiscordChannelAllColumns
 	t.Run("ChannelIDを追加できること", func(t *testing.T) {
 		err := repo.InsertLinePostDiscordChannel(ctx, "123456789", "987654321")
 		assert.NoError(t, err)

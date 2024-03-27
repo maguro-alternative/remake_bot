@@ -10,6 +10,14 @@ type PermissionCode struct {
 	Code    int64  `db:"code"`
 }
 
+func NewPermissionCode(guildID, permissionType string, code int64) *PermissionCode {
+	return &PermissionCode{
+		GuildID: guildID,
+		Type:    permissionType,
+		Code:    code,
+	}
+}
+
 func (r *Repository) GetPermissionCode(ctx context.Context, guildID, permissionType string) (int64, error) {
 	var code int64
 	if permissionType == "" {

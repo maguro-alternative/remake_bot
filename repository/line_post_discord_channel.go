@@ -16,6 +16,15 @@ type LinePostDiscordChannelAllColumns struct {
 	BotMessage bool   `db:"bot_message"`
 }
 
+func NewLinePostDiscordChannel(channelID, guildID string, ng, botMessage bool) *LinePostDiscordChannelAllColumns {
+	return &LinePostDiscordChannelAllColumns{
+		ChannelID:  channelID,
+		GuildID:    guildID,
+		Ng:         ng,
+		BotMessage: botMessage,
+	}
+}
+
 func (r *Repository) GetLinePostDiscordChannel(ctx context.Context, channelID string) (LinePostDiscordChannel, error) {
 	var channel LinePostDiscordChannel
 	query := `

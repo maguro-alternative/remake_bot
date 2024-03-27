@@ -18,6 +18,15 @@ type LineNgDiscordIDAllCoulmns struct {
 	IDType    string `db:"id_type"`
 }
 
+func NewLineNgDiscordID(channelID, guildID, id, idType string) *LineNgDiscordIDAllCoulmns {
+	return &LineNgDiscordIDAllCoulmns{
+		ChannelID: channelID,
+		GuildID:   guildID,
+		ID:        id,
+		IDType:    idType,
+	}
+}
+
 func (r *Repository) GetLineNgDiscordID(ctx context.Context, channelID string) ([]LineNgDiscordID, error) {
 	var ngIDs []LineNgDiscordID
 	query := `
@@ -33,7 +42,7 @@ func (r *Repository) GetLineNgDiscordID(ctx context.Context, channelID string) (
 	return ngIDs, err
 }
 
-func (r *Repository) InsertLineNgDiscordIDs(ctx context.Context, lineNgIDs []LineNgDiscordIDAllCoulmns) error {
+func (r *Repository) InsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []LineNgDiscordIDAllCoulmns) error {
 	query := `
 		INSERT INTO line_ng_discord_id (
 			channel_id,
@@ -47,7 +56,7 @@ func (r *Repository) InsertLineNgDiscordIDs(ctx context.Context, lineNgIDs []Lin
 			:id_type
 		) ON CONFLICT (channel_id, id) DO NOTHING
 	`
-	for _, lineNgID := range lineNgIDs {
+	for _, lineNgID := range lineNgDiscordIDs {
 		_, err := r.db.NamedExecContext(ctx, query, lineNgID)
 		if err != nil {
 			return err
@@ -56,9 +65,9 @@ func (r *Repository) InsertLineNgDiscordIDs(ctx context.Context, lineNgIDs []Lin
 	return nil
 }
 
-func (r *Repository) DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNgIDs []LineNgDiscordIDAllCoulmns) error {
+func (r *Repository) DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []LineNgDiscordIDAllCoulmns) error {
 	var values []string
-	for _, lineNgType := range lineNgIDs {
+	for _, lineNgType := range lineNgDiscordIDs {
 		values = append(values, fmt.Sprintf("('%s', '%s', '%s', '%s')", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.ID, lineNgType.IDType))
 		_, err := r.db.ExecContext(ctx, "DELETE FROM line_ng_discord_id WHERE channel_id = $1", lineNgType.ChannelID)
 		if err != nil {

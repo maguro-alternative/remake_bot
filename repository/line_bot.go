@@ -34,6 +34,30 @@ type LineBotDefaultChannelID struct {
 	DefaultChannelID string `db:"default_channel_id"`
 }
 
+func NewLineBot(
+	guildID string,
+	lineNotifyToken pq.ByteaArray,
+	lineBotToken pq.ByteaArray,
+	lineBotSecret pq.ByteaArray,
+	lineGroupID pq.ByteaArray,
+	lineClientID pq.ByteaArray,
+	lineClientSecret pq.ByteaArray,
+	defaultChannelID string,
+	debugMode bool,
+) *LineBot {
+	return &LineBot{
+		GuildID:          guildID,
+		LineNotifyToken:  lineNotifyToken,
+		LineBotToken:     lineBotToken,
+		LineBotSecret:    lineBotSecret,
+		LineGroupID:      lineGroupID,
+		LineClientID:     lineClientID,
+		LineClientSecret: lineClientSecret,
+		DefaultChannelID: defaultChannelID,
+		DebugMode:        debugMode,
+	}
+}
+
 func (r *Repository) InsertLineBot(ctx context.Context, lineBot *LineBot)  error {
 	query := `
 		INSERT INTO line_bot (

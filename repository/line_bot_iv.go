@@ -25,16 +25,35 @@ type LineBotIvNotClient struct {
 	LineGroupIDIv     pq.ByteaArray `db:"line_group_id_iv"`
 }
 
+func NewLineBotIv(
+	guildID string,
+	lineNotifyTokenIv pq.ByteaArray,
+	lineBotTokenIv pq.ByteaArray,
+	lineBotSecretIv pq.ByteaArray,
+	lineGroupIDIv pq.ByteaArray,
+	lineClientIDIv pq.ByteaArray,
+	lineClientSecretIv pq.ByteaArray,
+) *LineBotIv {
+	return &LineBotIv{
+		GuildID:            guildID,
+		LineNotifyTokenIv:  lineNotifyTokenIv,
+		LineBotTokenIv:     lineBotTokenIv,
+		LineBotSecretIv:    lineBotSecretIv,
+		LineGroupIDIv:      lineGroupIDIv,
+		LineClientIDIv:     lineClientIDIv,
+		LineClientSecretIv: lineClientSecretIv,
+	}
+}
 
-func (r *Repository) InsertLineBotIv(ctx context.Context, lineBotIv *LineBotIv) error {
+func (r *Repository) InsertLineBotIv(ctx context.Context, guildId string) error {
 	query := `
 		INSERT INTO line_bot_iv (
 			guild_id
 		) VALUES (
-			:guild_id
+			$1
 		) ON CONFLICT (guild_id) DO NOTHING
 	`
-	_, err := r.db.NamedExecContext(ctx, query, lineBotIv)
+	_, err := r.db.ExecContext(ctx, query, guildId)
 	return err
 }
 

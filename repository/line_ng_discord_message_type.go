@@ -12,7 +12,15 @@ type LineNgDiscordMessageType struct {
 	Type      int    `db:"type"`
 }
 
-func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgTypes []LineNgDiscordMessageType) error {
+func NewLineNgDiscordMessageType(channelID, guildID string, ngType int) *LineNgDiscordMessageType {
+	return &LineNgDiscordMessageType{
+		ChannelID: channelID,
+		GuildID:   guildID,
+		Type:      ngType,
+	}
+}
+
+func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error {
 	query := `
 		INSERT INTO line_ng_discord_message_type (
 			channel_id,
@@ -24,7 +32,7 @@ func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNg
 			:type
 		) ON CONFLICT (channel_id, type) DO NOTHING
 	`
-	for _, lineNgType := range lineNgTypes {
+	for _, lineNgType := range lineNgDiscordTypes {
 		_, err := r.db.NamedExecContext(ctx, query, lineNgType)
 		if err != nil {
 			return err
@@ -33,9 +41,9 @@ func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNg
 	return nil
 }
 
-func (r *Repository) DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgTypes []LineNgDiscordMessageType) error {
+func (r *Repository) DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error {
 	var values []string
-	for _, lineNgType := range lineNgTypes {
+	for _, lineNgType := range lineNgDiscordTypes {
 		values = append(values, fmt.Sprintf("('%s', '%s', %d)", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.Type))
 		_, err := r.db.ExecContext(ctx, "DELETE FROM line_ng_discord_message_type WHERE channel_id = $1", lineNgType.ChannelID)
 		if err != nil {

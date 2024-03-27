@@ -39,7 +39,7 @@ func TestInsertLineBotIv(t *testing.T) {
 		lineBotIv := &LineBotIv{
 			GuildID:          "987654321",
 		}
-		err := repo.InsertLineBotIv(ctx, lineBotIv)
+		err := repo.InsertLineBotIv(ctx, lineBotIv.GuildID)
 		assert.NoError(t, err)
 
 		var lineBotIvResult LineBotIv

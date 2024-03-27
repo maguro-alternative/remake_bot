@@ -18,6 +18,16 @@ type PermissionID struct {
 	Permission string `db:"permission"`
 }
 
+func NewPermissionIDAllColumns(guildID, permissionType, targetType, targetID, permission string) *PermissionIDAllColumns {
+	return &PermissionIDAllColumns{
+		GuildID:    guildID,
+		Type:       permissionType,
+		TargetType: targetType,
+		TargetID:   targetID,
+		Permission: permission,
+	}
+}
+
 func (r *Repository) InsertPermissionIDs(ctx context.Context, permissionsID []PermissionIDAllColumns) error {
 	query := `
 		INSERT INTO permissions_id (

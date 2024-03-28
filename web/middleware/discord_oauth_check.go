@@ -21,7 +21,10 @@ type Repository interface {
 	GetPermissionCode(ctx context.Context, guildID string, permissionType string) (int64, error)
 	GetPermissionIDs(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionID, error)
 	GetAllColumnsLineBot(ctx context.Context, guildID string) (repository.LineBot, error)
+	GetLineBotNotClient(ctx context.Context, guildID string) (repository.LineBotNotClient, error)
 	GetLineBotIvNotClient(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error)
+	InsertLineBot(ctx context.Context, lineBot *repository.LineBot) error
+	InsertLineBotIv(ctx context.Context, guildId string) error
 }
 
 var (

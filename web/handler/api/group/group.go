@@ -29,7 +29,6 @@ type OAuthPermission interface {
 type LineGroupHandler struct {
 	IndexService    *service.IndexService
 	Repo            Repository
-	OAuthPermission OAuthPermission
 }
 
 var (
@@ -39,12 +38,10 @@ var (
 func NewLineGroupHandler(
 	indexService *service.IndexService,
 	repo service.Repository,
-	//oauthPermission OAuthPermission,
 ) *LineGroupHandler {
 	return &LineGroupHandler{
 		IndexService:    indexService,
 		Repo:            repo,
-		//OAuthPermission: oauthPermission,
 	}
 }
 

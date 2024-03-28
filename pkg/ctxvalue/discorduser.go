@@ -9,16 +9,16 @@ import (
 
 type contextKey string
 
-const userKey contextKey = "discordUser"
+const discordUserKey contextKey = "discordUser"
 
 // ユーザー情報をコンテキストにセット
 func ContextWithDiscordUser(parent context.Context, user *model.DiscordUser) context.Context {
-    return context.WithValue(parent, userKey, user)
+    return context.WithValue(parent, discordUserKey, user)
 }
 
 // ユーザー情報をコンテキストから取り出す
 func DiscordUserFromContext(ctx context.Context) (*model.DiscordUser, error) {
-    v := ctx.Value(userKey)
+    v := ctx.Value(discordUserKey)
     user, ok := v.(*model.DiscordUser)
     if !ok {
         return nil, errors.New("user not found")

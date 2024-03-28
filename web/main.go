@@ -73,6 +73,12 @@ func NewWebRouter(
 	mux := http.NewServeMux()
 	middleChain := alice.New(middleware.LogMiddleware)
 	discordMiddleChain := alice.New(middleware.DiscordOAuthCheckMiddleware(*indexService, repo), middleware.LogMiddleware)
+	lineMiddleChain := alice.New(middleware.LineOAuthCheckMiddleware(*indexService, repo), middleware.LogMiddleware)
+	oauthMiddleChain := alice.New(
+		middleware.DiscordOAuthCheckMiddleware(*indexService, repo),
+		middleware.LineOAuthCheckMiddleware(*indexService, repo),
+		middleware.LogMiddleware,
+	)
 	// 静的ファイルのハンドリング
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/templates/static/"))))
 
@@ -83,15 +89,15 @@ func NewWebRouter(
 	mux.Handle("/guild/{guildId}", middleChain.ThenFunc(guildIdView.NewGuildIDViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/permission", middleChain.ThenFunc(permissionView.NewPermissionViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/linetoken", middleChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService).Index))
-	mux.Handle("/guild/{guildId}/line-post-discord-channel", discordMiddleChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService, repo).Index))
-	mux.Handle("/group/{guildId}", middleChain.ThenFunc(groupView.NewLineGroupViewHandler(indexService).Index))
+	mux.Handle("/guild/{guildId}/line-post-discord-channel", oauthMiddleChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService, repo).Index))
+	mux.Handle("/group/{guildId}", oauthMiddleChain.ThenFunc(groupView.NewLineGroupViewHandler(indexService).Index))
 
 	mux.Handle("/api/line-bot", middleChain.Then(linebot.NewLineBotHandler(indexService)))
 	mux.Handle("/login/discord", middleChain.Then(discordLogin.NewDiscordOAuth2Handler(discordOAuth2Service)))
 	mux.Handle("/logout/discord", middleChain.Then(discordLogout.NewDiscordOAuth2Handler(discordOAuth2Service)))
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
 	mux.Handle("/callback/line-callback/", middleChain.Then(lineCallback.NewLineCallbackHandler(indexService)))
-	mux.Handle("/api/{guildId}/group", middleChain.Then(group.NewLineGroupHandler(indexService, repo)))
+	mux.Handle("/api/{guildId}/group", lineMiddleChain.Then(group.NewLineGroupHandler(indexService, repo)))
 	mux.Handle("/api/{guildId}/permission", middleChain.Then(permission.NewPermissionHandler(indexService, repo)))
 	mux.Handle("/api/{guildId}/linetoken", middleChain.Then(linetoken.NewLineTokenHandler(indexService)))
 	mux.Handle("/api/{guildId}/line-post-discord-channel", discordMiddleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(indexService, repo)))

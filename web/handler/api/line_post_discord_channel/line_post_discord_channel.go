@@ -33,7 +33,6 @@ type OAuthPermission interface {
 type LinePostDiscordChannelHandler struct {
 	IndexService          *service.IndexService
 	Repo                  Repository
-	DiscordPermissiondata *model.DiscordPermissionData
 }
 
 //go:generate go run github.com/matryer/moq -out discordsession_mock_test.go . Session
@@ -58,12 +57,10 @@ var (
 func NewLinePostDiscordChannelHandler(
 	indexService *service.IndexService,
 	repo Repository,
-	DiscordPermissionData *model.DiscordPermissionData,
 ) *LinePostDiscordChannelHandler {
 	return &LinePostDiscordChannelHandler{
 		IndexService:          indexService,
 		Repo:                  repo,
-		DiscordPermissiondata: DiscordPermissionData,
 	}
 }
 

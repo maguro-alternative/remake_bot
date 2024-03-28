@@ -10,12 +10,13 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
+
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
@@ -59,18 +60,15 @@ var (
 type LinePostDiscordChannelViewHandler struct {
 	IndexService          *service.IndexService
 	Repo                  Repository
-	DiscordPermissiondata *model.DiscordPermissionData
 }
 
 func NewLinePostDiscordChannelViewHandler(
 	indexService *service.IndexService,
 	repo Repository,
-	permissionData *model.DiscordPermissionData,
 ) *LinePostDiscordChannelViewHandler {
 	return &LinePostDiscordChannelViewHandler{
 		IndexService:          indexService,
 		Repo:                  repo,
-		DiscordPermissiondata: permissionData,
 	}
 }
 
@@ -85,7 +83,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		ctx = context.Background()
 	}
 
-	guild, err := g.IndexService.DiscordSession.Guild(guildId, discordgo.WithClient(&client))
+	guild, err := g.IndexService.DiscordBotState.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました:"+err.Error())
@@ -110,20 +108,13 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		}
 	}
 
-	oauthPermission := permission.NewPermissionHandler(r, &client, g.IndexService)
-	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_post_discord_channel")
+	discordPermissionData, err := ctxvalue.DiscordPermissionFromContext(ctx)
 	if err != nil {
-		if statusCode == http.StatusFound {
-			http.Redirect(w, r, "/login/discord", http.StatusFound)
-			slog.InfoContext(ctx, "Redirect to /login/discord")
-			return
-		}
-		if discordPermissionData.Permission == "" {
-			http.Error(w, "Not permission", statusCode)
-			slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
-			return
-		}
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "Discordの権限情報の取得に失敗しました:", "エラー",err.Error())
+		return
 	}
+
 	oauthStore := getoauth.NewOAuthStore(g.IndexService.CookieStore, config.SessionSecret())
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
 	lineSession, err := oauthStore.GetLineOAuth(r)
@@ -133,7 +124,6 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	//[categoryID]map[channelPosition]channelName
 	channelsInCategory := make(map[string][]components.DiscordChannelSet)
 	repo = g.Repo
-	fmt.Printf("(%%#v) %#v\n", repo)
 	for _, channel := range guild.Channels {
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue

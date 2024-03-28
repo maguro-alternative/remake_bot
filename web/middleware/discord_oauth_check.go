@@ -5,7 +5,9 @@ import (
 	"encoding/gob"
 	"net/http"
 	"strings"
-	"fmt"
+	"log/slog"
+
+	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 
@@ -32,18 +34,21 @@ func init() {
 	gob.Register(&model.DiscordUser{})
 }
 
+
 func DiscordOAuthCheckMiddleware(
 	indexService service.IndexService,
 	repo Repository,
-	permissionData *model.DiscordPermissionData,
 ) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var userPermissionCode int64
-			ctx := r.Context()
-			if ctx == nil {
-				ctx = context.Background()
+			userPermissionCode = 0
+			permissionData := &model.DiscordPermissionData{
+				PermissionCode: 0,
+				User:           model.DiscordUser{},
+				Permission:     "",
 			}
+			ctx := r.Context()
 			pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/"), "/")
 			client := &http.Client{}
 			guildId := r.PathValue("guildId")
@@ -66,9 +71,11 @@ func DiscordOAuthCheckMiddleware(
 				return
 			}
 			defer resp.Body.Close()
+
+			ctx = ctxvalue.ContextWithDiscordUser(ctx, &discordLoginUser.User)
 			// 特定の設定ページ以外はアクセスを許可
 			if len(pathParts) > 0 && len(pathParts) < 3 || (pathParts[0] != "api" && pathParts[0] != "guild") {
-				h.ServeHTTP(w, r)
+				h.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
 			permissionType := pathParts[2]
@@ -78,7 +85,8 @@ func DiscordOAuthCheckMiddleware(
 			case "line-post-discord-channel":
 				permissionType = "line_post_discord_channel"
 			default:
-				h.ServeHTTP(w, r)
+				slog.InfoContext(ctx, "権限チャンネル以外", "permissionType", permissionType)
+				h.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
 			permissionCode, err := repo.GetPermissionCode(ctx, guildId, permissionType)
@@ -109,11 +117,10 @@ func DiscordOAuthCheckMiddleware(
 			if err != nil {
 				return
 			}
-			fmt.Printf("(%%#v) %#v\n", permissionData)
 			// 設定ページの場合所属していればアクセスを許可
 			permissionData.User = discordLoginUser.User
-			permissionData.PermissionCode = permissionCode | userPermissionCode
-			if memberPermission&permissionData.PermissionCode == 0 {
+			permissionData.PermissionCode = memberPermission | userPermissionCode
+			if (permissionCode&permissionData.PermissionCode) == 0 {
 				permissionFlag := false
 				for _, permissionId := range permissionIDs {
 					if permissionId.TargetType == "user" && permissionId.TargetID == discordLoginUser.User.ID {
@@ -130,15 +137,19 @@ func DiscordOAuthCheckMiddleware(
 							}
 						}
 					}
-					if !permissionFlag {
-						return
-					}
+				}
+				if !permissionFlag {
+					http.Error(w, "Forbidden", http.StatusForbidden)
+					slog.WarnContext(ctx, "権限のないアクセスがありました。")
+					return
 				}
 			}
 			if permissionData.Permission == "" {
 				permissionData.Permission = "all"
 			}
-			h.ServeHTTP(w, r)
+			slog.InfoContext(ctx, "権限チェック成功", "アクセスユーザー", permissionData.User.Username, "権限", permissionData.Permission, "権限コード", permissionData.PermissionCode)
+			ctx = ctxvalue.ContextWithDiscordPermission(ctx, permissionData)
+			h.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }

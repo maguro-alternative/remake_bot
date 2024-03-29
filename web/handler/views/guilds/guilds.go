@@ -10,10 +10,10 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
+
 	"github.com/maguro-alternative/remake_bot/web/components"
-	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
@@ -41,14 +41,15 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	oauthStore := getoauth.NewOAuthStore(g.IndexService.CookieStore, config.SessionSecret())
-	discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, r)
-	if err != nil || discordLoginUser.Token == "" {
-		http.Redirect(w, r, "/login/discord", http.StatusFound)
+	// Discordの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
+	discordLoginUser, err := ctxvalue.DiscordUserFromContext(ctx)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "Discordログインユーザー取得に失敗しました。", "エラー: ", err.Error())
 		return
 	}
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := oauthStore.GetLineOAuth(r)
+	lineSession, err := ctxvalue.LineUserFromContext(ctx)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

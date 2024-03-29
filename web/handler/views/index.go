@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
+
 	"github.com/maguro-alternative/remake_bot/web/components"
-	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
@@ -29,16 +29,20 @@ func (g *IndexViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	oauthStore := getoauth.NewOAuthStore(g.IndexService.CookieStore, config.SessionSecret())
+
 	// Discordの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, r)
+	discordLoginUser, err := ctxvalue.DiscordUserFromContext(ctx)
 	if err != nil {
-		discordLoginUser = &model.DiscordOAuthSession{}
+		discordLoginUser = &model.DiscordOAuthSession{
+			User: model.DiscordUser{},
+		}
 	}
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := oauthStore.GetLineOAuth(r)
+	lineSession, err := ctxvalue.LineUserFromContext(ctx)
 	if err != nil {
-		lineSession = &model.LineOAuthSession{}
+		lineSession = &model.LineOAuthSession{
+			User: model.LineIdTokenUser{},
+		}
 	}
 	accountVer := strings.Builder{}
 	accountVer.WriteString(components.CreateDiscordAccountVer(discordLoginUser.User))

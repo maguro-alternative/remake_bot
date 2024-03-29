@@ -14,13 +14,13 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
+	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/login/line_login/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
@@ -117,13 +117,12 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		`, lineBot.GuildID, lineBotProfile.PictureURL, lineBotProfile.DisplayName))
 	}
 	// Discordの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	oauthStore := getoauth.NewOAuthStore(h.IndexService.CookieStore, config.SessionSecret())
-	discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, r)
+	discordLoginUser, err := ctxvalue.DiscordUserFromContext(ctx)
 	if err != nil {
 		discordLoginUser = &model.DiscordOAuthSession{}
 	}
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := oauthStore.GetLineOAuth(r)
+	lineSession, err := ctxvalue.LineUserFromContext(ctx)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

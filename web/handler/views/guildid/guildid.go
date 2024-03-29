@@ -9,11 +9,10 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
+
 	"github.com/maguro-alternative/remake_bot/web/components"
-	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/permission"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
@@ -41,23 +40,15 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: ", "エラーメッセージ:", err.Error())
 		return
 	}
-	oauthPermission := permission.NewPermissionHandler(r, &client, g.IndexService)
-	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "")
+
+	discordPermissionData, err := ctxvalue.DiscordPermissionFromContext(ctx)
 	if err != nil {
-		if statusCode == 302 {
-			http.Redirect(w, r, "/login/discord", http.StatusFound)
-			slog.InfoContext(ctx, "Redirect to /login/discord")
-			return
-		}
-		if discordPermissionData.Permission == "" {
-			http.Error(w, "Not permission", statusCode)
-			slog.WarnContext(ctx, "権限のないアクセスがありました。", "エラーメッセージ:", err.Error(), "権限コード:", discordPermissionData.PermissionCode, "権限:", discordPermissionData.Permission)
-			return
-		}
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "Discord認証情報の取得に失敗しました: ", "エラーメッセージ:", err.Error())
+		return
 	}
-	oauthStore := getoauth.NewOAuthStore(g.IndexService.CookieStore, config.SessionSecret())
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := oauthStore.GetLineOAuth(r)
+	lineSession, err := ctxvalue.LineUserFromContext(ctx)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

@@ -109,10 +109,9 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	discordPermissionData, err := ctxvalue.DiscordPermissionFromContext(ctx)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "Discordの権限情報の取得に失敗しました:", "エラー", err.Error())
+		slog.ErrorContext(ctx, "Discord認証情報の取得に失敗しました: ", "エラーメッセージ:", err.Error())
 		return
 	}
-
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
 	lineSession, err := ctxvalue.LineUserFromContext(ctx)
 	if err != nil {

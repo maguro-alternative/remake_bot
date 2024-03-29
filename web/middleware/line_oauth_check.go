@@ -43,6 +43,14 @@ func LineOAuthCheckMiddleware(
 				slog.ErrorContext(ctx, "lineのユーザー取得に失敗しました", "エラー:", err.Error())
 				return
 			}
+			if lineLoginUser == nil {
+				lineLoginUser = &model.LineOAuthSession{
+					User: model.LineIdTokenUser{},
+				}
+				ctx = ctxvalue.ContextWithLineProfile(ctx, &lineProfile)
+				h.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
 			ctx = ctxvalue.ContextWithLineUser(ctx, lineLoginUser)
 
 			guildId := r.PathValue("guildId")
@@ -95,7 +103,7 @@ func LineOAuthCheckMiddleware(
 				lineBotDecrypt.LineGroupID,
 			)
 			lineProfile, err = lineRequ.GetProfileInGroup(ctx, lineLoginUser.User.Sub)
-			if err != nil {
+			if err != nil && loginRequiredFlag {
 				slog.ErrorContext(ctx, "LineProfileの取得に失敗しました", "エラー:", err.Error())
 				return
 			}

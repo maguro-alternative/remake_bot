@@ -55,12 +55,12 @@ func DiscordOAuthCheckMiddleware(
 			ctx := r.Context()
 			pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/"), "/")
 			client := &http.Client{}
-			guildId := r.PathValue("guildId")
 			oauthStore := getoauth.NewOAuthStore(indexService.CookieStore, config.SessionSecret())
 
 			discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, r)
 			if err != nil && loginRequiredFlag {
 				http.Redirect(w, r, "/login/discord", http.StatusFound)
+				slog.WarnContext(ctx, "ログインしていないユーザーがアクセスしました。")
 				return
 			}
 			req, err := http.NewRequestWithContext(ctx, "GET", "https://discord.com/api/users/@me", nil)
@@ -76,12 +76,47 @@ func DiscordOAuthCheckMiddleware(
 			}
 			defer resp.Body.Close()
 
-			ctx = ctxvalue.ContextWithDiscordUser(ctx, &discordLoginUser.User)
+			ctx = ctxvalue.ContextWithDiscordUser(ctx, discordLoginUser)
+			guildId := r.PathValue("guildId")
+			// 特定のサーバーのページでない場合はアクセスを許可
+			if guildId == "" {
+				h.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+
+			guild, err := indexService.DiscordBotState.Guild(guildId)
+			if err != nil {
+				slog.WarnContext(ctx, "ギルド情報の取得に失敗しました。", "guildId", guildId)
+				return
+			}
+			member, err := indexService.DiscordBotState.Member(guildId, discordLoginUser.User.ID)
+			if err != nil {
+				slog.WarnContext(ctx, "メンバー情報の取得に失敗しました。", "guildId", guildId, "userId", discordLoginUser.User.ID)
+				return
+			}
+			for _, role := range member.Roles {
+				for _, guildRole := range guild.Roles {
+					if role == guildRole.ID {
+						userPermissionCode |= guildRole.Permissions
+					}
+				}
+			}
+			memberPermission, err := indexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, guild.Channels[0].ID)
+			if err != nil {
+				slog.WarnContext(ctx, "メンバー権限の取得に失敗しました。", "guildId", guildId, "userId", discordLoginUser.User.ID)
+				return
+			}
+			// 設定ページの場合所属していればアクセスを許可
+			permissionData.User = discordLoginUser.User
+			permissionData.PermissionCode = memberPermission | userPermissionCode
+
+			ctx = ctxvalue.ContextWithDiscordPermission(ctx, permissionData)
 			// 特定の設定ページ以外はアクセスを許可
 			if len(pathParts) > 0 && len(pathParts) < 3 || (pathParts[0] != "api" && pathParts[0] != "guild") {
 				h.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
+
 			permissionType := pathParts[2]
 			switch permissionType {
 			case "linetoken":
@@ -95,35 +130,15 @@ func DiscordOAuthCheckMiddleware(
 			}
 			permissionCode, err := repo.GetPermissionCode(ctx, guildId, permissionType)
 			if err != nil {
+				slog.WarnContext(ctx, "権限コードの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
 				return
 			}
 			permissionIDs, err := repo.GetPermissionIDs(ctx, guildId, permissionType)
 			if err != nil {
+				slog.WarnContext(ctx, "権限IDの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
 				return
 			}
 
-			guild, err := indexService.DiscordBotState.Guild(guildId)
-			if err != nil {
-				return
-			}
-			member, err := indexService.DiscordBotState.Member(guildId, discordLoginUser.User.ID)
-			if err != nil {
-				return
-			}
-			for _, role := range member.Roles {
-				for _, guildRole := range guild.Roles {
-					if role == guildRole.ID {
-						userPermissionCode |= guildRole.Permissions
-					}
-				}
-			}
-			memberPermission, err := indexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, guild.Channels[0].ID)
-			if err != nil {
-				return
-			}
-			// 設定ページの場合所属していればアクセスを許可
-			permissionData.User = discordLoginUser.User
-			permissionData.PermissionCode = memberPermission | userPermissionCode
 			if (permissionCode&permissionData.PermissionCode) == 0 {
 				permissionFlag := false
 				for _, permissionId := range permissionIDs {

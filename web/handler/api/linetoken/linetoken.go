@@ -13,7 +13,6 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 )
 
 type Repository interface {
@@ -43,7 +42,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var lineTokenJson internal.LineBotJson
 	var repo Repository
-	var client http.Client
+
 	if err := json.NewDecoder(r.Body).Decode(&lineTokenJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました:"+err.Error())
@@ -54,27 +53,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "jsonのバリデーションに失敗しました:"+err.Error())
 		return
 	}
-	lineTokenJson.GuildID = r.PathValue("guildId")
-	guild, err := h.IndexService.DiscordSession.Guild(lineTokenJson.GuildID)
-	if err != nil {
-		http.Error(w, "Not get guild id", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "guild idの取得に失敗しました:"+err.Error())
-		return
-	}
-	oauthPermission := permission.NewPermissionHandler(r, &client, h.IndexService)
-	statusCode, discordPermissionData, err := oauthPermission.CheckDiscordPermission(ctx, guild, "line_bot")
-	if err != nil {
-		if statusCode == http.StatusFound {
-			http.Redirect(w, r, "/login/discord", http.StatusFound)
-			slog.InfoContext(ctx, "Redirect to /login/discord")
-			return
-		}
-		if discordPermissionData.Permission == "" {
-			http.Error(w, "Not permission", statusCode)
-			slog.WarnContext(ctx, "権限のないアクセスがありました。 "+err.Error())
-			return
-		}
-	}
+
 	// 暗号化キーの取得
 	privateKey := config.PrivateKey()
 	lineBot, lineBotIv, err := lineBotJsonEncrypt(privateKey, &lineTokenJson)

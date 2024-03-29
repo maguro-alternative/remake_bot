@@ -109,8 +109,8 @@ func NewWebRouter(
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
 	mux.Handle("/callback/line-callback/", middleChain.Then(lineCallback.NewLineCallbackHandler(indexService)))
 	mux.Handle("/api/{guildId}/group", lineMiddleChain.Then(group.NewLineGroupHandler(indexService, repo)))
-	mux.Handle("/api/{guildId}/permission", middleChain.Then(permission.NewPermissionHandler(indexService, repo)))
-	mux.Handle("/api/{guildId}/linetoken", middleChain.Then(linetoken.NewLineTokenHandler(indexService)))
+	mux.Handle("/api/{guildId}/permission", discordMiddleChain.Then(permission.NewPermissionHandler(indexService, repo)))
+	mux.Handle("/api/{guildId}/linetoken", discordMiddleChain.Then(linetoken.NewLineTokenHandler(indexService)))
 	mux.Handle("/api/{guildId}/line-post-discord-channel", discordMiddleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(indexService, repo)))
 
 	http.ListenAndServe(":"+config.Port(), mux)

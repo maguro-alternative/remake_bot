@@ -13,30 +13,30 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/config"
-	"github.com/maguro-alternative/remake_bot/web/handler/login/line_login/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
-type Repository interface {
-	GetLineBots(ctx context.Context) ([]*internal.LineBot, error)
-	GetLineBot(ctx context.Context, guildID string) (internal.LineBot, error)
-	GetLineBotIv(ctx context.Context, guildID string) (internal.LineBotIv, error)
-}
-
 type LineLoginHandler struct {
 	IndexService *service.IndexService
+	Repo         repository.RepositoryFunc
 }
 
-func NewLineLoginHandler(indexService *service.IndexService) *LineLoginHandler {
+func NewLineLoginHandler(
+	indexService *service.IndexService,
+	repo repository.RepositoryFunc,
+) *LineLoginHandler {
 	return &LineLoginHandler{
 		IndexService: indexService,
+		Repo:         repo,
 	}
 }
 
@@ -48,9 +48,8 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
 	gob.Register(&model.LineIdTokenUser{})
-	var lineBotIv internal.LineBotIv
+	var lineBotIv repository.LineBotIv
 	var lineLoginHtmlBuilder strings.Builder
-	var repo Repository
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -64,15 +63,14 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	repo = internal.NewRepository(h.IndexService.DB)
-	lineBots, err := repo.GetLineBots(ctx)
+	lineBots, err := h.Repo.GetAllColumnsLineBots(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	for _, lineBot := range lineBots {
-		lineBotIv, err = repo.GetLineBotIv(ctx, lineBot.GuildID)
+		lineBotIv, err = h.Repo.GetAllColumnsLineBotIv(ctx, lineBot.GuildID)
 		if err != nil {
 			slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。")
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -154,7 +152,6 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 	guildID := r.PathValue("guildId")
 	state := uuid.New().String()
 	nonce := uuid.New().String()
-	var lineBotIv internal.LineBotIv
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -168,14 +165,14 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	repo := internal.NewRepository(h.IndexService.DB)
-	lineBot, err := repo.GetLineBot(ctx, guildID)
+
+	lineBot, err := h.Repo.GetAllColumnsLineBot(ctx, guildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	lineBotIv, err = repo.GetLineBotIv(ctx, lineBot.GuildID)
+	lineBotIv, err := h.Repo.GetAllColumnsLineBotIv(ctx, lineBot.GuildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

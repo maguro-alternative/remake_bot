@@ -2,6 +2,7 @@ package group
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -54,7 +55,11 @@ func TestLineGroupHandler_ServeHTTP(t *testing.T) {
 			IndexService: &service.IndexService{
 				DiscordSession: &discordgo.Session{},
 			},
-			Repo: &repository.RepositoryFuncMock{},
+			Repo: &repository.RepositoryFuncMock{
+				UpdateLineBotFunc: func(ctx context.Context, lineBot *repository.LineBot) error {
+					return nil
+				},
+			},
 		}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/group", bytes.NewReader(bodyJson))

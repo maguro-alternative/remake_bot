@@ -49,10 +49,13 @@ type OAuthStore interface {
 
 type PermissionHandler struct {
 	IndexService *service.IndexService
-	Repo         Repository
+	Repo         repository.RepositoryFunc
 }
 
-func NewPermissionHandler(indexService *service.IndexService, repo service.Repository,) *PermissionHandler {
+func NewPermissionHandler(
+	indexService *service.IndexService,
+	repo service.Repository,
+) *PermissionHandler {
 	return &PermissionHandler{
 		IndexService: indexService,
 		Repo:         repo,

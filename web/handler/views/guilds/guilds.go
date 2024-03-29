@@ -41,7 +41,6 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	// Discordの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
 	discordLoginUser, err := ctxvalue.DiscordUserFromContext(ctx)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

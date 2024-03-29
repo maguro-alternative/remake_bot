@@ -10,42 +10,39 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
-	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
-type Repository interface {
-	GetLineBot(ctx context.Context, guildID string) (internal.LineBot, error)
-	InsertLineBot(ctx context.Context, lineBot *internal.LineBot) error
-	InsertLineBotIv(ctx context.Context, lineBotIv *internal.LineBotIv) error
-}
-
 type LineTokenViewHandler struct {
 	IndexService *service.IndexService
+	Repo         repository.RepositoryFunc
 }
 
-func NewLineTokenViewHandler(indexService *service.IndexService) *LineTokenViewHandler {
+func NewLineTokenViewHandler(
+	indexService *service.IndexService,
+	repo repository.RepositoryFunc,
+) *LineTokenViewHandler {
 	return &LineTokenViewHandler{
 		IndexService: indexService,
+		Repo:         repo,
 	}
 }
 
 func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
-	var repo Repository
-	var client http.Client
 	categoryPositions := make(map[string]components.DiscordChannel)
 	guildId := r.PathValue("guildId")
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	repo = internal.NewRepository(g.IndexService.DB)
 
-	guild, err := g.IndexService.DiscordSession.Guild(guildId, discordgo.WithClient(&client))
+	guild, err := g.IndexService.DiscordBotState.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Not get guild id: "+err.Error())
@@ -53,7 +50,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if guild.Channels == nil {
-		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId, discordgo.WithClient(&client))
+		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
@@ -99,9 +96,9 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			channelsInCategory,
 		)
 	}
-	lineBot, err := repo.GetLineBot(ctx, guildId)
+	lineBot, err := g.Repo.GetAllColumnsLineBot(ctx, guildId)
 	if err != nil && err.Error() == "sql: no rows in result set" {
-		err = repo.InsertLineBot(ctx, &internal.LineBot{
+		err = g.Repo.InsertLineBot(ctx, &repository.LineBot{
 			GuildID:          guildId,
 			DefaultChannelID: guild.SystemChannelID,
 			DebugMode:        false,
@@ -111,9 +108,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			slog.ErrorContext(ctx, "line_botの作成に失敗しました:"+err.Error())
 			return
 		}
-		err = repo.InsertLineBotIv(ctx, &internal.LineBotIv{
-			GuildID: guildId,
-		})
+		err = g.Repo.InsertLineBotIv(ctx, guildId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "line_bot_ivの作成に失敗しました:"+err.Error())

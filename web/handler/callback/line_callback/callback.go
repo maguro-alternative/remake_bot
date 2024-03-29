@@ -13,26 +13,26 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/web/config"
-	"github.com/maguro-alternative/remake_bot/web/handler/callback/line_callback/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
-type Repository interface {
-	GetLineBot(ctx context.Context, guildID string) (internal.LineBot, error)
-	GetLineBots(ctx context.Context) ([]*internal.LineBot, error)
-	GetLineBotIv(ctx context.Context, guildID string) (internal.LineBotIv, error)
-}
-
 type LineCallbackHandler struct {
-	svc *service.IndexService
+	svc  *service.IndexService
+	repo repository.RepositoryFunc
 }
 
-func NewLineCallbackHandler(svc *service.IndexService) *LineCallbackHandler {
+func NewLineCallbackHandler(
+	svc *service.IndexService,
+	repo repository.RepositoryFunc,
+) *LineCallbackHandler {
 	return &LineCallbackHandler{
-		svc: svc,
+		svc:  svc,
+		repo: repo,
 	}
 }
 
@@ -41,7 +41,6 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	var repo Repository
 	privateKey := config.PrivateKey()
 	keyBytes, err := hex.DecodeString(privateKey)
 	if err != nil {
@@ -49,7 +48,7 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	repo = internal.NewRepository(h.svc.DB)
+
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
 	gob.Register(&model.LineIdTokenUser{})
@@ -90,13 +89,13 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	session.Values["line_nonce"] = ""
 	// 1. 認可ページのURL
 	code := r.URL.Query().Get("code")
-	lineBot, err := repo.GetLineBot(ctx, guildId)
+	lineBot, err := h.repo.GetAllColumnsLineBot(ctx, guildId)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	lineBotIv, err := repo.GetLineBotIv(ctx, lineBot.GuildID)
+	lineBotIv, err := h.repo.GetAllColumnsLineBotIv(ctx, lineBot.GuildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -152,7 +151,7 @@ func getIdToken(ctx context.Context, code, clientID, clientSecret string) (*mode
 	client := &http.Client{}
 	u, err := url.ParseRequestURI("https://api.line.me/oauth2/v2.1/token")
 	if err != nil {
-		return nil, func(){}, err
+		return nil, func() {}, err
 	}
 	form := url.Values{}
 	form.Add("grant_type", "authorization_code")
@@ -163,18 +162,18 @@ func getIdToken(ctx context.Context, code, clientID, clientSecret string) (*mode
 	body := strings.NewReader(form.Encode())
 	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), body)
 	if err != nil {
-		return nil, func(){}, err
+		return nil, func() {}, err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, func(){}, err
+		return nil, func() {}, err
 	}
 	var token model.LineToken
 	if err := json.NewDecoder(resp.Body).Decode(&token); err != nil {
-		return nil, func(){}, err
+		return nil, func() {}, err
 	}
-	return &token, func(){resp.Body.Close()}, nil
+	return &token, func() { resp.Body.Close() }, nil
 }
 
 func verifyIdToken(ctx context.Context, idToken, clientID, nonce string) (*model.LineIdTokenUser, func(), error) {
@@ -182,7 +181,7 @@ func verifyIdToken(ctx context.Context, idToken, clientID, nonce string) (*model
 	verifyUrl := "https://api.line.me/oauth2/v2.1/verify"
 	u, err := url.ParseRequestURI(verifyUrl)
 	if err != nil {
-		return nil, func(){}, err
+		return nil, func() {}, err
 	}
 	form := url.Values{}
 	form.Add("id_token", idToken)
@@ -192,13 +191,13 @@ func verifyIdToken(ctx context.Context, idToken, clientID, nonce string) (*model
 	body := strings.NewReader(form.Encode())
 	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), body)
 	if err != nil {
-		return nil, func(){}, err
+		return nil, func() {}, err
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := nonceClient.Do(req)
 	if err != nil {
-		return nil, func(){}, err
+		return nil, func() {}, err
 	}
 	if resp.StatusCode != http.StatusOK {
 		slog.InfoContext(ctx, resp.Status)
@@ -208,12 +207,12 @@ func verifyIdToken(ctx context.Context, idToken, clientID, nonce string) (*model
 			ErrorDescription string `json:"error_description"`
 		}
 		json.NewDecoder(resp.Body).Decode(&e)
-		return nil, func(){}, errors.New(e.ErrorDescription)
+		return nil, func() {}, errors.New(e.ErrorDescription)
 	}
 	var user model.LineIdTokenUser
 	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
-		return nil, func(){}, err
+		return nil, func() {}, err
 	}
 	slog.InfoContext(ctx, fmt.Sprintf("ユーザー情報: %+v", user))
-	return &user, func(){resp.Body.Close()}, nil
+	return &user, func() { resp.Body.Close() }, nil
 }

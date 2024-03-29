@@ -44,25 +44,14 @@ var (
 	}
 )
 
-type Repository interface {
-	GetLinePostDiscordChannel(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error)
-	InsertLinePostDiscordChannel(ctx context.Context, channelID, guildID string) error
-	GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error)
-	GetLineNgDiscordID(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error)
-}
-
-var (
-	_ Repository = (*repository.Repository)(nil)
-)
-
 type LinePostDiscordChannelViewHandler struct {
 	IndexService *service.IndexService
-	Repo         Repository
+	Repo         repository.RepositoryFunc
 }
 
 func NewLinePostDiscordChannelViewHandler(
 	indexService *service.IndexService,
-	repo Repository,
+	repo repository.RepositoryFunc,
 ) *LinePostDiscordChannelViewHandler {
 	return &LinePostDiscordChannelViewHandler{
 		IndexService: indexService,
@@ -73,8 +62,6 @@ func NewLinePostDiscordChannelViewHandler(
 func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	categoryPositions := make(map[string]components.DiscordChannel)
 	var categoryIDTmps []string
-	var repo Repository
-	var client http.Client
 	guildId := r.PathValue("guildId")
 	ctx := r.Context()
 	if ctx == nil {
@@ -98,7 +85,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	}
 
 	if guild.Channels == nil {
-		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId, discordgo.WithClient(&client))
+		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
@@ -119,7 +106,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	}
 	//[categoryID]map[channelPosition]channelName
 	channelsInCategory := make(map[string][]components.DiscordChannelSet)
-	repo = g.Repo
+
 	for _, channel := range guild.Channels {
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue
@@ -136,7 +123,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	for _, channel := range guild.Channels {
 		err = createCategoryInChannels(
 			ctx,
-			repo,
+			g.Repo,
 			guild,
 			channel,
 			categoryPositions,
@@ -194,7 +181,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 
 func createCategoryInChannels(
 	ctx context.Context,
-	repo Repository,
+	repo repository.RepositoryFunc,
 	guild *discordgo.Guild,
 	channel *discordgo.Channel,
 	categoryPositions map[string]components.DiscordChannel,

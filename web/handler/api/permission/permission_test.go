@@ -8,9 +8,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/stretchr/testify/assert"
@@ -76,28 +77,15 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 					},
 				},
 			},
-			repo: &RepositoryMock{
-				UpdatePermissionCodesFunc: func(ctx context.Context, permissionsCode []internal.PermissionCode) error {
+			Repo: &repository.RepositoryFuncMock{
+				UpdatePermissionCodesFunc: func(ctx context.Context, permissionsCode []repository.PermissionCode) error {
 					return nil
 				},
 				DeletePermissionIDsFunc: func(ctx context.Context, guildId string) error {
 					return nil
 				},
-				InsertPermissionIDsFunc: func(ctx context.Context, permissionsID []internal.PermissionID) error {
+				InsertPermissionIDsFunc: func(ctx context.Context, permissionsID []repository.PermissionIDAllColumns) error {
 					return nil
-				},
-			},
-			oauthStore: &OAuthStoreMock{
-				GetDiscordOAuthFunc: func(ctx context.Context, r *http.Request) (*model.DiscordOAuthSession, error) {
-					return &model.DiscordOAuthSession{
-						User: model.DiscordUser{
-							ID: "123456789",
-						},
-						Token: "token",
-					}, nil
-				},
-				GetLineOAuthFunc: func(r *http.Request) (*model.LineOAuthSession, error) {
-					return nil, nil
 				},
 			},
 		}

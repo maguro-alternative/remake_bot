@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bwmarrin/discordgo"
-
 	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
@@ -28,13 +26,12 @@ func NewGuildIDViewHandler(indexService *service.IndexService) *GuildIDViewHandl
 
 func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	var settingLinks string
-	var client http.Client
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	guildId := r.PathValue("guildId")
-	guild, err := g.IndexService.DiscordSession.Guild(guildId, discordgo.WithClient(&client))
+	guild, err := g.IndexService.DiscordBotState.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: ", "エラーメッセージ:", err.Error())

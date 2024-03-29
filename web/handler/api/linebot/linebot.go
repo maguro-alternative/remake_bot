@@ -8,6 +8,8 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 	"github.com/maguro-alternative/remake_bot/pkg/youtube"
 
@@ -16,20 +18,20 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
-type Repository interface {
-	GetLineBots(ctx context.Context) ([]*internal.LineBot, error)
-	GetLineBotIv(ctx context.Context, guildID string) (internal.LineBotIv, error)
-}
-
 // A LineBotHandler handles requests for the line bot.
 type LineBotHandler struct {
 	IndexService *service.IndexService
+	Repo         repository.RepositoryFunc
 }
 
 // NewLineBotHandler returns new LineBotHandler.
-func NewLineBotHandler(indexService *service.IndexService) *LineBotHandler {
+func NewLineBotHandler(
+	indexService *service.IndexService,
+	repo repository.RepositoryFunc,
+) *LineBotHandler {
 	return &LineBotHandler{
 		IndexService: indexService,
+		Repo:         repo,
 	}
 }
 
@@ -41,16 +43,15 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var lineResponses internal.LineResponses
 	var lineBotDecrypt *internal.LineBotDecrypt
-	var lineBotIv internal.LineBotIv
-	var repo Repository
+	var lineBotIv repository.LineBotIvNotClient
 	// 暗号化キーの取得
 	privateKey := config.PrivateKey()
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	repo = internal.NewRepository(h.IndexService.DB)
-	lineBots, err := repo.GetLineBots(ctx)
+
+	lineBots, err := h.Repo.GetAllColumnsLineBots(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -66,14 +67,14 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, lineBot := range lineBots {
-		lineBotIv, err = repo.GetLineBotIv(ctx, lineBot.GuildID)
+		lineBotIv, err = h.Repo.GetLineBotIvNotClient(ctx, lineBot.GuildID)
 		if err != nil {
 			slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		// リクエストボディの検証
-		lineBotDecrypt, err = internal.LineHmac(privateKey, requestBodyByte, *lineBot, lineBotIv, r.Header.Get("X-Line-Signature"))
+		lineBotDecrypt, err = internal.LineHmac(privateKey, requestBodyByte, lineBot, lineBotIv, r.Header.Get("X-Line-Signature"))
 		if err != nil {
 			slog.ErrorContext(ctx, "署名の検証に失敗しました。", "エラー:", err.Error())
 			http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -93,7 +94,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// バリデーションチェック
-	err = lineResponses.Validate();
+	err = lineResponses.Validate()
 	if err != nil {
 		slog.ErrorContext(ctx, "バリデーションチェックに失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Unprocessable Entity", http.StatusUnprocessableEntity)

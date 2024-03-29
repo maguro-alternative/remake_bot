@@ -10,31 +10,31 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
-	"github.com/maguro-alternative/remake_bot/web/handler/views/group/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
-type Repository interface {
-	GetLineBot(ctx context.Context, guildID string) (internal.LineBot, error)
-}
-
 type LineGroupViewHandler struct {
 	IndexService *service.IndexService
+	Repo         repository.RepositoryFunc
 }
 
-func NewLineGroupViewHandler(indexService *service.IndexService) *LineGroupViewHandler {
+func NewLineGroupViewHandler(
+	indexService *service.IndexService,
+	repo         repository.RepositoryFunc,
+) *LineGroupViewHandler {
 	return &LineGroupViewHandler{
 		IndexService: indexService,
+		Repo:         repo,
 	}
 }
 
 func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
-	var repo Repository
-	var client http.Client
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -49,7 +49,7 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if guild.Channels == nil {
-		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId, discordgo.WithClient(&client))
+		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
@@ -96,8 +96,8 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			channelsInCategory,
 		)
 	}
-	repo = internal.NewRepository(g.IndexService.DB)
-	lineBot, err := repo.GetLineBot(ctx, guildId)
+
+	lineBot, err := g.Repo.GetAllColumnsLineBot(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました:"+err.Error())

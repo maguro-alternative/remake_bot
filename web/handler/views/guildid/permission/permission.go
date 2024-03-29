@@ -7,28 +7,27 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
-	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/permission/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
-type Repository interface {
-	GetPermissionCodes(ctx context.Context, guildID string) ([]internal.PermissionCode, error)
-	GetPermissionIDs(ctx context.Context, guildID string) ([]internal.PermissionID, error)
-}
-
 type PermissionViewHandler struct {
 	IndexService *service.IndexService
+	Repo         repository.RepositoryFunc
 }
 
-func NewPermissionViewHandler(indexService *service.IndexService) *PermissionViewHandler {
+func NewPermissionViewHandler(
+	indexService *service.IndexService,
+	repo repository.RepositoryFunc,
+) *PermissionViewHandler {
 	return &PermissionViewHandler{
 		IndexService: indexService,
+		Repo:         repo,
 	}
 }
 
@@ -43,11 +42,9 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "/guild/permission Method Not Allowed")
 		return
 	}
-	var repo Repository
 	var componentPermissionIDs []components.PermissionID
-	var client http.Client
 
-	guild, err := h.IndexService.DiscordSession.Guild(guildId, discordgo.WithClient(&client))
+	guild, err := h.IndexService.DiscordBotState.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Not get guild id: "+err.Error())
@@ -55,7 +52,7 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if guild.Members == nil {
-		guild.Members, err = h.IndexService.DiscordSession.GuildMembers(guildId, "", 1000, discordgo.WithClient(&client))
+		guild.Members, err = h.IndexService.DiscordSession.GuildMembers(guildId, "", 1000)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild members: "+err.Error())
@@ -75,16 +72,14 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		lineSession = &model.LineOAuthSession{}
 	}
 
-	repo = internal.NewRepository(h.IndexService.DB)
-
-	permissionCodes, err := repo.GetPermissionCodes(ctx, guildId)
+	permissionCodes, err := h.Repo.GetPermissionCodes(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "permissions_codeの取得に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	permissionIDs, err := repo.GetPermissionIDs(ctx, guildId)
+	permissionIDs, err := h.Repo.GetGuildPermissionIDsAllColumns(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "permissions_idの取得に失敗しました。", "エラー:", err.Error())

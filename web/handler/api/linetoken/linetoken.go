@@ -9,24 +9,26 @@ import (
 
 	"github.com/lib/pq"
 
+	"github.com/maguro-alternative/remake_bot/repository"
+
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
-type Repository interface {
-	UpdateLineBot(ctx context.Context, lineBot *internal.LineBot) error
-	UpdateLineBotIv(ctx context.Context, lineBotIv *internal.LineBotIv) error
-}
-
 type LineTokenHandler struct {
 	IndexService *service.IndexService
+	Repo         repository.RepositoryFunc
 }
 
-func NewLineTokenHandler(indexService *service.IndexService) *LineTokenHandler {
+func NewLineTokenHandler(
+	indexService *service.IndexService,
+	repo repository.RepositoryFunc,
+) *LineTokenHandler {
 	return &LineTokenHandler{
 		IndexService: indexService,
+		Repo:         repo,
 	}
 }
 
@@ -41,7 +43,6 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var lineTokenJson internal.LineBotJson
-	var repo Repository
 
 	if err := json.NewDecoder(r.Body).Decode(&lineTokenJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -62,14 +63,13 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "暗号化に失敗しました:"+err.Error())
 		return
 	}
-	// 暗号化
-	repo = internal.NewRepository(h.IndexService.DB)
-	if err := repo.UpdateLineBot(ctx, lineBot); err != nil {
+
+	if err := h.Repo.UpdateLineBot(ctx, lineBot); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "line_botの更新に失敗しました:"+err.Error())
 		return
 	}
-	if err := repo.UpdateLineBotIv(ctx, lineBotIv); err != nil {
+	if err := h.Repo.UpdateLineBotIv(ctx, lineBotIv); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "line_bot_ivの更新に失敗しました:"+err.Error())
 		return
@@ -78,8 +78,8 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("OK")
 }
 
-func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (Bot *internal.LineBot, BotIv *internal.LineBotIv, err error) {
-	lineBot := internal.LineBot{
+func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (Bot *repository.LineBot, BotIv *repository.LineBotIv, err error) {
+	lineBot := repository.LineBot{
 		LineNotifyToken:  make(pq.ByteaArray, 1),
 		LineBotToken:     make(pq.ByteaArray, 1),
 		LineBotSecret:    make(pq.ByteaArray, 1),
@@ -87,7 +87,7 @@ func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (B
 		LineClientID:     make(pq.ByteaArray, 1),
 		LineClientSecret: make(pq.ByteaArray, 1),
 	}
-	lineBotIv := internal.LineBotIv{
+	lineBotIv := repository.LineBotIv{
 		LineNotifyTokenIv:  make(pq.ByteaArray, 1),
 		LineBotTokenIv:     make(pq.ByteaArray, 1),
 		LineBotSecretIv:    make(pq.ByteaArray, 1),

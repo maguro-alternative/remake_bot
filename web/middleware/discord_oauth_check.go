@@ -41,6 +41,7 @@ func init() {
 func DiscordOAuthCheckMiddleware(
 	indexService service.IndexService,
 	repo Repository,
+	loginRequiredFlag bool,
 ) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +59,7 @@ func DiscordOAuthCheckMiddleware(
 			oauthStore := getoauth.NewOAuthStore(indexService.CookieStore, config.SessionSecret())
 
 			discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, r)
-			if err != nil {
+			if err != nil && loginRequiredFlag {
 				http.Redirect(w, r, "/login/discord", http.StatusFound)
 				return
 			}
@@ -69,7 +70,7 @@ func DiscordOAuthCheckMiddleware(
 			}
 			req.Header.Set("Authorization", "Bearer "+discordLoginUser.Token)
 			resp, err := client.Do(req)
-			if err != nil || resp.StatusCode != http.StatusOK {
+			if (err != nil || resp.StatusCode != http.StatusOK) && loginRequiredFlag {
 				http.Redirect(w, r, "/login/discord", http.StatusFound)
 				return
 			}

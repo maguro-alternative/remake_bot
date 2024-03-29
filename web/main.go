@@ -72,25 +72,36 @@ func NewWebRouter(
 	// register routes
 	mux := http.NewServeMux()
 	middleChain := alice.New(middleware.LogMiddleware)
-	discordMiddleChain := alice.New(middleware.DiscordOAuthCheckMiddleware(*indexService, repo), middleware.LogMiddleware)
-	lineMiddleChain := alice.New(middleware.LineOAuthCheckMiddleware(*indexService, repo), middleware.LogMiddleware)
-	oauthMiddleChain := alice.New(
-		middleware.DiscordOAuthCheckMiddleware(*indexService, repo),
-		middleware.LineOAuthCheckMiddleware(*indexService, repo),
+	discordMiddleChain := alice.New(middleware.DiscordOAuthCheckMiddleware(*indexService, repo, true), middleware.LogMiddleware)
+	lineMiddleChain := alice.New(middleware.LineOAuthCheckMiddleware(*indexService, repo, true), middleware.LogMiddleware)
+	loginRequiredChain := alice.New(
+		middleware.DiscordOAuthCheckMiddleware(*indexService, repo, false),
+		middleware.LineOAuthCheckMiddleware(*indexService, repo, false),
 		middleware.LogMiddleware,
 	)
+	discordLoginRequiredChain := alice.New(
+		middleware.DiscordOAuthCheckMiddleware(*indexService, repo, true),
+		middleware.LineOAuthCheckMiddleware(*indexService, repo, false),
+		middleware.LogMiddleware,
+	)
+	lineLoginRequiredChain := alice.New(
+		middleware.DiscordOAuthCheckMiddleware(*indexService, repo, false),
+		middleware.LineOAuthCheckMiddleware(*indexService, repo, true),
+		middleware.LogMiddleware,
+	)
+
 	// 静的ファイルのハンドリング
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/templates/static/"))))
 
-	mux.Handle("/", middleChain.ThenFunc(indexView.NewIndexViewHandler(indexService).Index))
+	mux.Handle("/", loginRequiredChain.ThenFunc(indexView.NewIndexViewHandler(indexService).Index))
 	mux.Handle("/login/line", middleChain.ThenFunc(lineLogin.NewLineLoginHandler(indexService).Index))
 	mux.Handle("/login/line/{guildId}", middleChain.ThenFunc(lineLogin.NewLineLoginHandler(indexService).LineLogin))
 	mux.Handle("/guilds", middleChain.ThenFunc(guildsView.NewGuildsViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}", middleChain.ThenFunc(guildIdView.NewGuildIDViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/permission", middleChain.ThenFunc(permissionView.NewPermissionViewHandler(indexService).Index))
 	mux.Handle("/guild/{guildId}/linetoken", middleChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService).Index))
-	mux.Handle("/guild/{guildId}/line-post-discord-channel", oauthMiddleChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService, repo).Index))
-	mux.Handle("/group/{guildId}", oauthMiddleChain.ThenFunc(groupView.NewLineGroupViewHandler(indexService).Index))
+	mux.Handle("/guild/{guildId}/line-post-discord-channel", discordLoginRequiredChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService, repo).Index))
+	mux.Handle("/group/{guildId}", lineLoginRequiredChain.ThenFunc(groupView.NewLineGroupViewHandler(indexService).Index))
 
 	mux.Handle("/api/line-bot", middleChain.Then(linebot.NewLineBotHandler(indexService)))
 	mux.Handle("/login/discord", middleChain.Then(discordLogin.NewDiscordOAuth2Handler(discordOAuth2Service)))

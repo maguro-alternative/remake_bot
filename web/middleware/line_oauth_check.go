@@ -28,21 +28,27 @@ type LineBotDecrypt struct {
 func LineOAuthCheckMiddleware(
 	indexService service.IndexService,
 	repo Repository,
+	loginRequiredFlag bool,
 ) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var lineProfile line.LineProfile
 			var lineLoginUser *model.LineOAuthSession
 			ctx := r.Context()
-			guildId := r.PathValue("guildId")
 			oauthStore := getoauth.NewOAuthStore(indexService.CookieStore, config.SessionSecret())
 			// ログインユーザーの取得
 			lineLoginUser, err := oauthStore.GetLineOAuth(r)
-			if err != nil {
+			if err != nil && loginRequiredFlag {
+				http.Redirect(w, r, "/login/line", http.StatusFound)
 				slog.ErrorContext(ctx, "lineのユーザー取得に失敗しました", "エラー:", err.Error())
 				return
 			}
 			ctx = ctxvalue.ContextWithLineUser(ctx, lineLoginUser)
+
+			guildId := r.PathValue("guildId")
+			if guildId == "" {
+				guildId = lineLoginUser.DiscordGuildID
+			}
 
 			lineBotApi, err := repo.GetLineBotNotClient(ctx, guildId)
 			if err != nil {

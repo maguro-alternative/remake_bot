@@ -15,9 +15,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
-	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
@@ -58,8 +56,8 @@ var (
 )
 
 type LinePostDiscordChannelViewHandler struct {
-	IndexService          *service.IndexService
-	Repo                  Repository
+	IndexService *service.IndexService
+	Repo         Repository
 }
 
 func NewLinePostDiscordChannelViewHandler(
@@ -67,8 +65,8 @@ func NewLinePostDiscordChannelViewHandler(
 	repo Repository,
 ) *LinePostDiscordChannelViewHandler {
 	return &LinePostDiscordChannelViewHandler{
-		IndexService:          indexService,
-		Repo:                  repo,
+		IndexService: indexService,
+		Repo:         repo,
 	}
 }
 
@@ -111,13 +109,12 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	discordPermissionData, err := ctxvalue.DiscordPermissionFromContext(ctx)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "Discordの権限情報の取得に失敗しました:", "エラー",err.Error())
+		slog.ErrorContext(ctx, "Discordの権限情報の取得に失敗しました:", "エラー", err.Error())
 		return
 	}
 
-	oauthStore := getoauth.NewOAuthStore(g.IndexService.CookieStore, config.SessionSecret())
 	// Lineの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
-	lineSession, err := oauthStore.GetLineOAuth(r)
+	lineSession, err := ctxvalue.LineUserFromContext(ctx)
 	if err != nil {
 		lineSession = &model.LineOAuthSession{}
 	}

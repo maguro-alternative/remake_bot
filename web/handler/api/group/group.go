@@ -12,7 +12,6 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/group/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/permission"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
@@ -57,8 +56,6 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var lineGroupJson internal.LineBotJson
 	var repo Repository
-	var oauthPermission OAuthPermission
-	var client http.Client
 	if err := json.NewDecoder(r.Body).Decode(&lineGroupJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました:"+err.Error())
@@ -70,19 +67,8 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	guildId := r.PathValue("guildId")
-	oauthPermission = permission.NewPermissionHandler(r, &client, g.IndexService)
-	_, _, err := oauthPermission.CheckLinePermission(
-		ctx,
-		r,
-		guildId,
-	)
-	if err != nil {
-		http.Redirect(w, r, "/login/line", http.StatusFound)
-		slog.InfoContext(ctx, "Redirect to /login/line")
-		return
-	}
 	repo = g.Repo
-	err = repo.UpdateLineBot(ctx, &repository.LineBot{
+	err := repo.UpdateLineBot(ctx, &repository.LineBot{
 		GuildID:          guildId,
 		DefaultChannelID: lineGroupJson.DefaultChannelID,
 	})

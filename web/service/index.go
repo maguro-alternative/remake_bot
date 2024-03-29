@@ -64,7 +64,7 @@ type Session interface {
 }
 
 var (
-	_ Session = (*discordgo.Session)(nil)
+	_ Session    = (*discordgo.Session)(nil)
 	_ Repository = (*repository.Repository)(nil)
 )
 

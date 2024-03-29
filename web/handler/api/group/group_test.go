@@ -2,7 +2,6 @@ package group
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -11,11 +10,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/maguro-alternative/remake_bot/repository"
 
-	"github.com/maguro-alternative/remake_bot/pkg/line"
-
 	"github.com/maguro-alternative/remake_bot/web/handler/api/group/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -46,11 +42,6 @@ func TestLineGroupHandler_ServeHTTP(t *testing.T) {
 	t.Run("jsonのバリデーションに失敗すると、Unprocessable Entityが返ること", func(t *testing.T) {
 		h := &LineGroupHandler{
 			IndexService: &service.IndexService{},
-			oauthPermission: &OAuthPermissionMock{
-				CheckLinePermissionFunc: func(ctx context.Context, r *http.Request, guildId string) (lineProfile line.LineProfile, lineLoginUser *model.LineOAuthSession, err error) {
-					return line.LineProfile{}, &model.LineOAuthSession{}, nil
-				},
-			},
 		}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/group", bytes.NewReader([]byte(`{"channel_id":"123456789"}`)))
@@ -63,16 +54,7 @@ func TestLineGroupHandler_ServeHTTP(t *testing.T) {
 			IndexService: &service.IndexService{
 				DiscordSession: &discordgo.Session{},
 			},
-			Repo: &RepositoryMock{
-				UpdateLineBotFunc: func(ctx context.Context, lineBot *repository.LineBot) error {
-					return nil
-				},
-			},
-			oauthPermission: &OAuthPermissionMock{
-				CheckLinePermissionFunc: func(ctx context.Context, r *http.Request, guildId string) (lineProfile line.LineProfile, lineLoginUser *model.LineOAuthSession, err error) {
-					return line.LineProfile{}, &model.LineOAuthSession{}, nil
-				},
-			},
+			Repo: &repository.RepositoryFuncMock{},
 		}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/group", bytes.NewReader(bodyJson))

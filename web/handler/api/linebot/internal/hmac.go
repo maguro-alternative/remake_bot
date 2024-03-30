@@ -11,7 +11,13 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 )
 
-func LineHmac(privateKey string, requestBodyByte []byte, lineBot *repository.LineBot, lineBotIv repository.LineBotIvNotClient, header string) (decrypt *LineBotDecrypt, err error) {
+func LineHmac(
+	privateKey string,
+	requestBodyByte []byte,
+	lineBot *repository.LineBot,
+	lineBotIv repository.LineBotIvNotClient,
+	header string,
+) (decrypt *LineBotDecrypt, err error) {
 	lineBotDecrypt := &LineBotDecrypt{}
 	// 暗号化キーのバイトへの変換
 	keyBytes, err := hex.DecodeString(privateKey)

@@ -40,12 +40,12 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var lineGroupJson internal.LineBotJson
 	if err := json.NewDecoder(r.Body).Decode(&lineGroupJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
-		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました:"+err.Error())
+		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました", "エラー:", err.Error())
 		return
 	}
 	if err := lineGroupJson.Validate(); err != nil {
 		http.Error(w, "Unprocessable Entity", http.StatusUnprocessableEntity)
-		slog.ErrorContext(ctx, "jsonのバリデーションに失敗しました:"+err.Error())
+		slog.ErrorContext(ctx, "jsonのバリデーションに失敗しました:", "エラー:", err.Error())
 		return
 	}
 	guildId := r.PathValue("guildId")
@@ -55,7 +55,7 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "DBの更新に失敗しました:"+err.Error())
+		slog.ErrorContext(ctx, "DBの更新に失敗しました:", "エラー:", err.Error())
 		return
 	}
 	w.WriteHeader(http.StatusOK)

@@ -63,7 +63,6 @@ func NewPermissionHandler(
 }
 
 func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var repo Repository
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -77,8 +76,6 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var permissionJson internal.PermissionJson
 	var permissionCodes []repository.PermissionCode
 	var permissionIDs []repository.PermissionIDAllColumns
-
-	repo = h.Repo
 
 	if err := json.NewDecoder(r.Body).Decode(&permissionJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -109,19 +106,19 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	if err := repo.UpdatePermissionCodes(ctx, permissionCodes); err != nil {
+	if err := h.Repo.UpdatePermissionCodes(ctx, permissionCodes); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの更新に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	if err := repo.DeletePermissionIDs(ctx, guildId); err != nil {
+	if err := h.Repo.DeletePermissionIDs(ctx, guildId); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの削除に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	if err := repo.InsertPermissionIDs(ctx, permissionIDs); err != nil {
+	if err := h.Repo.InsertPermissionIDs(ctx, permissionIDs); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの追加に失敗しました。", "エラー:", err.Error())
 		return

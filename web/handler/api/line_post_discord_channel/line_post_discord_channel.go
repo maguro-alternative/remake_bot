@@ -41,13 +41,13 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 	var lineChannelJson internal.LinePostDiscordChannelJson
 	if err := json.NewDecoder(r.Body).Decode(&lineChannelJson); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "Json読み取りに失敗しました。 "+err.Error())
+		slog.ErrorContext(ctx, "Json読み取りに失敗しました。 ", "エラー:", err.Error())
 		return
 	}
 
 	if err := lineChannelJson.Validate(); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "Jsonバリデーションに失敗しました。 "+err.Error())
+		slog.ErrorContext(ctx, "Jsonバリデーションに失敗しました。 ", "エラー:", err.Error())
 		return
 	}
 
@@ -64,32 +64,32 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 		)
 		if err := h.Repo.UpdateLinePostDiscordChannel(ctx, *linePostDiscordChannel); err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "line_post_discord_channel更新に失敗しました。 "+err.Error())
+			slog.ErrorContext(ctx, "line_post_discord_channel更新に失敗しました。 ", "エラー:", err.Error())
 			return
 		}
 	}
 
 	if err := h.Repo.InsertLineNgDiscordMessageTypes(ctx, lineNgTypes); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "line_ng_discord_message_type更新に失敗しました。 "+err.Error())
+		slog.ErrorContext(ctx, "line_ng_discord_message_type更新に失敗しました。 ", "エラー:", err.Error())
 		return
 	}
 
 	if err := h.Repo.DeleteNotInsertLineNgDiscordMessageTypes(ctx, lineNgTypes); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "line_ng_discord_message_type更新に失敗しました。 "+err.Error())
+		slog.ErrorContext(ctx, "line_ng_discord_message_type更新に失敗しました。 ", "エラー:", err.Error())
 		return
 	}
 
 	if err := h.Repo.InsertLineNgDiscordIDs(ctx, lineNgIDs); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "line_ng_discord_id更新に失敗しました。 "+err.Error())
+		slog.ErrorContext(ctx, "line_ng_discord_id更新に失敗しました。 ", "エラー:", err.Error())
 		return
 	}
 
 	if err := h.Repo.DeleteNotInsertLineNgDiscordIDs(ctx, lineNgIDs); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "line_ng_discord_id更新に失敗しました。 "+err.Error())
+		slog.ErrorContext(ctx, "line_ng_discord_id更新に失敗しました。 ", "エラー:", err.Error())
 		return
 	}
 

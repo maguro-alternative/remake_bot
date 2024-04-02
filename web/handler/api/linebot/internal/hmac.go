@@ -60,4 +60,3 @@ func LineHmac(
 	lineBotDecrypt.DebugMode = lineBot.DebugMode
 	return lineBotDecrypt, nil
 }
-

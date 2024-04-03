@@ -57,6 +57,11 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	if len(lineBots) == 0 {
+		slog.ErrorContext(ctx, "line_botの情報が見つかりませんでした。")
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 
 	// リクエストボディの読み込み
 	requestBodyByte, err := io.ReadAll(r.Body)
@@ -66,7 +71,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, lineBot := range lineBots {
+	for i, lineBot := range lineBots {
 		lineBotIv, err = h.Repo.GetLineBotIvNotClient(ctx, lineBot.GuildID)
 		if err != nil {
 			slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
@@ -83,6 +88,12 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// 署名が一致した場合はループを抜ける
 		if lineBotDecrypt != nil {
 			break
+		}
+		// 署名が一致しなかった場合は最後のループでエラーを返す
+		if i == len(lineBots)-1 {
+			slog.ErrorContext(ctx, "line_botの情報が見つかりませんでした。")
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
 		}
 	}
 

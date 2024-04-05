@@ -17,7 +17,7 @@ type LineNotifyCall struct {
 
 // LINE Notifyでメッセージを送信
 func (r *LineRequest) PushMessageNotify(ctx context.Context, message string) error {
-	client := &http.Client{}
+	client := r.client
 	notifyUrl := "https://notify-api.line.me/api/notify"
 	u, err := url.ParseRequestURI(notifyUrl)
 	if err != nil {

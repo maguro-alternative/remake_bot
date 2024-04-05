@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"net/http"
 	"fmt"
 
 	"github.com/maguro-alternative/remake_bot/bot/config"
@@ -12,7 +13,7 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
-func BotOnReady(indexDB db.Driver) (*discordgo.Session, func(), error) {
+func BotOnReady(indexDB db.Driver, client *http.Client) (*discordgo.Session, func(), error) {
 	/*
 		ボットの起動
 
@@ -37,7 +38,7 @@ func BotOnReady(indexDB db.Driver) (*discordgo.Session, func(), error) {
 	if err != nil {
 		return nil, func(){}, errors.WithStack(err)
 	}
-	registerHandlers(discordSession, indexDB)
+	registerHandlers(discordSession, indexDB, client)
 	cleanupCommandHandlers, err := commands.RegisterCommands(discordSession, indexDB)
 	return discordSession, cleanupCommandHandlers, err
 }
@@ -45,8 +46,9 @@ func BotOnReady(indexDB db.Driver) (*discordgo.Session, func(), error) {
 func registerHandlers(
 	s *discordgo.Session,
 	sqlxdb db.Driver,
+	client *http.Client,
 ) {
-	cogs := cogs.NewCogHandler(sqlxdb)
+	cogs := cogs.NewCogHandler(sqlxdb, client)
 	fmt.Println(s.State.User.Username + "としてログインしました")
 	//s.AddHandler(cogs.OnVoiceStateUpdate)
 	s.AddHandler(cogs.OnMessageCreate)

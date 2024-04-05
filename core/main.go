@@ -4,6 +4,9 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"net"
+	"net/http"
+	"time"
 	"os"
 	"os/signal"
 
@@ -33,8 +36,19 @@ func main() {
 		panic(err)
 	}
 
+	client := http.Client{
+		Timeout: 5 * time.Second,
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout: time.Second,
+			}).DialContext,
+			TLSHandshakeTimeout:   time.Second,
+			ResponseHeaderTimeout: time.Second,
+		},
+	}
+
 	// ボットの起動
-	discord, cleanupCommandHandlers, err := bot.BotOnReady(dbV1)
+	discord, cleanupCommandHandlers, err := bot.BotOnReady(dbV1, &client)
 	if err != nil {
 		panic(err)
 	}
@@ -54,6 +68,7 @@ func main() {
 	go func() {
 		web.NewWebRouter(
 			dbV1,
+			&client,
 			store,
 			discord,
 		)

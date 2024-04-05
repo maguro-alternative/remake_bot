@@ -98,6 +98,7 @@ func LineOAuthCheckMiddleware(
 			lineBotDecrypt.DebugMode = lineBotApi.DebugMode
 
 			lineRequ := line.NewLineRequest(
+				*indexService.Client,
 				lineBotDecrypt.LineNotifyToken,
 				lineBotDecrypt.LineBotToken,
 				lineBotDecrypt.LineGroupID,

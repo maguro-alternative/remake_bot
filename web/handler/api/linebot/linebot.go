@@ -120,7 +120,12 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	lineEvent := lineResponses.Events[0]
 
-	lineRequ := line.NewLineRequest(lineBotDecrypt.LineNotifyToken, lineBotDecrypt.LineBotToken, lineBotDecrypt.LineGroupID)
+	lineRequ := line.NewLineRequest(
+		*h.IndexService.Client,
+		lineBotDecrypt.LineNotifyToken,
+		lineBotDecrypt.LineBotToken,
+		lineBotDecrypt.LineGroupID,
+	)
 	// ユーザー情報の取得
 	lineProfile, err := lineRequ.GetProfile(ctx, lineEvent.Source.UserID)
 	if err != nil {

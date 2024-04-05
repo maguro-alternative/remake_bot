@@ -1,7 +1,9 @@
 package web
 
 import (
+	"net"
 	"net/http"
+	"time"
 	"strings"
 
 	"github.com/maguro-alternative/remake_bot/repository"
@@ -53,12 +55,22 @@ func NewWebRouter(
 		},
 		RedirectURL: config.ServerUrl() + "/callback/discord-callback/",
 	}
+	client := http.Client{
+		Timeout: 5 * time.Second,
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout: time.Second,
+			}).DialContext,
+			TLSHandshakeTimeout:   time.Second,
+			ResponseHeaderTimeout: time.Second,
+		},
+	}
 
 	repo := repository.NewRepository(indexDB)
 
 	// create a *service.TODOService type variable using the *sql.DB type variable
 	var indexService = service.NewIndexService(
-		indexDB,
+		&client,
 		cookieStore,
 		discordSession,
 		discordSession.State,

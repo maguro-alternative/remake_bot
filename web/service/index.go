@@ -2,11 +2,10 @@ package service
 
 import (
 	"context"
+	"net/http"
 	"io"
 
 	"github.com/maguro-alternative/remake_bot/repository"
-
-	"github.com/maguro-alternative/remake_bot/pkg/db"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gorilla/sessions"
@@ -14,7 +13,7 @@ import (
 
 // A TODOService implements CRUD of TODO entities.
 type IndexService struct {
-	DB              db.Driver
+	Client          *http.Client
 	CookieStore     *sessions.CookieStore
 	DiscordSession  Session
 	DiscordBotState *discordgo.State
@@ -70,13 +69,13 @@ var (
 
 // NewTODOService returns new TODOService.
 func NewIndexService(
-	db db.Driver,
+	client *http.Client,
 	cookieStore *sessions.CookieStore,
 	discordSession Session,
 	discordBotState *discordgo.State,
 ) *IndexService {
 	return &IndexService{
-		DB:              db,
+		Client:          client,
 		CookieStore:     cookieStore,
 		DiscordSession:  discordSession,
 		DiscordBotState: discordBotState,

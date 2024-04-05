@@ -96,6 +96,7 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		}
 
 		lineRequ := line.NewLineRequest(
+			*h.IndexService.Client,
 			string(lineNotifyTokenByte),
 			string(lineBotTokenByte),
 			string(lineGroupByte),

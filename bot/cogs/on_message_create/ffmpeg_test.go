@@ -17,18 +17,19 @@ func TestFfmpeg_ConversionAudioFile(t *testing.T) {
 		require.NoError(t, os.Chdir(cwd))
 	})
 	require.NoError(t, os.Chdir("../.."))
+	tmpFile := cwd + "/yumi_dannasama.mp3"
+	tmpFileNotExt := cwd + "/yumi_dannasama"
 	ffmpeg := Ffmpeg{
-		tmpFile:       cwd+"/yumi_dannasama.mp3",
-		tmpFileNotExt: cwd+"/yumi_dannasama",
+		tmpFile: tmpFile,
 	}
-	_, err = os.Stat(ffmpeg.tmpFileNotExt+".m4a")
+	_, err = os.Stat(tmpFileNotExt + ".m4a")
 	// 既に変換済みの場合は削除
 	if err == nil {
-		err = os.Remove(ffmpeg.tmpFileNotExt+".m4a")
+		err = os.Remove(tmpFileNotExt + ".m4a")
 		require.NoError(t, err)
 	}
 	t.Run("正常系", func(t *testing.T) {
-		err = ffmpeg.ConversionAudioFile(ctx)
+		err = ffmpeg.ConversionAudioFile(ctx, tmpFile, tmpFileNotExt)
 		assert.NoError(t, err)
 	})
 }
@@ -41,14 +42,13 @@ func TestFfmpeg_GetAudioFileSecond(t *testing.T) {
 		require.NoError(t, os.Chdir(cwd))
 	})
 	require.NoError(t, os.Chdir("../.."))
-	tmpFile := cwd+"/yumi_dannasama.mp3"
-	tmpFileNotExt := cwd+"/yumi_dannasama"
+	tmpFile := cwd + "/yumi_dannasama.mp3"
+	tmpFileNotExt := cwd + "/yumi_dannasama"
 	ffmpeg := Ffmpeg{
-		tmpFile:       tmpFile,
-		tmpFileNotExt: tmpFileNotExt,
+		tmpFile: tmpFile,
 	}
 	t.Run("正常系", func(t *testing.T) {
-		_, err := ffmpeg.GetAudioFileSecond(ctx)
+		_, err := ffmpeg.GetAudioFileSecond(ctx, tmpFile, tmpFileNotExt)
 		assert.NoError(t, err)
 	})
 }

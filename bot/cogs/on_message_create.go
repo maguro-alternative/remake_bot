@@ -7,9 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -19,8 +17,8 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 
 	onMessageCreate "github.com/maguro-alternative/remake_bot/bot/cogs/on_message_create"
-	"github.com/maguro-alternative/remake_bot/bot/service"
 	"github.com/maguro-alternative/remake_bot/bot/config"
+	"github.com/maguro-alternative/remake_bot/bot/service"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -28,7 +26,8 @@ import (
 func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.MessageCreate) {
 	ctx := context.Background()
 	repo := repository.NewRepository(h.DB)
-	err := onMessageCreateFunc(ctx, h.client, repo, s, vs)
+	ffmpeg := onMessageCreate.NewFfmpeg("")
+	err := onMessageCreateFunc(ctx, h.client, repo, *ffmpeg, s, vs)
 	if err != nil {
 		slog.ErrorContext(ctx, "OnMessageCreate Error", "Error:", err.Error())
 	}
@@ -38,6 +37,7 @@ func onMessageCreateFunc(
 	ctx context.Context,
 	client *http.Client,
 	repo repository.RepositoryFunc,
+	ffmpeg onMessageCreate.FfmpegInterface,
 	s service.Session,
 	vs *discordgo.MessageCreate,
 ) error {
@@ -203,7 +203,7 @@ func onMessageCreateFunc(
 			tmpFile := os.TempDir() + "/" + attachment.Filename
 			tmpFileNotExt := os.TempDir() + "/" + fileNameNoExt
 			slog.InfoContext(ctx, "download:"+attachment.URL)
-			err = downloadFile(tmpFile, attachment.URL)
+			err = downloadFile(client, tmpFile, attachment.URL)
 			if err != nil {
 				slog.ErrorContext(ctx, "ファイルのダウンロードに失敗しました", "エラー:", err.Error())
 				return err
@@ -211,7 +211,7 @@ func onMessageCreateFunc(
 			if extension != ".m4a" {
 				slog.InfoContext(ctx, "m4a変換:"+tmpFile)
 				slog.InfoContext(ctx, "ffmpeg:"+tmpFile)
-				err = exec.CommandContext(ctx, "ffmpeg", "-i", tmpFile, tmpFileNotExt+".m4a").Run()
+				err = ffmpeg.ConversionAudioFile(ctx, tmpFile, tmpFileNotExt)
 				if err != nil {
 					slog.ErrorContext(ctx, "ffmpegの秒数カウントに失敗しました", "エラー:", err.Error())
 					return err
@@ -223,7 +223,7 @@ func onMessageCreateFunc(
 				return err
 			}
 			defer f.Close()
-			messsage, err := s.ChannelFileSendWithMessage(
+			fileSendMesssage, err := s.ChannelFileSendWithMessage(
 				vs.ChannelID,
 				"m4aに変換します。",
 				tmpFileNotExt+".m4a",
@@ -234,34 +234,15 @@ func onMessageCreateFunc(
 				return err
 			}
 			// 音声ファイルの秒数を取得
-			cmd := exec.CommandContext(
-				ctx,
-				"ffprobe",
-				"-hide_banner",
-				tmpFileNotExt+".m4a",
-				"-show_entries",
-				"format=duration",
-			)
 			slog.InfoContext(ctx, "秒数取得:"+tmpFileNotExt+".m4a")
-			out, err := cmd.CombinedOutput()
-			if err != nil {
-				slog.ErrorContext(ctx, "ffmpegの実行に失敗しました", "エラー:", err.Error())
-				return err
-			}
-			re, err := regexp.Compile(`(\d+\.\d+)`)
-			if err != nil {
-				slog.ErrorContext(ctx, "正規表現のコンパイルに失敗しました", "エラー:", err.Error())
-				return err
-			}
-			match := re.FindStringSubmatch(string(out))
-			slog.InfoContext(ctx, "秒数:"+match[0])
-			audioLen, err := strconv.ParseFloat(match[0], 64)
+			audioLen, err := ffmpeg.GetAudioFileSecond(ctx, tmpFile, tmpFileNotExt)
 			if err != nil {
 				slog.ErrorContext(ctx, "音声ファイルの秒数の抽出に失敗しました", "エラー:", err.Error())
 				return err
 			}
+			slog.InfoContext(ctx, "秒数:"+strconv.FormatFloat(audioLen, 'f', -1, 64))
 			audio := lineRequ.NewLineAudioMessage(
-				messsage.Attachments[0].URL,
+				fileSendMesssage.Attachments[0].URL,
 				audioLen,
 			)
 			lineMessageTypes = append(lineMessageTypes, audio)
@@ -315,13 +296,13 @@ func onMessageCreateFunc(
 	return err
 }
 
-func downloadFile(tmpFilePath, url string) error {
+func downloadFile(client *http.Client, tmpFilePath, url string) error {
 	f, err := os.Create(tmpFilePath)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	resp, err := http.Get(url)
+	resp, err := client.Get(url)
 	if err != nil {
 		return err
 	}

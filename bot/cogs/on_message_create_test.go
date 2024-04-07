@@ -13,6 +13,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 	"github.com/maguro-alternative/remake_bot/repository"
 
+	onMessageCreate "github.com/maguro-alternative/remake_bot/bot/cogs/on_message_create"
 	"github.com/maguro-alternative/remake_bot/bot/service"
 
 	"github.com/bwmarrin/discordgo"
@@ -62,112 +63,270 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 		LineGroupIDIv:     pq.ByteaArray{decodeGroupID},
 	}
 
-    t.Run("正常系", func(t *testing.T) {
-        err = onMessageCreateFunc(
-            ctx,
-            stubClient,
-            &repository.RepositoryFuncMock{
-                GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
-                    return repository.LinePostDiscordChannel{
-                        Ng:         false,
-                        BotMessage: false,
-                    }, nil
-                },
-                InsertLinePostDiscordChannelFunc: func(ctx context.Context, channelID string, guildID string) error {
-                    return nil
-                },
-                GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
-                    return nil, nil
-                },
-                GetLineNgDiscordIDFunc: func(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error) {
-                    return nil, nil
-                },
-                GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
-                    return *lineBot, nil
-                },
-                GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
-                    return lineBotIv, nil
-                },
-            },
-            &service.SessionMock{
-                ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
-                    return &discordgo.Channel{
-                        GuildID: "guildID",
-                    }, nil
-                },
-                ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
-                    return &discordgo.Message{}, nil
-                },
-                GuildFunc: func(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error) {
-                    return &discordgo.Guild{
-                        ID: "guildID",
-                    }, nil
-                },
-            },
-            &discordgo.MessageCreate{
-                Message: &discordgo.Message{
-                    Content: "test",
-                    Author: &discordgo.User{
-                        Bot: false,
-                    },
-                },
-            },
-        )
-        assert.NoError(t, err)
-    })
+	t.Run("正常系", func(t *testing.T) {
+		err = onMessageCreateFunc(
+			ctx,
+			stubClient,
+			&repository.RepositoryFuncMock{
+				GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+					return repository.LinePostDiscordChannel{
+						Ng:         false,
+						BotMessage: false,
+					}, nil
+				},
+				InsertLinePostDiscordChannelFunc: func(ctx context.Context, channelID string, guildID string) error {
+					return nil
+				},
+				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+					return nil, nil
+				},
+				GetLineNgDiscordIDFunc: func(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error) {
+					return nil, nil
+				},
+				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+					return *lineBot, nil
+				},
+				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+					return lineBotIv, nil
+				},
+			},
+			&onMessageCreate.FfmpegMock{
+				ConversionAudioFileFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) error {
+					return nil
+				},
+				GetAudioFileSecondFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error) {
+					return 0.0, nil
+				},
+			},
+			&service.SessionMock{
+				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
+					return &discordgo.Channel{
+						GuildID: "guildID",
+					}, nil
+				},
+				ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{}, nil
+				},
+				GuildFunc: func(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error) {
+					return &discordgo.Guild{
+						ID: "guildID",
+					}, nil
+				},
+			},
+			&discordgo.MessageCreate{
+				Message: &discordgo.Message{
+					Content: "test",
+					Author: &discordgo.User{
+						Bot: false,
+					},
+				},
+			},
+		)
+		assert.NoError(t, err)
+	})
 
-    t.Run("正常系", func(t *testing.T) {
-        err = onMessageCreateFunc(
-            ctx,
-            stubClient,
-            &repository.RepositoryFuncMock{
-                GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
-                    return repository.LinePostDiscordChannel{
-                        Ng:         false,
-                        BotMessage: false,
-                    }, nil
-                },
-                InsertLinePostDiscordChannelFunc: func(ctx context.Context, channelID string, guildID string) error {
-                    return nil
-                },
-                GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
-                    return nil, nil
-                },
-                GetLineNgDiscordIDFunc: func(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error) {
-                    return nil, nil
-                },
-                GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
-                    return *lineBot, nil
-                },
-                GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
-                    return lineBotIv, nil
-                },
-            },
-            &service.SessionMock{
-                ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
-                    return &discordgo.Channel{
-                        GuildID: "guildID",
-                    }, nil
-                },
-                ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
-                    return &discordgo.Message{}, nil
-                },
-                GuildFunc: func(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error) {
-                    return &discordgo.Guild{
-                        ID: "guildID",
-                    }, nil
-                },
-            },
-            &discordgo.MessageCreate{
-                Message: &discordgo.Message{
-                    Content: "test",
-                    Attachments: []*discordgo.MessageAttachment{},
-                    Author: &discordgo.User{
-                        Bot: false,
-                    },
-                },
-            },
-        )
-        assert.NoError(t, err)
-    })
+	t.Run("正常系(画像)", func(t *testing.T) {
+		err = onMessageCreateFunc(
+			ctx,
+			stubClient,
+			&repository.RepositoryFuncMock{
+				GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+					return repository.LinePostDiscordChannel{
+						Ng:         false,
+						BotMessage: false,
+					}, nil
+				},
+				InsertLinePostDiscordChannelFunc: func(ctx context.Context, channelID string, guildID string) error {
+					return nil
+				},
+				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+					return nil, nil
+				},
+				GetLineNgDiscordIDFunc: func(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error) {
+					return nil, nil
+				},
+				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+					return *lineBot, nil
+				},
+				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+					return lineBotIv, nil
+				},
+			},
+			&onMessageCreate.FfmpegMock{
+				ConversionAudioFileFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) error {
+					return nil
+				},
+				GetAudioFileSecondFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error) {
+					return 0.0, nil
+				},
+			},
+			&service.SessionMock{
+				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
+					return &discordgo.Channel{
+						GuildID: "guildID",
+					}, nil
+				},
+				ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{}, nil
+				},
+				GuildFunc: func(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error) {
+					return &discordgo.Guild{
+						ID: "guildID",
+					}, nil
+				},
+			},
+			&discordgo.MessageCreate{
+				Message: &discordgo.Message{
+					Content: "test",
+					Attachments: []*discordgo.MessageAttachment{
+						{
+							URL:      "https://example.com/image.jpg",
+							Filename: "image.jpg",
+						},
+					},
+					Author: &discordgo.User{
+						Bot: false,
+					},
+				},
+			},
+		)
+		assert.NoError(t, err)
+	})
+
+	t.Run("正常系(NGユーザー)", func(t *testing.T) {
+		err = onMessageCreateFunc(
+			ctx,
+			stubClient,
+			&repository.RepositoryFuncMock{
+				GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+					return repository.LinePostDiscordChannel{
+						Ng:         true,
+						BotMessage: false,
+					}, nil
+				},
+				InsertLinePostDiscordChannelFunc: func(ctx context.Context, channelID string, guildID string) error {
+					return nil
+				},
+				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+					return nil, nil
+				},
+				GetLineNgDiscordIDFunc: func(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error) {
+					return []repository.LineNgDiscordID{
+						{
+							ID:     "userID",
+							IDType: "user",
+						},
+					}, nil
+				},
+				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+					return *lineBot, nil
+				},
+				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+					return lineBotIv, nil
+				},
+			},
+			&onMessageCreate.FfmpegMock{
+				ConversionAudioFileFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) error {
+					return nil
+				},
+				GetAudioFileSecondFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error) {
+					return 0.0, nil
+				},
+			},
+			&service.SessionMock{
+				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
+					return &discordgo.Channel{
+						GuildID: "guildID",
+					}, nil
+				},
+				ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{}, nil
+				},
+				GuildFunc: func(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error) {
+					return &discordgo.Guild{
+						ID: "guildID",
+					}, nil
+				},
+			},
+			&discordgo.MessageCreate{
+				Message: &discordgo.Message{
+					Author: &discordgo.User{
+						ID:  "userID",
+						Bot: false,
+					},
+					Content: "test",
+				},
+			},
+		)
+		assert.NoError(t, err)
+	})
+
+	t.Run("正常系(音声)", func(t *testing.T) {
+		err = onMessageCreateFunc(
+			ctx,
+			stubClient,
+			&repository.RepositoryFuncMock{
+				GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+					return repository.LinePostDiscordChannel{
+						Ng:         false,
+						BotMessage: false,
+					}, nil
+				},
+				InsertLinePostDiscordChannelFunc: func(ctx context.Context, channelID string, guildID string) error {
+					return nil
+				},
+				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+					return nil, nil
+				},
+				GetLineNgDiscordIDFunc: func(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error) {
+					return nil, nil
+				},
+				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+					return *lineBot, nil
+				},
+				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+					return lineBotIv, nil
+				},
+			},
+			&onMessageCreate.FfmpegMock{
+				ConversionAudioFileFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) error {
+					return nil
+				},
+				GetAudioFileSecondFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error) {
+					return 0.0, nil
+				},
+			},
+			&service.SessionMock{
+				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
+					return &discordgo.Channel{
+						GuildID: "guildID",
+					}, nil
+				},
+				ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{}, nil
+				},
+				GuildFunc: func(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error) {
+					return &discordgo.Guild{
+						ID: "guildID",
+					}, nil
+				},
+			},
+			&discordgo.MessageCreate{
+				Message: &discordgo.Message{
+					Content: "test",
+					Attachments: []*discordgo.MessageAttachment{
+						{
+							URL:      "https://example.com/voice.mp3",
+							Filename: "voice.mp3",
+						},
+					},
+					Author: &discordgo.User{
+						Bot: false,
+					},
+				},
+			},
+		)
+		assert.NoError(t, err)
+	})
+
 }

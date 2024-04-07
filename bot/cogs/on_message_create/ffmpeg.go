@@ -10,20 +10,25 @@ import (
 
 type Ffmpeg struct {
 	tmpFile       string
-	tmpFileNotExt string
 }
 
-func (f Ffmpeg) ConversionAudioFile(ctx context.Context) error {
-	err := exec.CommandContext(ctx, "ffmpeg", "-i", f.tmpFile, f.tmpFileNotExt+".m4a").Run()
+func NewFfmpeg(tmpFile string) *Ffmpeg {
+	return &Ffmpeg{
+		tmpFile:       tmpFile,
+	}
+}
+
+func (f Ffmpeg) ConversionAudioFile(ctx context.Context, tmpFile, tmpFileNotExt string) error {
+	err := exec.CommandContext(ctx, "ffmpeg", "-i", tmpFile, tmpFileNotExt+".m4a").Run()
 	return err
 }
 
-func (f Ffmpeg) GetAudioFileSecond(ctx context.Context) (float64, error) {
+func (f Ffmpeg) GetAudioFileSecond(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error) {
 	cmd := exec.CommandContext(
 		ctx,
 		"ffprobe",
 		"-hide_banner",
-		f.tmpFileNotExt+".m4a",
+		tmpFileNotExt+".m4a",
 		"-show_entries",
 		"format=duration",
 	)
@@ -46,3 +51,26 @@ func (f Ffmpeg) GetAudioFileSecond(ctx context.Context) (float64, error) {
 
 	return sec, nil
 }
+
+type FfmpegMock struct {
+	ConversionAudioFileFunc func(ctx context.Context, tmpFile, tmpFileNotExt string) error
+	GetAudioFileSecondFunc  func(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error)
+}
+
+func (f FfmpegMock) ConversionAudioFile(ctx context.Context, tmpFile, tmpFileNotExt string) error {
+	return f.ConversionAudioFileFunc(ctx, tmpFile, tmpFileNotExt)
+}
+
+func (f FfmpegMock) GetAudioFileSecond(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error) {
+	return f.GetAudioFileSecondFunc(ctx, tmpFile, tmpFileNotExt)
+}
+
+type FfmpegInterface interface {
+	ConversionAudioFile(ctx context.Context, tmpFile, tmpFileNotExt string) error
+	GetAudioFileSecond(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error)
+}
+
+var (
+	_ FfmpegInterface = (*Ffmpeg)(nil)
+	_ FfmpegInterface = (*FfmpegMock)(nil)
+)

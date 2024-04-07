@@ -49,7 +49,6 @@ func (r *LineRequest) PushMessageNotify(ctx context.Context, message string) err
 
 // LINE Notifyで画像を送信
 func (r *LineRequest) PushImageNotify(ctx context.Context, message, image string) error {
-	client := &http.Client{}
 	notifyUrl := "https://notify-api.line.me/api/notify"
 	u, err := url.ParseRequestURI(notifyUrl)
 	if err != nil {
@@ -68,7 +67,7 @@ func (r *LineRequest) PushImageNotify(ctx context.Context, message, image string
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
-	resp, err := client.Do(req)
+	resp, err := r.client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -83,7 +82,6 @@ func (r *LineRequest) PushImageNotify(ctx context.Context, message, image string
 
 // LINE Notifyでスタンプを送信
 func (r *LineRequest) PushStampNotify(ctx context.Context, message, stickerPackageID, stickerID string) error {
-	client := &http.Client{}
 	notifyUrl := "https://notify-api.line.me/api/notify"
 	u, err := url.ParseRequestURI(notifyUrl)
 	if err != nil {
@@ -102,7 +100,7 @@ func (r *LineRequest) PushStampNotify(ctx context.Context, message, stickerPacka
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
-	resp, err := client.Do(req)
+	resp, err := r.client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -117,7 +115,6 @@ func (r *LineRequest) PushStampNotify(ctx context.Context, message, stickerPacka
 
 // LINE Notifyのメッセージを送信するためのリクエストを作成(実行はDo()で行う)
 func (r *LineRequest) PushMessageNotifyCall(ctx context.Context, message string) (*LineNotifyCall, error) {
-	client := &http.Client{}
 	notifyUrl := "https://notify-api.line.me/api/notify"
 	u, err := url.ParseRequestURI(notifyUrl)
 	if err != nil {
@@ -135,14 +132,13 @@ func (r *LineRequest) PushMessageNotifyCall(ctx context.Context, message string)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
 	return &LineNotifyCall{
-		c: client,
+		c: &r.client,
 		r: req,
 	}, nil
 }
 
 // LINE Notifyの画像を送信するためのリクエストを作成(実行はDo()で行う)
 func (r *LineRequest) PushImageNotifyCall(ctx context.Context, message, image string) (*LineNotifyCall, error) {
-	client := &http.Client{}
 	notifyUrl := "https://notify-api.line.me/api/notify"
 	u, err := url.ParseRequestURI(notifyUrl)
 	if err != nil {
@@ -162,14 +158,13 @@ func (r *LineRequest) PushImageNotifyCall(ctx context.Context, message, image st
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
 	return &LineNotifyCall{
-		c: client,
+		c: &r.client,
 		r: req,
 	}, nil
 }
 
 // LINE Notifyのスタンプを送信するためのリクエストを作成(実行はDo()で行う)
 func (r *LineRequest) PushStampNotifyCall(ctx context.Context, message, stickerPackageID, stickerID string) (*LineNotifyCall, error) {
-	client := &http.Client{}
 	notifyUrl := "https://notify-api.line.me/api/notify"
 	u, err := url.ParseRequestURI(notifyUrl)
 	if err != nil {
@@ -189,7 +184,7 @@ func (r *LineRequest) PushStampNotifyCall(ctx context.Context, message, stickerP
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+r.lineNotifyToken)
 	return &LineNotifyCall{
-		c: client,
+		c: &r.client,
 		r: req,
 	}, nil
 }

@@ -40,10 +40,10 @@ func main() {
 		Timeout: 5 * time.Second,
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
-				Timeout: time.Second,
+				Timeout: 5 * time.Second,
 			}).DialContext,
-			TLSHandshakeTimeout:   time.Second,
-			ResponseHeaderTimeout: time.Second,
+			TLSHandshakeTimeout:   5 * time.Second,
+			ResponseHeaderTimeout: 5 * time.Second,
 		},
 	}
 

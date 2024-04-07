@@ -38,7 +38,6 @@ func (l *LineBotInfo) Validate() error {
 // LINEBotのプロフィール情報を取得
 func (r *LineRequest) GetBotInfo(ctx context.Context) (LineBotInfo, error) {
 	var lineBotProfile LineBotInfo
-	client := &http.Client{}
 	url := "https://api.line.me/v2/bot/info"
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -46,7 +45,7 @@ func (r *LineRequest) GetBotInfo(ctx context.Context) (LineBotInfo, error) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+r.lineBotToken)
-	resp, err := client.Do(req)
+	resp, err := r.client.Do(req)
 	if err != nil {
 		return lineBotProfile, err
 	}

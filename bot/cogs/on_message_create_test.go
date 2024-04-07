@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 
@@ -18,6 +19,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLineRequest_PushMessageNotify(t *testing.T) {
@@ -262,6 +264,40 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 	})
 
 	t.Run("正常系(音声)", func(t *testing.T) {
+		cwd, err := os.Getwd()
+		require.NoError(t, err)
+		t.Cleanup(func() {
+			require.NoError(t, os.Chdir(cwd))
+		})
+		require.NoError(t, os.Chdir("../.."))
+
+		srcMp3, err := os.Open(cwd + "/on_message_create/yumi_dannasama.mp3")
+		require.NoError(t, err)
+
+		dstMp3, err := os.Create(os.TempDir() + "/yumi_dannasama.mp3")
+		require.NoError(t, err)
+
+		srcM4a, err := os.Open(cwd + "/on_message_create/yumi_dannasama.m4a")
+		require.NoError(t, err)
+
+		dstM4a, err := os.Create(os.TempDir() + "/yumi_dannasama.m4a")
+		require.NoError(t, err)
+
+		defer func() {
+			require.NoError(t, os.Remove(dstMp3.Name()))
+			require.NoError(t, os.Remove(dstM4a.Name()))
+		}()
+
+		_, err = io.Copy(dstMp3, srcMp3)
+		require.NoError(t, err)
+		srcMp3.Close()
+		dstMp3.Close()
+
+		_, err = io.Copy(dstM4a, srcM4a)
+		require.NoError(t, err)
+
+		srcM4a.Close()
+		dstM4a.Close()
 		err = onMessageCreateFunc(
 			ctx,
 			stubClient,
@@ -305,6 +341,16 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
 					return &discordgo.Message{}, nil
 				},
+				ChannelFileSendWithMessageFunc: func(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{
+						Attachments: []*discordgo.MessageAttachment{
+							{
+								URL:      "https://example.com/yumi_dannasama.mp3",
+								Filename: "yumi_dannasama.mp3",
+							},
+						},
+					}, nil
+				},
 				GuildFunc: func(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error) {
 					return &discordgo.Guild{
 						ID: "guildID",
@@ -316,8 +362,8 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					Content: "test",
 					Attachments: []*discordgo.MessageAttachment{
 						{
-							URL:      "https://example.com/voice.mp3",
-							Filename: "voice.mp3",
+							URL:      "https://example.com/yumi_dannasama.mp3",
+							Filename: "yumi_dannasama.mp3",
 						},
 					},
 					Author: &discordgo.User{

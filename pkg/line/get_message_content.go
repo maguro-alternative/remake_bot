@@ -8,15 +8,13 @@ import (
 )
 
 type LineMessageContent struct {
-	Content       io.ReadCloser
+	Content       []byte
 	ContentLength int64
 	ContentType   string
 }
 
 // LINEメッセージ内のファイルを取得
 func (r *LineRequest) GetContent(ctx context.Context, messageID string) (LineMessageContent, error) {
-	//var buf bytes.Buffer
-	client := &http.Client{}
 	url := "https://api-data.line.me/v2/bot/message/" + messageID + "/content"
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -25,15 +23,20 @@ func (r *LineRequest) GetContent(ctx context.Context, messageID string) (LineMes
 
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("Authorization", "Bearer "+r.lineBotToken)
-	resp, err := client.Do(req)
+	resp, err := r.client.Do(req)
 	if err != nil {
 		return LineMessageContent{}, err
 	}
 	if resp.StatusCode != http.StatusOK {
 		return LineMessageContent{}, errors.New("LINEメッセージの取得に失敗しました。" + resp.Status)
 	}
+	defer resp.Body.Close()
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return LineMessageContent{}, err
+	}
 	content := LineMessageContent{
-		Content:       resp.Body,
+		Content:       b,
 		ContentType:   resp.Header.Get("Content-Type"),
 		ContentLength: resp.ContentLength,
 	}

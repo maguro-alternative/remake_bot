@@ -28,7 +28,6 @@ func (l *LineBotFriend) Validate() error {
 
 // LINEの友達数を取得
 func (r *LineRequest) GetFriendCount(ctx context.Context) (int, error) {
-	client := &http.Client{}
 	url := "https://api.line.me/v2/bot/followers/count"
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -36,7 +35,7 @@ func (r *LineRequest) GetFriendCount(ctx context.Context) (int, error) {
 	}
 
 	req.Header.Set("Authorization", "Bearer "+r.lineBotToken)
-	resp, err := client.Do(req)
+	resp, err := r.client.Do(req)
 	if err != nil {
 		return 0, err
 	}
@@ -54,7 +53,6 @@ func (r *LineRequest) GetFriendCount(ctx context.Context) (int, error) {
 // LINEのプロフィール情報をLINEグループから取得
 func (r *LineRequest) GetProfileInGroup(ctx context.Context, userID string) (LineProfile, error) {
 	var lineProfile LineProfile
-	client := &http.Client{}
 	url := "https://api.line.me/v2/bot/group/" + r.lineGroupID + "/member/" + userID
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -62,7 +60,7 @@ func (r *LineRequest) GetProfileInGroup(ctx context.Context, userID string) (Lin
 	}
 
 	req.Header.Set("Authorization", "Bearer "+r.lineBotToken)
-	resp, err := client.Do(req)
+	resp, err := r.client.Do(req)
 	if err != nil {
 		return lineProfile, err
 	}

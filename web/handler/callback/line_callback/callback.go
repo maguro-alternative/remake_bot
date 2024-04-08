@@ -116,14 +116,14 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	lineClientID := string(lineClientIDByte)
 	lineClientSecret := string(lineClientSecretByte)
 	// 3. アクセストークンを取得するためのリクエスト
-	token, cleanupTokenBody, err := getIdToken(ctx, code, lineClientID, lineClientSecret)
+	token, cleanupTokenBody, err := getIdToken(ctx, h.svc.Client, code, lineClientID, lineClientSecret)
 	if err != nil {
 		slog.ErrorContext(ctx, "ユーザー情報の取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	defer cleanupTokenBody()
-	user, cleanupIdtokenBody, err := verifyIdToken(ctx, token.IDToken, lineClientID, nonce)
+	user, cleanupIdtokenBody, err := verifyIdToken(ctx, h.svc.Client, token.IDToken, lineClientID, nonce)
 	if err != nil {
 		slog.ErrorContext(ctx, "id_tokenの検証に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -147,8 +147,7 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	http.Redirect(w, r, config.ServerUrl()+"/group/"+guildId, http.StatusFound)
 }
 
-func getIdToken(ctx context.Context, code, clientID, clientSecret string) (*model.LineToken, func(), error) {
-	client := &http.Client{}
+func getIdToken(ctx context.Context, client *http.Client, code, clientID, clientSecret string) (*model.LineToken, func(), error) {
 	u, err := url.ParseRequestURI("https://api.line.me/oauth2/v2.1/token")
 	if err != nil {
 		return nil, func() {}, err
@@ -176,8 +175,7 @@ func getIdToken(ctx context.Context, code, clientID, clientSecret string) (*mode
 	return &token, func() { resp.Body.Close() }, nil
 }
 
-func verifyIdToken(ctx context.Context, idToken, clientID, nonce string) (*model.LineIdTokenUser, func(), error) {
-	nonceClient := &http.Client{}
+func verifyIdToken(ctx context.Context, nonceClient *http.Client, idToken, clientID, nonce string) (*model.LineIdTokenUser, func(), error) {
 	verifyUrl := "https://api.line.me/oauth2/v2.1/verify"
 	u, err := url.ParseRequestURI(verifyUrl)
 	if err != nil {

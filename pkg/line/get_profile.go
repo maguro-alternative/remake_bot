@@ -28,7 +28,6 @@ func (l *LineProfile) Validate() error {
 // LINEのプロフィール情報を取得
 func (r *LineRequest) GetProfile(ctx context.Context, userID string) (LineProfile, error) {
 	var lineProfile LineProfile
-	client := &http.Client{}
 	url := "https://api.line.me/v2/bot/profile/" + userID
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
@@ -36,7 +35,7 @@ func (r *LineRequest) GetProfile(ctx context.Context, userID string) (LineProfil
 	}
 
 	req.Header.Set("Authorization", "Bearer "+r.lineBotToken)
-	resp, err := client.Do(req)
+	resp, err := r.client.Do(req)
 	if err != nil {
 		return lineProfile, err
 	}

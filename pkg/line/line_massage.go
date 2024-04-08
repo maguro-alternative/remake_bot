@@ -70,7 +70,6 @@ func (r *LineRequest) NewLineAudioMessage(originalContentUrl string, duration fl
 
 // LINEにメッセージを送信
 func (r *LineRequest) PushMessageBotInGroup(ctx context.Context, messages []*LineMessageType) error {
-	client := &http.Client{}
 	url := "https://api.line.me/v2/bot/message/push"
 	lineMessage := LineMessage{
 		To:       r.lineGroupID,
@@ -91,7 +90,7 @@ func (r *LineRequest) PushMessageBotInGroup(ctx context.Context, messages []*Lin
 
 	req.Header.Set("Authorization", "Bearer "+r.lineBotToken)
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := client.Do(req)
+	resp, err := r.client.Do(req)
 	if err != nil {
 		return err
 	}

@@ -12,13 +12,13 @@ import (
 	"strings"
 
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 
 	onMessageCreate "github.com/maguro-alternative/remake_bot/bot/cogs/on_message_create"
 	"github.com/maguro-alternative/remake_bot/bot/config"
-	"github.com/maguro-alternative/remake_bot/bot/service"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -38,7 +38,7 @@ func onMessageCreateFunc(
 	client *http.Client,
 	repo repository.RepositoryFunc,
 	ffmpeg onMessageCreate.FfmpegInterface,
-	s service.Session,
+	s mock.Session,
 	vs *discordgo.MessageCreate,
 ) error {
 	var channel repository.LinePostDiscordChannel

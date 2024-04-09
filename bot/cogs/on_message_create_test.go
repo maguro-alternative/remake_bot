@@ -13,9 +13,9 @@ import (
 	"github.com/lib/pq"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	onMessageCreate "github.com/maguro-alternative/remake_bot/bot/cogs/on_message_create"
-	"github.com/maguro-alternative/remake_bot/bot/service"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/stretchr/testify/assert"
@@ -100,7 +100,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					return 0.0, nil
 				},
 			},
-			&service.SessionMock{
+			&mock.SessionMock{
 				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
 					return &discordgo.Channel{
 						GuildID: "guildID",
@@ -162,7 +162,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					return 0.0, nil
 				},
 			},
-			&service.SessionMock{
+			&mock.SessionMock{
 				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
 					return &discordgo.Channel{
 						GuildID: "guildID",
@@ -235,7 +235,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					return 0.0, nil
 				},
 			},
-			&service.SessionMock{
+			&mock.SessionMock{
 				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
 					return &discordgo.Channel{
 						GuildID: "guildID",
@@ -332,7 +332,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					return 0.0, nil
 				},
 			},
-			&service.SessionMock{
+			&mock.SessionMock{
 				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
 					return &discordgo.Channel{
 						GuildID: "guildID",

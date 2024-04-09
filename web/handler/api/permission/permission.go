@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/repository"
-	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -20,7 +19,7 @@ type PermissionHandler struct {
 
 func NewPermissionHandler(
 	indexService *service.IndexService,
-	repo mock.Repository,
+	repo repository.RepositoryFunc,
 ) *PermissionHandler {
 	return &PermissionHandler{
 		IndexService: indexService,

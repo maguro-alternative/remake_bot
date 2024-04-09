@@ -6,9 +6,9 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/maguro-alternative/remake_bot/fixtures"
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
+	"github.com/maguro-alternative/remake_bot/testutil/fixtures"
 	"github.com/maguro-alternative/remake_bot/web/config"
 
 	"github.com/lib/pq"
@@ -266,7 +266,6 @@ func TestRepository_GetLineBotDefaultChannelID(t *testing.T) {
 		assert.Equal(t, "987654321", lineBot.DefaultChannelID)
 	})
 }
-
 
 func TestRepository_UpdateLineBot(t *testing.T) {
 	ctx := context.Background()

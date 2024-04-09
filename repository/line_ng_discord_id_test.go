@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/maguro-alternative/remake_bot/bot/config"
-	"github.com/maguro-alternative/remake_bot/fixtures"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
+	"github.com/maguro-alternative/remake_bot/testutil/fixtures"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -38,7 +38,6 @@ func TestGetLineNgDiscordID(t *testing.T) {
 		assert.Equal(t, "user", ngDiscordIDs[0].IDType)
 	})
 }
-
 
 func TestRepository_InsertLineNgDiscordIDs(t *testing.T) {
 	ctx := context.Background()
@@ -141,4 +140,3 @@ func TestRepository_DeleteLineNgDiscordIDs(t *testing.T) {
 		assert.Equal(t, 2, lineChannelCount)
 	})
 }
-

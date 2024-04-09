@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/maguro-alternative/remake_bot/bot/config"
-	"github.com/maguro-alternative/remake_bot/fixtures"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
+	"github.com/maguro-alternative/remake_bot/testutil/fixtures"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/maguro-alternative/remake_bot/bot/config"
-	"github.com/maguro-alternative/remake_bot/fixtures"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
+	"github.com/maguro-alternative/remake_bot/testutil/fixtures"
 
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
@@ -37,7 +37,7 @@ func TestInsertLineBotIv(t *testing.T) {
 	repo := NewRepository(tx)
 	t.Run("LineBotIvが正しく挿入されること", func(t *testing.T) {
 		lineBotIv := &LineBotIv{
-			GuildID:          "987654321",
+			GuildID: "987654321",
 		}
 		err := repo.InsertLineBotIv(ctx, lineBotIv.GuildID)
 		assert.NoError(t, err)
@@ -217,4 +217,3 @@ func TestRepository_UpdateLineBotIv(t *testing.T) {
 		assert.Equal(t, []byte("123456789"), lineBotIv.LineClientSecretIv[0])
 	})
 }
-

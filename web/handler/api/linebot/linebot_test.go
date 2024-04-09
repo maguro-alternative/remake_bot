@@ -15,6 +15,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -253,7 +254,7 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 		h := &LineBotHandler{
 			IndexService: &service.IndexService{
 				Client:         stubClient,
-				DiscordSession: &service.SessionMock{
+				DiscordSession: &mock.SessionMock{
 					ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
 						return &discordgo.Message{}, nil
 					},

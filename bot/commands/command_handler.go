@@ -10,32 +10,32 @@ import (
 
 
 // スラッシュコマンド内でもデータベースを使用できるようにする
-type CommandHandler struct {
+type commandHandler struct {
 	DB db.Driver
 }
 
-func NewCogHandler(db db.Driver) *CommandHandler {
-	return &CommandHandler{
+func newCogHandler(db db.Driver) *commandHandler {
+	return &commandHandler{
 		DB: db,
 	}
 }
 
-type Command struct {
+type command struct {
 	Name        string
 	Aliases     []string
 	Description string
 	Options     []*discordgo.ApplicationCommandOption
 	AppCommand  *discordgo.ApplicationCommand
-	Executor    func(s *discordgo.Session, i *discordgo.InteractionCreate)
+	Executor    func(s *discordgo.Session, i *discordgo.InteractionCreate) error
 }
 
-func (c *Command) addApplicationCommand(appCmd *discordgo.ApplicationCommand) {
+func (c *command) addApplicationCommand(appCmd *discordgo.ApplicationCommand) {
 	c.AppCommand = appCmd
 }
 
 type handler struct {
 	session  *discordgo.Session
-	commands map[string]*Command
+	commands map[string]*command
 	guild    string
 }
 
@@ -46,13 +46,13 @@ func newCommandHandler(
 ) *handler {
 	return &handler{
 		session:  session,
-		commands: make(map[string]*Command),
+		commands: make(map[string]*command),
 		guild:    guildID,
 	}
 }
 
 // スラッシュコマンドの登録
-func (h *handler) commandRegister(command *Command) error {
+func (h *handler) commandRegister(command *command) error {
 	// すでに同じ名前のコマンドが登録されている場合はエラーを返す
 	if _, exists := h.commands[command.Name]; exists {
 		return fmt.Errorf("command with name `%s` already exists", command.Name)
@@ -92,7 +92,7 @@ func (h *handler) commandRegister(command *Command) error {
 }
 
 // スラッシュコマンドの削除
-func (h *handler) CommandRemove(command *Command) error {
+func (h *handler) commandRemove(command *command) error {
 	err := h.session.ApplicationCommandDelete(h.session.State.User.ID, h.guild, command.AppCommand.ID)
 	if err != nil {
 		return fmt.Errorf("error while deleting application command: %v", err)
@@ -104,8 +104,8 @@ func (h *handler) CommandRemove(command *Command) error {
 }
 
 // スラッシュコマンドの取得
-func (h *handler) GetCommands() []*Command {
-	var commands []*Command
+func (h *handler) getCommands() []*command {
+	var commands []*command
 
 	for _, v := range h.commands {
 		commands = append(commands, v)
@@ -128,8 +128,8 @@ func RegisterCommands(discordSession *discordgo.Session, db db.Driver) (func(), 
 	commandHandlers = append(commandHandlers, commandHandler)
 	cleanupCommandHandlers := func() {
 		for _, handler := range commandHandlers {
-			for _, command := range handler.GetCommands() {
-				err := handler.CommandRemove(command)
+			for _, command := range handler.getCommands() {
+				err := handler.commandRemove(command)
 				if err != nil {
 					fmt.Printf("error while removing command: %v\n", err)
 				}

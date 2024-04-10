@@ -8,7 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func PingCommand(db db.Driver) *Command {
+func PingCommand(db db.Driver) *command {
 	/*
 		pingコマンドの定義
 
@@ -16,8 +16,8 @@ func PingCommand(db db.Driver) *Command {
 		説明: Pong!
 		オプション: なし
 	*/
-	exec := NewCogHandler(db)
-	return &Command{
+	exec := newCogHandler(db)
+	return &command{
 		Name:        "ping",
 		Description: "Pong!",
 		Options:     []*discordgo.ApplicationCommandOption{},
@@ -25,17 +25,17 @@ func PingCommand(db db.Driver) *Command {
 	}
 }
 
-func (h *CommandHandler) handlePing(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func (h *commandHandler) handlePing(s *discordgo.Session, i *discordgo.InteractionCreate) error {
 	/*
 		pingコマンドの実行
 
 		コマンドの実行結果を返す
 	*/
 	if i.Interaction.ApplicationCommandData().Name != "ping" {
-		return
+		return nil
 	}
 	if i.Interaction.GuildID != i.GuildID {
-		return
+		return nil
 	}
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -45,5 +45,7 @@ func (h *CommandHandler) handlePing(s *discordgo.Session, i *discordgo.Interacti
 	})
 	if err != nil {
 		fmt.Printf("error responding to ping command: %v\n", err)
+		return err
 	}
+	return nil
 }

@@ -26,7 +26,7 @@ import (
 func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.MessageCreate) {
 	ctx := context.Background()
 	repo := repository.NewRepository(h.DB)
-	ffmpeg := onMessageCreate.NewFfmpeg("")
+	ffmpeg := onMessageCreate.NewFfmpeg(ctx)
 	err := onMessageCreateFunc(ctx, h.client, repo, *ffmpeg, s, vs)
 	if err != nil {
 		slog.ErrorContext(ctx, "OnMessageCreate Error", "Error:", err.Error())
@@ -211,7 +211,7 @@ func onMessageCreateFunc(
 			if extension != ".m4a" {
 				slog.InfoContext(ctx, "m4a変換:"+tmpFile)
 				slog.InfoContext(ctx, "ffmpeg:"+tmpFile)
-				err = ffmpeg.ConversionAudioFile(ctx, tmpFile, tmpFileNotExt)
+				err = ffmpeg.ConversionAudioFile(tmpFile, tmpFileNotExt)
 				if err != nil {
 					slog.ErrorContext(ctx, "ffmpegの秒数カウントに失敗しました", "エラー:", err.Error())
 					return err
@@ -235,7 +235,7 @@ func onMessageCreateFunc(
 			}
 			// 音声ファイルの秒数を取得
 			slog.InfoContext(ctx, "秒数取得:"+tmpFileNotExt+".m4a")
-			audioLen, err := ffmpeg.GetAudioFileSecond(ctx, tmpFile, tmpFileNotExt)
+			audioLen, err := ffmpeg.GetAudioFileSecond(tmpFile, tmpFileNotExt)
 			if err != nil {
 				slog.ErrorContext(ctx, "音声ファイルの秒数の抽出に失敗しました", "エラー:", err.Error())
 				return err

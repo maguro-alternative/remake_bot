@@ -93,10 +93,10 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				},
 			},
 			&onMessageCreate.FfmpegMock{
-				ConversionAudioFileFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) error {
+				ConversionAudioFileFunc: func(tmpFile, tmpFileNotExt string) error {
 					return nil
 				},
-				GetAudioFileSecondFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error) {
+				GetAudioFileSecondFunc: func(tmpFile, tmpFileNotExt string) (float64, error) {
 					return 0.0, nil
 				},
 			},
@@ -155,10 +155,10 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				},
 			},
 			&onMessageCreate.FfmpegMock{
-				ConversionAudioFileFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) error {
+				ConversionAudioFileFunc: func(tmpFile, tmpFileNotExt string) error {
 					return nil
 				},
-				GetAudioFileSecondFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error) {
+				GetAudioFileSecondFunc: func(tmpFile, tmpFileNotExt string) (float64, error) {
 					return 0.0, nil
 				},
 			},
@@ -228,10 +228,10 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				},
 			},
 			&onMessageCreate.FfmpegMock{
-				ConversionAudioFileFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) error {
+				ConversionAudioFileFunc: func(tmpFile, tmpFileNotExt string) error {
 					return nil
 				},
-				GetAudioFileSecondFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error) {
+				GetAudioFileSecondFunc: func(tmpFile, tmpFileNotExt string) (float64, error) {
 					return 0.0, nil
 				},
 			},
@@ -269,15 +269,18 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 		t.Cleanup(func() {
 			require.NoError(t, os.Chdir(cwd))
 		})
-		require.NoError(t, os.Chdir("../.."))
+		require.NoError(t, os.Chdir("../../"))
 
-		srcMp3, err := os.Open(cwd + "/on_message_create/yumi_dannasama.mp3")
+		testFilesPath, err := os.Getwd()
+		require.NoError(t, err)
+
+		srcMp3, err := os.Open(testFilesPath + "/testutil/files/yumi_dannasama.mp3")
 		require.NoError(t, err)
 
 		dstMp3, err := os.Create(os.TempDir() + "/yumi_dannasama.mp3")
 		require.NoError(t, err)
 
-		srcM4a, err := os.Open(cwd + "/on_message_create/yumi_dannasama.m4a")
+		srcM4a, err := os.Open(testFilesPath + "/testutil/files/yumi_dannasama.m4a")
 		require.NoError(t, err)
 
 		dstM4a, err := os.Create(os.TempDir() + "/yumi_dannasama.m4a")
@@ -325,10 +328,10 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				},
 			},
 			&onMessageCreate.FfmpegMock{
-				ConversionAudioFileFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) error {
+				ConversionAudioFileFunc: func(tmpFile, tmpFileNotExt string) error {
 					return nil
 				},
-				GetAudioFileSecondFunc: func(ctx context.Context, tmpFile, tmpFileNotExt string) (float64, error) {
+				GetAudioFileSecondFunc: func(tmpFile, tmpFileNotExt string) (float64, error) {
 					return 0.0, nil
 				},
 			},

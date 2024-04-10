@@ -20,7 +20,7 @@ func TestFfmpeg_ConversionAudioFile(t *testing.T) {
 	tmpFile := cwd + "/yumi_dannasama.mp3"
 	tmpFileNotExt := cwd + "/yumi_dannasama"
 	ffmpeg := Ffmpeg{
-		tmpFile: tmpFile,
+		ctx: ctx,
 	}
 	_, err = os.Stat(tmpFileNotExt + ".m4a")
 	// 既に変換済みの場合は削除
@@ -29,7 +29,7 @@ func TestFfmpeg_ConversionAudioFile(t *testing.T) {
 		require.NoError(t, err)
 	}
 	t.Run("正常系", func(t *testing.T) {
-		err = ffmpeg.ConversionAudioFile(ctx, tmpFile, tmpFileNotExt)
+		err = ffmpeg.ConversionAudioFile(tmpFile, tmpFileNotExt)
 		assert.NoError(t, err)
 	})
 }
@@ -45,10 +45,10 @@ func TestFfmpeg_GetAudioFileSecond(t *testing.T) {
 	tmpFile := cwd + "/yumi_dannasama.mp3"
 	tmpFileNotExt := cwd + "/yumi_dannasama"
 	ffmpeg := Ffmpeg{
-		tmpFile: tmpFile,
+		ctx: ctx,
 	}
 	t.Run("正常系", func(t *testing.T) {
-		_, err := ffmpeg.GetAudioFileSecond(ctx, tmpFile, tmpFileNotExt)
+		_, err := ffmpeg.GetAudioFileSecond(tmpFile, tmpFileNotExt)
 		assert.NoError(t, err)
 	})
 }

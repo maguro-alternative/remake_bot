@@ -27,7 +27,7 @@ func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	ctx := context.Background()
 	repo := repository.NewRepository(h.DB)
 	ffmpeg := onMessageCreate.NewFfmpeg(ctx)
-	err := onMessageCreateFunc(ctx, h.client, repo, *ffmpeg, s, vs)
+	err := onMessageCreateFunc(ctx, h.client, repo, ffmpeg, s, vs)
 	if err != nil {
 		slog.ErrorContext(ctx, "OnMessageCreate Error", "Error:", err.Error())
 	}

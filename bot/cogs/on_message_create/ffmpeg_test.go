@@ -16,9 +16,13 @@ func TestFfmpeg_ConversionAudioFile(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, os.Chdir(cwd))
 	})
-	require.NoError(t, os.Chdir("../.."))
-	tmpFile := cwd + "/yumi_dannasama.mp3"
-	tmpFileNotExt := cwd + "/yumi_dannasama"
+	require.NoError(t, os.Chdir("../../../"))
+
+	testFilesPath, err := os.Getwd()
+	require.NoError(t, err)
+
+	tmpFile := testFilesPath + "/testutil/files/yumi_dannasama.mp3"
+	tmpFileNotExt := testFilesPath + "/testutil/files/yumi_dannasama"
 	ffmpeg := Ffmpeg{
 		ctx: ctx,
 	}
@@ -41,9 +45,13 @@ func TestFfmpeg_GetAudioFileSecond(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, os.Chdir(cwd))
 	})
-	require.NoError(t, os.Chdir("../.."))
-	tmpFile := cwd + "/yumi_dannasama.mp3"
-	tmpFileNotExt := cwd + "/yumi_dannasama"
+	require.NoError(t, os.Chdir("../../../"))
+
+	testFilesPath, err := os.Getwd()
+	require.NoError(t, err)
+
+	tmpFile := testFilesPath + "/testutil/files/yumi_dannasama.mp3"
+	tmpFileNotExt := testFilesPath + "/testutil/files/yumi_dannasama"
 	ffmpeg := Ffmpeg{
 		ctx: ctx,
 	}

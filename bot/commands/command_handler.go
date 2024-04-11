@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
+	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -11,12 +12,12 @@ import (
 
 // スラッシュコマンド内でもデータベースを使用できるようにする
 type commandHandler struct {
-	DB db.Driver
+	repo repository.RepositoryFunc
 }
 
-func newCogHandler(db db.Driver) *commandHandler {
+func newCogHandler(repo repository.RepositoryFunc) *commandHandler {
 	return &commandHandler{
-		DB: db,
+		repo: repo,
 	}
 }
 
@@ -119,8 +120,9 @@ func RegisterCommands(discordSession *discordgo.Session, db db.Driver) (func(), 
 	// 所属しているサーバすべてにスラッシュコマンドを追加する
 	// NewCommandHandlerの第二引数を空にすることで、グローバルでの使用を許可する
 	commandHandler := newCommandHandler(discordSession, "")
+	repo := repository.NewRepository(db)
 	// 追加したいコマンドをここに追加
-	err := commandHandler.commandRegister(PingCommand(db))
+	err := commandHandler.commandRegister(PingCommand(repo))
 	if err != nil {
 		fmt.Printf("error while registering command: %v\n", err)
 		return nil, err

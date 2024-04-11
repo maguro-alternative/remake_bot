@@ -3,12 +3,12 @@ package commands
 import (
 	"fmt"
 
-	"github.com/maguro-alternative/remake_bot/pkg/db"
+	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func PingCommand(db db.Driver) *command {
+func PingCommand(repo repository.RepositoryFunc) *command {
 	/*
 		pingコマンドの定義
 
@@ -16,7 +16,7 @@ func PingCommand(db db.Driver) *command {
 		説明: Pong!
 		オプション: なし
 	*/
-	exec := newCogHandler(db)
+	exec := newCogHandler(repo)
 	return &command{
 		Name:        "ping",
 		Description: "Pong!",

@@ -60,3 +60,70 @@ func TestFfmpeg_GetAudioFileSecond(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+func TestPlayFfmpeg_Start(t *testing.T) {
+	ctx := context.Background()
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.Chdir(cwd))
+	})
+	require.NoError(t, os.Chdir("../../../"))
+
+	testFilesPath, err := os.Getwd()
+	require.NoError(t, err)
+
+	tmpFile := testFilesPath + "/testutil/files/yumi_dannasama.mp3"
+	ffmpeg := Ffmpeg{
+		ctx: ctx,
+	}
+	playFfmpeg := ffmpeg.NewPlayFFmpeg(tmpFile)
+	err = playFfmpeg.Start()
+	assert.NoError(t, err)
+}
+
+func TestPlayFfmpeg_Kill(t *testing.T) {
+	ctx := context.Background()
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.Chdir(cwd))
+	})
+	require.NoError(t, os.Chdir("../../../"))
+
+	testFilesPath, err := os.Getwd()
+	require.NoError(t, err)
+
+	tmpFile := testFilesPath + "/testutil/files/yumi_dannasama.mp3"
+	ffmpeg := Ffmpeg{
+		ctx: ctx,
+	}
+	playFfmpeg := ffmpeg.NewPlayFFmpeg(tmpFile)
+	err = playFfmpeg.Start()
+	assert.NoError(t, err)
+	err = playFfmpeg.Kill()
+	assert.NoError(t, err)
+}
+
+func TestPlayFfmpeg_StdoutPipe(t *testing.T) {
+	ctx := context.Background()
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		require.NoError(t, os.Chdir(cwd))
+	})
+	require.NoError(t, os.Chdir("../../../"))
+
+	testFilesPath, err := os.Getwd()
+	require.NoError(t, err)
+
+	tmpFile := testFilesPath + "/testutil/files/yumi_dannasama.mp3"
+	ffmpeg := Ffmpeg{
+		ctx: ctx,
+	}
+	playFfmpeg := ffmpeg.NewPlayFFmpeg(tmpFile)
+	_, err = playFfmpeg.StdoutPipe()
+	assert.NoError(t, err)
+	err = playFfmpeg.Start()
+	assert.NoError(t, err)
+}

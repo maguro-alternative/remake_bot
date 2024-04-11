@@ -14,10 +14,6 @@ type Ffmpeg struct{
 	ctx context.Context
 }
 
-type PlayFfmpeg struct {
-	*exec.Cmd
-}
-
 func NewFfmpeg(ctx context.Context) *Ffmpeg {
 	return &Ffmpeg{
 		ctx: ctx,
@@ -64,13 +60,46 @@ func (f Ffmpeg) GetAudioFileSecond(tmpFile, tmpFileNotExt string) (float64, erro
 	return sec, nil
 }
 
-func (f *Ffmpeg) NewPlayFFmpeg(output string) *PlayFfmpeg {
+type FfmpegMock struct {
+	ConversionAudioFileFunc func(tmpFile, tmpFileNotExt string) error
+	GetAudioFileSecondFunc  func(tmpFile, tmpFileNotExt string) (float64, error)
+	NewPlayFFmpegFunc       func(output string) *PlayFfmpeg
+}
+
+func (f FfmpegMock) ConversionAudioFile(tmpFile, tmpFileNotExt string) error {
+	return f.ConversionAudioFileFunc(tmpFile, tmpFileNotExt)
+}
+
+func (f FfmpegMock) GetAudioFileSecond(tmpFile, tmpFileNotExt string) (float64, error) {
+	return f.GetAudioFileSecondFunc(tmpFile, tmpFileNotExt)
+}
+
+func (f FfmpegMock) NewPlayFFmpeg(output string) *PlayFfmpeg {
+	return f.NewPlayFFmpegFunc(output)
+}
+
+type FfmpegInterface interface {
+	ConversionAudioFile(tmpFile, tmpFileNotExt string) error
+	GetAudioFileSecond(tmpFile, tmpFileNotExt string) (float64, error)
+	NewPlayFFmpeg(output string) *PlayFfmpeg
+}
+
+var (
+	_ FfmpegInterface = (*Ffmpeg)(nil)
+	_ FfmpegInterface = (*FfmpegMock)(nil)
+)
+
+type PlayFfmpeg struct {
+	*exec.Cmd
+}
+
+func (f *Ffmpeg) NewPlayFFmpeg(musicFile string) *PlayFfmpeg {
 	return &PlayFfmpeg{
 		Cmd: exec.CommandContext(
 			f.ctx,
 			"ffmpeg",
 			"-i",
-			output,
+			musicFile,
 			"-f",
 			"s16le",
 			"-ar",
@@ -113,31 +142,37 @@ func (f *PlayFfmpeg) Play(ctx context.Context, buf *bufio.Reader, send chan []in
 	}
 }
 
-type FfmpegMock struct {
-	ConversionAudioFileFunc func(tmpFile, tmpFileNotExt string) error
-	GetAudioFileSecondFunc  func(tmpFile, tmpFileNotExt string) (float64, error)
-	NewPlayFFmpegFunc       func(output string) *PlayFfmpeg
+type PlayFfmpegMock struct {
+	StdoutPipeFunc func() (bufio.Reader, error)
+	StartFunc      func() error
+	KillFunc       func() error
+	PlayFunc       func(ctx context.Context, buf *bufio.Reader, send chan []int16) error
 }
 
-func (f FfmpegMock) ConversionAudioFile(tmpFile, tmpFileNotExt string) error {
-	return f.ConversionAudioFileFunc(tmpFile, tmpFileNotExt)
+func (f *PlayFfmpegMock) StdoutPipe() (bufio.Reader, error) {
+	return f.StdoutPipeFunc()
 }
 
-func (f FfmpegMock) GetAudioFileSecond(tmpFile, tmpFileNotExt string) (float64, error) {
-	return f.GetAudioFileSecondFunc(tmpFile, tmpFileNotExt)
+func (f *PlayFfmpegMock) Start() error {
+	return f.StartFunc()
 }
 
-func (f FfmpegMock) NewPlayFFmpeg(output string) *PlayFfmpeg {
-	return f.NewPlayFFmpegFunc(output)
+func (f *PlayFfmpegMock) Kill() error {
+	return f.KillFunc()
 }
 
-type FfmpegInterface interface {
-	ConversionAudioFile(tmpFile, tmpFileNotExt string) error
-	GetAudioFileSecond(tmpFile, tmpFileNotExt string) (float64, error)
-	NewPlayFFmpeg(output string) *PlayFfmpeg
+func (f *PlayFfmpegMock) Play(ctx context.Context, buf *bufio.Reader, send chan []int16) error {
+	return f.PlayFunc(ctx, buf, send)
+}
+
+type PlayFfmpegInterface interface {
+	StdoutPipe() (bufio.Reader, error)
+	Start() error
+	Kill() error
+	Play(ctx context.Context, buf *bufio.Reader, send chan []int16) error
 }
 
 var (
-	_ FfmpegInterface = (*Ffmpeg)(nil)
-	_ FfmpegInterface = (*FfmpegMock)(nil)
+	_ PlayFfmpegInterface = (*PlayFfmpeg)(nil)
+	_ PlayFfmpegInterface = (*PlayFfmpegMock)(nil)
 )

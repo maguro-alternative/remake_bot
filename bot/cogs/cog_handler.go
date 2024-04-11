@@ -1,22 +1,36 @@
 package cogs
 
 import (
+	"fmt"
 	"net/http"
+
+	"github.com/bwmarrin/discordgo"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 )
 
-type CogHandler struct {
-	DB db.Driver
+type cogHandler struct {
+	db     db.Driver
 	client *http.Client
 }
 
-func NewCogHandler(
+func newCogHandler(
 	db db.Driver,
 	client *http.Client,
-) *CogHandler {
-	return &CogHandler{
-		DB: db,
+) *cogHandler {
+	return &cogHandler{
+		db:     db,
 		client: client,
 	}
+}
+
+func RegisterHandlers(
+	s *discordgo.Session,
+	sqlxdb db.Driver,
+	client *http.Client,
+) {
+	cogs := newCogHandler(sqlxdb, client)
+	fmt.Println(s.State.User.Username + "としてログインしました")
+	//s.AddHandler(cogs.OnVoiceStateUpdate)
+	s.AddHandler(cogs.OnMessageCreate)
 }

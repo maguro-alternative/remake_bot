@@ -23,9 +23,9 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func (h *CogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.MessageCreate) {
+func (h *cogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.MessageCreate) {
 	ctx := context.Background()
-	repo := repository.NewRepository(h.DB)
+	repo := repository.NewRepository(h.db)
 	ffmpeg := onMessageCreate.NewFfmpeg(ctx)
 	err := onMessageCreateFunc(ctx, h.client, repo, ffmpeg, s, vs)
 	if err != nil {

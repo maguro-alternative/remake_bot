@@ -5,6 +5,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -27,7 +28,7 @@ type command struct {
 	Description string
 	Options     []*discordgo.ApplicationCommandOption
 	AppCommand  *discordgo.ApplicationCommand
-	Executor    func(s *discordgo.Session, i *discordgo.InteractionCreate) error
+	Executor    func(s mock.Session, i *discordgo.InteractionCreate) error
 }
 
 func (c *command) addApplicationCommand(appCmd *discordgo.ApplicationCommand) {

@@ -15,6 +15,7 @@ type SessionMock struct {
 	GuildMemberFunc                func(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error)
 	GuildMembersFunc               func(guildID string, after string, limit int, options ...discordgo.RequestOption) (st []*discordgo.Member, err error)
 	GuildRolesFunc                 func(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Role, err error)
+	InteractionRespondFunc         func(interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error
 	UserChannelPermissionsFunc     func(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error)
 	UserGuildsFunc                 func(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
 }
@@ -51,6 +52,10 @@ func (s *SessionMock) GuildRoles(guildID string, options ...discordgo.RequestOpt
 	return s.GuildRolesFunc(guildID, options...)
 }
 
+func (s *SessionMock) InteractionRespond(interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error {
+	return nil
+}
+
 func (s *SessionMock) UserChannelPermissions(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error) {
 	return s.UserChannelPermissionsFunc(userID, channelID, fetchOptions...)
 }
@@ -69,6 +74,7 @@ type Session interface {
 	GuildMember(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error)
 	GuildMembers(guildID string, after string, limit int, options ...discordgo.RequestOption) (st []*discordgo.Member, err error)
 	GuildRoles(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Role, err error)
+	InteractionRespond(interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error
 	UserChannelPermissions(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error)
 	UserGuilds(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
 }

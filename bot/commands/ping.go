@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -25,7 +26,7 @@ func PingCommand(repo repository.RepositoryFunc) *command {
 	}
 }
 
-func (h *commandHandler) handlePing(s *discordgo.Session, i *discordgo.InteractionCreate) error {
+func (h *commandHandler) handlePing(s mock.Session, i *discordgo.InteractionCreate) error {
 	/*
 		pingコマンドの実行
 

@@ -6,7 +6,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
-var lineUserKey = "line_user"
+var lineUserKey sessionKey = "line_user"
 
 func (s *SessionStore) SetLineUser(ctx context.Context, user model.LineIdTokenUser) {
 	s.session.Values[lineUserKey] = user

@@ -6,6 +6,8 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+type sessionKey string
+
 type SessionStore struct {
 	session *sessions.Session
 	store   *sessions.CookieStore

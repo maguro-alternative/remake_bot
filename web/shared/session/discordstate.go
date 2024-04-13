@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-var discordStateKey = "discord_state"
+var discordStateKey sessionKey = "discord_state"
 
 func (s *SessionStore) SetDiscordState(ctx context.Context, state string) {
 	s.session.Values[discordStateKey] = state

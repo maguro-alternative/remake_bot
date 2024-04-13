@@ -6,7 +6,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
-var discordUserKey = "discord_user"
+var discordUserKey sessionKey = "discord_user"
 
 func (s *SessionStore) SetDiscordUser(ctx context.Context, user *model.DiscordUser) {
 	s.session.Values[discordUserKey] = user

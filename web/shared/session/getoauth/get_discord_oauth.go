@@ -13,13 +13,13 @@ import (
 
 //go:generate go run github.com/matryer/moq -out mock_test.go . OAuthStore
 type OAuthStore struct {
-	Store *sessions.CookieStore
+	Store  *sessions.CookieStore
 	Secret string
 }
 
 func NewOAuthStore(store *sessions.CookieStore, secret string) *OAuthStore {
 	return &OAuthStore{
-		Store: store,
+		Store:  store,
 		Secret: secret,
 	}
 }

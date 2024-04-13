@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-var lineNonceKey = "line_nonce"
+var lineNonceKey sessionKey = "line_nonce"
 
 func (s *SessionStore) SetLineNonce(ctx context.Context, nonce string) {
 	s.session.Values[lineNonceKey] = nonce

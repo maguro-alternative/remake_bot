@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-var lineOAuthTokenKey = "line_oauth_token"
+var lineOAuthTokenKey sessionKey = "line_oauth_token"
 
 func (s *SessionStore) SetLineOAuthToken(ctx context.Context, token string) {
 	s.session.Values[lineOAuthTokenKey] = token

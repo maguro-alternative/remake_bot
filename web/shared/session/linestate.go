@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-var lineStateKey = "line_state"
+var lineStateKey sessionKey = "line_state"
 
 func (s *SessionStore) SetLineState(ctx context.Context, state string) {
 	s.session.Values[lineStateKey] = state

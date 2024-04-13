@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-var guildIdKey = "guild_id"
+var guildIdKey sessionKey = "guild_id"
 
 func (s *SessionStore) SetGuildID(ctx context.Context, guildId string) {
 	s.session.Values[guildId] = guildId

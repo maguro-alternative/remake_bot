@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-var discordOAuthTokenKey = "discord_oauth_token"
+var discordOAuthTokenKey sessionKey = "discord_oauth_token"
 
 func (s *SessionStore) SetDiscordOAuthToken(ctx context.Context, token string) {
 	s.session.Values[discordOAuthTokenKey] = token

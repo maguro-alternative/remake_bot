@@ -1,5 +1,7 @@
 package session
 
+
+
 var lineStateKey sessionKey = "line_state"
 
 func (s *sessionStore) SetLineState(state string) {

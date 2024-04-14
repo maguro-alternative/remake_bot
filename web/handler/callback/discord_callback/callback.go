@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	//"reflect"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -34,12 +33,6 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
 	gob.Register(&model.DiscordUser{})
-	_, err := h.svc.CookieStore.Get(r, config.SessionSecret())
-	if err != nil {
-		slog.ErrorContext(ctx, "sessionの取得に失敗しました。", "エラー:", err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
 	sessionStore, err := session.NewSessionStore(r, h.svc.CookieStore, config.SessionSecret())
 	if err != nil {
 		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())

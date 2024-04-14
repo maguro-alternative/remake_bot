@@ -14,7 +14,6 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
-	//"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
 	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
 
@@ -60,7 +59,6 @@ func DiscordOAuthCheckMiddleware(
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			//oauthStore := getoauth.NewOAuthStore(indexService.CookieStore, config.SessionSecret())
 
 			discordUser, err := sessionStore.GetDiscordUser()
 			if err != nil && loginRequiredFlag {

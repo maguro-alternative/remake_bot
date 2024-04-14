@@ -30,12 +30,6 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	// これがない場合、エラーが発生する
 	gob.Register(&model.DiscordUser{})
 	uuid := uuid.New().String()
-	_, err := h.DiscordOAuth2Service.CookieStore.Get(r, config.SessionSecret())
-	if err != nil {
-		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
 	sessionStore, err := session.NewSessionStore(r, h.DiscordOAuth2Service.CookieStore, config.SessionSecret())
 	if err != nil {
 		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
@@ -43,8 +37,6 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	sessionStore.SetDiscordState(uuid)
-	//sessionsSession.Values["discord_state"] = uuid
-	//session.SetDiscordState(sessionsSession, uuid)
 	// セッションに保存
 	err = sessionStore.SessionSave(r, w)
 	if err != nil {

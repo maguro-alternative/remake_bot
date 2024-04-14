@@ -1,4 +1,4 @@
-package components
+package internal
 
 import (
 	"fmt"
@@ -6,6 +6,20 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 )
+
+type PermissionCode struct {
+	GuildID string
+	Type    string
+	Code    int64
+}
+
+type PermissionID struct {
+	GuildID    string
+	Type       string
+	TargetType string
+	TargetID   string
+	Permission string
+}
 
 func CreatePermissionCodeForm(guildID string, permissionCode PermissionCode) string {
 	return fmt.Sprintf(`

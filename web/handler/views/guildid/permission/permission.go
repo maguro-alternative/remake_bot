@@ -12,6 +12,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/ctxvalue"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
+	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/permission/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
@@ -42,7 +43,7 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "/guild/permission Method Not Allowed")
 		return
 	}
-	var componentPermissionIDs []components.PermissionID
+	var componentPermissionIDs []internal.PermissionID
 
 	guild, err := h.IndexService.DiscordBotState.Guild(guildId)
 	if err != nil {
@@ -90,7 +91,7 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	for _, permissionID := range permissionIDs {
 		componentPermissionIDs = append(
 			componentPermissionIDs,
-			components.PermissionID{
+			internal.PermissionID{
 				GuildID:    guildId,
 				Type:       permissionID.Type,
 				TargetType: permissionID.TargetType,
@@ -101,13 +102,13 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, permissionCode := range permissionCodes {
 		permissionForm.WriteString(
-			components.CreatePermissionCodeForm(guildId, components.PermissionCode{
+			internal.CreatePermissionCodeForm(guildId, internal.PermissionCode{
 				GuildID: guildId,
 				Type:    permissionCode.Type,
 				Code:    permissionCode.Code,
 			}),
 		)
-		permissionForm.WriteString(components.CreatePermissionSelectForm(
+		permissionForm.WriteString(internal.CreatePermissionSelectForm(
 			guild,
 			componentPermissionIDs,
 			permissionCode.Type,

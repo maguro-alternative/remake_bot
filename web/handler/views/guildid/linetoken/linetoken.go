@@ -15,6 +15,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/ctxvalue"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
+	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
@@ -119,7 +120,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました:"+err.Error())
 		return
 	}
-	lineBotByte := components.LineBotByteEntered{
+	lineBotByte := internal.LineBotByteEntered{
 		LineNotifyToken:  lineBot.LineNotifyToken,
 		LineBotToken:     lineBot.LineBotToken,
 		LineBotSecret:    lineBot.LineBotSecret,
@@ -128,7 +129,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		LineClientSecret: lineBot.LineClientSecret,
 		LineDebugMode:    lineBot.DebugMode,
 	}
-	lineEntered := components.EnteredLineBotForm(lineBotByte)
+	lineEntered := internal.EnteredLineBotForm(lineBotByte)
 
 	guildIconUrl := "https://cdn.discordapp.com/icons/" + guild.ID + "/" + guild.Icon + ".png"
 	if guild.Icon == "" {
@@ -153,7 +154,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		GuildName    string
 		GuildIconUrl string
 		GuildID      string
-		LineEntered  components.LineEntered
+		LineEntered  internal.LineEntered
 		Channels     template.HTML
 	}{
 		Title:        "LineBotの設定",

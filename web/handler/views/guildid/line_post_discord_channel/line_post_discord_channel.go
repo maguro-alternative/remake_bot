@@ -14,6 +14,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/repository"
 
+	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel/internal"
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
@@ -60,7 +61,7 @@ func NewLinePostDiscordChannelViewHandler(
 }
 
 func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http.Request) {
-	categoryPositions := make(map[string]components.DiscordChannel)
+	categoryPositions := make(map[string]internal.DiscordChannel)
 	var categoryIDTmps []string
 	guildId := r.PathValue("guildId")
 	ctx := r.Context()
@@ -105,14 +106,14 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		lineSession = &model.LineOAuthSession{}
 	}
 	//[categoryID]map[channelPosition]channelName
-	channelsInCategory := make(map[string][]components.DiscordChannelSet)
+	channelsInCategory := make(map[string][]internal.DiscordChannelSet)
 
 	for _, channel := range guild.Channels {
 		if channel.Type != discordgo.ChannelTypeGuildCategory {
 			continue
 		}
 		categoryIDTmps = append(categoryIDTmps, channel.ID)
-		categoryPositions[channel.ID] = components.DiscordChannel{
+		categoryPositions[channel.ID] = internal.DiscordChannel{
 			ID:       channel.ID,
 			Name:     channel.Name,
 			Position: channel.Position,
@@ -146,7 +147,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	accountVer.WriteString(components.CreateDiscordAccountVer(discordPermissionData.User))
 	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 
-	htmlFormBuilder := components.CreateLinePostDiscordChannelForm(
+	htmlFormBuilder := internal.CreateLinePostDiscordChannelForm(
 		categoryIDTmps,
 		channelsInCategory,
 		categoryPositions,
@@ -184,8 +185,8 @@ func createCategoryInChannels(
 	repo repository.RepositoryFunc,
 	guild *discordgo.Guild,
 	channel *discordgo.Channel,
-	categoryPositions map[string]components.DiscordChannel,
-	channelsInCategory map[string][]components.DiscordChannelSet,
+	categoryPositions map[string]internal.DiscordChannel,
+	channelsInCategory map[string][]internal.DiscordChannelSet,
 ) error {
 	if channel.Type == discordgo.ChannelTypeGuildForum {
 		return nil
@@ -199,7 +200,7 @@ func createCategoryInChannels(
 	}
 	categoryPosition := categoryPositions[channel.ParentID]
 	if len(channelsInCategory[categoryPosition.ID]) == 0 {
-		channelsInCategory[categoryPosition.ID] = make([]components.DiscordChannelSet, len(guild.Channels)-2, len(guild.Channels))
+		channelsInCategory[categoryPosition.ID] = make([]internal.DiscordChannelSet, len(guild.Channels)-2, len(guild.Channels))
 	}
 	discordChannel, err := repo.GetLinePostDiscordChannel(ctx, channel.ID)
 	if err != nil && err.Error() != "sql: no rows in result set" {
@@ -226,7 +227,7 @@ func createCategoryInChannels(
 		slog.ErrorContext(ctx, "line_ng_discord_idの読み取りに失敗しました:"+err.Error())
 		return err
 	}
-	channelsInCategory[categoryPosition.ID][channel.Position] = components.DiscordChannelSet{
+	channelsInCategory[categoryPosition.ID][channel.Position] = internal.DiscordChannelSet{
 		ID:         channel.ID,
 		Name:       fmt.Sprintf("%s %s", typeIcon, channel.Name),
 		Ng:         discordChannel.Ng,

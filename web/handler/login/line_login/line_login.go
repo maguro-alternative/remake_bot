@@ -192,7 +192,6 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 	sessionStore.SetLineState(state)
 	sessionStore.SetLineNonce(nonce)
 	sessionStore.SetGuildID(guildID)
-	slog.InfoContext(ctx, "", "state:", state, "nonce:", nonce, "guildID:", guildID)
 	err = sessionStore.SessionSave(r, w)
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())

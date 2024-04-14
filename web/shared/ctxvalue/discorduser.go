@@ -7,8 +7,6 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
-type contextKey string
-
 const discordUserKey contextKey = "discordUser"
 
 // ユーザー情報をコンテキストにセット

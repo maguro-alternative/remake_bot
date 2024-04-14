@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
-	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
+	"github.com/maguro-alternative/remake_bot/web/shared/ctxvalue"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"

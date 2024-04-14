@@ -10,7 +10,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
+	"github.com/maguro-alternative/remake_bot/web/shared/ctxvalue"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 

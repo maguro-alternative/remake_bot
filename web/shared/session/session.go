@@ -16,14 +16,14 @@ func NewSessionStore(
 	r *http.Request,
 	store *sessions.CookieStore,
 	secret string,
-) *sessionStore {
+) (*sessionStore, error) {
 	session, err := store.Get(r, secret)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	return &sessionStore{
 		session: session,
-	}
+	}, nil
 }
 
 func (s *sessionStore) SessionSave(r *http.Request, w http.ResponseWriter) error {

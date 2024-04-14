@@ -1,12 +1,17 @@
 package session
 
 import (
+	"encoding/gob"
 	"net/http"
 
 	"github.com/gorilla/sessions"
 )
 
 type sessionKey string
+
+func init() {
+	gob.Register(sessionKey(""))
+}
 
 type sessionStore struct {
 	session *sessions.Session

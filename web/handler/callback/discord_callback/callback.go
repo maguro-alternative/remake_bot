@@ -7,11 +7,12 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"reflect"
+	//"reflect"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
 
 type DiscordCallbackHandler struct {
@@ -39,16 +40,22 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	state, ok := sessionsSession.Values["discord_state"].(string)
-	if !ok {
-		stateType := reflect.TypeOf(sessionsSession.Values["discord_state"]).String()
-		slog.ErrorContext(ctx, stateType+"型のstateが取得できませんでした。")
+	//state, ok := sessionsSession.Values["discord_state"].(string)
+	//if !ok {
+		//stateType := reflect.TypeOf(sessionsSession.Values["discord_state"]).String()
+		//slog.ErrorContext(ctx, stateType+"型のstateが取得できませんでした。")
+		//http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		//return
+	//}
+	state, err := session.GetDiscordState(sessionsSession)
+	if err != nil {
+		slog.ErrorContext(ctx, "stateの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	// 2. 認可ページからリダイレクトされてきたときに送られてくるstateパラメータ
 	if r.URL.Query().Get("state") != state {
-		slog.ErrorContext(ctx, "stateが一致しません。")
+		slog.ErrorContext(ctx, "stateが一致しません。", "state:", state, "r.URL.Query()", r.URL.Query().Get("state"))
 		sessionsSession.Values["discord_state"] = ""
 		h.svc.CookieStore.Save(r, w, sessionsSession)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

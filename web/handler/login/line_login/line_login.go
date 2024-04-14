@@ -22,7 +22,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
 type LineLoginHandler struct {

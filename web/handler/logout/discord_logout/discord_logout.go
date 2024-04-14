@@ -3,12 +3,12 @@ package discordlogout
 import (
 	"context"
 	"encoding/gob"
-	"net/http"
 	"log/slog"
+	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
 type DiscordOAuth2Handler struct {

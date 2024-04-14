@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
 const lineUserKey contextKey = "lineUser"

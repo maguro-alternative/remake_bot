@@ -3,9 +3,9 @@ package middleware
 import (
 	"context"
 	"encoding/gob"
+	"log/slog"
 	"net/http"
 	"strings"
-	"log/slog"
 
 	"github.com/maguro-alternative/remake_bot/pkg/ctxvalue"
 
@@ -13,8 +13,8 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/shared/model"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 type Repository interface {
@@ -36,7 +36,6 @@ func init() {
 	// これがない場合、エラーが発生する
 	gob.Register(&model.DiscordUser{})
 }
-
 
 func DiscordOAuthCheckMiddleware(
 	indexService service.IndexService,
@@ -138,7 +137,7 @@ func DiscordOAuthCheckMiddleware(
 				return
 			}
 
-			if (permissionCode&permissionData.PermissionCode) == 0 {
+			if (permissionCode & permissionData.PermissionCode) == 0 {
 				permissionFlag := false
 				for _, permissionId := range permissionIDs {
 					if permissionId.TargetType == "user" && permissionId.TargetID == discordLoginUser.User.ID {

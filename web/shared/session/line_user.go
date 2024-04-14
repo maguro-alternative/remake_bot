@@ -3,7 +3,7 @@ package session
 import (
 	"context"
 
-	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
 var lineUserKey sessionKey = "line_user"

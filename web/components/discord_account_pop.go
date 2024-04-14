@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
 func CreateDiscordAccountVer(discordUser model.DiscordUser) string {

@@ -11,8 +11,8 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/shared/model"
 	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/model"
 )
 
 type LineBotDecrypt struct {

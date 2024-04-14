@@ -8,15 +8,15 @@ import (
 
 var lineUserKey sessionKey = "line_user"
 
-func (s *SessionStore) SetLineUser(ctx context.Context, user model.LineIdTokenUser) {
+func (s *sessionStore) SetLineUser(ctx context.Context, user model.LineIdTokenUser) {
 	s.session.Values[lineUserKey] = user
 }
 
-func (s *SessionStore) GetLineUser(ctx context.Context) (model.LineIdTokenUser, bool) {
+func (s *sessionStore) GetLineUser(ctx context.Context) (model.LineIdTokenUser, bool) {
 	user, ok := s.session.Values[lineUserKey].(model.LineIdTokenUser)
 	return user, ok
 }
 
-func (s *SessionStore) ClearLineUser(ctx context.Context) {
+func (s *sessionStore) ClearLineUser(ctx context.Context) {
 	delete(s.session.Values, lineUserKey)
 }

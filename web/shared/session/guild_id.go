@@ -6,15 +6,15 @@ import (
 
 var guildIdKey sessionKey = "guild_id"
 
-func (s *SessionStore) SetGuildID(ctx context.Context, guildId string) {
+func (s *sessionStore) SetGuildID(ctx context.Context, guildId string) {
 	s.session.Values[guildId] = guildId
 }
 
-func (s *SessionStore) GetGuildID() (string, bool) {
+func (s *sessionStore) GetGuildID() (string, bool) {
 	guildId, ok := s.session.Values[guildIdKey].(string)
 	return guildId, ok
 }
 
-func (s *SessionStore) CleanupGuildID(ctx context.Context) {
+func (s *sessionStore) CleanupGuildID(ctx context.Context) {
 	delete(s.session.Values, guildIdKey)
 }

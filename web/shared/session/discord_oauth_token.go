@@ -6,15 +6,15 @@ import (
 
 var discordOAuthTokenKey sessionKey = "discord_oauth_token"
 
-func (s *SessionStore) SetDiscordOAuthToken(ctx context.Context, token string) {
+func (s *sessionStore) SetDiscordOAuthToken(ctx context.Context, token string) {
 	s.session.Values[discordOAuthTokenKey] = token
 }
 
-func (s *SessionStore) GetDiscordOAuthToken() (string, bool) {
+func (s *sessionStore) GetDiscordOAuthToken() (string, bool) {
 	token, ok := s.session.Values[discordOAuthTokenKey].(string)
 	return token, ok
 }
 
-func (s *SessionStore) CleanupDiscordOAuthToken(ctx context.Context) {
+func (s *sessionStore) CleanupDiscordOAuthToken(ctx context.Context) {
 	delete(s.session.Values, discordOAuthTokenKey)
 }

@@ -1,12 +1,8 @@
 package session
 
-import (
-	"context"
-)
-
 var lineStateKey sessionKey = "line_state"
 
-func (s *sessionStore) SetLineState(ctx context.Context, state string) {
+func (s *sessionStore) SetLineState(state string) {
 	s.session.Values[lineStateKey] = state
 }
 
@@ -15,6 +11,6 @@ func (s *sessionStore) GetLineState() (string, bool) {
 	return state, ok
 }
 
-func (s *sessionStore) CleanupLineState(ctx context.Context) {
+func (s *sessionStore) CleanupLineState() {
 	delete(s.session.Values, lineStateKey)
 }

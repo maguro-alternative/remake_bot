@@ -1,12 +1,8 @@
 package session
 
-import (
-	"context"
-)
-
 var lineNonceKey sessionKey = "line_nonce"
 
-func (s *sessionStore) SetLineNonce(ctx context.Context, nonce string) {
+func (s *sessionStore) SetLineNonce(nonce string) {
 	s.session.Values[lineNonceKey] = nonce
 }
 
@@ -15,6 +11,6 @@ func (s *sessionStore) GetLineNonce() (string, bool) {
 	return state, ok
 }
 
-func (s *sessionStore) CleanupLineNonce(ctx context.Context) {
+func (s *sessionStore) CleanupLineNonce() {
 	delete(s.session.Values, lineNonceKey)
 }

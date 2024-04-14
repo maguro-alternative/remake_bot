@@ -1,12 +1,8 @@
 package session
 
-import (
-	"context"
-)
-
 var discordOAuthTokenKey sessionKey = "discord_oauth_token"
 
-func (s *sessionStore) SetDiscordOAuthToken(ctx context.Context, token string) {
+func (s *sessionStore) SetDiscordOAuthToken(token string) {
 	s.session.Values[discordOAuthTokenKey] = token
 }
 
@@ -15,6 +11,6 @@ func (s *sessionStore) GetDiscordOAuthToken() (string, bool) {
 	return token, ok
 }
 
-func (s *sessionStore) CleanupDiscordOAuthToken(ctx context.Context) {
+func (s *sessionStore) CleanupDiscordOAuthToken() {
 	delete(s.session.Values, discordOAuthTokenKey)
 }

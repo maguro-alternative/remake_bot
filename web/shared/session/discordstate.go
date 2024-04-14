@@ -1,12 +1,8 @@
 package session
 
-import (
-	"context"
-)
-
 var discordStateKey sessionKey = "discord_state"
 
-func (s *sessionStore) SetDiscordState(ctx context.Context, state string) {
+func (s *sessionStore) SetDiscordState(state string) {
 	s.session.Values[discordStateKey] = state
 }
 
@@ -15,6 +11,6 @@ func (s *sessionStore) GetDiscordState() (string, bool) {
 	return state, ok
 }
 
-func (s *sessionStore) CleanupDiscordState(ctx context.Context) {
+func (s *sessionStore) CleanupDiscordState() {
 	delete(s.session.Values, discordStateKey)
 }

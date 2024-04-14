@@ -19,5 +19,6 @@ func (s *sessionStore) GetLineNonce() (string, error) {
 }
 
 func (s *sessionStore) CleanupLineNonce() {
+	s.session.Values[lineNonceKey] = ""
 	delete(s.session.Values, lineNonceKey)
 }

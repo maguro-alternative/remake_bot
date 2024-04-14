@@ -2,7 +2,6 @@ package linelogin
 
 import (
 	"context"
-	"encoding/gob"
 	"encoding/hex"
 	"fmt"
 	"html/template"
@@ -23,6 +22,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
 
 type LineLoginHandler struct {
@@ -45,9 +45,6 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	// セッションに保存する構造体の型を登録
-	// これがない場合、エラーが発生する
-	gob.Register(&model.LineIdTokenUser{})
 	var lineBotIv repository.LineBotIv
 	var lineLoginHtmlBuilder strings.Builder
 	ctx := r.Context()
@@ -153,6 +150,12 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 	guildID := r.PathValue("guildId")
 	state := uuid.New().String()
 	nonce := uuid.New().String()
+	sessionStore, err := session.NewSessionStore(r, h.IndexService.CookieStore, config.SessionSecret())
+	if err != nil {
+		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
@@ -185,22 +188,18 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	session, err := h.IndexService.CookieStore.Get(r, config.SessionSecret())
-	if err != nil {
-		slog.ErrorContext(ctx, "sessionの取得に失敗しました。", "エラー:", err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	session.Values["line_state"] = state
-	session.Values["line_nonce"] = nonce
-	session.Values["guild_id"] = guildID
-	err = session.Save(r, w)
+
+	sessionStore.SetLineState(state)
+	sessionStore.SetLineNonce(nonce)
+	sessionStore.SetGuildID(guildID)
+	slog.InfoContext(ctx, "", "state:", state, "nonce:", nonce, "guildID:", guildID)
+	err = sessionStore.SessionSave(r, w)
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = h.IndexService.CookieStore.Save(r, w, session)
+	err = h.IndexService.CookieStore.Save(r, w, sessionStore.GetSession())
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

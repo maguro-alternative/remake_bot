@@ -2,13 +2,11 @@ package discordlogout
 
 import (
 	"context"
-	"encoding/gob"
 	"log/slog"
 	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/model"
 	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
 
@@ -24,13 +22,10 @@ func NewDiscordOAuth2Handler(discordOAuth2Service *service.DiscordOAuth2Service)
 
 // Discordの認証情報を削除し、ログアウトする
 func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// セッションに保存する構造体の型を登録
-	// これがない場合、エラーが発生する
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	gob.Register(&model.DiscordUser{})
 	sessionStore, err := session.NewSessionStore(r, h.DiscordOAuth2Service.CookieStore, config.SessionSecret())
 	if err != nil {
 		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())

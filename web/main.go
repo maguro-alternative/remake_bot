@@ -1,6 +1,7 @@
 package web
 
 import (
+	"encoding/gob"
 	"net/http"
 	"strings"
 
@@ -20,6 +21,7 @@ import (
 	discordLogin "github.com/maguro-alternative/remake_bot/web/handler/login/discord_login"
 	lineLogin "github.com/maguro-alternative/remake_bot/web/handler/login/line_login"
 	discordLogout "github.com/maguro-alternative/remake_bot/web/handler/logout/discord_logout"
+	lineLogout "github.com/maguro-alternative/remake_bot/web/handler/logout/line_logout"
 
 	indexView "github.com/maguro-alternative/remake_bot/web/handler/views"
 	groupView "github.com/maguro-alternative/remake_bot/web/handler/views/group"
@@ -29,6 +31,7 @@ import (
 	permissionView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/permission"
 	guildsView "github.com/maguro-alternative/remake_bot/web/handler/views/guilds"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/shared/model"
 
 	"golang.org/x/oauth2"
 
@@ -36,6 +39,14 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/justinas/alice"
 )
+
+func init() {
+	// セッションに保存する構造体の型を登録
+	// これがない場合、エラーが発生する
+	gob.Register(&model.DiscordUser{})
+	gob.Register(&model.LineIdTokenUser{})
+	gob.Register(&model.LineOAuthSession{})
+}
 
 func NewWebRouter(
 	indexDB db.Driver,
@@ -109,6 +120,7 @@ func NewWebRouter(
 	mux.Handle("/login/discord", middleChain.Then(discordLogin.NewDiscordOAuth2Handler(discordOAuth2Service)))
 	mux.Handle("/logout/discord", middleChain.Then(discordLogout.NewDiscordOAuth2Handler(discordOAuth2Service)))
 	mux.Handle("/login/line/{guildId}", middleChain.ThenFunc(lineLogin.NewLineLoginHandler(indexService, repo).LineLogin))
+	mux.Handle("/logout/line", middleChain.Then(lineLogout.NewLineLogoutHandler(indexService)))
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
 	mux.Handle("/callback/line-callback/", middleChain.Then(lineCallback.NewLineCallbackHandler(indexService, repo)))
 	mux.Handle("/api/{guildId}/group", lineMiddleChain.Then(group.NewLineGroupHandler(indexService, repo)))

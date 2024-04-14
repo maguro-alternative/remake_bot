@@ -19,5 +19,6 @@ func (s *sessionStore) GetDiscordState() (string, error) {
 }
 
 func (s *sessionStore) CleanupDiscordState() {
+	s.session.Values[discordStateKey] = ""
 	delete(s.session.Values, discordStateKey)
 }

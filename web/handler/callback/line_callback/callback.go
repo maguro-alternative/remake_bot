@@ -2,7 +2,6 @@ package linecallback
 
 import (
 	"context"
-	"encoding/gob"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -10,7 +9,6 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
-	"reflect"
 	"strings"
 
 	"github.com/maguro-alternative/remake_bot/repository"
@@ -19,6 +17,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
 
 type LineCallbackHandler struct {
@@ -49,30 +48,27 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// セッションに保存する構造体の型を登録
-	// これがない場合、エラーが発生する
-	gob.Register(&model.LineIdTokenUser{})
-	session, err := h.svc.CookieStore.Get(r, config.SessionSecret())
+	sessionStore, err := session.NewSessionStore(r, h.svc.CookieStore, config.SessionSecret())
 	if err != nil {
-		slog.ErrorContext(ctx, "sessionの取得に失敗しました。", "エラー:", err.Error())
+		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	state, ok := session.Values["line_state"].(string)
-	if !ok {
-		stateType := reflect.TypeOf(session.Values["line_state"]).String()
-		slog.ErrorContext(ctx, stateType+"型のstateが取得できませんでした。")
+	// 1. 認可ページのURL
+	state, err := sessionStore.GetLineState()
+	if err != nil {
+		slog.ErrorContext(ctx, "stateの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	nonce, ok := session.Values["line_nonce"].(string)
-	if !ok {
+	nonce, err := sessionStore.GetLineNonce()
+	if err != nil {
 		slog.ErrorContext(ctx, "nonceが取得できませんでした。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	guildId, ok := session.Values["guild_id"].(string)
-	if !ok {
+	guildId, err := sessionStore.GetGuildID()
+	if err != nil {
 		slog.ErrorContext(ctx, "guild_idが取得できませんでした。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -80,13 +76,13 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	// 2. 認可ページからリダイレクトされてきたときに送られてくるstateパラメータ
 	if r.URL.Query().Get("state") != state {
 		slog.ErrorContext(ctx, "stateが一致しません。")
-		session.Values["line_state"] = ""
-		h.svc.CookieStore.Save(r, w, session)
+		sessionStore.CleanupLineState()
+		h.svc.CookieStore.Save(r, w, sessionStore.GetSession())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	session.Values["line_state"] = ""
-	session.Values["line_nonce"] = ""
+	sessionStore.CleanupLineState()
+	sessionStore.CleanupLineNonce()
 	// 1. 認可ページのURL
 	code := r.URL.Query().Get("code")
 	lineBot, err := h.repo.GetAllColumnsLineBot(ctx, guildId)
@@ -130,15 +126,15 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	defer cleanupIdtokenBody()
-	session.Values["line_user"] = user
-	session.Values["line_oauth_token"] = token.AccessToken
-	err = session.Save(r, w)
+	sessionStore.SetLineUser(user)
+	sessionStore.SetLineOAuthToken(token.AccessToken)
+	err = sessionStore.SessionSave(r, w)
 	if err != nil {
 		slog.ErrorContext(ctx, "sessionの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = h.svc.CookieStore.Save(r, w, session)
+	err = h.svc.CookieStore.Save(r, w, sessionStore.GetSession())
 	if err != nil {
 		slog.ErrorContext(ctx, "sessionの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

@@ -21,5 +21,6 @@ func (s *sessionStore) GetDiscordUser() (*model.DiscordUser, error) {
 }
 
 func (s *sessionStore) CleanupDiscordUser() {
+	s.session.Values[discordUserKey] = &model.DiscordUser{}
 	delete(s.session.Values, discordUserKey)
 }

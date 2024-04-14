@@ -1,17 +1,11 @@
 package getoauth
 
 import (
-	"encoding/gob"
 	"errors"
 	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
-
-func init() {
-	// 本番では削除すること
-	gob.Register(&model.LineIdTokenUser{})
-}
 
 func (o *OAuthStore) GetLineOAuth(r *http.Request) (*model.LineOAuthSession, error) {
 	session, err := o.Store.Get(r, o.Secret)

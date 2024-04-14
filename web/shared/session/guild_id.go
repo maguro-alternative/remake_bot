@@ -7,7 +7,7 @@ import (
 var guildIdKey sessionKey = "guild_id"
 
 func (s *sessionStore) SetGuildID(guildId string) {
-	s.session.Values[guildId] = guildId
+	s.session.Values[guildIdKey] = guildId
 }
 
 func (s *sessionStore) GetGuildID() (string, error) {
@@ -19,5 +19,6 @@ func (s *sessionStore) GetGuildID() (string, error) {
 }
 
 func (s *sessionStore) CleanupGuildID() {
+	s.session.Values[guildIdKey] = ""
 	delete(s.session.Values, guildIdKey)
 }

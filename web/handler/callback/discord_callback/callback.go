@@ -2,7 +2,6 @@ package discordcallback
 
 import (
 	"context"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -30,9 +29,6 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	// セッションに保存する構造体の型を登録
-	// これがない場合、エラーが発生する
-	gob.Register(&model.DiscordUser{})
 	sessionStore, err := session.NewSessionStore(r, h.svc.CookieStore, config.SessionSecret())
 	if err != nil {
 		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())

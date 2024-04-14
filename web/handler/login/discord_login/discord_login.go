@@ -1,7 +1,6 @@
 package discordlogin
 
 import (
-	"encoding/gob"
 	"log/slog"
 	"net/http"
 
@@ -10,7 +9,6 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/model"
 	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
 
@@ -26,9 +24,6 @@ func NewDiscordOAuth2Handler(discordOAuth2Service *service.DiscordOAuth2Service)
 
 // stateを生成し、Discordの認可ページのURLにリダイレクトする
 func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// セッションに保存する構造体の型を登録
-	// これがない場合、エラーが発生する
-	gob.Register(&model.DiscordUser{})
 	uuid := uuid.New().String()
 	sessionStore, err := session.NewSessionStore(r, h.DiscordOAuth2Service.CookieStore, config.SessionSecret())
 	if err != nil {

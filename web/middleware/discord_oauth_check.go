@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"encoding/gob"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -30,12 +29,6 @@ type Repository interface {
 var (
 	_ Repository = (*repository.Repository)(nil)
 )
-
-func init() {
-	// セッションに保存する構造体の型を登録
-	// これがない場合、エラーが発生する
-	gob.Register(&model.DiscordUser{})
-}
 
 func DiscordOAuthCheckMiddleware(
 	indexService service.IndexService,

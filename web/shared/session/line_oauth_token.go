@@ -19,5 +19,6 @@ func (s *sessionStore) GetLineOAuthToken() (string, error) {
 }
 
 func (s *sessionStore) CleanupLineOAuthToken() {
+	s.session.Values[lineOAuthTokenKey] = ""
 	delete(s.session.Values, lineOAuthTokenKey)
 }

@@ -19,5 +19,6 @@ func (s *sessionStore) GetDiscordOAuthToken() (string, error) {
 }
 
 func (s *sessionStore) CleanupDiscordOAuthToken() {
+	s.session.Values[discordOAuthTokenKey] = ""
 	delete(s.session.Values, discordOAuthTokenKey)
 }

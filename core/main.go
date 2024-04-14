@@ -16,7 +16,6 @@ import (
 	"github.com/maguro-alternative/remake_bot/web"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/gorilla/sessions"
 )
 
 //go:embed schema.sql
@@ -60,16 +59,12 @@ func main() {
 		panic(err)
 	}
 
-	// セッションストアを作成します。
-	store := sessions.NewCookieStore([]byte(config.SessionSecret()))
-
 	// サーバーの待ち受けを開始(ゴルーチンで非同期処理)
 	// ここでサーバーを起動すると、Ctrl+Cで終了するまでサーバーが起動し続ける
 	go func() {
 		web.NewWebRouter(
 			dbV1,
 			&client,
-			store,
 			discord,
 		)
 	}()

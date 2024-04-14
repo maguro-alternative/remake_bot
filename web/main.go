@@ -40,7 +40,6 @@ import (
 func NewWebRouter(
 	indexDB db.Driver,
 	client *http.Client,
-	cookieStore *sessions.CookieStore,
 	discordSession *discordgo.Session,
 ) {
 	scopes := config.DiscordScopes()
@@ -56,6 +55,9 @@ func NewWebRouter(
 	}
 
 	repo := repository.NewRepository(indexDB)
+
+	// セッションストアを作成します。
+	cookieStore := sessions.NewCookieStore([]byte(config.SessionSecret()))
 
 	// create a *service.TODOService type variable using the *sql.DB type variable
 	var indexService = service.NewIndexService(

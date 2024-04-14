@@ -14,7 +14,8 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
-	"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	//"github.com/maguro-alternative/remake_bot/web/shared/session/getoauth"
+	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
 
 type Repository interface {
@@ -53,12 +54,24 @@ func DiscordOAuthCheckMiddleware(
 			}
 			ctx := r.Context()
 			pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/"), "/")
-			oauthStore := getoauth.NewOAuthStore(indexService.CookieStore, config.SessionSecret())
+			sessionStore, err := session.NewSessionStore(r, indexService.CookieStore, config.SessionSecret())
+			if err != nil {
+				slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+			//oauthStore := getoauth.NewOAuthStore(indexService.CookieStore, config.SessionSecret())
 
-			discordLoginUser, err := oauthStore.GetDiscordOAuth(ctx, r)
+			discordUser, err := sessionStore.GetDiscordUser()
 			if err != nil && loginRequiredFlag {
-				http.Redirect(w, r, "/login/discord", http.StatusFound)
 				slog.WarnContext(ctx, "ログインしていないユーザーがアクセスしました。")
+				http.Redirect(w, r, "/login/discord", http.StatusFound)
+				return
+			}
+			discordOAuthToken, err := sessionStore.GetDiscordOAuthToken()
+			if err != nil && loginRequiredFlag {
+				slog.WarnContext(ctx, "ログインしていないユーザーがアクセスしました。")
+				http.Redirect(w, r, "/login/discord", http.StatusFound)
 				return
 			}
 			req, err := http.NewRequestWithContext(ctx, "GET", "https://discord.com/api/users/@me", nil)
@@ -66,13 +79,20 @@ func DiscordOAuthCheckMiddleware(
 				http.Error(w, "Not get user", http.StatusInternalServerError)
 				return
 			}
-			req.Header.Set("Authorization", "Bearer "+discordLoginUser.Token)
+
+			req.Header.Set("Authorization", "Bearer "+discordOAuthToken)
 			resp, err := indexService.Client.Do(req)
 			if (err != nil || resp.StatusCode != http.StatusOK) && loginRequiredFlag {
+				slog.WarnContext(ctx, "ユーザー情報に問題があります。", "エラー:", err, "ステータスコード:", resp.StatusCode)
 				http.Redirect(w, r, "/login/discord", http.StatusFound)
 				return
 			}
 			defer resp.Body.Close()
+
+			discordLoginUser := &model.DiscordOAuthSession{
+				User:  *discordUser,
+				Token: discordOAuthToken,
+			}
 
 			ctx = ctxvalue.ContextWithDiscordUser(ctx, discordLoginUser)
 			guildId := r.PathValue("guildId")

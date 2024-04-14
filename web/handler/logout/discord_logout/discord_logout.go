@@ -9,6 +9,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
 
 type DiscordOAuth2Handler struct {
@@ -30,21 +31,27 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		ctx = context.Background()
 	}
 	gob.Register(&model.DiscordUser{})
-	session, err := h.DiscordOAuth2Service.CookieStore.Get(r, config.SessionSecret())
+	sessionStore, err := session.NewSessionStore(r, h.DiscordOAuth2Service.CookieStore, config.SessionSecret())
+	if err != nil {
+		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	_, err = h.DiscordOAuth2Service.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
 		slog.ErrorContext(ctx, "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	session.Values["discord_oauth_token"] = ""
-	session.Values["discord_user"] = model.DiscordUser{}
-	err = session.Save(r, w)
+	sessionStore.CleanupDiscordUser()
+	sessionStore.CleanupDiscordOAuthToken()
+	err = sessionStore.SessionSave(r, w)
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = h.DiscordOAuth2Service.CookieStore.Save(r, w, session)
+	err = h.DiscordOAuth2Service.CookieStore.Save(r, w, sessionStore.GetSession())
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

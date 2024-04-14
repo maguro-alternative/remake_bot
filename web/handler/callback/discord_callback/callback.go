@@ -34,20 +34,19 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
 	gob.Register(&model.DiscordUser{})
-	sessionsSession, err := h.svc.CookieStore.Get(r, config.SessionSecret())
+	_, err := h.svc.CookieStore.Get(r, config.SessionSecret())
 	if err != nil {
 		slog.ErrorContext(ctx, "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	//state, ok := sessionsSession.Values["discord_state"].(string)
-	//if !ok {
-		//stateType := reflect.TypeOf(sessionsSession.Values["discord_state"]).String()
-		//slog.ErrorContext(ctx, stateType+"型のstateが取得できませんでした。")
-		//http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		//return
-	//}
-	state, err := session.GetDiscordState(sessionsSession)
+	sessionStore, err := session.NewSessionStore(r, h.svc.CookieStore, config.SessionSecret())
+	if err != nil {
+		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	state, err := sessionStore.GetDiscordState()
 	if err != nil {
 		slog.ErrorContext(ctx, "stateの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -56,12 +55,12 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	// 2. 認可ページからリダイレクトされてきたときに送られてくるstateパラメータ
 	if r.URL.Query().Get("state") != state {
 		slog.ErrorContext(ctx, "stateが一致しません。", "state:", state, "r.URL.Query()", r.URL.Query().Get("state"))
-		sessionsSession.Values["discord_state"] = ""
-		h.svc.CookieStore.Save(r, w, sessionsSession)
+		sessionStore.CleanupDiscordState()
+		h.svc.CookieStore.Save(r, w, sessionStore.GetSession())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	sessionsSession.Values["discord_state"] = ""
+	sessionStore.CleanupDiscordState()
 	// 1. 認可ページのURL
 	code := r.URL.Query().Get("code")
 	conf := h.svc.OAuth2Conf
@@ -72,7 +71,7 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	sessionsSession.Values["discord_oauth_token"] = token.AccessToken
+	sessionStore.SetDiscordOAuthToken(token.AccessToken)
 	// 3. ユーザー情報の取得
 	client := conf.Client(ctx, token)
 	resp, err := client.Get("https://discord.com/api/users/@me")
@@ -89,14 +88,14 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	// セッションに保存
-	sessionsSession.Values["discord_user"] = user
-	err = sessionsSession.Save(r, w)
+	sessionStore.SetDiscordUser(&user)
+	err = sessionStore.SessionSave(r, w)
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = h.svc.CookieStore.Save(r, w, sessionsSession)
+	err = h.svc.CookieStore.Save(r, w, sessionStore.GetSession())
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

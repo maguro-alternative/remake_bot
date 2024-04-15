@@ -7,6 +7,9 @@ import (
 )
 
 type SessionMock struct {
+	AddHandlerFunc                 func(handler interface{}) func()
+	ApplicationCommandCreateFunc   func(appID string, guildID string, cmd *discordgo.ApplicationCommand, options ...discordgo.RequestOption) (ccmd *discordgo.ApplicationCommand, err error)
+	ApplicationCommandDeleteFunc   func(appID string, guildID string, cmdID string, options ...discordgo.RequestOption) error
 	ChannelFunc                    func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error)
 	ChannelMessageSendFunc         func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error)
 	ChannelFileSendWithMessageFunc func(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error)
@@ -18,6 +21,18 @@ type SessionMock struct {
 	InteractionRespondFunc         func(interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error
 	UserChannelPermissionsFunc     func(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error)
 	UserGuildsFunc                 func(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
+}
+
+func (s *SessionMock) AddHandler(handler interface{}) func() {
+	return s.AddHandlerFunc(handler)
+}
+
+func (s *SessionMock) ApplicationCommandCreate(appID string, guildID string, cmd *discordgo.ApplicationCommand, options ...discordgo.RequestOption) (ccmd *discordgo.ApplicationCommand, err error) {
+	return s.ApplicationCommandCreateFunc(appID, guildID, cmd, options...)
+}
+
+func (s *SessionMock) ApplicationCommandDelete(appID string, guildID string, cmdID string, options ...discordgo.RequestOption) error {
+	return s.ApplicationCommandDeleteFunc(appID, guildID, cmdID, options...)
 }
 
 func (s *SessionMock) Channel(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
@@ -66,6 +81,9 @@ func (s *SessionMock) UserGuilds(limit int, beforeID string, afterID string, opt
 
 // Session is an interface for discordgo.Session.
 type Session interface {
+	AddHandler(handler interface{}) func()
+	ApplicationCommandCreate(appID string, guildID string, cmd *discordgo.ApplicationCommand, options ...discordgo.RequestOption) (ccmd *discordgo.ApplicationCommand, err error)
+	ApplicationCommandDelete(appID string, guildID string, cmdID string, options ...discordgo.RequestOption) error
 	Channel(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error)
 	ChannelMessageSend(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error)
 	ChannelFileSendWithMessage(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error)

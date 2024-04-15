@@ -32,7 +32,7 @@ func (h *commandHandler) handlePing(s mock.Session, i *discordgo.InteractionCrea
 
 		コマンドの実行結果を返す
 	*/
-	if i.Interaction.ApplicationCommandData().Name != "ping" {
+	if i.Interaction.Data.(discordgo.ApplicationCommandInteractionData).Name != "ping" {
 		return nil
 	}
 	if i.Interaction.GuildID != i.GuildID {

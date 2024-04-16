@@ -39,7 +39,7 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = h.DiscordOAuth2Service.CookieStore.Save(r, w, sessionStore.GetSession())
+	err = sessionStore.StoreSave(r, w, h.DiscordOAuth2Service.CookieStore)
 	if err != nil {
 		slog.ErrorContext(r.Context(), "sessionの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

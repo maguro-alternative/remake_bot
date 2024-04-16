@@ -14,6 +14,8 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 	"github.com/maguro-alternative/remake_bot/web/shared/session"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 type Repository interface {
@@ -103,13 +105,8 @@ func DiscordOAuthCheckMiddleware(
 				slog.WarnContext(ctx, "メンバー情報の取得に失敗しました。", "guildId", guildId, "userId", discordLoginUser.User.ID)
 				return
 			}
-			for _, role := range member.Roles {
-				for _, guildRole := range guild.Roles {
-					if role == guildRole.ID {
-						userPermissionCode |= guildRole.Permissions
-					}
-				}
-			}
+			userPermissionCode = getUserRolePermissionCode(member, guild)
+
 			memberPermission, err := indexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, guild.Channels[0].ID)
 			if err != nil {
 				slog.WarnContext(ctx, "メンバー権限の取得に失敗しました。", "guildId", guildId, "userId", discordLoginUser.User.ID)
@@ -149,23 +146,12 @@ func DiscordOAuthCheckMiddleware(
 			}
 
 			if (permissionCode & permissionData.PermissionCode) == 0 {
-				permissionFlag := false
-				for _, permissionId := range permissionIDs {
-					if permissionId.TargetType == "user" && permissionId.TargetID == discordLoginUser.User.ID {
-						permissionFlag = true
-						permissionData.Permission = permissionId.Permission
-						break
-					}
-					if permissionId.TargetType == "role" && member.Roles != nil {
-						for _, role := range member.Roles {
-							if permissionId.TargetID == role {
-								permissionFlag = true
-								permissionData.Permission = permissionId.Permission
-								break
-							}
-						}
-					}
-				}
+				permissionFlag := isUserAccessPermission(
+					permissionIDs,
+					permissionData,
+					discordLoginUser,
+					member,
+				)
 				if !permissionFlag {
 					http.Error(w, "Forbidden", http.StatusForbidden)
 					slog.WarnContext(ctx, "権限のないアクセスがありました。")
@@ -180,4 +166,43 @@ func DiscordOAuthCheckMiddleware(
 			h.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
+}
+
+func getUserRolePermissionCode(
+	member *discordgo.Member,
+	guild *discordgo.Guild,
+) int64 {
+	var userPermissionCode int64
+	userPermissionCode = 0
+	for _, role := range member.Roles {
+		for _, guildRole := range guild.Roles {
+			if role == guildRole.ID {
+				userPermissionCode |= guildRole.Permissions
+			}
+		}
+	}
+	return userPermissionCode
+}
+
+func isUserAccessPermission(
+	permissionIDs []repository.PermissionID,
+	permissionData *model.DiscordPermissionData,
+	discordLoginUser *model.DiscordOAuthSession,
+	member *discordgo.Member,
+) bool {
+	for _, permissionId := range permissionIDs {
+		if permissionId.TargetType == "user" && permissionId.TargetID == discordLoginUser.User.ID {
+			permissionData.Permission = permissionId.Permission
+			return true
+		}
+		if permissionId.TargetType == "role" && member.Roles != nil {
+			for _, role := range member.Roles {
+				if permissionId.TargetID == role {
+					permissionData.Permission = permissionId.Permission
+					return true
+				}
+			}
+		}
+	}
+	return false
 }

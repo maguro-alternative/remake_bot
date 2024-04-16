@@ -41,7 +41,7 @@ func (h *LineLogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = h.LineLogoutService.CookieStore.Save(r, w, sessionStore.GetSession())
+	err = sessionStore.StoreSave(r, w, h.LineLogoutService.CookieStore)
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

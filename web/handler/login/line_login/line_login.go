@@ -198,7 +198,7 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = h.IndexService.CookieStore.Save(r, w, sessionStore.GetSession())
+	err = sessionStore.StoreSave(r, w, h.IndexService.CookieStore)
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

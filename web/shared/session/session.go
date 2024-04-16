@@ -35,6 +35,10 @@ func (s *sessionStore) SessionSave(r *http.Request, w http.ResponseWriter) error
 	return s.session.Save(r, w)
 }
 
-func (s *sessionStore) GetSession() *sessions.Session {
-	return s.session
+func (s *sessionStore) StoreSave(
+	r *http.Request,
+	w http.ResponseWriter,
+	store *sessions.CookieStore,
+) error {
+	return store.Save(r, w, s.session)
 }

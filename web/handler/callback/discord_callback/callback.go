@@ -45,7 +45,7 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	if r.URL.Query().Get("state") != state {
 		slog.ErrorContext(ctx, "stateが一致しません。", "state:", state, "r.URL.Query()", r.URL.Query().Get("state"))
 		sessionStore.CleanupDiscordState()
-		h.svc.CookieStore.Save(r, w, sessionStore.GetSession())
+		err = sessionStore.StoreSave(r, w, h.svc.CookieStore)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -84,7 +84,7 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = h.svc.CookieStore.Save(r, w, sessionStore.GetSession())
+	err = sessionStore.StoreSave(r, w, h.svc.CookieStore)
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

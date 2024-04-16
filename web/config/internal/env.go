@@ -15,7 +15,7 @@ type Config struct {
 	Port                string `env:"PORT" envDefault:"8080"`
 	ServerUrl           string `env:"SERVER_URL" envDefault:"http://localhost:8080"`
 	SessionName         string `env:"SESSION_NAME" envDefault:""`
-	SessionSecret       string `env:"SESSION_SECRET" envDefault:""`
+	SessionSecret       string `env:"SESSION_SECRET" envDefault:"test"`
 	YouTubeAPIKey       string `env:"YOUTUBE_API_KEY" envDefault:""`
 	YoutubeAccessToken  string `env:"YOUTUBE_ACCESS_TOKEN" envDefault:""`
 	YoutubeClientID     string `env:"YOUTUBE_CLIENT_ID" envDefault:""`

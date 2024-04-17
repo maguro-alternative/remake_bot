@@ -20,7 +20,8 @@ import (
 
 type Repository interface {
 	GetPermissionCode(ctx context.Context, guildID string, permissionType string) (int64, error)
-	GetPermissionIDs(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionID, error)
+	GetPermissionUserIDs(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error)
+	GetPermissionRoleIDs(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error)
 	GetAllColumnsLineBot(ctx context.Context, guildID string) (repository.LineBot, error)
 	GetLineBotNotClient(ctx context.Context, guildID string) (repository.LineBotNotClient, error)
 	GetLineBotIvNotClient(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error)
@@ -139,7 +140,12 @@ func DiscordOAuthCheckMiddleware(
 				slog.WarnContext(ctx, "権限コードの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
 				return
 			}
-			permissionIDs, err := repo.GetPermissionIDs(ctx, guildId, permissionType)
+			permissionUserIDs, err := repo.GetPermissionUserIDs(ctx, guildId, permissionType)
+			if err != nil {
+				slog.WarnContext(ctx, "権限IDの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
+				return
+			}
+			permissionRoleIDs, err := repo.GetPermissionRoleIDs(ctx, guildId, permissionType)
 			if err != nil {
 				slog.WarnContext(ctx, "権限IDの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
 				return
@@ -147,7 +153,8 @@ func DiscordOAuthCheckMiddleware(
 
 			if (permissionCode & permissionData.PermissionCode) == 0 {
 				permissionFlag := isUserAccessPermission(
-					permissionIDs,
+					permissionUserIDs,
+					permissionRoleIDs,
 					permissionData,
 					discordLoginUser,
 					member,
@@ -185,17 +192,20 @@ func getUserRolePermissionCode(
 }
 
 func isUserAccessPermission(
-	permissionIDs []repository.PermissionID,
+	permissionUserIDs []repository.PermissionUserID,
+	permissionRoleIDs []repository.PermissionRoleID,
 	permissionData *model.DiscordPermissionData,
 	discordLoginUser *model.DiscordOAuthSession,
 	member *discordgo.Member,
 ) bool {
-	for _, permissionId := range permissionIDs {
-		if permissionId.TargetType == "user" && permissionId.TargetID == discordLoginUser.User.ID {
+	for _, permissionId := range permissionUserIDs {
+		if permissionId.TargetID == discordLoginUser.User.ID {
 			permissionData.Permission = permissionId.Permission
 			return true
 		}
-		if permissionId.TargetType == "role" && member.Roles != nil {
+	}
+	for _, permissionId := range permissionRoleIDs {
+		if member.Roles != nil {
 			for _, role := range member.Roles {
 				if permissionId.TargetID == role {
 					permissionData.Permission = permissionId.Permission

@@ -4,33 +4,30 @@ import (
 	"context"
 )
 
-type PermissionIDAllColumns struct {
+type PermissionUserIDAllColumns struct {
 	GuildID    string `db:"guild_id"`
 	Type       string `db:"type"`
-	TargetType string `db:"target_type"`
 	TargetID   string `db:"target_id"`
 	Permission string `db:"permission"`
 }
 
-type PermissionID struct {
-	TargetType string `db:"target_type"`
+type PermissionUserID struct {
 	TargetID   string `db:"target_id"`
 	Permission string `db:"permission"`
 }
 
-func NewPermissionIDAllColumns(guildID, permissionType, targetType, targetID, permission string) *PermissionIDAllColumns {
-	return &PermissionIDAllColumns{
+func NewPermissionUserIDAllColumns(guildID, permissionType, targetID, permission string) *PermissionUserIDAllColumns {
+	return &PermissionUserIDAllColumns{
 		GuildID:    guildID,
 		Type:       permissionType,
-		TargetType: targetType,
 		TargetID:   targetID,
 		Permission: permission,
 	}
 }
 
-func (r *Repository) InsertPermissionIDs(ctx context.Context, permissionsID []PermissionIDAllColumns) error {
+func (r *Repository) InsertPermissionUserIDs(ctx context.Context, permissionsID []PermissionUserIDAllColumns) error {
 	query := `
-		INSERT INTO permissions_id (
+		INSERT INTO permissions_user_id (
 			guild_id,
 			type,
 			target_type,
@@ -53,13 +50,13 @@ func (r *Repository) InsertPermissionIDs(ctx context.Context, permissionsID []Pe
 	return nil
 }
 
-func (r *Repository) GetGuildPermissionIDsAllColumns(ctx context.Context, guildID string) ([]PermissionIDAllColumns, error) {
-	var permissionsID []PermissionIDAllColumns
+func (r *Repository) GetGuildPermissionUserIDsAllColumns(ctx context.Context, guildID string) ([]PermissionUserIDAllColumns, error) {
+	var permissionsID []PermissionUserIDAllColumns
 	query := `
 		SELECT
 			*
 		FROM
-			permissions_id
+			permissions_user_id
 		WHERE
 			guild_id = $1
 	`
@@ -67,15 +64,15 @@ func (r *Repository) GetGuildPermissionIDsAllColumns(ctx context.Context, guildI
 	return permissionsID, err
 }
 
-func (r *Repository) GetPermissionIDs(ctx context.Context, guildID, permissionType string) ([]PermissionID, error) {
-	var permissionIDs []PermissionID
+func (r *Repository) GetPermissionUserIDs(ctx context.Context, guildID, permissionType string) ([]PermissionUserID, error) {
+	var permissionIDs []PermissionUserID
 	query := `
 		SELECT
 			target_type,
 			target_id,
 			permission
 		FROM
-			permissions_id
+			permissions_user_id
 		WHERE
 			guild_id = $1 AND
 			type = $2
@@ -84,10 +81,10 @@ func (r *Repository) GetPermissionIDs(ctx context.Context, guildID, permissionTy
 	return permissionIDs, err
 }
 
-func (r *Repository) DeletePermissionIDs(ctx context.Context, guildId string) error {
+func (r *Repository) DeletePermissionUserIDs(ctx context.Context, guildId string) error {
 	query := `
 		DELETE FROM
-			permissions_id
+			permissions_user_id
 		WHERE
 			guild_id = $1
 	`

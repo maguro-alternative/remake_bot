@@ -222,7 +222,12 @@ func createCategoryInChannels(
 		slog.ErrorContext(ctx, "line_ng_typeの読み取りに失敗しました:"+err.Error())
 		return err
 	}
-	ngDiscordIDs, err := repo.GetLineNgDiscordID(ctx, channel.ID)
+	ngDiscordUserIDs, err := repo.GetLineNgDiscordUserID(ctx, channel.ID)
+	if err != nil {
+		slog.ErrorContext(ctx, "line_ng_discord_user_idの読み取りに失敗しました:"+err.Error())
+		return err
+	}
+	ngDiscordRoleIDs, err := repo.GetLineNgDiscordRoleID(ctx, channel.ID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_ng_discord_idの読み取りに失敗しました:"+err.Error())
 		return err
@@ -234,12 +239,11 @@ func createCategoryInChannels(
 		BotMessage: discordChannel.BotMessage,
 		NgTypes:    ngTypes,
 	}
-	for _, ngDiscordID := range ngDiscordIDs {
-		if ngDiscordID.IDType == "user" {
-			channelsInCategory[categoryPosition.ID][channel.Position].NgUsers = append(channelsInCategory[categoryPosition.ID][channel.Position].NgUsers, ngDiscordID.ID)
-			continue
-		}
-		channelsInCategory[categoryPosition.ID][channel.Position].NgRoles = append(channelsInCategory[categoryPosition.ID][channel.Position].NgRoles, ngDiscordID.ID)
+	for _, ngDiscordID := range ngDiscordUserIDs {
+		channelsInCategory[categoryPosition.ID][channel.Position].NgUsers = append(channelsInCategory[categoryPosition.ID][channel.Position].NgUsers, ngDiscordID)
+	}
+	for _, ngDiscordID := range ngDiscordRoleIDs {
+		channelsInCategory[categoryPosition.ID][channel.Position].NgRoles = append(channelsInCategory[categoryPosition.ID][channel.Position].NgRoles, ngDiscordID)
 	}
 	return nil
 }

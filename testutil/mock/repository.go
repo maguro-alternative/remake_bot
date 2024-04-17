@@ -18,9 +18,12 @@ type Repository interface {
 	GetLineBotDefaultChannelID(ctx context.Context, guildID string) (repository.LineBotDefaultChannelID, error)
 	GetLineBotNotClient(ctx context.Context, guildID string) (repository.LineBotNotClient, error)
 	UpdateLineBot(ctx context.Context, lineBot *repository.LineBot) error
-	GetLineNgDiscordID(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error)
-	InsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordIDAllCoulmns) error
-	DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordIDAllCoulmns) error
+	GetLineNgDiscordUserID(ctx context.Context, channelID string) ([]string, error)
+	GetLineNgDiscordRoleID(ctx context.Context, channelID string) ([]string, error)
+	InsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []repository.LineNgDiscordUserIDAllCoulmns) error
+	InsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns) error
+	DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []repository.LineNgDiscordUserIDAllCoulmns) error
+	DeleteNotInsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns) error
 	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []repository.LineNgDiscordMessageType) error
 	DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []repository.LineNgDiscordMessageType) error
 	GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error)
@@ -30,10 +33,14 @@ type Repository interface {
 	GetPermissionCode(ctx context.Context, guildID, permissionType string) (int64, error)
 	GetPermissionCodes(ctx context.Context, guildID string) ([]repository.PermissionCode, error)
 	UpdatePermissionCodes(ctx context.Context, permissionsCode []repository.PermissionCode) error
-	InsertPermissionIDs(ctx context.Context, permissionsID []repository.PermissionIDAllColumns) error
-	GetGuildPermissionIDsAllColumns(ctx context.Context, guildID string) ([]repository.PermissionIDAllColumns, error)
-	GetPermissionIDs(ctx context.Context, guildID, permissionType string) ([]repository.PermissionID, error)
-	DeletePermissionIDs(ctx context.Context, guildId string) error
+	InsertPermissionUserIDs(ctx context.Context, permissionsUserID []repository.PermissionUserIDAllColumns) error
+	InsertPermissionRoleIDs(ctx context.Context, permissionsRoleID []repository.PermissionRoleIDAllColumns) error
+	GetGuildPermissionUserIDsAllColumns(ctx context.Context, guildID string) ([]repository.PermissionUserIDAllColumns, error)
+	GetGuildPermissionRoleIDsAllColumns(ctx context.Context, guildID string) ([]repository.PermissionRoleIDAllColumns, error)
+	GetPermissionUserIDs(ctx context.Context, guildID, permissionType string) ([]repository.PermissionUserID, error)
+	GetPermissionRoleIDs(ctx context.Context, guildID, permissionType string) ([]repository.PermissionRoleID, error)
+	DeletePermissionUserIDs(ctx context.Context, guildId string) error
+	DeletePermissionRoleIDs(ctx context.Context, guildId string) error
 }
 
 var (

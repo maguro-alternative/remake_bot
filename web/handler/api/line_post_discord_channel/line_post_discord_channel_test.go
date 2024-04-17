@@ -74,10 +74,16 @@ func TestLinePostDiscordChannelHandler_ServeHTTP(t *testing.T) {
 				DeleteNotInsertLineNgDiscordMessageTypesFunc: func(ctx context.Context, lineNgDiscordMessageTypes []repository.LineNgDiscordMessageType) error {
 					return nil
 				},
-				InsertLineNgDiscordIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordIDAllCoulmns) error {
+				InsertLineNgDiscordUserIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordUserIDAllCoulmns) error {
 					return nil
 				},
-				DeleteNotInsertLineNgDiscordIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordIDAllCoulmns) error {
+				InsertLineNgDiscordRoleIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordRoleIDAllCoulmns) error {
+					return nil
+				},
+				DeleteNotInsertLineNgDiscordUserIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordUserIDAllCoulmns) error {
+					return nil
+				},
+				DeleteNotInsertLineNgDiscordRoleIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordRoleIDAllCoulmns) error {
 					return nil
 				},
 			},

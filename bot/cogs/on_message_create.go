@@ -68,9 +68,14 @@ func onMessageCreateFunc(
 		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
 		return err
 	}
-	ngDiscordIDs, err := repo.GetLineNgDiscordID(ctx, vs.ChannelID)
+	ngDiscordUserIDs, err := repo.GetLineNgDiscordUserID(ctx, vs.ChannelID)
 	if err != nil {
-		slog.ErrorContext(ctx, "line_ng_discord_message_typeの登録に失敗しました", "エラー:", err.Error())
+		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
+		return err
+	}
+	ngDiscordRoleIDs, err := repo.GetLineNgDiscordRoleID(ctx, vs.ChannelID)
+	if err != nil {
+		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
 		return err
 	}
 	// メッセージの種類がNGの場合は処理を終了
@@ -81,17 +86,17 @@ func onMessageCreateFunc(
 		}
 	}
 	// メッセージの送信者がNGの場合は処理を終了
-	for _, ngDiscordID := range ngDiscordIDs {
-		if ngDiscordID.IDType == "user" && vs.Author.ID == ngDiscordID.ID {
+	for _, ngDiscordID := range ngDiscordUserIDs {
+		if vs.Author.ID == ngDiscordID {
 			slog.InfoContext(ctx, "NG User")
 			return err
 		}
-		if ngDiscordID.IDType == "role" {
-			for _, role := range vs.Member.Roles {
-				if role == ngDiscordID.ID {
-					slog.InfoContext(ctx, "NG Role")
-					return err
-				}
+	}
+	for _, ngDiscordRoleID := range ngDiscordRoleIDs {
+		for _, role := range vs.Member.Roles {
+			if role == ngDiscordRoleID {
+				slog.InfoContext(ctx, "NG Role")
+				return err
 			}
 		}
 	}

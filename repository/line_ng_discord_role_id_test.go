@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetLineNgDiscordID(t *testing.T) {
+func TestGetLineNgDiscordRoleID(t *testing.T) {
 	ctx := context.Background()
 	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
 	assert.NoError(t, err)
@@ -32,14 +32,13 @@ func TestGetLineNgDiscordID(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからNG Discord IDを取得できること", func(t *testing.T) {
-		ngDiscordIDs, err := repo.GetLineNgDiscordID(ctx, "987654321")
+		ngDiscordIDs, err := repo.GetLineNgDiscordRoleID(ctx, "987654321")
 		assert.NoError(t, err)
-		assert.Equal(t, "123456789", ngDiscordIDs[0].ID)
-		assert.Equal(t, "user", ngDiscordIDs[0].IDType)
+		assert.Equal(t, "123456789", ngDiscordIDs[0])
 	})
 }
 
-func TestRepository_InsertLineNgDiscordIDs(t *testing.T) {
+func TestRepository_InsertLineNgDiscordRoleIDs(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NGなIDが正しく追加されること", func(t *testing.T) {
 		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
@@ -53,27 +52,24 @@ func TestRepository_InsertLineNgDiscordIDs(t *testing.T) {
 		tx.ExecContext(ctx, "DELETE FROM line_ng_discord_id")
 
 		repo := NewRepository(tx)
-		lineNgDiscordIDs := []LineNgDiscordIDAllCoulmns{
+		lineNgDiscordIDs := []LineNgDiscordRoleIDAllCoulmns{
 			{
 				ChannelID: "123456789",
 				GuildID:   "987654321",
 				ID:        "123456789",
-				IDType:    "user",
 			},
 			{
 				ChannelID: "123456789",
 				GuildID:   "123456789",
 				ID:        "987654321",
-				IDType:    "user",
 			},
 			{
 				ChannelID: "987654321",
 				GuildID:   "123456789",
 				ID:        "987654321",
-				IDType:    "user",
 			},
 		}
-		err = repo.InsertLineNgDiscordIDs(ctx, lineNgDiscordIDs)
+		err = repo.InsertLineNgDiscordRoleIDs(ctx, lineNgDiscordIDs)
 		assert.NoError(t, err)
 
 		var lineChannelCount int
@@ -84,7 +80,7 @@ func TestRepository_InsertLineNgDiscordIDs(t *testing.T) {
 	})
 }
 
-func TestRepository_DeleteLineNgDiscordIDs(t *testing.T) {
+func TestRepository_DeleteLineNgDiscordRoleIDs(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NGなIDが正しく削除されること", func(t *testing.T) {
 		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
@@ -117,20 +113,18 @@ func TestRepository_DeleteLineNgDiscordIDs(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		insertLineNgDiscordIDs := []LineNgDiscordIDAllCoulmns{
+		insertLineNgDiscordIDs := []LineNgDiscordRoleIDAllCoulmns{
 			{
 				ChannelID: "123456789",
 				ID:        "123456789",
-				IDType:    "user",
 			},
 			{
 				ChannelID: "987654321",
 				ID:        "123456789",
-				IDType:    "user",
 			},
 		}
 
-		err = repo.DeleteNotInsertLineNgDiscordIDs(ctx, insertLineNgDiscordIDs)
+		err = repo.DeleteNotInsertLineNgDiscordRoleIDs(ctx, insertLineNgDiscordIDs)
 		assert.NoError(t, err)
 
 		var lineChannelCount int

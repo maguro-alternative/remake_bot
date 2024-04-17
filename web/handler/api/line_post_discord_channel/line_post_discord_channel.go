@@ -53,7 +53,7 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 
 	lineChannelJson.GuildID = r.PathValue("guildId")
 
-	lineChannels, lineNgTypes, lineNgIDs := lineChannelJsonRead(lineChannelJson)
+	lineChannels, lineNgTypes, lineNgUserIDs, lineNgRoleIDs := lineChannelJsonRead(lineChannelJson)
 
 	for _, lineChannel := range lineChannels {
 		linePostDiscordChannel := repository.NewLinePostDiscordChannel(
@@ -81,15 +81,25 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 		return
 	}
 
-	if err := h.Repo.InsertLineNgDiscordIDs(ctx, lineNgIDs); err != nil {
+	if err := h.Repo.InsertLineNgDiscordUserIDs(ctx, lineNgUserIDs); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "line_ng_discord_id更新に失敗しました。 ", "エラー:", err.Error())
+		slog.ErrorContext(ctx, "line_ng_discord_user_id更新に失敗しました。 ", "エラー:", err.Error())
+		return
+	}
+	if err := h.Repo.InsertLineNgDiscordRoleIDs(ctx, lineNgRoleIDs); err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "line_ng_discord_role_id更新に失敗しました。 ", "エラー:", err.Error())
 		return
 	}
 
-	if err := h.Repo.DeleteNotInsertLineNgDiscordIDs(ctx, lineNgIDs); err != nil {
+	if err := h.Repo.DeleteNotInsertLineNgDiscordUserIDs(ctx, lineNgUserIDs); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		slog.ErrorContext(ctx, "line_ng_discord_id更新に失敗しました。 ", "エラー:", err.Error())
+		slog.ErrorContext(ctx, "line_ng_discord_user_id更新に失敗しました。 ", "エラー:", err.Error())
+		return
+	}
+	if err := h.Repo.DeleteNotInsertLineNgDiscordUserIDs(ctx, lineNgUserIDs); err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "line_ng_discord_role_id更新に失敗しました。 ", "エラー:", err.Error())
 		return
 	}
 
@@ -100,11 +110,13 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 func lineChannelJsonRead(lineChannelJson internal.LinePostDiscordChannelJson) (
 	channels []repository.LinePostDiscordChannelAllColumns,
 	ngTypes []repository.LineNgDiscordMessageType,
-	ngIDs []repository.LineNgDiscordIDAllCoulmns,
+	ngUserIDs []repository.LineNgDiscordUserIDAllCoulmns,
+	ngRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns,
 ) {
 	var lineChannels []repository.LinePostDiscordChannelAllColumns
 	var lineNgTypes []repository.LineNgDiscordMessageType
-	var lineNgIDs []repository.LineNgDiscordIDAllCoulmns
+	var lineNgUserIDs []repository.LineNgDiscordUserIDAllCoulmns
+	var lineNgRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns
 	for _, lineChannel := range lineChannelJson.Channels {
 		channel := repository.NewLinePostDiscordChannel(
 			lineChannel.ChannelID,
@@ -125,26 +137,24 @@ func lineChannelJsonRead(lineChannelJson internal.LinePostDiscordChannelJson) (
 		}
 		if len(lineChannel.NgUsers) > 0 {
 			for _, ngUser := range lineChannel.NgUsers {
-				user := repository.NewLineNgDiscordID(
+				user := repository.NewLineNgDiscordUserID(
 					lineChannel.ChannelID,
 					lineChannelJson.GuildID,
 					ngUser,
-					"user",
 				)
-				lineNgIDs = append(lineNgIDs, *user)
+				lineNgUserIDs = append(lineNgUserIDs, *user)
 			}
 		}
 		if len(lineChannel.NgRoles) > 0 {
 			for _, ngRole := range lineChannel.NgRoles {
-				role := repository.NewLineNgDiscordID(
+				role := repository.NewLineNgDiscordRoleID(
 					lineChannel.ChannelID,
 					lineChannelJson.GuildID,
 					ngRole,
-					"role",
 				)
-				lineNgIDs = append(lineNgIDs, *role)
+				lineNgRoleIDs = append(lineNgRoleIDs, *role)
 			}
 		}
 	}
-	return lineChannels, lineNgTypes, lineNgIDs
+	return lineChannels, lineNgTypes, lineNgUserIDs, lineNgRoleIDs
 }

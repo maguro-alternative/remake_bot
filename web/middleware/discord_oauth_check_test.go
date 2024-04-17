@@ -30,7 +30,7 @@ func (f roundTripFn) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 func TestDiscordOAuthCheckMiddleware(t *testing.T) {
-	t.Run("DiscordOAuthCheckMiddlewareが正常に動作すること", func(t *testing.T) {
+	t.Run("DiscordOAuthCheckMiddlewareが'/'で正常に動作すること", func(t *testing.T) {
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		})
@@ -66,7 +66,10 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 0, nil
 				},
-				GetPermissionIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionID, error) {
+				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+					return nil, nil
+				},
+				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return nil, nil
 				},
 			},
@@ -74,6 +77,57 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/", nil)
+		middleware(handler).ServeHTTP(w, r)
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("'/guilds'で認証情報がない場合、ログインページにリダイレクトさせること", func(t *testing.T) {
+		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})
+		middleware := DiscordOAuthCheckMiddleware(
+			service.IndexService{
+				Client: newStubHttpClient(func(req *http.Request) *http.Response {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body: io.NopCloser(strings.NewReader(`{
+							"id": "123456789",
+							"username": "test",
+							"global_name": "test",
+							"avatar": "test",
+							"avatar_decoration": "test",
+							"discriminator": "1234",
+							"public_flags": 0,
+							"flags": 0,
+							"banner": "test",
+							"banner_color": "test",
+							"accent_color": "test",
+							"locale": "test",
+							"mfa_enabled": true,
+							"premium_type": 0,
+							"email": "test",
+							"verified": true,
+							"bio": "test",
+						}`)),
+					}
+				}),
+				CookieStore: sessions.NewCookieStore([]byte(config.SessionSecret())),
+			},
+			&repository.RepositoryFuncMock{
+				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+					return 0, nil
+				},
+				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+					return nil, nil
+				},
+				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+					return nil, nil
+				},
+			},
+			true,
+		)
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodGet, "/guilds", nil)
 		middleware(handler).ServeHTTP(w, r)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})

@@ -50,7 +50,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 	lineGroupStr, err := base64.StdEncoding.DecodeString(string([]byte("YgexFQQlLcaXmsw9mFN35Q==")))
 	require.NoError(t, err)
 	t.Run("LineOAuthCheckMiddlewareが正常に動作すること", func(t *testing.T) {
-		middlewareFixture := func(h http.Handler) http.Handler {
+		middlewareStartFixture := func(h http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				user := &model.LineIdTokenUser{
 					Iss:     "https://access.line.me",
@@ -73,6 +73,13 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 				require.NoError(t, err)
 				h.ServeHTTP(w, r)
 			})
+		}
+		middlewareEndFixture := func(r *http.Request) {
+				sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+				require.NoError(t, err)
+				sessionStore.CleanupLineUser()
+				sessionStore.CleanupLineOAuthToken()
+				sessionStore.CleanupGuildID()
 		}
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -112,10 +119,11 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 			true,
 		)(handler)
 
-		req := httptest.NewRequest(http.MethodGet, "/line", nil)
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Set("Authorization", "Bearer test")
 		w := httptest.NewRecorder()
-		middlewareFixture(middleware).ServeHTTP(w, req)
+		middlewareStartFixture(middleware).ServeHTTP(w, req)
+		middlewareEndFixture(req)
 
 		assert.Equal(t, http.StatusOK, w.Code)
 	})

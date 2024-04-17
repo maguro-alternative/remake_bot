@@ -43,7 +43,8 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "/guild/permission Method Not Allowed")
 		return
 	}
-	var componentPermissionIDs []internal.PermissionID
+	var componentPermissionUserIDs []internal.PermissionUserID
+	var componentPermissionRoleIDs []internal.PermissionRoleID
 
 	guild, err := h.IndexService.DiscordBotState.Guild(guildId)
 	if err != nil {
@@ -80,7 +81,14 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	permissionIDs, err := h.Repo.GetGuildPermissionIDsAllColumns(ctx, guildId)
+	permissionUserIDs, err := h.Repo.GetGuildPermissionUserIDsAllColumns(ctx, guildId)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "permissions_idの取得に失敗しました。", "エラー:", err.Error())
+		return
+	}
+
+	permissionRoleIDs, err := h.Repo.GetGuildPermissionRoleIDsAllColumns(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "permissions_idの取得に失敗しました。", "エラー:", err.Error())
@@ -88,13 +96,23 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	permissionForm := strings.Builder{}
-	for _, permissionID := range permissionIDs {
-		componentPermissionIDs = append(
-			componentPermissionIDs,
-			internal.PermissionID{
+	for _, permissionID := range permissionUserIDs {
+		componentPermissionUserIDs = append(
+			componentPermissionUserIDs,
+			internal.PermissionUserID{
 				GuildID:    guildId,
 				Type:       permissionID.Type,
-				TargetType: permissionID.TargetType,
+				TargetID:   permissionID.TargetID,
+				Permission: permissionID.Permission,
+			},
+		)
+	}
+	for _, permissionID := range permissionRoleIDs {
+		componentPermissionRoleIDs = append(
+			componentPermissionRoleIDs,
+			internal.PermissionRoleID{
+				GuildID:    guildId,
+				Type:       permissionID.Type,
 				TargetID:   permissionID.TargetID,
 				Permission: permissionID.Permission,
 			},
@@ -110,7 +128,8 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		)
 		permissionForm.WriteString(internal.CreatePermissionSelectForm(
 			guild,
-			componentPermissionIDs,
+			componentPermissionUserIDs,
+			componentPermissionRoleIDs,
 			permissionCode.Type,
 		))
 	}

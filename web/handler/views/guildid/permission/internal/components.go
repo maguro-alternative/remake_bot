@@ -21,6 +21,20 @@ type PermissionID struct {
 	Permission string
 }
 
+type PermissionUserID struct {
+	GuildID    string
+	Type       string
+	TargetID   string
+	Permission string
+}
+
+type PermissionRoleID struct {
+	GuildID    string
+	Type       string
+	TargetID   string
+	Permission string
+}
+
 func CreatePermissionCodeForm(guildID string, permissionCode PermissionCode) string {
 	return fmt.Sprintf(`
 	<h3>%s</h3>
@@ -29,12 +43,17 @@ func CreatePermissionCodeForm(guildID string, permissionCode PermissionCode) str
 	`, permissionCode.Type, permissionCode.Type, permissionCode.Code)
 }
 
-func CreatePermissionSelectForm(guild *discordgo.Guild, permissionIDs []PermissionID, permission string) string {
+func CreatePermissionSelectForm(
+	guild *discordgo.Guild,
+	permissionUserIDs []PermissionUserID,
+	permissionRoleIDs []PermissionRoleID,
+	permission string,
+) string {
 	selectMemberFormBuilder := strings.Builder{}
 	for _, member := range guild.Members {
 		selectedFlag := false
-		for _, permissionID := range permissionIDs {
-			if permissionID.TargetID == member.User.ID && permissionID.TargetType == "user" && permissionID.Type == permission {
+		for _, permissionID := range permissionUserIDs {
+			if permissionID.TargetID == member.User.ID && permissionID.Type == permission {
 				selectedFlag = true
 				break
 			}
@@ -48,8 +67,8 @@ func CreatePermissionSelectForm(guild *discordgo.Guild, permissionIDs []Permissi
 	selectRoleFormBuilder := strings.Builder{}
 	for _, role := range guild.Roles {
 		selectedFlag := false
-		for _, permissionID := range permissionIDs {
-			if permissionID.TargetID == role.ID && permissionID.TargetType == "role" && permissionID.Type == permission {
+		for _, permissionID := range permissionRoleIDs {
+			if permissionID.TargetID == role.ID && permissionID.Type == permission {
 				selectedFlag = true
 				break
 			}

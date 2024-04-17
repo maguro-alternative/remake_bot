@@ -40,7 +40,8 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var permissionJson internal.PermissionJson
 	var permissionCodes []repository.PermissionCode
-	var permissionIDs []repository.PermissionIDAllColumns
+	var permissionUserIDs []repository.PermissionUserIDAllColumns
+	var permissionRoleIDs []repository.PermissionRoleIDAllColumns
 
 	if err := json.NewDecoder(r.Body).Decode(&permissionJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)

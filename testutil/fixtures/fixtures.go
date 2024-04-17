@@ -8,7 +8,8 @@ import (
 
 type Fixture struct {
 	PermissionsCodes          []*PermissionsCode
-	PermissionsIDs            []*PermissionsID
+	PermissionsUserIDs        []*PermissionsUserID
+	PermissionsRoleIDs        []*PermissionsRoleID
 	LinePostDiscordChannels   []*LinePostDiscordChannel
 	LineNgDiscordMessageTypes []*LineNgDiscordMessageType
 	LineNgDiscordIDs          []*LineNgDiscordID

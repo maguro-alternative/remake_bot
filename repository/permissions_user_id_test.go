@@ -23,24 +23,22 @@ func TestRepository_InsertPermissionsID(t *testing.T) {
 		defer tx.RollbackCtx(ctx)
 
 		repo := NewRepository(tx)
-		insertPermissionsID := []PermissionIDAllColumns{
+		insertPermissionsID := []PermissionUserIDAllColumns{
 			{
 				GuildID:    "987654321",
 				Type:       "line_bot",
-				TargetType: "user",
 				TargetID:   "123456789",
 				Permission: "all",
 			},
 		}
-		err = repo.InsertPermissionIDs(ctx, insertPermissionsID)
+		err = repo.InsertPermissionUserIDs(ctx, insertPermissionsID)
 		assert.NoError(t, err)
 
-		var permissionsID PermissionIDAllColumns
+		var permissionsID PermissionUserIDAllColumns
 		err = tx.GetContext(ctx, &permissionsID, "SELECT * FROM permissions_id WHERE guild_id = $1", "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", permissionsID.GuildID)
 		assert.Equal(t, "line_bot", permissionsID.Type)
-		assert.Equal(t, "user", permissionsID.TargetType)
 		assert.Equal(t, "123456789", permissionsID.TargetID)
 		assert.Equal(t, "all", permissionsID.Permission)
 	})
@@ -58,45 +56,39 @@ func TestGetGuildPermissionIDsAllColumns(t *testing.T) {
 
 	f := &fixtures.Fixture{DBv1: tx}
 	f.Build(t,
-		fixtures.NewPermissionsID(ctx, func(p *fixtures.PermissionsID) {
+		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
 			p.TargetID = "123456789"
-			p.TargetType = "user"
 			p.Type = "line_bot"
 			p.Permission = "read"
 		}),
-		fixtures.NewPermissionsID(ctx, func(p *fixtures.PermissionsID) {
+		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
 			p.TargetID = "345678912"
-			p.TargetType = "user"
 			p.Type = "line_bot"
 			p.Permission = "write"
 		}),
-		fixtures.NewPermissionsID(ctx, func(p *fixtures.PermissionsID) {
+		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
 			p.TargetID = "567891234"
-			p.TargetType = "user"
 			p.Type = "line_bot"
 			p.Permission = "all"
 		}),
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからPermissionIDを取得できること", func(t *testing.T) {
-		permissionIDs, err := repo.GetGuildPermissionIDsAllColumns(ctx, "987654321")
+		permissionIDs, err := repo.GetGuildPermissionUserIDsAllColumns(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", permissionIDs[0].GuildID)
 		assert.Equal(t, "line_bot", permissionIDs[0].Type)
-		assert.Equal(t, "user", permissionIDs[0].TargetType)
 		assert.Equal(t, "123456789", permissionIDs[0].TargetID)
 		assert.Equal(t, "read", permissionIDs[0].Permission)
 		assert.Equal(t, "987654321", permissionIDs[1].GuildID)
 		assert.Equal(t, "line_bot", permissionIDs[1].Type)
-		assert.Equal(t, "user", permissionIDs[1].TargetType)
 		assert.Equal(t, "345678912", permissionIDs[1].TargetID)
 		assert.Equal(t, "write", permissionIDs[1].Permission)
 		assert.Equal(t, "987654321", permissionIDs[2].GuildID)
 		assert.Equal(t, "line_bot", permissionIDs[2].Type)
-		assert.Equal(t, "user", permissionIDs[2].TargetType)
 		assert.Equal(t, "567891234", permissionIDs[2].TargetID)
 		assert.Equal(t, "all", permissionIDs[2].Permission)
 	})
@@ -114,40 +106,34 @@ func TestGetPermissionIDs(t *testing.T) {
 
 	f := &fixtures.Fixture{DBv1: tx}
 	f.Build(t,
-		fixtures.NewPermissionsID(ctx, func(p *fixtures.PermissionsID) {
+		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
 			p.TargetID = "123456789"
-			p.TargetType = "user"
 			p.Type = "line_bot"
 			p.Permission = "read"
 		}),
-		fixtures.NewPermissionsID(ctx, func(p *fixtures.PermissionsID) {
+		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
 			p.TargetID = "345678912"
-			p.TargetType = "user"
 			p.Type = "line_bot"
 			p.Permission = "write"
 		}),
-		fixtures.NewPermissionsID(ctx, func(p *fixtures.PermissionsID) {
+		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
 			p.TargetID = "567891234"
-			p.TargetType = "user"
 			p.Type = "line_bot"
 			p.Permission = "all"
 		}),
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからPermissionIDを取得できること", func(t *testing.T) {
-		permissionIDs, err := repo.GetPermissionIDs(ctx, "987654321", "line_bot")
+		permissionIDs, err := repo.GetPermissionUserIDs(ctx, "987654321", "line_bot")
 		assert.NoError(t, err)
 		assert.Equal(t, "123456789", permissionIDs[0].TargetID)
-		assert.Equal(t, "user", permissionIDs[0].TargetType)
 		assert.Equal(t, "read", permissionIDs[0].Permission)
 		assert.Equal(t, "345678912", permissionIDs[1].TargetID)
-		assert.Equal(t, "user", permissionIDs[1].TargetType)
 		assert.Equal(t, "write", permissionIDs[1].Permission)
 		assert.Equal(t, "567891234", permissionIDs[2].TargetID)
-		assert.Equal(t, "user", permissionIDs[2].TargetType)
 		assert.Equal(t, "all", permissionIDs[2].Permission)
 	})
 }
@@ -165,20 +151,19 @@ func TestRepository_DeletePermissionsID(t *testing.T) {
 
 		f := &fixtures.Fixture{DBv1: tx}
 		f.Build(t,
-			fixtures.NewPermissionsID(ctx, func(pi *fixtures.PermissionsID) {
+			fixtures.NewPermissionsUserID(ctx, func(pi *fixtures.PermissionsUserID) {
 				pi.GuildID = "987654321"
 				pi.Type = "line_bot"
-				pi.TargetType = "user"
 				pi.TargetID = "123456789"
 				pi.Permission = "all"
 			}),
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeletePermissionIDs(ctx, "987654321")
+		err = repo.DeletePermissionUserIDs(ctx, "987654321")
 		assert.NoError(t, err)
 
-		var permissionsID PermissionID
+		var permissionsID PermissionUserID
 		err = tx.GetContext(ctx, &permissionsID, "SELECT * FROM permissions_id WHERE guild_id = $1", "987654321")
 		assert.Error(t, err)
 		assert.Empty(t, permissionsID)

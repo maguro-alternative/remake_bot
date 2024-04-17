@@ -27,9 +27,12 @@ type RepositoryFuncMock struct {
 	GetLineBotDefaultChannelIDFunc               func(ctx context.Context, guildID string) (LineBotDefaultChannelID, error)
 	GetLineBotNotClientFunc                      func(ctx context.Context, guildID string) (LineBotNotClient, error)
 	UpdateLineBotFunc                            func(ctx context.Context, lineBot *LineBot) error
-	GetLineNgDiscordIDFunc                       func(ctx context.Context, channelID string) ([]LineNgDiscordID, error)
-	InsertLineNgDiscordIDsFunc                   func(ctx context.Context, lineNgDiscordIDs []LineNgDiscordIDAllCoulmns) error
-	DeleteNotInsertLineNgDiscordIDsFunc          func(ctx context.Context, lineNgDiscordIDs []LineNgDiscordIDAllCoulmns) error
+	GetLineNgDiscordUserIDFunc                   func(ctx context.Context, channelID string) ([]string, error)
+	GetLineNgDiscordRoleIDFunc                   func(ctx context.Context, channelID string) ([]string, error)
+	InsertLineNgDiscordUserIDsFunc               func(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
+	InsertLineNgDiscordRoleIDsFunc               func(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
+	DeleteNotInsertLineNgDiscordUserIDsFunc      func(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
+	DeleteNotInsertLineNgDiscordRoleIDsFunc      func(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
 	InsertLineNgDiscordMessageTypesFunc          func(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
 	DeleteNotInsertLineNgDiscordMessageTypesFunc func(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
 	GetLineNgDiscordMessageTypeFunc              func(ctx context.Context, channelID string) ([]int, error)
@@ -39,10 +42,14 @@ type RepositoryFuncMock struct {
 	GetPermissionCodeFunc                        func(ctx context.Context, guildID, permissionType string) (int64, error)
 	GetPermissionCodesFunc                       func(ctx context.Context, guildID string) ([]PermissionCode, error)
 	UpdatePermissionCodesFunc                    func(ctx context.Context, permissionsCode []PermissionCode) error
-	InsertPermissionIDsFunc                      func(ctx context.Context, permissionsID []PermissionIDAllColumns) error
-	GetGuildPermissionIDsAllColumnsFunc          func(ctx context.Context, guildID string) ([]PermissionIDAllColumns, error)
-	GetPermissionIDsFunc                         func(ctx context.Context, guildID, permissionType string) ([]PermissionID, error)
-	DeletePermissionIDsFunc                      func(ctx context.Context, guildId string) error
+	InsertPermissionUserIDsFunc                  func(ctx context.Context, permissionsUserID []PermissionUserIDAllColumns) error
+	InsertPermissionRoleIDsFunc                  func(ctx context.Context, permissionsRoleID []PermissionRoleIDAllColumns) error
+	GetGuildPermissionUserIDsAllColumnsFunc      func(ctx context.Context, guildID string) ([]PermissionUserIDAllColumns, error)
+	GetGuildPermissionRoleIDsAllColumnsFunc      func(ctx context.Context, guildID string) ([]PermissionRoleIDAllColumns, error)
+	GetPermissionUserIDsFunc                     func(ctx context.Context, guildID, permissionType string) ([]PermissionUserID, error)
+	GetPermissionRoleIDsFunc                     func(ctx context.Context, guildID, permissionType string) ([]PermissionRoleID, error)
+	DeletePermissionUserIDsFunc                  func(ctx context.Context, guildId string) error
+	DeletePermissionRoleIDsFunc                  func(ctx context.Context, guildId string) error
 }
 
 func (r *RepositoryFuncMock) InsertLineBotIv(ctx context.Context, guildId string) error {
@@ -85,16 +92,28 @@ func (r *RepositoryFuncMock) UpdateLineBot(ctx context.Context, lineBot *LineBot
 	return r.UpdateLineBotFunc(ctx, lineBot)
 }
 
-func (r *RepositoryFuncMock) GetLineNgDiscordID(ctx context.Context, channelID string) ([]LineNgDiscordID, error) {
-	return r.GetLineNgDiscordIDFunc(ctx, channelID)
+func (r *RepositoryFuncMock) GetLineNgDiscordUserID(ctx context.Context, channelID string) ([]string, error) {
+	return r.GetLineNgDiscordUserIDFunc(ctx, channelID)
 }
 
-func (r *RepositoryFuncMock) InsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []LineNgDiscordIDAllCoulmns) error {
-	return r.InsertLineNgDiscordIDsFunc(ctx, lineNgDiscordIDs)
+func (r *RepositoryFuncMock) GetLineNgDiscordRoleID(ctx context.Context, channelID string) ([]string, error) {
+	return r.GetLineNgDiscordRoleIDFunc(ctx, channelID)
 }
 
-func (r *RepositoryFuncMock) DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []LineNgDiscordIDAllCoulmns) error {
-	return r.DeleteNotInsertLineNgDiscordIDsFunc(ctx, lineNgDiscordIDs)
+func (r *RepositoryFuncMock) InsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error {
+	return r.InsertLineNgDiscordUserIDsFunc(ctx, lineNgDiscordUserIDs)
+}
+
+func (r *RepositoryFuncMock) InsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error {
+	return r.InsertLineNgDiscordRoleIDsFunc(ctx, lineNgDiscordRoleIDs)
+}
+
+func (r *RepositoryFuncMock) DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error {
+	return r.DeleteNotInsertLineNgDiscordUserIDsFunc(ctx, lineNgDiscordUserIDs)
+}
+
+func (r *RepositoryFuncMock) DeleteNotInsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error {
+	return r.DeleteNotInsertLineNgDiscordRoleIDsFunc(ctx, lineNgDiscordRoleIDs)
 }
 
 func (r *RepositoryFuncMock) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error {
@@ -133,20 +152,36 @@ func (r *RepositoryFuncMock) UpdatePermissionCodes(ctx context.Context, permissi
 	return r.UpdatePermissionCodesFunc(ctx, permissionsCode)
 }
 
-func (r *RepositoryFuncMock) InsertPermissionIDs(ctx context.Context, permissionsID []PermissionIDAllColumns) error {
-	return r.InsertPermissionIDsFunc(ctx, permissionsID)
+func (r *RepositoryFuncMock) InsertPermissionUserIDs(ctx context.Context, permissionsUserID []PermissionUserIDAllColumns) error {
+	return r.InsertPermissionUserIDsFunc(ctx, permissionsUserID)
 }
 
-func (r *RepositoryFuncMock) GetGuildPermissionIDsAllColumns(ctx context.Context, guildID string) ([]PermissionIDAllColumns, error) {
-	return r.GetGuildPermissionIDsAllColumnsFunc(ctx, guildID)
+func (r *RepositoryFuncMock) InsertPermissionRoleIDs(ctx context.Context, permissionsRoleID []PermissionRoleIDAllColumns) error {
+	return r.InsertPermissionRoleIDsFunc(ctx, permissionsRoleID)
 }
 
-func (r *RepositoryFuncMock) GetPermissionIDs(ctx context.Context, guildID, permissionType string) ([]PermissionID, error) {
-	return r.GetPermissionIDsFunc(ctx, guildID, permissionType)
+func (r *RepositoryFuncMock) GetGuildPermissionUserIDsAllColumns(ctx context.Context, guildID string) ([]PermissionUserIDAllColumns, error) {
+	return r.GetGuildPermissionUserIDsAllColumnsFunc(ctx, guildID)
 }
 
-func (r *RepositoryFuncMock) DeletePermissionIDs(ctx context.Context, guildId string) error {
-	return r.DeletePermissionIDsFunc(ctx, guildId)
+func (r *RepositoryFuncMock) GetGuildPermissionRoleIDsAllColumns(ctx context.Context, guildID string) ([]PermissionRoleIDAllColumns, error) {
+	return r.GetGuildPermissionRoleIDsAllColumnsFunc(ctx, guildID)
+}
+
+func (r *RepositoryFuncMock) GetPermissionUserIDs(ctx context.Context, guildID, permissionType string) ([]PermissionUserID, error) {
+	return r.GetPermissionUserIDsFunc(ctx, guildID, permissionType)
+}
+
+func (r *RepositoryFuncMock) GetPermissionRoleIDs(ctx context.Context, guildID, permissionType string) ([]PermissionRoleID, error) {
+	return r.GetPermissionRoleIDsFunc(ctx, guildID, permissionType)
+}
+
+func (r *RepositoryFuncMock) DeletePermissionUserIDs(ctx context.Context, guildId string) error {
+	return r.DeletePermissionUserIDsFunc(ctx, guildId)
+}
+
+func (r *RepositoryFuncMock) DeletePermissionRoleIDs(ctx context.Context, guildId string) error {
+	return r.DeletePermissionRoleIDsFunc(ctx, guildId)
 }
 
 // Repository is an interface for repository.
@@ -161,9 +196,12 @@ type RepositoryFunc interface {
 	GetLineBotDefaultChannelID(ctx context.Context, guildID string) (LineBotDefaultChannelID, error)
 	GetLineBotNotClient(ctx context.Context, guildID string) (LineBotNotClient, error)
 	UpdateLineBot(ctx context.Context, lineBot *LineBot) error
-	GetLineNgDiscordID(ctx context.Context, channelID string) ([]LineNgDiscordID, error)
-	InsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []LineNgDiscordIDAllCoulmns) error
-	DeleteNotInsertLineNgDiscordIDs(ctx context.Context, lineNgDiscordIDs []LineNgDiscordIDAllCoulmns) error
+	GetLineNgDiscordUserID(ctx context.Context, channelID string) ([]string, error)
+	GetLineNgDiscordRoleID(ctx context.Context, channelID string) ([]string, error)
+	InsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
+	InsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
+	DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
+	DeleteNotInsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
 	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
 	DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
 	GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error)
@@ -173,10 +211,14 @@ type RepositoryFunc interface {
 	GetPermissionCode(ctx context.Context, guildID, permissionType string) (int64, error)
 	GetPermissionCodes(ctx context.Context, guildID string) ([]PermissionCode, error)
 	UpdatePermissionCodes(ctx context.Context, permissionsCode []PermissionCode) error
-	InsertPermissionIDs(ctx context.Context, permissionsID []PermissionIDAllColumns) error
-	GetGuildPermissionIDsAllColumns(ctx context.Context, guildID string) ([]PermissionIDAllColumns, error)
-	GetPermissionIDs(ctx context.Context, guildID, permissionType string) ([]PermissionID, error)
-	DeletePermissionIDs(ctx context.Context, guildId string) error
+	InsertPermissionUserIDs(ctx context.Context, permissionsUserID []PermissionUserIDAllColumns) error
+	InsertPermissionRoleIDs(ctx context.Context, permissionsRoleID []PermissionRoleIDAllColumns) error
+	GetGuildPermissionUserIDsAllColumns(ctx context.Context, guildID string) ([]PermissionUserIDAllColumns, error)
+	GetGuildPermissionRoleIDsAllColumns(ctx context.Context, guildID string) ([]PermissionRoleIDAllColumns, error)
+	GetPermissionUserIDs(ctx context.Context, guildID, permissionType string) ([]PermissionUserID, error)
+	GetPermissionRoleIDs(ctx context.Context, guildID, permissionType string) ([]PermissionRoleID, error)
+	DeletePermissionUserIDs(ctx context.Context, guildId string) error
+	DeletePermissionRoleIDs(ctx context.Context, guildId string) error
 }
 
 var (

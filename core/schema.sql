@@ -15,23 +15,39 @@ CREATE TABLE IF NOT EXISTS permissions_code (
 );
 
 /*
-サーバーの権限設定を保存するテーブル
+サーバーのユーザー権限設定を保存するテーブル
 
 カラム:
 
     guild_id (TEXT PRIMARY KEY): サーバーID
     type (TEXT): 権限の種類 (line_post_discord_channel, line_bot, vc, webhook)
-    target_type (TEXT): 対象の種類 (user, role)
-    target_id (TEXT): 対象ID (ユーザーID、ロールID)
+    target_id (TEXT): 対象ID (ユーザーID)
     permission (TEXT): 権限レベル(read, write, admin)
 */
-CREATE TABLE IF NOT EXISTS permissions_id (
+CREATE TABLE IF NOT EXISTS permissions_user_id (
     guild_id TEXT NOT NULL,
     type TEXT NOT NULL,
-    target_type TEXT NOT NULL,
     target_id TEXT NOT NULL,
     permission TEXT NOT NULL,
-    PRIMARY KEY(guild_id, type, target_type, target_id)
+    PRIMARY KEY(guild_id, type, target_id)
+);
+
+/*
+サーバーのロール権限設定を保存するテーブル
+
+カラム:
+
+    guild_id (TEXT PRIMARY KEY): サーバーID
+    type (TEXT): 権限の種類 (line_post_discord_channel, line_bot, vc, webhook)
+    target_id (TEXT): 対象ID (ロールID)
+    permission (TEXT): 権限レベル(read, write, admin)
+*/
+CREATE TABLE IF NOT EXISTS permissions_role_id (
+    guild_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    target_id TEXT NOT NULL,
+    permission TEXT NOT NULL,
+    PRIMARY KEY(guild_id, type, target_id)
 );
 
 /*
@@ -110,20 +126,36 @@ CREATE TABLE IF NOT EXISTS vc_signal_channel (
 );
 
 /*
-指定されたユーザー、ロールがボイスチャンネルに参加した場合通知しない
+指定されたユーザーがボイスチャンネルに参加した場合通知しない
 
 カラム:
 
     vc_channel_id (TEXT): ボイスチャンネルID
     guild_id (TEXT): サーバーID
-    id_type (TEXT PRIMARY KEY): ユーザーIDの種類 (user, role)
     id (TEXT): ID
 */
 
-CREATE TABLE IF NOT EXISTS vc_signal_ng_id (
+CREATE TABLE IF NOT EXISTS vc_signal_ng_member_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
-    id_type TEXT NOT NULL,
+    id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, id)
+);
+
+/*
+指定されたロールがボイスチャンネルに参加した場合通知しない
+
+カラム:
+
+    vc_channel_id (TEXT): ボイスチャンネルID
+    guild_id (TEXT): サーバーID
+    id (TEXT): ID
+*/
+
+
+CREATE TABLE IF NOT EXISTS vc_signal_ng_role_id (
+    vc_channel_id TEXT NOT NULL,
+    guild_id TEXT NOT NULL,
     id TEXT NOT NULL,
     PRIMARY KEY(vc_channel_id, id)
 );

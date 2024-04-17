@@ -82,7 +82,10 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordIDFunc: func(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error) {
+				GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+					return nil, nil
+				},
+				GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return nil, nil
 				},
 				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
@@ -144,7 +147,10 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordIDFunc: func(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error) {
+				GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+					return nil, nil
+				},
+				GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return nil, nil
 				},
 				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
@@ -212,13 +218,11 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordIDFunc: func(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error) {
-					return []repository.LineNgDiscordID{
-						{
-							ID:     "userID",
-							IDType: "user",
-						},
-					}, nil
+				GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+					return []string{"userID"}, nil
+				},
+				GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+					return []string{"roleID"}, nil
 				},
 				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return *lineBot, nil
@@ -317,7 +321,10 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordIDFunc: func(ctx context.Context, channelID string) ([]repository.LineNgDiscordID, error) {
+				GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+					return nil, nil
+				},
+				GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return nil, nil
 				},
 				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {

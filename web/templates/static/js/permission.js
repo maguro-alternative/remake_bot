@@ -72,5 +72,4 @@ document.getElementById('form').onsubmit = async function (event) {
             alert('設定の保存に失敗しました');
         }
     });
-
 }

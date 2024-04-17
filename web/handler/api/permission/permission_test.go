@@ -20,12 +20,19 @@ import (
 
 func TestPermissionHandler_ServeHTTP(t *testing.T) {
 	bodyJson, err := json.Marshal(internal.PermissionJson{
-		PermissionIDs: []internal.PermissionID{
+		PermissionUserIDs: []internal.PermissionID{
 			{
 				GuildID:    "987654321",
 				Type:       "line_bot",
-				TargetType: "user",
 				TargetID:   "123456789",
+				Permission: "all",
+			},
+		},
+		PermissionRoleIDs: []internal.PermissionID{
+			{
+				GuildID:    "987654321",
+				Type:       "line_bot",
+				TargetID:   "987654321",
 				Permission: "all",
 			},
 		},
@@ -82,10 +89,16 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 				UpdatePermissionCodesFunc: func(ctx context.Context, permissionsCode []repository.PermissionCode) error {
 					return nil
 				},
-				DeletePermissionIDsFunc: func(ctx context.Context, guildId string) error {
+				DeletePermissionUserIDsFunc: func(ctx context.Context, guildId string) error {
 					return nil
 				},
-				InsertPermissionIDsFunc: func(ctx context.Context, permissionsID []repository.PermissionIDAllColumns) error {
+				InsertPermissionUserIDsFunc: func(ctx context.Context, permissionsID []repository.PermissionUserIDAllColumns) error {
+					return nil
+				},
+				DeletePermissionRoleIDsFunc: func(ctx context.Context, guildId string) error {
+					return nil
+				},
+				InsertPermissionRoleIDsFunc: func(ctx context.Context, permissionsID []repository.PermissionRoleIDAllColumns) error {
 					return nil
 				},
 			},

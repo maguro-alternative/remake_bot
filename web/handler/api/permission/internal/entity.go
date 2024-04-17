@@ -5,9 +5,10 @@ import (
 )
 
 type PermissionJson struct {
-	GuildID         string           `json:"guild_id"`
-	PermissionCodes []PermissionCode `json:"permission_codes"`
-	PermissionIDs   []PermissionID   `json:"permission_ids"`
+	GuildID           string           `json:"guild_id"`
+	PermissionCodes   []PermissionCode `json:"permission_codes"`
+	PermissionUserIDs []PermissionID   `json:"permission_user_ids"`
+	PermissionRoleIDs []PermissionID   `json:"permission_role_ids"`
 }
 
 func (g PermissionJson) Validate() error {
@@ -25,7 +26,6 @@ type PermissionCode struct {
 type PermissionID struct {
 	GuildID    string `json:"guild_id"`
 	Type       string `json:"type"`
-	TargetType string `json:"target_type"`
 	TargetID   string `json:"target_id"`
 	Permission string `json:"permission"`
 }

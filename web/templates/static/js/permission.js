@@ -13,7 +13,8 @@ document.getElementById('form').onsubmit = async function (event) {
     let permissionName;
     let jsonTmp = {
         "permission_codes": [],
-        "permission_ids": [],
+        "permission_user_ids": [],
+        "permission_role_ids": [],
     };
     console.log(formElements)
     // 各formのkeyを取得
@@ -31,10 +32,9 @@ document.getElementById('form').onsubmit = async function (event) {
             permissionName = formKey.substr(0, formKey.indexOf('_member_permission_id'));
             for (let user of formData.getAll(formKey)) {
                 console.log(user);
-                jsonTmp['permission_ids'].push({
+                jsonTmp['permission_user_ids'].push({
                     "guild_id": guildId,
                     "type": permissionName,
-                    "target_type": "user",
                     "target_id": user,
                     "permission": "all"
                 })
@@ -42,10 +42,9 @@ document.getElementById('form').onsubmit = async function (event) {
         } else if (formKey.includes('role_permission_id')) {
             permissionName = formKey.substr(0, formKey.indexOf('_role_permission_id'));
             for (let role of formData.getAll(formKey)) {
-                jsonTmp['permission_ids'].push({
+                jsonTmp['permission_role_ids'].push({
                     "guild_id": guildId,
                     "type": permissionName,
-                    "target_type": "role",
                     "target_id": role,
                     "permission": "all"
                 })

@@ -62,11 +62,19 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	for _, permissionID := range permissionJson.PermissionIDs {
-		permissionIDs = append(permissionIDs, repository.PermissionIDAllColumns{
+	for _, permissionID := range permissionJson.PermissionUserIDs {
+		permissionUserIDs = append(permissionUserIDs, repository.PermissionUserIDAllColumns{
 			GuildID:    guildId,
 			Type:       permissionID.Type,
-			TargetType: permissionID.TargetType,
+			TargetID:   permissionID.TargetID,
+			Permission: permissionID.Permission,
+		})
+	}
+
+	for _, permissionID := range permissionJson.PermissionRoleIDs {
+		permissionRoleIDs = append(permissionRoleIDs, repository.PermissionRoleIDAllColumns{
+			GuildID:    guildId,
+			Type:       permissionID.Type,
 			TargetID:   permissionID.TargetID,
 			Permission: permissionID.Permission,
 		})
@@ -78,17 +86,30 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.Repo.DeletePermissionIDs(ctx, guildId); err != nil {
+	if err := h.Repo.DeletePermissionUserIDs(ctx, guildId); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの削除に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	if err := h.Repo.InsertPermissionIDs(ctx, permissionIDs); err != nil {
+	if err := h.Repo.InsertPermissionUserIDs(ctx, permissionUserIDs); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの追加に失敗しました。", "エラー:", err.Error())
 		return
 	}
+
+	if err := h.Repo.DeletePermissionRoleIDs(ctx, guildId); err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "パーミッションの削除に失敗しました。", "エラー:", err.Error())
+		return
+	}
+
+	if err := h.Repo.InsertPermissionRoleIDs(ctx, permissionRoleIDs); err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "パーミッションの追加に失敗しました。", "エラー:", err.Error())
+		return
+	}
+
 
 	w.WriteHeader(http.StatusOK)
 }

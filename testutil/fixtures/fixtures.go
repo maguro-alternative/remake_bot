@@ -12,7 +12,8 @@ type Fixture struct {
 	PermissionsRoleIDs        []*PermissionsRoleID
 	LinePostDiscordChannels   []*LinePostDiscordChannel
 	LineNgDiscordMessageTypes []*LineNgDiscordMessageType
-	LineNgDiscordIDs          []*LineNgDiscordID
+	LineNgDiscordUserIDs      []*LineNgDiscordUserID
+	LineNgDiscordRoleIDs      []*LineNgDiscordRoleID
 	LineBots                  []*LineBot
 	LineBotIvs                []*LineBotIv
 	VcSignalChannels          []*VcSignalChannel

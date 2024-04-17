@@ -30,7 +30,7 @@ func (r *Repository) GetLineNgDiscordRoleID(ctx context.Context, channelID strin
 		WHERE
 			channel_id = $1
 	`
-	err := r.db.GetContext(ctx, &ngIDs, query, channelID)
+	err := r.db.SelectContext(ctx, &ngIDs, query, channelID)
 	return ngIDs, err
 }
 

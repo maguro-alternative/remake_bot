@@ -30,16 +30,14 @@ func (r *Repository) InsertPermissionUserIDs(ctx context.Context, permissionsID 
 		INSERT INTO permissions_user_id (
 			guild_id,
 			type,
-			target_type,
 			target_id,
 			permission
 		) VALUES (
 			:guild_id,
 			:type,
-			:target_type,
 			:target_id,
 			:permission
-		) ON CONFLICT (guild_id, type, target_type, target_id) DO NOTHING
+		) ON CONFLICT (guild_id, type, target_id) DO NOTHING
 	`
 	for _, permissionID := range permissionsID {
 		_, err := r.db.NamedExecContext(ctx, query, permissionID)
@@ -68,7 +66,6 @@ func (r *Repository) GetPermissionUserIDs(ctx context.Context, guildID, permissi
 	var permissionIDs []PermissionUserID
 	query := `
 		SELECT
-			target_type,
 			target_id,
 			permission
 		FROM

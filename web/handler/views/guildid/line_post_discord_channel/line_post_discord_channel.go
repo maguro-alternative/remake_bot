@@ -229,7 +229,7 @@ func createCategoryInChannels(
 	}
 	ngDiscordRoleIDs, err := repo.GetLineNgDiscordRoleID(ctx, channel.ID)
 	if err != nil {
-		slog.ErrorContext(ctx, "line_ng_discord_idの読み取りに失敗しました:"+err.Error())
+		slog.ErrorContext(ctx, "line_ng_discord_role_idの読み取りに失敗しました:"+err.Error())
 		return err
 	}
 	channelsInCategory[categoryPosition.ID][channel.Position] = internal.DiscordChannelSet{

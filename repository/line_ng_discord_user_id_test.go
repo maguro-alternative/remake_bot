@@ -23,10 +23,9 @@ func TestGetLineNgDiscordUserID(t *testing.T) {
 
 	f := &fixtures.Fixture{DBv1: tx}
 	f.Build(t,
-		fixtures.NewLineNgDiscordID(ctx, func(lng *fixtures.LineNgDiscordID) {
+		fixtures.NewLineNgDiscordUserID(ctx, func(lng *fixtures.LineNgDiscordUserID) {
 			lng.ChannelID = "987654321"
 			lng.GuildID = "123456789"
-			lng.IDType = "user"
 			lng.ID = "123456789"
 		}),
 	)
@@ -49,7 +48,7 @@ func TestRepository_InsertLineNgDiscordUserIDs(t *testing.T) {
 
 		defer tx.RollbackCtx(ctx)
 
-		tx.ExecContext(ctx, "DELETE FROM line_ng_discord_id")
+		tx.ExecContext(ctx, "DELETE FROM line_ng_discord_user_id")
 
 		repo := NewRepository(tx)
 		lineNgDiscordIDs := []LineNgDiscordUserIDAllCoulmns{
@@ -73,7 +72,7 @@ func TestRepository_InsertLineNgDiscordUserIDs(t *testing.T) {
 		assert.NoError(t, err)
 
 		var lineChannelCount int
-		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_ng_discord_id")
+		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_ng_discord_user_id")
 		assert.NoError(t, err)
 
 		assert.Equal(t, 3, lineChannelCount)
@@ -91,24 +90,21 @@ func TestRepository_DeleteLineNgDiscordUserIDs(t *testing.T) {
 
 		defer tx.RollbackCtx(ctx)
 
-		tx.ExecContext(ctx, "DELETE FROM line_ng_discord_id")
+		tx.ExecContext(ctx, "DELETE FROM line_ng_discord_user_id")
 
 		f := &fixtures.Fixture{DBv1: tx}
 		f.Build(t,
-			fixtures.NewLineNgDiscordID(ctx, func(lnt *fixtures.LineNgDiscordID) {
+			fixtures.NewLineNgDiscordUserID(ctx, func(lnt *fixtures.LineNgDiscordUserID) {
 				lnt.ChannelID = "123456789"
 				lnt.ID = "123456789"
-				lnt.IDType = "user"
 			}),
-			fixtures.NewLineNgDiscordID(ctx, func(lnt *fixtures.LineNgDiscordID) {
+			fixtures.NewLineNgDiscordUserID(ctx, func(lnt *fixtures.LineNgDiscordUserID) {
 				lnt.ChannelID = "123456789"
 				lnt.ID = "987654321"
-				lnt.IDType = "user"
 			}),
-			fixtures.NewLineNgDiscordID(ctx, func(lnt *fixtures.LineNgDiscordID) {
+			fixtures.NewLineNgDiscordUserID(ctx, func(lnt *fixtures.LineNgDiscordUserID) {
 				lnt.ChannelID = "987654321"
 				lnt.ID = "123456789"
-				lnt.IDType = "user"
 			}),
 		)
 
@@ -128,7 +124,7 @@ func TestRepository_DeleteLineNgDiscordUserIDs(t *testing.T) {
 		assert.NoError(t, err)
 
 		var lineChannelCount int
-		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_ng_discord_id")
+		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_ng_discord_user_id")
 		assert.NoError(t, err)
 
 		assert.Equal(t, 2, lineChannelCount)

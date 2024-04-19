@@ -11,12 +11,12 @@ import (
 )
 
 type DiscordOAuth2Handler struct {
-	DiscordOAuth2Service *service.DiscordOAuth2Service
+	indexService *service.IndexService
 }
 
-func NewDiscordOAuth2Handler(discordOAuth2Service *service.DiscordOAuth2Service) *DiscordOAuth2Handler {
+func NewDiscordOAuth2Handler(indexService *service.IndexService) *DiscordOAuth2Handler {
 	return &DiscordOAuth2Handler{
-		DiscordOAuth2Service: discordOAuth2Service,
+		indexService: indexService,
 	}
 }
 
@@ -26,7 +26,7 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	sessionStore, err := session.NewSessionStore(r, h.DiscordOAuth2Service.CookieStore, config.SessionSecret())
+	sessionStore, err := session.NewSessionStore(r, h.indexService.CookieStore, config.SessionSecret())
 	if err != nil {
 		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -40,7 +40,7 @@ func (h *DiscordOAuth2Handler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = sessionStore.StoreSave(r, w, h.DiscordOAuth2Service.CookieStore)
+	err = sessionStore.StoreSave(r, w, h.indexService.CookieStore)
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの初期化に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

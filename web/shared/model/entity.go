@@ -11,6 +11,14 @@ type DiscordOAuthSession struct {
 	User  DiscordUser
 }
 
+type DiscordToken struct {
+	AccessToken  string `json:"access_token"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int    `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	Scope        string `json:"scope"`
+}
+
 type DiscordUser struct {
 	ID               string `json:"id"`
 	Username         string `json:"username"`

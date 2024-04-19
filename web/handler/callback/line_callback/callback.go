@@ -78,6 +78,11 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		slog.ErrorContext(ctx, "stateが一致しません。")
 		sessionStore.CleanupLineState()
 		err = sessionStore.StoreSave(r, w, h.svc.CookieStore)
+		if err != nil {
+			slog.ErrorContext(ctx, "セッションの保存に失敗しました。", "エラー:", err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

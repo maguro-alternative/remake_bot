@@ -3,7 +3,6 @@ package web
 import (
 	"encoding/gob"
 	"net/http"
-	"strings"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 
@@ -33,8 +32,6 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 
-	"golang.org/x/oauth2"
-
 	"github.com/bwmarrin/discordgo"
 	"github.com/gorilla/sessions"
 	"github.com/justinas/alice"
@@ -53,18 +50,6 @@ func NewWebRouter(
 	client *http.Client,
 	discordSession *discordgo.Session,
 ) {
-	scopes := config.DiscordScopes()
-	conf := &oauth2.Config{
-		ClientID:     config.DiscordClientID(),
-		ClientSecret: config.DiscordClientSecret(),
-		Scopes:       strings.Split(scopes, "%20"),
-		Endpoint: oauth2.Endpoint{
-			AuthURL:  "https://discord.com/api/oauth2/authorize",
-			TokenURL: "https://discord.com/api/oauth2/token",
-		},
-		RedirectURL: config.ServerUrl() + "/callback/discord-callback/",
-	}
-
 	repo := repository.NewRepository(indexDB)
 
 	// セッションストアを作成します。
@@ -76,11 +61,6 @@ func NewWebRouter(
 		cookieStore,
 		discordSession,
 		discordSession.State,
-	)
-	var discordOAuth2Service = service.NewDiscordOAuth2Service(
-		conf,
-		cookieStore,
-		discordSession,
 	)
 
 	// register routes
@@ -117,11 +97,11 @@ func NewWebRouter(
 	mux.Handle("/group/{guildId}", lineLoginRequiredChain.ThenFunc(groupView.NewLineGroupViewHandler(indexService, repo).Index))
 
 	mux.Handle("/api/line-bot", middleChain.Then(linebot.NewLineBotHandler(indexService, repo)))
-	mux.Handle("/login/discord", middleChain.Then(discordLogin.NewDiscordOAuth2Handler(discordOAuth2Service)))
-	mux.Handle("/logout/discord", middleChain.Then(discordLogout.NewDiscordOAuth2Handler(discordOAuth2Service)))
+	mux.Handle("/login/discord", middleChain.Then(discordLogin.NewDiscordOAuth2Handler(indexService)))
+	mux.Handle("/logout/discord", middleChain.Then(discordLogout.NewDiscordOAuth2Handler(indexService)))
 	mux.Handle("/login/line/{guildId}", middleChain.ThenFunc(lineLogin.NewLineLoginHandler(indexService, repo).LineLogin))
 	mux.Handle("/logout/line", middleChain.Then(lineLogout.NewLineLogoutHandler(indexService)))
-	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(discordOAuth2Service)))
+	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(indexService)))
 	mux.Handle("/callback/line-callback/", middleChain.Then(lineCallback.NewLineCallbackHandler(indexService, repo)))
 	mux.Handle("/api/{guildId}/group", lineMiddleChain.Then(group.NewLineGroupHandler(indexService, repo)))
 	mux.Handle("/api/{guildId}/permission", discordMiddleChain.Then(permission.NewPermissionHandler(indexService, repo)))

@@ -3,9 +3,12 @@ package discordcallback
 import (
 	"context"
 	"encoding/json"
+	"encoding/gob"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -13,11 +16,15 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
 
-type DiscordCallbackHandler struct {
-	svc *service.DiscordOAuth2Service
+func init(){
+	gob.Register(&model.DiscordUser{})
 }
 
-func NewDiscordCallbackHandler(svc *service.DiscordOAuth2Service) *DiscordCallbackHandler {
+type DiscordCallbackHandler struct {
+	svc *service.IndexService
+}
+
+func NewDiscordCallbackHandler(svc *service.IndexService) *DiscordCallbackHandler {
 	return &DiscordCallbackHandler{
 		svc: svc,
 	}
@@ -57,18 +64,18 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	sessionStore.CleanupDiscordState()
 	// 1. 認可ページのURL
 	code := r.URL.Query().Get("code")
-	conf := h.svc.OAuth2Conf
+	//conf := h.svc.OAuth2Conf
 	// 2. アクセストークンの取得
-	token, err := conf.Exchange(ctx, code)
+	token, cleanupTokenBody, err := getToken(ctx, h.svc.Client, code, config.DiscordClientID(), config.DiscordClientSecret())
 	if err != nil {
 		slog.ErrorContext(ctx, "アクセストークンの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	defer cleanupTokenBody()
 	sessionStore.SetDiscordOAuthToken(token.AccessToken)
 	// 3. ユーザー情報の取得
-	client := conf.Client(ctx, token)
-	resp, err := client.Get("https://discord.com/api/users/@me")
+	resp, err := h.svc.Client.Get("https://discord.com/api/users/@me")
 	if err != nil {
 		slog.ErrorContext(ctx, "ユーザー情報の取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -99,3 +106,32 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	// 4. ログイン後のページに遷移
 	http.Redirect(w, r, "/guilds", http.StatusFound)
 }
+
+func getToken(ctx context.Context, client *http.Client, code, clientID, clientSecret string) (*model.DiscordToken, func(), error) {
+	u, err := url.ParseRequestURI("https://discord.com/api/oauth2/token")
+	if err != nil {
+		return nil, func() {}, err
+	}
+	form := url.Values{}
+	form.Add("grant_type", "authorization_code")
+	form.Add("code", code)
+	form.Add("redirect_uri", config.ServerUrl()+"/callback/discord-callback/")
+	form.Add("client_id", clientID)
+	form.Add("client_secret", clientSecret)
+	body := strings.NewReader(form.Encode())
+	req, err := http.NewRequestWithContext(ctx, "POST", u.String(), body)
+	if err != nil {
+		return nil, func() {}, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, func() {}, err
+	}
+	var token model.DiscordToken
+	if err := json.NewDecoder(resp.Body).Decode(&token); err != nil {
+		return nil, func() {}, err
+	}
+	return &token, func() { resp.Body.Close() }, nil
+}
+

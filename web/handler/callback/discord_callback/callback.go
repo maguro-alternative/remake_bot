@@ -2,8 +2,8 @@ package discordcallback
 
 import (
 	"context"
-	"encoding/json"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -16,7 +16,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
 
-func init(){
+func init() {
 	gob.Register(&model.DiscordUser{})
 }
 
@@ -74,8 +74,14 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	}
 	defer cleanupTokenBody()
 	sessionStore.SetDiscordOAuthToken(token.AccessToken)
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://discord.com/api/users/@me", nil)
+	if err != nil {
+		http.Error(w, "Not get user", http.StatusInternalServerError)
+		return
+	}
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
 	// 3. ユーザー情報の取得
-	resp, err := h.svc.Client.Get("https://discord.com/api/users/@me")
+	resp, err := h.svc.Client.Do(req)
 	if err != nil {
 		slog.ErrorContext(ctx, "ユーザー情報の取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -134,4 +140,3 @@ func getToken(ctx context.Context, client *http.Client, code, clientID, clientSe
 	}
 	return &token, func() { resp.Body.Close() }, nil
 }
-

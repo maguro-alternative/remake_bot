@@ -236,4 +236,70 @@ func TestLineLogin(t *testing.T) {
 
 		assert.Equal(t, http.StatusSeeOther, rr.Code)
 	})
+
+	t.Run("test LineLogin with session store creation error", func(t *testing.T) {
+		// Mocking the necessary dependencies
+		h := NewLineLoginHandler(
+			&service.IndexService{
+				CookieStore: sessions.NewCookieStore([]byte("")),
+			},
+			&repository.RepositoryFuncMock{
+				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+					return repository.LineBot{
+							GuildID:          "111",
+							LineNotifyToken:  pq.ByteaArray{lineNotifyStr},
+							LineBotToken:     pq.ByteaArray{lineBotStr},
+							LineBotSecret:    pq.ByteaArray{lineBotSecretStr},
+							LineGroupID:      pq.ByteaArray{lineGroupStr},
+							LineClientID:     pq.ByteaArray{lineClientID},
+							LineClientSecret: pq.ByteaArray{lineClientSecret},
+					}, nil
+				},
+				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+					return repository.LineBotIv{
+						LineNotifyTokenIv:  pq.ByteaArray{decodeNotifyToken},
+						LineBotTokenIv:     pq.ByteaArray{decodeBotToken},
+						LineBotSecretIv:    pq.ByteaArray{decodeBotSecret},
+						LineGroupIDIv:      pq.ByteaArray{decodeGroupID},
+						LineClientIDIv:     pq.ByteaArray{decodeClientID},
+						LineClientSecretIv: pq.ByteaArray{decodeClientSecret},
+					}, nil
+				},
+			},
+		)
+
+		req, err := http.NewRequest("GET", "/login/line/111", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(h.LineLogin)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("test LineLogin with repository error", func(t *testing.T) {
+		// Mocking the necessary dependencies
+		h := NewLineLoginHandler(
+			&service.IndexService{
+				CookieStore: cookieStore,
+			},
+			&repository.RepositoryFuncMock{
+				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+					return repository.LineBot{}, errors.New("failed to get all columns of line bots")
+				},
+			},
+		)
+
+		req, err := http.NewRequest("GET", "/login/line/111", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(h.LineLogin)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
 }

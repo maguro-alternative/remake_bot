@@ -2,6 +2,7 @@ package linelogin
 
 import (
 	"context"
+	"errors"
 	"encoding/base64"
 	"encoding/hex"
 	"io"
@@ -12,10 +13,11 @@ import (
 	"testing"
 
 	"github.com/maguro-alternative/remake_bot/repository"
-	"errors"
 
+	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 
+	"github.com/gorilla/sessions"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -88,8 +90,8 @@ func TestIndex(t *testing.T) {
 		assert.NoError(t, err)
 
 		rr := httptest.NewRecorder()
-		handler := &LineLoginHandler{
-			IndexService: &service.IndexService{
+		handler := NewLineLoginHandler(
+			&service.IndexService{
 				Client: newStubHttpClient(func(req *http.Request) *http.Response {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -106,7 +108,7 @@ func TestIndex(t *testing.T) {
 					}
 				}),
 			},
-			Repo: &repository.RepositoryFuncMock{
+			&repository.RepositoryFuncMock{
 				GetAllColumnsLineBotsFunc: func(ctx context.Context) ([]*repository.LineBot, error) {
 					return []*repository.LineBot{
 						{
@@ -131,7 +133,7 @@ func TestIndex(t *testing.T) {
 					}, nil
 				},
 			},
-		}
+		)
 
 		handler.Index(rr, req)
 
@@ -143,13 +145,14 @@ func TestIndex(t *testing.T) {
 		assert.NoError(t, err)
 
 		rr := httptest.NewRecorder()
-		handler := &LineLoginHandler{
-			Repo: &repository.RepositoryFuncMock{
+		handler := NewLineLoginHandler(
+			&service.IndexService{},
+			&repository.RepositoryFuncMock{
 				GetAllColumnsLineBotsFunc: func(ctx context.Context) ([]*repository.LineBot, error) {
 					return nil, errors.New("failed to get all columns of line bots")
 				},
 			},
-		}
+		)
 
 		handler.Index(rr, req)
 
@@ -157,4 +160,80 @@ func TestIndex(t *testing.T) {
 	})
 
 	// Add more tests here for other error conditions
+}
+
+func TestLineLogin(t *testing.T) {
+	cookieStore := sessions.NewCookieStore([]byte(config.SessionSecret()))
+
+	decodeNotifyToken, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
+	assert.NoError(t, err)
+	lineNotifyStr, err := base64.StdEncoding.DecodeString(string([]byte("X+P6kmO6DnEjM3TVqXkwNA==")))
+	assert.NoError(t, err)
+
+	decodeBotToken, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
+	assert.NoError(t, err)
+	lineBotStr, err := base64.StdEncoding.DecodeString(string([]byte("uy2qtvYTnSoB5qIntwUdVQ==")))
+	assert.NoError(t, err)
+
+	decodeBotSecret, err := hex.DecodeString("0ffa8ed72efcb5f1d834e4ce8463a62c")
+	assert.NoError(t, err)
+	lineBotSecretStr, err := base64.StdEncoding.DecodeString(string([]byte("i2uHQCyn58wRR/b03fRw6w==")))
+	assert.NoError(t, err)
+
+	decodeGroupID, err := hex.DecodeString("e14db710b23520766fd652c0f19d437a")
+	assert.NoError(t, err)
+	lineGroupStr, err := base64.StdEncoding.DecodeString(string([]byte("YgexFQQlLcaXmsw9mFN35Q==")))
+	assert.NoError(t, err)
+
+	decodeClientID, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
+	assert.NoError(t, err)
+	lineClientID, err := base64.StdEncoding.DecodeString(string([]byte("X+P6kmO6DnEjM3TVqXkwNA==")))
+	assert.NoError(t, err)
+
+	decodeClientSecret, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
+	assert.NoError(t, err)
+	lineClientSecret, err := base64.StdEncoding.DecodeString(string([]byte("uy2qtvYTnSoB5qIntwUdVQ==")))
+	assert.NoError(t, err)
+
+	t.Run("test successful LineLogin", func(t *testing.T) {
+		// Mocking the necessary dependencies
+		h := NewLineLoginHandler(
+			&service.IndexService{
+				CookieStore: cookieStore,
+			},
+			&repository.RepositoryFuncMock{
+				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+					return repository.LineBot{
+							GuildID:          "111",
+							LineNotifyToken:  pq.ByteaArray{lineNotifyStr},
+							LineBotToken:     pq.ByteaArray{lineBotStr},
+							LineBotSecret:    pq.ByteaArray{lineBotSecretStr},
+							LineGroupID:      pq.ByteaArray{lineGroupStr},
+							LineClientID:     pq.ByteaArray{lineClientID},
+							LineClientSecret: pq.ByteaArray{lineClientSecret},
+					}, nil
+				},
+				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+					return repository.LineBotIv{
+						LineNotifyTokenIv:  pq.ByteaArray{decodeNotifyToken},
+						LineBotTokenIv:     pq.ByteaArray{decodeBotToken},
+						LineBotSecretIv:    pq.ByteaArray{decodeBotSecret},
+						LineGroupIDIv:      pq.ByteaArray{decodeGroupID},
+						LineClientIDIv:     pq.ByteaArray{decodeClientID},
+						LineClientSecretIv: pq.ByteaArray{decodeClientSecret},
+					}, nil
+				},
+			},
+		)
+
+		req, err := http.NewRequest("GET", "/login/line/111", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(h.LineLogin)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusSeeOther, rr.Code)
+	})
 }

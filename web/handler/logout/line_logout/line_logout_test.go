@@ -1,7 +1,6 @@
 package linelogout
 
 import (
-    //"context"
     "net/http"
     "net/http/httptest"
     "testing"

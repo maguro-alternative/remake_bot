@@ -1,7 +1,6 @@
 package discordlogout
 
 import (
-	//"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -41,6 +40,11 @@ func TestServeHTTP(t *testing.T) {
         handlerFunc.ServeHTTP(rr, req)
 
         assert.Equal(t, http.StatusSeeOther, rr.Code, "Expected response code to be 303")
+
+		_, err = sessionStore.GetDiscordUser()
+		assert.Error(t, err)
+		_, err = sessionStore.GetDiscordOAuthToken()
+		assert.Error(t, err)
     })
 
     t.Run("Test with Internal Server Error", func(t *testing.T) {

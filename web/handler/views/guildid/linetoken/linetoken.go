@@ -194,7 +194,7 @@ func createChannelsInCategory(
 	categoryPosition := categoryPositions[channel.ParentID]
 	// まだチャンネルがない場合は初期化
 	if len(channelsInCategory[categoryPosition.ID]) == 0 {
-		channelsInCategory[categoryPosition.ID] = make([]components.DiscordChannelSelect, len(guild.Channels)-2, len(guild.Channels))
+		channelsInCategory[categoryPosition.ID] = make([]components.DiscordChannelSelect, len(guild.Channels)+1)
 	}
 	channelsInCategory[categoryPosition.ID][channel.Position] = components.DiscordChannelSelect{
 		ID:   channel.ID,

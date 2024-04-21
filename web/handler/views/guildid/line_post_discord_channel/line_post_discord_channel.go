@@ -200,7 +200,7 @@ func createCategoryInChannels(
 	}
 	categoryPosition := categoryPositions[channel.ParentID]
 	if len(channelsInCategory[categoryPosition.ID]) == 0 {
-		channelsInCategory[categoryPosition.ID] = make([]internal.DiscordChannelSet, len(guild.Channels)-2, len(guild.Channels))
+		channelsInCategory[categoryPosition.ID] = make([]internal.DiscordChannelSet, len(guild.Channels)+1)
 	}
 	discordChannel, err := repo.GetLinePostDiscordChannel(ctx, channel.ID)
 	if err != nil && err.Error() != "sql: no rows in result set" {
@@ -239,11 +239,7 @@ func createCategoryInChannels(
 		BotMessage: discordChannel.BotMessage,
 		NgTypes:    ngTypes,
 	}
-	for _, ngDiscordID := range ngDiscordUserIDs {
-		channelsInCategory[categoryPosition.ID][channel.Position].NgUsers = append(channelsInCategory[categoryPosition.ID][channel.Position].NgUsers, ngDiscordID)
-	}
-	for _, ngDiscordID := range ngDiscordRoleIDs {
-		channelsInCategory[categoryPosition.ID][channel.Position].NgRoles = append(channelsInCategory[categoryPosition.ID][channel.Position].NgRoles, ngDiscordID)
-	}
+	channelsInCategory[categoryPosition.ID][channel.Position].NgUsers = append(channelsInCategory[categoryPosition.ID][channel.Position].NgUsers, ngDiscordUserIDs...)
+	channelsInCategory[categoryPosition.ID][channel.Position].NgRoles = append(channelsInCategory[categoryPosition.ID][channel.Position].NgRoles, ngDiscordRoleIDs...)
 	return nil
 }

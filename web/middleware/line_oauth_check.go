@@ -62,6 +62,7 @@ func LineOAuthCheckMiddleware(
 				return
 			}
 
+			// 認証情報が必要ないかつ、認証情報がない場合
 			if lineUser == nil {
 				lineLoginUser = &model.LineOAuthSession{
 					User: model.LineIdTokenUser{},
@@ -136,6 +137,7 @@ func LineOAuthCheckMiddleware(
 			lineProfile, err = lineRequ.GetProfileInGroup(ctx, lineLoginUser.User.Sub)
 			if err != nil && loginRequiredFlag {
 				slog.ErrorContext(ctx, "LineProfileの取得に失敗しました", "エラー:", err.Error())
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 			ctx = ctxvalue.ContextWithLineProfile(ctx, &lineProfile)

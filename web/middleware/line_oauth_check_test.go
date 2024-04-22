@@ -252,4 +252,74 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 		assert.Equal(t, http.StatusFound, w.Code)
 	})
 
+	t.Run("グループに所属していない場合へージを表示しないこと", func(t *testing.T) {
+		user := &model.LineIdTokenUser{
+			Iss:     "https://access.line.me",
+			Sub:     "U123456789abcdef123456789abcdef12",
+			Aud:     "1234567890",
+			Exp:     1504169092,
+			Iat:     1504168492,
+			Nonce:   "0987654321fedcba987654321fedcba9",
+			Amr:     []string{"pwd"},
+			Name:    "test",
+			Picture: "test",
+			Email:   "test",
+		}
+		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})
+		middleware := LineOAuthCheckMiddleware(
+			service.IndexService{
+				Client: newStubHttpClient(func(req *http.Request) *http.Response {
+					return &http.Response{
+						StatusCode: http.StatusNotFound,
+						Body: io.NopCloser(strings.NewReader(`{
+							"message": "Not found"
+						}`)),
+					}
+				}),
+				CookieStore: cookieStore,
+			},
+			&repository.RepositoryFuncMock{
+				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+					return repository.LineBotNotClient{
+							LineNotifyToken: pq.ByteaArray{lineNotifyStr},
+							LineBotToken:    pq.ByteaArray{lineBotStr},
+							LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
+							LineGroupID:     pq.ByteaArray{lineGroupStr},
+					}, nil
+				},
+				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+					return repository.LineBotIvNotClient{
+						LineNotifyTokenIv: pq.ByteaArray{decodeNotifyToken},
+						LineBotTokenIv:    pq.ByteaArray{decodeBotToken},
+						LineBotSecretIv:   pq.ByteaArray{decodeBotSecret},
+						LineGroupIDIv:     pq.ByteaArray{decodeGroupID},
+					}, nil
+				},
+			},
+			true,
+		)(handler)
+
+		mux := http.NewServeMux()
+
+		req := httptest.NewRequest(http.MethodGet, "/group/111", nil)
+		req.Header.Set("Authorization", "Bearer test")
+		w := httptest.NewRecorder()
+
+		sessionStore, err := session.NewSessionStore(req, cookieStore, config.SessionSecret())
+		require.NoError(t, err)
+		sessionStore.SetLineUser(user)
+		sessionStore.SetLineOAuthToken("test")
+		sessionStore.SetGuildID("111")
+		err = sessionStore.SessionSave(req, w)
+		require.NoError(t, err)
+
+		mux.HandleFunc("/group/{guildId}", middleware.ServeHTTP)
+		mux.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
+
+
 }

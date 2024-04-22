@@ -25,7 +25,7 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		require.NoError(t, os.Chdir(cwd))
 	})
 	require.NoError(t, os.Chdir("../../../../"))
-	t.Run("test new line group view handler", func(t *testing.T) {
+	t.Run("groupからチャンネルを変更できる", func(t *testing.T) {
 		indexService := &service.IndexService{
 			DiscordSession: &discordgo.Session{},
 		}
@@ -78,6 +78,10 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		mux.ServeHTTP(w, setCtxValue(r))
 
 		assert.Equal(t, http.StatusOK, w.Code)
+
+		assert.Contains(t, w.Body.String(), `<p>Discordアカウント: 未ログイン</p>`)
+		assert.Contains(t, w.Body.String(), `<p>LINEアカウント: test</p>`)
+		assert.Contains(t, w.Body.String(), `<img src="test" style="height:64px;" alt="LINEアイコン">`)
 
 		assert.Contains(t, w.Body.String(), `<option value="123" selected>カテゴリーなし:📝:test</option>`)
 		assert.Contains(t, w.Body.String(), `<option value="1234">カテゴリーなし:📝:test</option>`)

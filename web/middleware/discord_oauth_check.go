@@ -99,11 +99,13 @@ func DiscordOAuthCheckMiddleware(
 			guild, err := indexService.DiscordBotState.Guild(guildId)
 			if err != nil {
 				slog.WarnContext(ctx, "ギルド情報の取得に失敗しました。", "guildId", guildId)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 			member, err := indexService.DiscordBotState.Member(guildId, discordLoginUser.User.ID)
 			if err != nil {
 				slog.WarnContext(ctx, "メンバー情報の取得に失敗しました。", "guildId", guildId, "userId", discordLoginUser.User.ID)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 			userPermissionCode = getUserRolePermissionCode(member, guild)
@@ -111,6 +113,7 @@ func DiscordOAuthCheckMiddleware(
 			memberPermission, err := indexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, guild.Channels[0].ID)
 			if err != nil {
 				slog.WarnContext(ctx, "メンバー権限の取得に失敗しました。", "guildId", guildId, "userId", discordLoginUser.User.ID)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 			// 設定ページの場合所属していればアクセスを許可
@@ -138,16 +141,19 @@ func DiscordOAuthCheckMiddleware(
 			permissionCode, err := repo.GetPermissionCode(ctx, guildId, permissionType)
 			if err != nil {
 				slog.WarnContext(ctx, "権限コードの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 			permissionUserIDs, err := repo.GetPermissionUserIDs(ctx, guildId, permissionType)
 			if err != nil {
 				slog.WarnContext(ctx, "権限IDの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 			permissionRoleIDs, err := repo.GetPermissionRoleIDs(ctx, guildId, permissionType)
 			if err != nil {
 				slog.WarnContext(ctx, "権限IDの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
 

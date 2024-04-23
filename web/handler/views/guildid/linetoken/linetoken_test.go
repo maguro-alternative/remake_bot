@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/lib/pq"
@@ -26,7 +27,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		require.NoError(t, os.Chdir(cwd))
 	})
 	require.NoError(t, os.Chdir("../../../../../"))
-	t.Run("test new line post discord channel view handler", func(t *testing.T) {
+	t.Run("正常に表示されるか", func(t *testing.T) {
 		indexService := &service.IndexService{
 			DiscordSession: &discordgo.Session{},
 		}
@@ -94,6 +95,17 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<img src="https://cdn.discordapp.com/avatars/123/test.webp?size=64" alt="Discordアイコン">`)
 		assert.Contains(t, rec.Body.String(), `<p>LINEアカウント: 未ログイン</p>`)
 
+		assert.Contains(t, rec.Body.String(), `<input id="lineNotifyToken" type="password" name="line_notify_token">`)
+		assert.Contains(t, rec.Body.String(), `<input id="lineBotToken" type="password" name="line_bot_token">`)
+		assert.Contains(t, rec.Body.String(), `<input id="lineBotSecret" type="password" name="line_bot_secret">`)
+		assert.Contains(t, rec.Body.String(), `<input id="lineGroupId" type="password" name="line_group_id">`)
+		assert.Contains(t, rec.Body.String(), `<input id="lineClientId" type="password" name="line_client_id">`)
+		assert.Contains(t, rec.Body.String(), `<input id="lineClientSecret" type="password" name="line_client_secret">`)
+		assert.Equal(t, strings.Count(rec.Body.String(),"入力済み"), 6)
+
+		assert.Contains(t, rec.Body.String(), `<option value="123">カテゴリーなし:📝:test</option>`)
+		assert.Contains(t, rec.Body.String(), `<option value="1234">カテゴリーなし:📝:test</option>`)
+		assert.Contains(t, rec.Body.String(), `<option value="12345">カテゴリーなし:📝:test</option>`)
 	})
 }
 

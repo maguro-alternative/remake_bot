@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -22,18 +23,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-type roundTripFn func(req *http.Request) *http.Response
-
-func newStubHttpClient(fn roundTripFn) *http.Client {
-	return &http.Client{
-		Transport: fn,
-	}
-}
-
-func (f roundTripFn) RoundTrip(req *http.Request) (*http.Response, error) {
-	return f(req), nil
-}
 
 func TestIndex(t *testing.T) {
 	decodeNotifyToken, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
@@ -92,7 +81,7 @@ func TestIndex(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := NewLineLoginHandler(
 			&service.IndexService{
-				Client: newStubHttpClient(func(req *http.Request) *http.Response {
+				Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body: io.NopCloser(strings.NewReader(`{

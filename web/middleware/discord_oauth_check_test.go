@@ -22,18 +22,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type roundTripFn func(req *http.Request) *http.Response
-
-func newStubHttpClient(fn roundTripFn) *http.Client {
-	return &http.Client{
-		Transport: fn,
-	}
-}
-
-func (f roundTripFn) RoundTrip(req *http.Request) (*http.Response, error) {
-	return f(req), nil
-}
-
 func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 	cookieStore := sessions.NewCookieStore([]byte(config.SessionSecret()))
 	user := model.DiscordUser{
@@ -47,7 +35,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		})
 		middleware := DiscordOAuthCheckMiddleware(
 			service.IndexService{
-				Client: newStubHttpClient(func(req *http.Request) *http.Response {
+				Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body: io.NopCloser(strings.NewReader(`{
@@ -98,7 +86,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		})
 		middleware := DiscordOAuthCheckMiddleware(
 			service.IndexService{
-				Client: newStubHttpClient(func(req *http.Request) *http.Response {
+				Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body: io.NopCloser(strings.NewReader(`{
@@ -160,7 +148,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		})
 		middleware := DiscordOAuthCheckMiddleware(
 			service.IndexService{
-				Client: newStubHttpClient(func(req *http.Request) *http.Response {
+				Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body: io.NopCloser(strings.NewReader(`{
@@ -211,7 +199,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		})
 		indexService := service.IndexService{
-			Client: newStubHttpClient(func(req *http.Request) *http.Response {
+			Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body: io.NopCloser(strings.NewReader(`{
@@ -316,7 +304,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		})
 		indexService := service.IndexService{
-			Client: newStubHttpClient(func(req *http.Request) *http.Response {
+			Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body: io.NopCloser(strings.NewReader(`{
@@ -421,7 +409,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		})
 		indexService := service.IndexService{
-			Client: newStubHttpClient(func(req *http.Request) *http.Response {
+			Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body: io.NopCloser(strings.NewReader(`{
@@ -526,7 +514,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		})
 		indexService := service.IndexService{
-			Client: newStubHttpClient(func(req *http.Request) *http.Response {
+			Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body: io.NopCloser(strings.NewReader(`{
@@ -631,7 +619,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		})
 		indexService := service.IndexService{
-			Client: newStubHttpClient(func(req *http.Request) *http.Response {
+			Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body: io.NopCloser(strings.NewReader(`{
@@ -742,7 +730,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		})
 		indexService := service.IndexService{
-			Client: newStubHttpClient(func(req *http.Request) *http.Response {
+			Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body: io.NopCloser(strings.NewReader(`{
@@ -805,7 +793,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 			},
 			Roles: []*discordgo.Role{
 				{
-					ID:       "123",
+					ID: "123",
 				},
 			},
 		})
@@ -852,13 +840,12 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
-
 	t.Run("'/guild/{guildid}/linetoken'で権限がない場合403を返すこと", func(t *testing.T) {
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		})
 		indexService := service.IndexService{
-			Client: newStubHttpClient(func(req *http.Request) *http.Response {
+			Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body: io.NopCloser(strings.NewReader(`{

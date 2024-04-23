@@ -13,7 +13,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/maguro-alternative/remake_bot/pkg/line"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
@@ -174,7 +173,7 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 	assert.NoError(t, err)
 
 	// スタブHTTPクライアントを作成
-	stubClient := line.NewStubHttpClient(func(req *http.Request) *http.Response {
+	stubClient := mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 		if strings.Contains(req.URL.String(), "https://api.line.me/v2/bot/profile/") {
 			return &http.Response{
 				StatusCode: http.StatusOK,

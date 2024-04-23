@@ -12,14 +12,15 @@ import (
 	"testing"
 
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 	"github.com/maguro-alternative/remake_bot/web/shared/session"
 
-	"github.com/lib/pq"
 	"github.com/gorilla/sessions"
+	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -75,18 +76,18 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 			})
 		}
 		middlewareEndFixture := func(r *http.Request) {
-				sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
-				require.NoError(t, err)
-				sessionStore.CleanupLineUser()
-				sessionStore.CleanupLineOAuthToken()
-				sessionStore.CleanupGuildID()
+			sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+			require.NoError(t, err)
+			sessionStore.CleanupLineUser()
+			sessionStore.CleanupLineOAuthToken()
+			sessionStore.CleanupGuildID()
 		}
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		})
 		middleware := LineOAuthCheckMiddleware(
 			service.IndexService{
-				Client: newStubHttpClient(func(req *http.Request) *http.Response {
+				Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body: io.NopCloser(strings.NewReader(`{
@@ -101,10 +102,10 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 			&repository.RepositoryFuncMock{
 				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return repository.LineBotNotClient{
-							LineNotifyToken: pq.ByteaArray{lineNotifyStr},
-							LineBotToken:    pq.ByteaArray{lineBotStr},
-							LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
-							LineGroupID:     pq.ByteaArray{lineGroupStr},
+						LineNotifyToken: pq.ByteaArray{lineNotifyStr},
+						LineBotToken:    pq.ByteaArray{lineBotStr},
+						LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
+						LineGroupID:     pq.ByteaArray{lineGroupStr},
 					}, nil
 				},
 				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
@@ -146,7 +147,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 		})
 		middleware := LineOAuthCheckMiddleware(
 			service.IndexService{
-				Client: newStubHttpClient(func(req *http.Request) *http.Response {
+				Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body: io.NopCloser(strings.NewReader(`{
@@ -162,10 +163,10 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 			&repository.RepositoryFuncMock{
 				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return repository.LineBotNotClient{
-							LineNotifyToken: pq.ByteaArray{lineNotifyStr},
-							LineBotToken:    pq.ByteaArray{lineBotStr},
-							LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
-							LineGroupID:     pq.ByteaArray{lineGroupStr},
+						LineNotifyToken: pq.ByteaArray{lineNotifyStr},
+						LineBotToken:    pq.ByteaArray{lineBotStr},
+						LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
+						LineGroupID:     pq.ByteaArray{lineGroupStr},
 					}, nil
 				},
 				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
@@ -206,7 +207,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 		})
 		middleware := LineOAuthCheckMiddleware(
 			service.IndexService{
-				Client: newStubHttpClient(func(req *http.Request) *http.Response {
+				Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body: io.NopCloser(strings.NewReader(`{
@@ -222,10 +223,10 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 			&repository.RepositoryFuncMock{
 				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return repository.LineBotNotClient{
-							LineNotifyToken: pq.ByteaArray{lineNotifyStr},
-							LineBotToken:    pq.ByteaArray{lineBotStr},
-							LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
-							LineGroupID:     pq.ByteaArray{lineGroupStr},
+						LineNotifyToken: pq.ByteaArray{lineNotifyStr},
+						LineBotToken:    pq.ByteaArray{lineBotStr},
+						LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
+						LineGroupID:     pq.ByteaArray{lineGroupStr},
 					}, nil
 				},
 				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
@@ -270,7 +271,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 		})
 		middleware := LineOAuthCheckMiddleware(
 			service.IndexService{
-				Client: newStubHttpClient(func(req *http.Request) *http.Response {
+				Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 					return &http.Response{
 						StatusCode: http.StatusNotFound,
 						Body: io.NopCloser(strings.NewReader(`{
@@ -283,10 +284,10 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 			&repository.RepositoryFuncMock{
 				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return repository.LineBotNotClient{
-							LineNotifyToken: pq.ByteaArray{lineNotifyStr},
-							LineBotToken:    pq.ByteaArray{lineBotStr},
-							LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
-							LineGroupID:     pq.ByteaArray{lineGroupStr},
+						LineNotifyToken: pq.ByteaArray{lineNotifyStr},
+						LineBotToken:    pq.ByteaArray{lineBotStr},
+						LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
+						LineGroupID:     pq.ByteaArray{lineGroupStr},
 					}, nil
 				},
 				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
@@ -320,6 +321,5 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
-
 
 }

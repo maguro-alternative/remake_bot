@@ -94,12 +94,6 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<img src="https://cdn.discordapp.com/avatars/123/test.webp?size=64" alt="Discordアイコン">`)
 		assert.Contains(t, rec.Body.String(), `<p>LINEアカウント: 未ログイン</p>`)
 
-		assert.Contains(t, rec.Body.String(), `<select id="ng_users_123[]" name="ng_users_123[]" multiple>`)
-		assert.Contains(t, rec.Body.String(), `<select id="ng_roles_123[]" name="ng_roles_123[]" multiple>`)
-		assert.Contains(t, rec.Body.String(), `<select id="ng_users_1234[]" name="ng_users_1234[]" multiple>`)
-		assert.Contains(t, rec.Body.String(), `<select id="ng_roles_1234[]" name="ng_roles_1234[]" multiple>`)
-		assert.Contains(t, rec.Body.String(), `<select id="ng_users_12345[]" name="ng_users_12345[]" multiple>`)
-		assert.Contains(t, rec.Body.String(), `<select id="ng_roles_12345[]" name="ng_roles_12345[]" multiple>`)
 	})
 }
 

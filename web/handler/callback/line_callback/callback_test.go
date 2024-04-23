@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -27,18 +28,6 @@ func init() {
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
 	gob.Register(&model.LineIdTokenUser{})
-}
-
-type roundTripFn func(req *http.Request) *http.Response
-
-func newStubHttpClient(fn roundTripFn) *http.Client {
-	return &http.Client{
-		Transport: fn,
-	}
-}
-
-func (f roundTripFn) RoundTrip(req *http.Request) (*http.Response, error) {
-	return f(req), nil
 }
 
 func TestDiscordCallbackHandler_ServeHTTP(t *testing.T) {
@@ -74,7 +63,7 @@ func TestDiscordCallbackHandler_ServeHTTP(t *testing.T) {
 
 		// Mock the DiscordOAuth2Service
 		svc := &service.IndexService{
-			Client: newStubHttpClient(func(req *http.Request) *http.Response {
+			Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body: io.NopCloser(strings.NewReader(`{
@@ -128,7 +117,7 @@ func TestDiscordCallbackHandler_ServeHTTP(t *testing.T) {
 	t.Run("error on state mismatch", func(t *testing.T) {
 		// Mock the DiscordOAuth2Service
 		svc := &service.IndexService{
-			Client: newStubHttpClient(func(req *http.Request) *http.Response {
+			Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body: io.NopCloser(strings.NewReader(`{

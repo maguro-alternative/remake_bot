@@ -1,4 +1,4 @@
-package guildid
+package linetoken
 
 import (
 	"context"
@@ -13,7 +13,6 @@ import (
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/shared/ctxvalue"
-
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"

@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/lib/pq"
-	"github.com/maguro-alternative/remake_bot/pkg/line"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
@@ -25,7 +24,7 @@ import (
 func TestLineRequest_PushMessageNotify(t *testing.T) {
 	ctx := context.Background()
 	// スタブHTTPクライアントを作成
-	stubClient := line.NewStubHttpClient(func(req *http.Request) *http.Response {
+	stubClient := mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 		return &http.Response{
 			StatusCode: http.StatusOK,
 			Body:       io.NopCloser(strings.NewReader("")),

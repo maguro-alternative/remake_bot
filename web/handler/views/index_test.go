@@ -22,7 +22,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		require.NoError(t, os.Chdir(cwd))
 	})
 	require.NoError(t, os.Chdir("../../../../../"))
-	t.Run("test new line post discord channel view handler", func(t *testing.T) {
+	t.Run("正常に表示される", func(t *testing.T) {
 		indexService := &service.IndexService{
 			DiscordSession: &discordgo.Session{},
 		}

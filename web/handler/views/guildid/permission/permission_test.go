@@ -1,6 +1,5 @@
 package permission
 
-
 import (
 	"context"
 	"net/http"
@@ -8,7 +7,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lib/pq"
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -27,7 +25,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		require.NoError(t, os.Chdir(cwd))
 	})
 	require.NoError(t, os.Chdir("../../../../../"))
-	t.Run("test new line post discord channel view handler", func(t *testing.T) {
+	t.Run("正常に表示される", func(t *testing.T) {
 		indexService := &service.IndexService{
 			DiscordSession: &discordgo.Session{},
 		}
@@ -68,16 +66,35 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetAllColumnsLineBotFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
-				return repository.LineBot{
-					GuildID:          "111",
-					LineNotifyToken:  pq.ByteaArray{[]byte("test")},
-					LineBotToken:     pq.ByteaArray{[]byte("test")},
-					LineBotSecret:    pq.ByteaArray{[]byte("test")},
-					LineGroupID:      pq.ByteaArray{[]byte("test")},
-					LineClientID:     pq.ByteaArray{[]byte("test")},
-					LineClientSecret: pq.ByteaArray{[]byte("test")},
+			GetPermissionCodesFunc: func(ctx context.Context, guildID string) ([]repository.PermissionCode, error) {
+				return []repository.PermissionCode{
+					{
+						GuildID: "123",
+						Type:    "line_bot",
+						Code:    8,
+					},
+					{
+						GuildID: "123",
+						Type:    "line_post_discord_channel",
+						Code:    8,
+					},
+					{
+						GuildID: "123",
+						Type:    "vc_signal",
+						Code:    8,
+					},
+					{
+						GuildID: "123",
+						Type:    "webhook",
+						Code:    8,
+					},
 				}, nil
+			},
+			GetGuildPermissionUserIDsAllColumnsFunc: func(ctx context.Context, guildID string) ([]repository.PermissionUserIDAllColumns, error) {
+				return nil, nil
+			},
+			GetGuildPermissionRoleIDsAllColumnsFunc: func(ctx context.Context, guildID string) ([]repository.PermissionRoleIDAllColumns, error) {
+				return nil, nil
 			},
 		}
 		handler := NewPermissionViewHandler(indexService, repo)
@@ -96,16 +113,71 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<p>LINEアカウント: 未ログイン</p>`)
 
 	})
+
+	t.Run("permissionでguildIdが不正な値の場合500を返す", func(t *testing.T) {
+		indexService := &service.IndexService{
+			DiscordSession: &discordgo.Session{},
+		}
+		indexService.DiscordBotState = discordgo.NewState()
+		err := indexService.DiscordBotState.GuildAdd(&discordgo.Guild{
+			ID: "123",
+			Channels: []*discordgo.Channel{
+				{
+					ID:       "123",
+					Name:     "test",
+					Position: 1,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+				{
+					ID:       "1234",
+					Name:     "test",
+					Position: 2,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+				{
+					ID:       "12345",
+					Name:     "test",
+					Position: 3,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+			},
+			Members: []*discordgo.Member{
+				{
+					User: &discordgo.User{
+						ID: "123",
+					},
+				},
+			},
+		})
+		assert.NoError(t, err)
+		assert.Len(t, indexService.DiscordBotState.Guilds, 1)
+
+		mux := http.NewServeMux()
+
+		repo := &repository.RepositoryFuncMock{}
+		handler := NewPermissionViewHandler(indexService, repo)
+
+		mux.HandleFunc("/guilds/{guildId}/linetoken", handler.Index)
+
+		req := httptest.NewRequest(http.MethodGet, "/guilds/111/linetoken", nil)
+		rec := httptest.NewRecorder()
+
+		mux.ServeHTTP(rec, setCtxValue(req))
+
+		assert.Equal(t, http.StatusInternalServerError, rec.Code)
+
+	})
+
 }
 
 func setCtxValue(r *http.Request) *http.Request {
 	ctx := r.Context()
 	ctx = ctxvalue.ContextWithDiscordPermission(ctx, &model.DiscordPermissionData{
 		PermissionCode: 8,
-		User: 		 model.DiscordUser{
-			ID: "123",
+		User: model.DiscordUser{
+			ID:       "123",
 			Username: "test",
-			Avatar: "test",
+			Avatar:   "test",
 		},
 		Permission: "all",
 	})

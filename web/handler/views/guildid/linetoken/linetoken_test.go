@@ -70,7 +70,6 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		repo := &repository.RepositoryFuncMock{
 			GetAllColumnsLineBotFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
 				return repository.LineBot{
-					GuildID:          "111",
 					LineNotifyToken:  pq.ByteaArray{[]byte("test")},
 					LineBotToken:     pq.ByteaArray{[]byte("test")},
 					LineBotSecret:    pq.ByteaArray{[]byte("test")},
@@ -151,7 +150,6 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		repo := &repository.RepositoryFuncMock{
 			GetAllColumnsLineBotFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
 				return repository.LineBot{
-					GuildID:          "111",
 					LineNotifyToken:  pq.ByteaArray{[]byte("test")},
 					LineBotToken:     pq.ByteaArray{[]byte("test")},
 					LineBotSecret:    pq.ByteaArray{[]byte("test")},
@@ -265,6 +263,63 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<option value="12345">カテゴリーなし:📝:test</option>`)
 	})
 
+	t.Run("linetokenでguildIdが不正な値の場合500を返す", func(t *testing.T) {
+		indexService := &service.IndexService{
+			DiscordSession: &discordgo.Session{},
+		}
+		indexService.DiscordBotState = discordgo.NewState()
+		err := indexService.DiscordBotState.GuildAdd(&discordgo.Guild{
+			ID: "123",
+			Channels: []*discordgo.Channel{
+				{
+					ID:       "123",
+					Name:     "test",
+					Position: 1,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+				{
+					ID:       "1234",
+					Name:     "test",
+					Position: 2,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+				{
+					ID:       "12345",
+					Name:     "test",
+					Position: 3,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+			},
+			Members: []*discordgo.Member{
+				{
+					User: &discordgo.User{
+						ID: "123",
+					},
+				},
+			},
+		})
+		assert.NoError(t, err)
+		assert.Len(t, indexService.DiscordBotState.Guilds, 1)
+
+		mux := http.NewServeMux()
+
+		repo := &repository.RepositoryFuncMock{
+			GetAllColumnsLineBotFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
+				return repository.LineBot{}, nil
+			},
+		}
+		handler := NewLineTokenViewHandler(indexService, repo)
+
+		mux.HandleFunc("/guilds/{guildId}/linetoken", handler.Index)
+
+		req := httptest.NewRequest(http.MethodGet, "/guilds/111/linetoken", nil)
+		rec := httptest.NewRecorder()
+
+		mux.ServeHTTP(rec, setCtxValue(req))
+
+		assert.Equal(t, http.StatusInternalServerError, rec.Code)
+
+	})
 
 }
 

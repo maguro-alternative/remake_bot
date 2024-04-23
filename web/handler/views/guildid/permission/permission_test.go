@@ -99,9 +99,9 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		}
 		handler := NewPermissionViewHandler(indexService, repo)
 
-		mux.HandleFunc("/guilds/{guildId}/permission", handler.Index)
+		mux.HandleFunc("/guild/{guildId}/permission", handler.Index)
 
-		req := httptest.NewRequest(http.MethodGet, "/guilds/123/permission", nil)
+		req := httptest.NewRequest(http.MethodGet, "/guild/123/permission", nil)
 		rec := httptest.NewRecorder()
 
 		mux.ServeHTTP(rec, setCtxValue(req))
@@ -157,9 +157,9 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		repo := &repository.RepositoryFuncMock{}
 		handler := NewPermissionViewHandler(indexService, repo)
 
-		mux.HandleFunc("/guilds/{guildId}/linetoken", handler.Index)
+		mux.HandleFunc("/guild/{guildId}/permission", handler.Index)
 
-		req := httptest.NewRequest(http.MethodGet, "/guilds/111/linetoken", nil)
+		req := httptest.NewRequest(http.MethodGet, "/guild/111/permission", nil)
 		rec := httptest.NewRecorder()
 
 		mux.ServeHTTP(rec, setCtxValue(req))

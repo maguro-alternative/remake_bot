@@ -135,6 +135,51 @@ func TestIndex(t *testing.T) {
 		assert.Contains(t, rr.Body.String(), `<li>displayName</li>`)
 	})
 
+	t.Run("Lineログイン選択画面に遷移すること(Botなしで何も表示されない)", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodGet, "/login/line", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := NewLineLoginHandler(
+			&service.IndexService{
+				Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body: io.NopCloser(strings.NewReader(`{
+							"basicId": "basicId",
+							"chatMode": "chatMode",
+							"markAsReadMode": "markAsReadMode",
+							"premiumId": "premiumId",
+							"pictureUrl": "pictureUrl",
+							"displayName": "displayName",
+							"userId": "userId",
+							"message": "message"
+						}`)),
+					}
+				}),
+			},
+			&repository.RepositoryFuncMock{
+				GetAllColumnsLineBotsFunc: func(ctx context.Context) ([]*repository.LineBot, error) {
+					return nil, nil
+				},
+				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+					return repository.LineBotIv{}, nil
+				},
+			},
+		)
+
+		handler.Index(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		assert.Contains(t, rr.Body.String(), "<title>LINEログイン選択</title>")
+
+		assert.NotContains(t, rr.Body.String(), `<a href="/login/line/123">`)
+		assert.NotContains(t, rr.Body.String(), `<img src="pictureUrl"/>`)
+		assert.NotContains(t, rr.Body.String(), `<li>displayName</li>`)
+	})
+
+
 	t.Run("lineBotの読み込みに失敗した場合、500エラーを返す", func(t *testing.T) {
 		req, err := http.NewRequest(http.MethodGet, "/login/line", nil)
 		assert.NoError(t, err)

@@ -22,7 +22,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		require.NoError(t, os.Chdir(cwd))
 	})
 	require.NoError(t, os.Chdir("../../../../../"))
-	t.Run("test new line post discord channel view handler", func(t *testing.T) {
+	t.Run("正常に表示される", func(t *testing.T) {
 		indexService := &service.IndexService{
 			DiscordSession: &discordgo.Session{},
 		}
@@ -64,9 +64,9 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 
 		handler := NewGuildsViewHandler(indexService)
 
-		mux.HandleFunc("/guilds/{guildId}/line_post_discord_channel", handler.Index)
+		mux.HandleFunc("/guilds/{guildId}", handler.Index)
 
-		req := httptest.NewRequest(http.MethodGet, "/guilds/123/line_post_discord_channel", nil)
+		req := httptest.NewRequest(http.MethodGet, "/guilds/123", nil)
 		rec := httptest.NewRecorder()
 
 		mux.ServeHTTP(rec, setCtxValue(req))

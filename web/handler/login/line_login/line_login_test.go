@@ -74,7 +74,7 @@ func TestIndex(t *testing.T) {
 		assert.Equal(t, http.StatusMethodNotAllowed, rr.Code)
 	})
 
-	t.Run("Lineログイン画面に遷移すること", func(t *testing.T) {
+	t.Run("Lineログイン選択画面に遷移すること", func(t *testing.T) {
 		req, err := http.NewRequest(http.MethodGet, "/login/line", nil)
 		assert.NoError(t, err)
 
@@ -101,7 +101,7 @@ func TestIndex(t *testing.T) {
 				GetAllColumnsLineBotsFunc: func(ctx context.Context) ([]*repository.LineBot, error) {
 					return []*repository.LineBot{
 						{
-							GuildID:          "",
+							GuildID:          "123",
 							LineNotifyToken:  pq.ByteaArray{lineNotifyStr},
 							LineBotToken:     pq.ByteaArray{lineBotStr},
 							LineBotSecret:    pq.ByteaArray{lineBotSecretStr},
@@ -127,6 +127,12 @@ func TestIndex(t *testing.T) {
 		handler.Index(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
+
+		assert.Contains(t, rr.Body.String(), "<title>LINEログイン選択</title>")
+
+		assert.Contains(t, rr.Body.String(), `<a href="/login/line/123">`)
+		assert.Contains(t, rr.Body.String(), `<img src="pictureUrl"/>`)
+		assert.Contains(t, rr.Body.String(), `<li>displayName</li>`)
 	})
 
 	t.Run("lineBotの読み込みに失敗した場合、500エラーを返す", func(t *testing.T) {
@@ -184,7 +190,7 @@ func TestLineLogin(t *testing.T) {
 	lineClientSecret, err := base64.StdEncoding.DecodeString(string([]byte("uy2qtvYTnSoB5qIntwUdVQ==")))
 	assert.NoError(t, err)
 
-	t.Run("test successful LineLogin", func(t *testing.T) {
+	t.Run("Lineログインのリダイレクトに成功する", func(t *testing.T) {
 		// Mocking the necessary dependencies
 		h := NewLineLoginHandler(
 			&service.IndexService{
@@ -226,7 +232,7 @@ func TestLineLogin(t *testing.T) {
 		assert.Equal(t, http.StatusSeeOther, rr.Code)
 	})
 
-	t.Run("test LineLogin with session store creation error", func(t *testing.T) {
+	t.Run("セッションの読み込みに失敗した場合500を返す", func(t *testing.T) {
 		// Mocking the necessary dependencies
 		h := NewLineLoginHandler(
 			&service.IndexService{
@@ -268,7 +274,7 @@ func TestLineLogin(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 	})
 
-	t.Run("test LineLogin with repository error", func(t *testing.T) {
+	t.Run("データベースがエラーを返した場合500エラーを返す", func(t *testing.T) {
 		// Mocking the necessary dependencies
 		h := NewLineLoginHandler(
 			&service.IndexService{

@@ -12,7 +12,7 @@ import (
 )
 
 func TestServeHTTP(t *testing.T) {
-    t.Run("test successful ServeHTTP", func(t *testing.T) {
+    t.Run("Discordログイン画面にリダイレクトする", func(t *testing.T) {
         // Mocking the necessary dependencies
         h := NewDiscordOAuth2Handler(
             &service.IndexService{
@@ -31,7 +31,7 @@ func TestServeHTTP(t *testing.T) {
         assert.Equal(t, http.StatusSeeOther, rr.Code)
     })
 
-    t.Run("test ServeHTTP with session store creation error", func(t *testing.T) {
+    t.Run("stateが書き込めない場合、エラーを出す", func(t *testing.T) {
         // Mocking the necessary dependencies
         h := NewDiscordOAuth2Handler(
             &service.IndexService{

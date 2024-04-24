@@ -62,7 +62,7 @@ func TestIndex(t *testing.T) {
 	})
 	require.NoError(t, os.Chdir("../../../../"))
 
-	t.Run("Method not allowed", func(t *testing.T) {
+	t.Run("Getではない場合400エラーを返す", func(t *testing.T) {
 		req, err := http.NewRequest(http.MethodPost, "/login/line", nil)
 		assert.NoError(t, err)
 
@@ -74,7 +74,7 @@ func TestIndex(t *testing.T) {
 		assert.Equal(t, http.StatusMethodNotAllowed, rr.Code)
 	})
 
-	t.Run("Successful request", func(t *testing.T) {
+	t.Run("Lineログイン画面に遷移すること", func(t *testing.T) {
 		req, err := http.NewRequest(http.MethodGet, "/login/line", nil)
 		assert.NoError(t, err)
 
@@ -129,7 +129,7 @@ func TestIndex(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
 
-	t.Run("Failed to get all columns of line bots", func(t *testing.T) {
+	t.Run("lineBotの読み込みに失敗した場合、500エラーを返す", func(t *testing.T) {
 		req, err := http.NewRequest(http.MethodGet, "/login/line", nil)
 		assert.NoError(t, err)
 

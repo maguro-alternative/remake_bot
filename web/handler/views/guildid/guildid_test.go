@@ -21,8 +21,8 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, os.Chdir(cwd))
 	})
-	require.NoError(t, os.Chdir("../../../../../"))
-	t.Run("test new line post discord channel view handler", func(t *testing.T) {
+	require.NoError(t, os.Chdir("../../../../"))
+	t.Run("設定ページ一覧が正常に表示される(管理者)", func(t *testing.T) {
 		indexService := &service.IndexService{
 			DiscordSession: &discordgo.Session{},
 		}
@@ -64,9 +64,9 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 
 		handler := NewGuildIDViewHandler(indexService)
 
-		mux.HandleFunc("/guilds/{guildId}/line_post_discord_channel", handler.Index)
+		mux.HandleFunc("/guild/{guildId}", handler.Index)
 
-		req := httptest.NewRequest(http.MethodGet, "/guilds/123/line_post_discord_channel", nil)
+		req := httptest.NewRequest(http.MethodGet, "/guild/123", nil)
 		rec := httptest.NewRecorder()
 
 		mux.ServeHTTP(rec, setCtxValue(req))
@@ -76,6 +76,13 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<p>Discordアカウント: test</p>`)
 		assert.Contains(t, rec.Body.String(), `<img src="https://cdn.discordapp.com/avatars/123/test.webp?size=64" alt="Discordアイコン">`)
 		assert.Contains(t, rec.Body.String(), `<p>LINEアカウント: 未ログイン</p>`)
+
+		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/permission" class="btn btn-primary">管理者設定</a>`)
+
+		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/line-post-discord-channel" class="btn btn-primary">LINEへの送信設定</a>`)
+		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/linetoken" class="btn btn-primary">LINEBOTおよびグループ設定</a>`)
+		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/vc-signal" class="btn btn-primary">ボイスチャンネルの通知設定</a>`)
+		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/webhook" class="btn btn-primary">webhookの送信設定</a>`)
 
 	})
 }

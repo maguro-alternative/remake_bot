@@ -132,6 +132,116 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<img src="test" style="height:64px;" alt="LINEアイコン">`)
 	})
 
+	t.Run("ルートページが正常に表示される(全部ログアウト)", func(t *testing.T) {
+		indexService := &service.IndexService{
+			DiscordSession: &discordgo.Session{},
+		}
+		indexService.DiscordBotState = discordgo.NewState()
+		indexService.DiscordBotState.User = &discordgo.User{
+			Username: "test",
+		}
+		err := indexService.DiscordBotState.GuildAdd(&discordgo.Guild{
+			ID: "123",
+			Channels: []*discordgo.Channel{
+				{
+					ID:       "123",
+					Name:     "test",
+					Position: 1,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+				{
+					ID:       "1234",
+					Name:     "test",
+					Position: 2,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+				{
+					ID:       "12345",
+					Name:     "test",
+					Position: 3,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+			},
+			Members: []*discordgo.Member{
+				{
+					User: &discordgo.User{
+						ID: "123",
+					},
+				},
+			},
+		})
+		assert.NoError(t, err)
+		assert.Len(t, indexService.DiscordBotState.Guilds, 1)
+
+		handler := NewIndexViewHandler(indexService)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+
+		handler.Index(rec, req)
+
+		assert.Equal(t, http.StatusOK, rec.Code)
+
+		assert.Contains(t, rec.Body.String(), `<p>Discordアカウント: 未ログイン</p>`)
+		assert.Contains(t, rec.Body.String(), `<p>LINEアカウント: 未ログイン</p>`)
+	})
+
+	t.Run("ルートページが正常に表示される(全部ログイン状態)", func(t *testing.T) {
+		indexService := &service.IndexService{
+			DiscordSession: &discordgo.Session{},
+		}
+		indexService.DiscordBotState = discordgo.NewState()
+		indexService.DiscordBotState.User = &discordgo.User{
+			Username: "test",
+		}
+		err := indexService.DiscordBotState.GuildAdd(&discordgo.Guild{
+			ID: "123",
+			Channels: []*discordgo.Channel{
+				{
+					ID:       "123",
+					Name:     "test",
+					Position: 1,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+				{
+					ID:       "1234",
+					Name:     "test",
+					Position: 2,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+				{
+					ID:       "12345",
+					Name:     "test",
+					Position: 3,
+					Type:     discordgo.ChannelTypeGuildText,
+				},
+			},
+			Members: []*discordgo.Member{
+				{
+					User: &discordgo.User{
+						ID: "123",
+					},
+				},
+			},
+		})
+		assert.NoError(t, err)
+		assert.Len(t, indexService.DiscordBotState.Guilds, 1)
+
+		handler := NewIndexViewHandler(indexService)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+
+		handler.Index(rec, setCtxDiscordUserValue(setCtxLineUserValue(req)))
+
+		assert.Equal(t, http.StatusOK, rec.Code)
+
+		assert.Contains(t, rec.Body.String(), `<p>Discordアカウント: test</p>`)
+		assert.Contains(t, rec.Body.String(), `<img src="https://cdn.discordapp.com/avatars/123/test.webp?size=64" alt="Discordアイコン">`)
+		assert.Contains(t, rec.Body.String(), `<p>LINEアカウント: test</p>`)
+		assert.Contains(t, rec.Body.String(), `<img src="test" style="height:64px;" alt="LINEアイコン">`)
+	})
+
 }
 
 func setCtxDiscordUserValue(r *http.Request) *http.Request {

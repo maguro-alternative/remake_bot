@@ -9,14 +9,14 @@ import (
 type LineNgDiscordUserIDAllCoulmns struct {
 	ChannelID string `db:"channel_id"`
 	GuildID   string `db:"guild_id"`
-	ID        string `db:"id"`
+	UserID    string `db:"user_id"`
 }
 
-func NewLineNgDiscordUserID(channelID, guildID, id string) *LineNgDiscordUserIDAllCoulmns {
+func NewLineNgDiscordUserID(channelID, guildID, userID string) *LineNgDiscordUserIDAllCoulmns {
 	return &LineNgDiscordUserIDAllCoulmns{
 		ChannelID: channelID,
 		GuildID:   guildID,
-		ID:        id,
+		UserID:    userID,
 	}
 }
 
@@ -24,7 +24,7 @@ func (r *Repository) GetLineNgDiscordUserID(ctx context.Context, channelID strin
 	var ngIDs []string
 	query := `
 		SELECT
-			id
+			user_id
 		FROM
 			line_ng_discord_user_id
 		WHERE
@@ -39,12 +39,12 @@ func (r *Repository) InsertLineNgDiscordUserIDs(ctx context.Context, lineNgDisco
 		INSERT INTO line_ng_discord_user_id (
 			channel_id,
 			guild_id,
-			id
+			user_id
 		) VALUES (
 			:channel_id,
 			:guild_id,
-			:id
-		) ON CONFLICT (channel_id, id) DO NOTHING
+			:user_id
+		) ON CONFLICT (channel_id, user_id) DO NOTHING
 	`
 	for _, lineNgID := range lineNgDiscordUserIDs {
 		_, err := r.db.NamedExecContext(ctx, query, lineNgID)
@@ -58,7 +58,7 @@ func (r *Repository) InsertLineNgDiscordUserIDs(ctx context.Context, lineNgDisco
 func (r *Repository) DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error {
 	var values []string
 	for _, lineNgType := range lineNgDiscordUserIDs {
-		values = append(values, fmt.Sprintf("('%s', '%s', '%s')", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.ID))
+		values = append(values, fmt.Sprintf("('%s', '%s', '%s')", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.UserID))
 		_, err := r.db.ExecContext(ctx, "DELETE FROM line_ng_discord_user_id WHERE channel_id = $1", lineNgType.ChannelID)
 		if err != nil {
 			return err
@@ -72,12 +72,11 @@ func (r *Repository) DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, li
 		INSERT INTO line_ng_discord_user_id (
 			channel_id,
 			guild_id,
-			id
+			user_id
 		) VALUES
 			%s
-		ON CONFLICT (channel_id, id) DO NOTHING
+		ON CONFLICT (channel_id, user_id) DO NOTHING
 	`, strings.Join(values, ","))
 	_, err := r.db.ExecContext(ctx, query)
 	return err
 }
-

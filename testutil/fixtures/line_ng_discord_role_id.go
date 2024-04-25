@@ -8,14 +8,14 @@ import (
 type LineNgDiscordRoleID struct {
 	ChannelID string `db:"channel_id"`
 	GuildID   string `db:"guild_id"`
-	ID        string `db:"id"`
+	RoleID    string `db:"role_id"`
 }
 
 func NewLineNgDiscordRoleID(ctx context.Context, setter ...func(b *LineNgDiscordRoleID)) *ModelConnector {
 	lineNgDiscordRoleID := &LineNgDiscordRoleID{
 		ChannelID: "1111111111111",
 		GuildID:   "1111111111111",
-		ID:        "1111111111111",
+		RoleID:    "1111111111111",
 	}
 
 	return &ModelConnector{
@@ -39,11 +39,11 @@ func NewLineNgDiscordRoleID(ctx context.Context, setter ...func(b *LineNgDiscord
 				INSERT INTO line_ng_discord_role_id (
 					channel_id,
 					guild_id,
-					id
+					role_id
 				) VALUES (
 					:channel_id,
 					:guild_id,
-					:id
+					:role_id
 				)
 			`, lineNgDiscordRoleID)
 			if err != nil {

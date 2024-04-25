@@ -26,7 +26,7 @@ func TestGetLineNgDiscordUserID(t *testing.T) {
 		fixtures.NewLineNgDiscordUserID(ctx, func(lng *fixtures.LineNgDiscordUserID) {
 			lng.ChannelID = "987654321"
 			lng.GuildID = "123456789"
-			lng.ID = "123456789"
+			lng.UserID = "123456789"
 		}),
 	)
 	repo := NewRepository(tx)
@@ -55,17 +55,17 @@ func TestRepository_InsertLineNgDiscordUserIDs(t *testing.T) {
 			{
 				ChannelID: "123456789",
 				GuildID:   "987654321",
-				ID:        "123456789",
+				UserID:    "123456789",
 			},
 			{
 				ChannelID: "123456789",
 				GuildID:   "123456789",
-				ID:        "987654321",
+				UserID:    "987654321",
 			},
 			{
 				ChannelID: "987654321",
 				GuildID:   "123456789",
-				ID:        "987654321",
+				UserID:    "987654321",
 			},
 		}
 		err = repo.InsertLineNgDiscordUserIDs(ctx, lineNgDiscordIDs)
@@ -96,15 +96,15 @@ func TestRepository_DeleteLineNgDiscordUserIDs(t *testing.T) {
 		f.Build(t,
 			fixtures.NewLineNgDiscordUserID(ctx, func(lnt *fixtures.LineNgDiscordUserID) {
 				lnt.ChannelID = "123456789"
-				lnt.ID = "123456789"
+				lnt.UserID = "123456789"
 			}),
 			fixtures.NewLineNgDiscordUserID(ctx, func(lnt *fixtures.LineNgDiscordUserID) {
 				lnt.ChannelID = "123456789"
-				lnt.ID = "987654321"
+				lnt.UserID = "987654321"
 			}),
 			fixtures.NewLineNgDiscordUserID(ctx, func(lnt *fixtures.LineNgDiscordUserID) {
 				lnt.ChannelID = "987654321"
-				lnt.ID = "123456789"
+				lnt.UserID = "123456789"
 			}),
 		)
 
@@ -112,11 +112,11 @@ func TestRepository_DeleteLineNgDiscordUserIDs(t *testing.T) {
 		insertLineNgDiscordIDs := []LineNgDiscordUserIDAllCoulmns{
 			{
 				ChannelID: "123456789",
-				ID:        "123456789",
+				UserID:    "123456789",
 			},
 			{
 				ChannelID: "987654321",
-				ID:        "123456789",
+				UserID:    "123456789",
 			},
 		}
 

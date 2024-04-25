@@ -96,8 +96,8 @@ LINEへ送信しないDiscordユーザーを保存するテーブル
 CREATE TABLE IF NOT EXISTS line_ng_discord_user_id (
     channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
-    id TEXT NOT NULL,
-    PRIMARY KEY(channel_id, id)
+    user_id TEXT NOT NULL,
+    PRIMARY KEY(channel_id, user_id)
 );
 
 /*
@@ -112,8 +112,8 @@ LINEへ送信しないDiscordロールを保存するテーブル
 CREATE TABLE IF NOT EXISTS line_ng_discord_role_id (
     channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
-    id TEXT NOT NULL,
-    PRIMARY KEY(channel_id, id)
+    role_id TEXT NOT NULL,
+    PRIMARY KEY(channel_id, role_id)
 );
 
 /*
@@ -152,8 +152,8 @@ CREATE TABLE IF NOT EXISTS vc_signal_channel (
 CREATE TABLE IF NOT EXISTS vc_signal_ng_member_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
-    id TEXT NOT NULL,
-    PRIMARY KEY(vc_channel_id, id)
+    user_id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, user_id)
 );
 
 /*
@@ -170,8 +170,8 @@ CREATE TABLE IF NOT EXISTS vc_signal_ng_member_id (
 CREATE TABLE IF NOT EXISTS vc_signal_ng_role_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
-    id TEXT NOT NULL,
-    PRIMARY KEY(vc_channel_id, id)
+    role_id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, role_id)
 );
 
 /*
@@ -181,16 +181,21 @@ CREATE TABLE IF NOT EXISTS vc_signal_ng_role_id (
 
     vc_channel_id (TEXT): ボイスチャンネルID
     guild_id (TEXT): サーバーID
-    id_type (TEXT PRIMARY KEY): ユーザーIDの種類 (user, role)
-    id (TEXT): ユーザーID
+    user_id (TEXT): ユーザーID
 */
 
-CREATE TABLE IF NOT EXISTS vc_signal_mention_id (
+CREATE TABLE IF NOT EXISTS vc_signal_mention_user_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
-    id_type TEXT NOT NULL,
-    id TEXT NOT NULL,
-    PRIMARY KEY(vc_channel_id, id)
+    user_id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS vc_signal_mention_role_id (
+    vc_channel_id TEXT NOT NULL,
+    guild_id TEXT NOT NULL,
+    role_id TEXT NOT NULL,
+    PRIMARY KEY(vc_channel_id, role_id)
 );
 
 CREATE TABLE IF NOT EXISTS webhook (
@@ -203,11 +208,17 @@ CREATE TABLE IF NOT EXISTS webhook (
     PRIMARY KEY(webhook_serial_id)
 );
 
-CREATE TABLE IF NOT EXISTS webhook_mention (
+CREATE TABLE IF NOT EXISTS webhook_user_mention (
     webhook_serial_id INTEGER,
-    id_type TEXT NOT NULL,
-    id TEXT NOT NULL,
-    PRIMARY KEY(webhook_serial_id, id),
+    user_id TEXT NOT NULL,
+    PRIMARY KEY(webhook_serial_id, user_id),
+    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id)
+);
+
+CREATE TABLE IF NOT EXISTS webhook_role_mention (
+    webhook_serial_id INTEGER,
+    role_id TEXT NOT NULL,
+    PRIMARY KEY(webhook_serial_id, role_id),
     FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id)
 );
 

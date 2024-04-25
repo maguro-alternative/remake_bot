@@ -35,7 +35,7 @@ func TestRepository_InsertPermissionsID(t *testing.T) {
 		assert.NoError(t, err)
 
 		var permissionsID PermissionUserIDAllColumns
-		err = tx.GetContext(ctx, &permissionsID, "SELECT * FROM permissions_id WHERE guild_id = $1", "987654321")
+		err = tx.GetContext(ctx, &permissionsID, "SELECT * FROM permissions_user_id WHERE guild_id = $1", "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", permissionsID.GuildID)
 		assert.Equal(t, "line_bot", permissionsID.Type)
@@ -164,7 +164,7 @@ func TestRepository_DeletePermissionsID(t *testing.T) {
 		assert.NoError(t, err)
 
 		var permissionsID PermissionUserID
-		err = tx.GetContext(ctx, &permissionsID, "SELECT * FROM permissions_id WHERE guild_id = $1", "987654321")
+		err = tx.GetContext(ctx, &permissionsID, "SELECT * FROM permissions_user_id WHERE guild_id = $1", "987654321")
 		assert.Error(t, err)
 		assert.Empty(t, permissionsID)
 	})

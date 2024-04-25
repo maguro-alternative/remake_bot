@@ -5,10 +5,8 @@ import (
 	"encoding/json"
 	"html/template"
 	"log/slog"
-	"net"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -56,16 +54,7 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var matchGuilds []discordgo.UserGuild
-	var client = http.Client{
-		Timeout: 5 * time.Second,
-		Transport: &http.Transport{
-			DialContext: (&net.Dialer{
-				Timeout: time.Second,
-			}).DialContext,
-			TLSHandshakeTimeout:   time.Second,
-			ResponseHeaderTimeout: time.Second,
-		},
-	}
+	var client = *g.IndexService.Client
 	botGuilds, err := g.IndexService.DiscordSession.UserGuilds(100, "", "", discordgo.WithClient(&client))
 	if err != nil {
 		slog.ErrorContext(ctx, "Botサーバー取得に失敗しました。", "エラー: ", err.Error())

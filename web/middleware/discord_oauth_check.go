@@ -204,17 +204,17 @@ func isUserAccessPermission(
 	discordLoginUser *model.DiscordOAuthSession,
 	member *discordgo.Member,
 ) bool {
-	for _, permissionId := range permissionUserIDs {
-		if permissionId.TargetID == discordLoginUser.User.ID {
-			permissionData.Permission = permissionId.Permission
+	for _, permissionUserId := range permissionUserIDs {
+		if permissionUserId.UserID == discordLoginUser.User.ID {
+			permissionData.Permission = permissionUserId.Permission
 			return true
 		}
 	}
-	for _, permissionId := range permissionRoleIDs {
+	for _, permissionRoleId := range permissionRoleIDs {
 		if member.Roles != nil {
 			for _, role := range member.Roles {
-				if permissionId.TargetID == role {
-					permissionData.Permission = permissionId.Permission
+				if permissionRoleId.RoleID == role {
+					permissionData.Permission = permissionRoleId.Permission
 					return true
 				}
 			}

@@ -22,17 +22,17 @@ type PermissionID struct {
 }
 
 type PermissionUserID struct {
-	GuildID    string
-	Type       string
-	TargetID   string
-	Permission string
+	GuildID    string `json:"guild_id"`
+	Type       string `json:"type"`
+	UserID     string `json:"user_id"`
+	Permission string `json:"permission"`
 }
 
 type PermissionRoleID struct {
-	GuildID    string
-	Type       string
-	TargetID   string
-	Permission string
+	GuildID    string `json:"guild_id"`
+	Type       string `json:"type"`
+	RoleID     string `json:"role_id"`
+	Permission string `json:"permission"`
 }
 
 func CreatePermissionCodeForm(guildID string, permissionCode PermissionCode) string {
@@ -52,8 +52,8 @@ func CreatePermissionSelectForm(
 	selectMemberFormBuilder := strings.Builder{}
 	for _, member := range guild.Members {
 		selectedFlag := false
-		for _, permissionID := range permissionUserIDs {
-			if permissionID.TargetID == member.User.ID && permissionID.Type == permission {
+		for _, permissionUserID := range permissionUserIDs {
+			if permissionUserID.UserID == member.User.ID && permissionUserID.Type == permission {
 				selectedFlag = true
 				break
 			}
@@ -67,8 +67,8 @@ func CreatePermissionSelectForm(
 	selectRoleFormBuilder := strings.Builder{}
 	for _, role := range guild.Roles {
 		selectedFlag := false
-		for _, permissionID := range permissionRoleIDs {
-			if permissionID.TargetID == role.ID && permissionID.Type == permission {
+		for _, permissionRoleID := range permissionRoleIDs {
+			if permissionRoleID.RoleID == role.ID && permissionRoleID.Type == permission {
 				selectedFlag = true
 				break
 			}

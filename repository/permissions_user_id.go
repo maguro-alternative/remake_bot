@@ -7,40 +7,40 @@ import (
 type PermissionUserIDAllColumns struct {
 	GuildID    string `db:"guild_id"`
 	Type       string `db:"type"`
-	TargetID   string `db:"target_id"`
+	UserID     string `db:"user_id"`
 	Permission string `db:"permission"`
 }
 
 type PermissionUserID struct {
-	TargetID   string `db:"target_id"`
+	UserID     string `db:"target_id"`
 	Permission string `db:"permission"`
 }
 
-func NewPermissionUserIDAllColumns(guildID, permissionType, targetID, permission string) *PermissionUserIDAllColumns {
+func NewPermissionUserIDAllColumns(guildID, permissionType, userID, permission string) *PermissionUserIDAllColumns {
 	return &PermissionUserIDAllColumns{
 		GuildID:    guildID,
 		Type:       permissionType,
-		TargetID:   targetID,
+		UserID:     userID,
 		Permission: permission,
 	}
 }
 
-func (r *Repository) InsertPermissionUserIDs(ctx context.Context, permissionsID []PermissionUserIDAllColumns) error {
+func (r *Repository) InsertPermissionUserIDs(ctx context.Context, permissionsUserID []PermissionUserIDAllColumns) error {
 	query := `
 		INSERT INTO permissions_user_id (
 			guild_id,
 			type,
-			target_id,
+			user_id,
 			permission
 		) VALUES (
 			:guild_id,
 			:type,
-			:target_id,
+			:user_id,
 			:permission
-		) ON CONFLICT (guild_id, type, target_id) DO NOTHING
+		) ON CONFLICT (guild_id, type, user_id) DO NOTHING
 	`
-	for _, permissionID := range permissionsID {
-		_, err := r.db.NamedExecContext(ctx, query, permissionID)
+	for _, permissionUserID := range permissionsUserID {
+		_, err := r.db.NamedExecContext(ctx, query, permissionUserID)
 		if err != nil {
 			return err
 		}
@@ -66,7 +66,7 @@ func (r *Repository) GetPermissionUserIDs(ctx context.Context, guildID, permissi
 	var permissionIDs []PermissionUserID
 	query := `
 		SELECT
-			target_id,
+			user_id,
 			permission
 		FROM
 			permissions_user_id

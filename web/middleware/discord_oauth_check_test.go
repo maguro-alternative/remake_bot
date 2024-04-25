@@ -692,7 +692,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return []repository.PermissionUserID{
 						{
-							TargetID:   "123",
+							UserID:     "123",
 							Permission: "write",
 						},
 					}, nil
@@ -810,7 +810,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return []repository.PermissionRoleID{
 						{
-							TargetID:   "123",
+							RoleID:     "123",
 							Permission: "write",
 						},
 					}, nil

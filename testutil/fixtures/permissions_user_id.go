@@ -8,7 +8,7 @@ import (
 type PermissionsUserID struct {
 	GuildID    string `db:"guild_id"`
 	Type       string `db:"type"`
-	TargetID   string `db:"target_id"`
+	UserID     string `db:"user_id"`
 	Permission string `db:"permission"`
 }
 
@@ -16,7 +16,7 @@ func NewPermissionsUserID(ctx context.Context, setter ...func(b *PermissionsUser
 	permissionsUserID := &PermissionsUserID{
 		GuildID:    "1111111111111",
 		Type:       "line",
-		TargetID:   "1111111111111",
+		UserID:     "1111111111111",
 		Permission: "read",
 	}
 
@@ -41,12 +41,12 @@ func NewPermissionsUserID(ctx context.Context, setter ...func(b *PermissionsUser
 				INSERT INTO permissions_user_id (
 					guild_id,
 					type,
-					target_id,
+					user_id,
 					permission
 				) VALUES (
 					:guild_id,
 					:type,
-					:target_id,
+					:user_id,
 					:permission
 				)
 			`, permissionsUserID)

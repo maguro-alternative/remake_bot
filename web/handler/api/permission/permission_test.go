@@ -20,19 +20,19 @@ import (
 
 func TestPermissionHandler_ServeHTTP(t *testing.T) {
 	bodyJson, err := json.Marshal(internal.PermissionJson{
-		PermissionUserIDs: []internal.PermissionID{
+		PermissionUserIDs: []internal.PermissionUserID{
 			{
 				GuildID:    "987654321",
 				Type:       "line_bot",
-				TargetID:   "123456789",
+				UserID:     "123456789",
 				Permission: "all",
 			},
 		},
-		PermissionRoleIDs: []internal.PermissionID{
+		PermissionRoleIDs: []internal.PermissionRoleID{
 			{
 				GuildID:    "987654321",
 				Type:       "line_bot",
-				TargetID:   "987654321",
+				RoleID:     "987654321",
 				Permission: "all",
 			},
 		},

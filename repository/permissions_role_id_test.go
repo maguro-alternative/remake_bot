@@ -38,7 +38,7 @@ func TestRepository_InsertPermissionsRoleID(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", permissionsID.GuildID)
 		assert.Equal(t, "line_bot", permissionsID.Type)
-		assert.Equal(t, "123456789", permissionsID.TargetID)
+		assert.Equal(t, "123456789", permissionsID.RoleID)
 		assert.Equal(t, "all", permissionsID.Permission)
 	})
 }
@@ -57,38 +57,38 @@ func TestGetGuildPermissionRoleIDsAllColumns(t *testing.T) {
 	f.Build(t,
 		fixtures.NewPermissionsRoleID(ctx, func(p *fixtures.PermissionsRoleID) {
 			p.GuildID = "987654321"
-			p.TargetID = "123456789"
+			p.RoleID = "123456789"
 			p.Type = "line_bot"
 			p.Permission = "read"
 		}),
 		fixtures.NewPermissionsRoleID(ctx, func(p *fixtures.PermissionsRoleID) {
 			p.GuildID = "987654321"
-			p.TargetID = "345678912"
+			p.RoleID = "345678912"
 			p.Type = "line_bot"
 			p.Permission = "write"
 		}),
 		fixtures.NewPermissionsRoleID(ctx, func(p *fixtures.PermissionsRoleID) {
 			p.GuildID = "987654321"
-			p.TargetID = "567891234"
+			p.RoleID = "567891234"
 			p.Type = "line_bot"
 			p.Permission = "all"
 		}),
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからPermissionIDを取得できること", func(t *testing.T) {
-		permissionIDs, err := repo.GetGuildPermissionUserIDsAllColumns(ctx, "987654321")
+		permissionIDs, err := repo.GetGuildPermissionRoleIDsAllColumns(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", permissionIDs[0].GuildID)
 		assert.Equal(t, "line_bot", permissionIDs[0].Type)
-		assert.Equal(t, "123456789", permissionIDs[0].TargetID)
+		assert.Equal(t, "123456789", permissionIDs[0].RoleID)
 		assert.Equal(t, "read", permissionIDs[0].Permission)
 		assert.Equal(t, "987654321", permissionIDs[1].GuildID)
 		assert.Equal(t, "line_bot", permissionIDs[1].Type)
-		assert.Equal(t, "345678912", permissionIDs[1].TargetID)
+		assert.Equal(t, "345678912", permissionIDs[1].RoleID)
 		assert.Equal(t, "write", permissionIDs[1].Permission)
 		assert.Equal(t, "987654321", permissionIDs[2].GuildID)
 		assert.Equal(t, "line_bot", permissionIDs[2].Type)
-		assert.Equal(t, "567891234", permissionIDs[2].TargetID)
+		assert.Equal(t, "567891234", permissionIDs[2].RoleID)
 		assert.Equal(t, "all", permissionIDs[2].Permission)
 	})
 }
@@ -107,32 +107,32 @@ func TestGetPermissionRoleIDs(t *testing.T) {
 	f.Build(t,
 		fixtures.NewPermissionsRoleID(ctx, func(p *fixtures.PermissionsRoleID) {
 			p.GuildID = "987654321"
-			p.TargetID = "123456789"
+			p.RoleID = "123456789"
 			p.Type = "line_bot"
 			p.Permission = "read"
 		}),
 		fixtures.NewPermissionsRoleID(ctx, func(p *fixtures.PermissionsRoleID) {
 			p.GuildID = "987654321"
-			p.TargetID = "345678912"
+			p.RoleID = "345678912"
 			p.Type = "line_bot"
 			p.Permission = "write"
 		}),
 		fixtures.NewPermissionsRoleID(ctx, func(p *fixtures.PermissionsRoleID) {
 			p.GuildID = "987654321"
-			p.TargetID = "567891234"
+			p.RoleID = "567891234"
 			p.Type = "line_bot"
 			p.Permission = "all"
 		}),
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからPermissionIDを取得できること", func(t *testing.T) {
-		permissionIDs, err := repo.GetPermissionUserIDs(ctx, "987654321", "line_bot")
+		permissionIDs, err := repo.GetPermissionRoleIDs(ctx, "987654321", "line_bot")
 		assert.NoError(t, err)
-		assert.Equal(t, "123456789", permissionIDs[0].TargetID)
+		assert.Equal(t, "123456789", permissionIDs[0].RoleID)
 		assert.Equal(t, "read", permissionIDs[0].Permission)
-		assert.Equal(t, "345678912", permissionIDs[1].TargetID)
+		assert.Equal(t, "345678912", permissionIDs[1].RoleID)
 		assert.Equal(t, "write", permissionIDs[1].Permission)
-		assert.Equal(t, "567891234", permissionIDs[2].TargetID)
+		assert.Equal(t, "567891234", permissionIDs[2].RoleID)
 		assert.Equal(t, "all", permissionIDs[2].Permission)
 	})
 }
@@ -153,7 +153,7 @@ func TestRepository_DeletePermissionsRoleID(t *testing.T) {
 			fixtures.NewPermissionsRoleID(ctx, func(pi *fixtures.PermissionsRoleID) {
 				pi.GuildID = "987654321"
 				pi.Type = "line_bot"
-				pi.TargetID = "123456789"
+				pi.RoleID = "123456789"
 				pi.Permission = "all"
 			}),
 		)

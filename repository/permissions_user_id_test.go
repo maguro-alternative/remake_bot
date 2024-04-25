@@ -27,7 +27,7 @@ func TestRepository_InsertPermissionsID(t *testing.T) {
 			{
 				GuildID:    "987654321",
 				Type:       "line_bot",
-				TargetID:   "123456789",
+				UserID:     "123456789",
 				Permission: "all",
 			},
 		}
@@ -39,7 +39,7 @@ func TestRepository_InsertPermissionsID(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", permissionsID.GuildID)
 		assert.Equal(t, "line_bot", permissionsID.Type)
-		assert.Equal(t, "123456789", permissionsID.TargetID)
+		assert.Equal(t, "123456789", permissionsID.UserID)
 		assert.Equal(t, "all", permissionsID.Permission)
 	})
 }
@@ -58,19 +58,19 @@ func TestGetGuildPermissionIDsAllColumns(t *testing.T) {
 	f.Build(t,
 		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
-			p.TargetID = "123456789"
+			p.UserID = "123456789"
 			p.Type = "line_bot"
 			p.Permission = "read"
 		}),
 		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
-			p.TargetID = "345678912"
+			p.UserID = "345678912"
 			p.Type = "line_bot"
 			p.Permission = "write"
 		}),
 		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
-			p.TargetID = "567891234"
+			p.UserID = "567891234"
 			p.Type = "line_bot"
 			p.Permission = "all"
 		}),
@@ -81,15 +81,15 @@ func TestGetGuildPermissionIDsAllColumns(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", permissionIDs[0].GuildID)
 		assert.Equal(t, "line_bot", permissionIDs[0].Type)
-		assert.Equal(t, "123456789", permissionIDs[0].TargetID)
+		assert.Equal(t, "123456789", permissionIDs[0].UserID)
 		assert.Equal(t, "read", permissionIDs[0].Permission)
 		assert.Equal(t, "987654321", permissionIDs[1].GuildID)
 		assert.Equal(t, "line_bot", permissionIDs[1].Type)
-		assert.Equal(t, "345678912", permissionIDs[1].TargetID)
+		assert.Equal(t, "345678912", permissionIDs[1].UserID)
 		assert.Equal(t, "write", permissionIDs[1].Permission)
 		assert.Equal(t, "987654321", permissionIDs[2].GuildID)
 		assert.Equal(t, "line_bot", permissionIDs[2].Type)
-		assert.Equal(t, "567891234", permissionIDs[2].TargetID)
+		assert.Equal(t, "567891234", permissionIDs[2].UserID)
 		assert.Equal(t, "all", permissionIDs[2].Permission)
 	})
 }
@@ -108,19 +108,19 @@ func TestGetPermissionIDs(t *testing.T) {
 	f.Build(t,
 		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
-			p.TargetID = "123456789"
+			p.UserID = "123456789"
 			p.Type = "line_bot"
 			p.Permission = "read"
 		}),
 		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
-			p.TargetID = "345678912"
+			p.UserID = "345678912"
 			p.Type = "line_bot"
 			p.Permission = "write"
 		}),
 		fixtures.NewPermissionsUserID(ctx, func(p *fixtures.PermissionsUserID) {
 			p.GuildID = "987654321"
-			p.TargetID = "567891234"
+			p.UserID = "567891234"
 			p.Type = "line_bot"
 			p.Permission = "all"
 		}),
@@ -129,11 +129,11 @@ func TestGetPermissionIDs(t *testing.T) {
 	t.Run("GuildIDからPermissionIDを取得できること", func(t *testing.T) {
 		permissionIDs, err := repo.GetPermissionUserIDs(ctx, "987654321", "line_bot")
 		assert.NoError(t, err)
-		assert.Equal(t, "123456789", permissionIDs[0].TargetID)
+		assert.Equal(t, "123456789", permissionIDs[0].UserID)
 		assert.Equal(t, "read", permissionIDs[0].Permission)
-		assert.Equal(t, "345678912", permissionIDs[1].TargetID)
+		assert.Equal(t, "345678912", permissionIDs[1].UserID)
 		assert.Equal(t, "write", permissionIDs[1].Permission)
-		assert.Equal(t, "567891234", permissionIDs[2].TargetID)
+		assert.Equal(t, "567891234", permissionIDs[2].UserID)
 		assert.Equal(t, "all", permissionIDs[2].Permission)
 	})
 }
@@ -154,7 +154,7 @@ func TestRepository_DeletePermissionsID(t *testing.T) {
 			fixtures.NewPermissionsUserID(ctx, func(pi *fixtures.PermissionsUserID) {
 				pi.GuildID = "987654321"
 				pi.Type = "line_bot"
-				pi.TargetID = "123456789"
+				pi.UserID = "123456789"
 				pi.Permission = "all"
 			}),
 		)

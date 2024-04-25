@@ -66,7 +66,7 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		permissionUserIDs = append(permissionUserIDs, repository.PermissionUserIDAllColumns{
 			GuildID:    guildId,
 			Type:       permissionID.Type,
-			TargetID:   permissionID.TargetID,
+			UserID:     permissionID.UserID,
 			Permission: permissionID.Permission,
 		})
 	}
@@ -75,7 +75,7 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		permissionRoleIDs = append(permissionRoleIDs, repository.PermissionRoleIDAllColumns{
 			GuildID:    guildId,
 			Type:       permissionID.Type,
-			TargetID:   permissionID.TargetID,
+			RoleID:     permissionID.RoleID,
 			Permission: permissionID.Permission,
 		})
 	}
@@ -109,7 +109,6 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "パーミッションの追加に失敗しました。", "エラー:", err.Error())
 		return
 	}
-
 
 	w.WriteHeader(http.StatusOK)
 }

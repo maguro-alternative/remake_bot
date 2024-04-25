@@ -102,7 +102,7 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			internal.PermissionUserID{
 				GuildID:    guildId,
 				Type:       permissionID.Type,
-				TargetID:   permissionID.TargetID,
+				UserID:     permissionID.UserID,
 				Permission: permissionID.Permission,
 			},
 		)
@@ -113,7 +113,7 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			internal.PermissionRoleID{
 				GuildID:    guildId,
 				Type:       permissionID.Type,
-				TargetID:   permissionID.TargetID,
+				RoleID:     permissionID.RoleID,
 				Permission: permissionID.Permission,
 			},
 		)

@@ -88,7 +88,7 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		assert.Contains(t, w.Body.String(), `<option value="12345">カテゴリーなし:📝:test</option>`)
 	})
 
-	t.Run("test new line group view handler with error", func(t *testing.T) {
+	t.Run("Lineのログイン情報がない場合、ログイン画面へリダイレクト", func(t *testing.T) {
 		indexService := &service.IndexService{
 			DiscordSession: &discordgo.Session{},
 		}
@@ -143,7 +143,7 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		assert.Equal(t, http.StatusFound, w.Code)
 	})
 
-	t.Run("test new line group view handler with error", func(t *testing.T) {
+	t.Run("サーバーidが無効の場合、500を返す", func(t *testing.T) {
 		indexService := &service.IndexService{
 			DiscordSession: &discordgo.Session{},
 		}
@@ -171,12 +171,12 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		assert.NoError(t, err)
 
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest(http.MethodGet, "/group/123", nil)
+		r := httptest.NewRequest(http.MethodGet, "/group/234", nil)
 
 		mux.HandleFunc("/group/{guildId}", handler.Index)
 		mux.ServeHTTP(w, setCtxValue(r))
 
-		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
 }
 

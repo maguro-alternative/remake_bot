@@ -5,47 +5,43 @@ import (
 	"testing"
 )
 
-type WebhookMention struct {
+type WebhookUserMention struct {
 	WebhookID int64  `db:"webhook_id"`
-	IDType    string `db:"id_type"`
-	ID        string `db:"id"`
+	UserID    string `db:"user_id"`
 }
 
-func NewWebhookMention(ctx context.Context, setter ...func(b *WebhookMention)) *ModelConnector {
-	webhookMention := &WebhookMention{
+func NewWebhookUserMention(ctx context.Context, setter ...func(b *WebhookUserMention)) *ModelConnector {
+	webhookUserMention := &WebhookUserMention{
 		WebhookID: 1,
-		IDType:    "user",
-		ID:        "1111111111111",
+		UserID:    "1111111111111",
 	}
 
 	return &ModelConnector{
-		Model: webhookMention,
+		Model: webhookUserMention,
 		setter: func() {
 			for _, s := range setter {
-				s(webhookMention)
+				s(webhookUserMention)
 			}
 		},
 		addToFixture: func(t *testing.T, f *Fixture) {
-			f.WebhookMentions = append(f.WebhookMentions, webhookMention)
+			f.WebhookUserMentions = append(f.WebhookUserMentions, webhookUserMention)
 		},
 		connect: func(t *testing.T, f *Fixture, connectingModel interface{}) {
 			switch connectingModel.(type) {
 			default:
-				t.Fatalf("%T cannot be connected to %T", connectingModel, webhookMention)
+				t.Fatalf("%T cannot be connected to %T", connectingModel, webhookUserMention)
 			}
 		},
 		insertTable: func(t *testing.T, f *Fixture) {
 			_, err := f.DBv1.NamedExecContext(ctx, `
-				INSERT INTO webhook_mention (
+				INSERT INTO webhook_user_mention (
 					webhook_id,
-					id_type,
-					id
+					user_id
 				) VALUES (
 					:webhook_id,
-					:id_type,
-					:id
+					:user_id
 				)
-			`, webhookMention)
+			`, webhookUserMention)
 			if err != nil {
 				t.Fatalf("insert error: %v", err)
 			}

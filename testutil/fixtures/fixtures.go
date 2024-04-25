@@ -17,10 +17,13 @@ type Fixture struct {
 	LineBots                  []*LineBot
 	LineBotIvs                []*LineBotIv
 	VcSignalChannels          []*VcSignalChannel
-	VcSignalNgIDs             []*VcSignalNgID
-	VcSignalMentionIDs        []*VcSignalMentionID
+	VcSignalNgUserIDs         []*VcSignalNgUserID
+	VcSignalNgRoleIDs         []*VcSignalNgRoleID
+	VcSignalMentionUserIDs    []*VcSignalMentionUserID
+	VcSignalMentionRoleIDs    []*VcSignalMentionRoleID
 	Webhooks                  []*Webhook
-	WebhookMentions           []*WebhookMention
+	WebhookUserMentions       []*WebhookUserMention
+	WebhookRoleMentions       []*WebhookRoleMention
 	WebhookWords              []*WebhookWord
 
 	DBv1 db.Driver

@@ -5,51 +5,47 @@ import (
 	"testing"
 )
 
-type VcSignalMentionID struct {
+type VcSignalNgRoleID struct {
 	VcChannelID string `db:"vc_channel_id"`
 	GuildID     string `db:"guild_id"`
-	IDType      string `db:"id_type"`
-	ID          string `db:"id"`
+	RoleID      string `db:"role_id"`
 }
 
-func NewVcSignalMentionID(ctx context.Context, setter ...func(b *VcSignalMentionID)) *ModelConnector {
-	vcSignalMentionID := &VcSignalMentionID{
+func NewVcSignalNgID(ctx context.Context, setter ...func(b *VcSignalNgRoleID)) *ModelConnector {
+	vcSignalNgRoleID := &VcSignalNgRoleID{
 		VcChannelID: "1111111111111",
 		GuildID:     "1111111111111",
-		IDType:      "user",
-		ID:          "1111111111111",
+		RoleID:      "1111111111111",
 	}
 
 	return &ModelConnector{
-		Model: vcSignalMentionID,
+		Model: vcSignalNgRoleID,
 		setter: func() {
 			for _, s := range setter {
-				s(vcSignalMentionID)
+				s(vcSignalNgRoleID)
 			}
 		},
 		addToFixture: func(t *testing.T, f *Fixture) {
-			f.VcSignalMentionIDs = append(f.VcSignalMentionIDs, vcSignalMentionID)
+			f.VcSignalNgRoleIDs = append(f.VcSignalNgRoleIDs, vcSignalNgRoleID)
 		},
 		connect: func(t *testing.T, f *Fixture, connectingModel interface{}) {
 			switch connectingModel.(type) {
 			default:
-				t.Fatalf("%T cannot be connected to %T", connectingModel, vcSignalMentionID)
+				t.Fatalf("%T cannot be connected to %T", connectingModel, vcSignalNgRoleID)
 			}
 		},
 		insertTable: func(t *testing.T, f *Fixture) {
 			_, err := f.DBv1.NamedExecContext(ctx, `
-				INSERT INTO vc_signal_mention_id (
+				INSERT INTO vc_signal_ng_role_id (
 					vc_channel_id,
 					guild_id,
-					id_type,
-					id
+					role_id
 				) VALUES (
 					:vc_channel_id,
 					:guild_id,
-					:id_type,
-					:id
+					:role_id
 				)
-			`, vcSignalMentionID)
+			`, vcSignalNgRoleID)
 			if err != nil {
 				t.Fatalf("insert error: %v", err)
 			}

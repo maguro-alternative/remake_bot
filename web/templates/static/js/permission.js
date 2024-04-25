@@ -35,7 +35,7 @@ document.getElementById('form').onsubmit = async function (event) {
                 jsonTmp['permission_user_ids'].push({
                     "guild_id": guildId,
                     "type": permissionName,
-                    "target_id": user,
+                    "user_id": user,
                     "permission": "all"
                 })
             }
@@ -45,7 +45,7 @@ document.getElementById('form').onsubmit = async function (event) {
                 jsonTmp['permission_role_ids'].push({
                     "guild_id": guildId,
                     "type": permissionName,
-                    "target_id": role,
+                    "role_id": role,
                     "permission": "all"
                 })
             }

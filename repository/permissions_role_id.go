@@ -12,7 +12,7 @@ type PermissionRoleIDAllColumns struct {
 }
 
 type PermissionRoleID struct {
-	RoleID     string `db:"target_id"`
+	RoleID     string `db:"role_id"`
 	Permission string `db:"permission"`
 }
 

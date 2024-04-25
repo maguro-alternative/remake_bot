@@ -13,14 +13,6 @@ type PermissionCode struct {
 	Code    int64
 }
 
-type PermissionID struct {
-	GuildID    string
-	Type       string
-	TargetType string
-	TargetID   string
-	Permission string
-}
-
 type PermissionUserID struct {
 	GuildID    string `json:"guild_id"`
 	Type       string `json:"type"`

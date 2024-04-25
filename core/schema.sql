@@ -21,15 +21,15 @@ CREATE TABLE IF NOT EXISTS permissions_code (
 
     guild_id (TEXT PRIMARY KEY): サーバーID
     type (TEXT): 権限の種類 (line_post_discord_channel, line_bot, vc, webhook)
-    target_id (TEXT): 対象ID (ユーザーID)
+    user_id (TEXT): 対象ID (ユーザーID)
     permission (TEXT): 権限レベル(read, write, admin)
 */
 CREATE TABLE IF NOT EXISTS permissions_user_id (
     guild_id TEXT NOT NULL,
     type TEXT NOT NULL,
-    target_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
     permission TEXT NOT NULL,
-    PRIMARY KEY(guild_id, type, target_id)
+    PRIMARY KEY(guild_id, type, user_id)
 );
 
 /*
@@ -39,15 +39,15 @@ CREATE TABLE IF NOT EXISTS permissions_user_id (
 
     guild_id (TEXT PRIMARY KEY): サーバーID
     type (TEXT): 権限の種類 (line_post_discord_channel, line_bot, vc, webhook)
-    target_id (TEXT): 対象ID (ロールID)
+    user_id (TEXT): 対象ID (ロールID)
     permission (TEXT): 権限レベル(read, write, admin)
 */
 CREATE TABLE IF NOT EXISTS permissions_role_id (
     guild_id TEXT NOT NULL,
     type TEXT NOT NULL,
-    target_id TEXT NOT NULL,
+    role_id TEXT NOT NULL,
     permission TEXT NOT NULL,
-    PRIMARY KEY(guild_id, type, target_id)
+    PRIMARY KEY(guild_id, type, role_id)
 );
 
 /*
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS vc_signal_channel (
     id (TEXT): ID
 */
 
-CREATE TABLE IF NOT EXISTS vc_signal_ng_member_id (
+CREATE TABLE IF NOT EXISTS vc_signal_ng_user_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     user_id TEXT NOT NULL,

@@ -198,6 +198,19 @@ CREATE TABLE IF NOT EXISTS vc_signal_mention_role_id (
     PRIMARY KEY(vc_channel_id, role_id)
 );
 
+/*
+    webhookの設定を保存するテーブル
+
+    カラム:
+    webhook_serial_id (SERIAL): webhookのシリアルID
+    guild_id (TEXT): サーバーID
+    webhook_id (TEXT): webhookのID
+    subscription_type (TEXT): 購読タイプ(youtube,niconico)
+    subscription_id (TEXT): 購読ID(youtubeのチャンネルID,niconicoのチャンネルID)
+    last_posted_at (TIMESTAMP): 最終送信日時
+
+*/
+
 CREATE TABLE IF NOT EXISTS webhook (
     webhook_serial_id SERIAL,
     guild_id TEXT NOT NULL,
@@ -208,12 +221,28 @@ CREATE TABLE IF NOT EXISTS webhook (
     PRIMARY KEY(webhook_serial_id)
 );
 
+/*
+    webhookが送信するメッセージのメンションを保存するテーブル
+
+    カラム:
+    webhook_serial_id (INTEGER): webhookのシリアルID
+    user_id (TEXT): ユーザーID
+*/
+
 CREATE TABLE IF NOT EXISTS webhook_user_mention (
     webhook_serial_id INTEGER,
     user_id TEXT NOT NULL,
     PRIMARY KEY(webhook_serial_id, user_id),
     FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id)
 );
+
+/*
+    webhookが送信するメッセージのメンションを保存するテーブル
+
+    カラム:
+    webhook_serial_id (INTEGER): webhookのシリアルID
+    role_id (TEXT): ロールID
+*/
 
 CREATE TABLE IF NOT EXISTS webhook_role_mention (
     webhook_serial_id INTEGER,
@@ -222,7 +251,20 @@ CREATE TABLE IF NOT EXISTS webhook_role_mention (
     FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id)
 );
 
-/*ng_or ng_and search_or search_and mention_or mention_and*/
+/*
+    webhookが送信するメッセージの条件を保存するテーブル
+
+    カラム:
+    webhook_serial_id (INTEGER): webhookのシリアルID
+    conditions (TEXT): 条件以下のような文字列
+        ng_or       : 送信しない条件をORで結合
+        ng_and      : 送信しない条件をANDで結合
+        search_or   : 検索条件をORで結合
+        search_and  : 検索条件をANDで結合
+        mention_or  : メンション条件をORで結合
+        mention_and : メンション条件をANDで結合
+    word (TEXT): 単語
+*/
 CREATE TABLE IF NOT EXISTS webhook_word (
     webhook_serial_id INTEGER,
     conditions TEXT NOT NULL,

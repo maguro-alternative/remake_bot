@@ -1,10 +1,14 @@
 package guilds
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
+
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/ctxvalue"
@@ -21,10 +25,40 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, os.Chdir(cwd))
 	})
-	require.NoError(t, os.Chdir("../../../../../"))
-	t.Run("正常に表示される", func(t *testing.T) {
+	require.NoError(t, os.Chdir("../../../../"))
+	t.Run("サーバー一覧が正常に表示される(1件のみ)", func(t *testing.T) {
 		indexService := &service.IndexService{
-			DiscordSession: &discordgo.Session{},
+			Client: mock.NewStubHttpClient(func(req *http.Request) *http.Response {
+				return &http.Response{
+					StatusCode: http.StatusOK,
+					Body: io.NopCloser(strings.NewReader(`
+					[
+						{
+							"id": "123",
+							"name": "test",
+							"icon": "test",
+							"owner": true,
+							"permissions": 1,
+							"features": ["test"]
+						}
+					]
+					`)),
+				}
+			}),
+			DiscordSession: &mock.SessionMock{
+				UserGuildsFunc: func(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) ([]*discordgo.UserGuild, error) {
+					return []*discordgo.UserGuild{
+						{
+							ID:          "123",
+							Name:        "test",
+							Icon:        "test",
+							Owner:       true,
+							Permissions: 1,
+							Features:    []discordgo.GuildFeature{"test"},
+						},
+					}, nil
+				},
+			},
 		}
 		indexService.DiscordBotState = discordgo.NewState()
 		err := indexService.DiscordBotState.GuildAdd(&discordgo.Guild{
@@ -64,9 +98,9 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 
 		handler := NewGuildsViewHandler(indexService)
 
-		mux.HandleFunc("/guilds/{guildId}", handler.Index)
+		mux.HandleFunc("/guilds", handler.Index)
 
-		req := httptest.NewRequest(http.MethodGet, "/guilds/123", nil)
+		req := httptest.NewRequest(http.MethodGet, "/guilds", nil)
 		rec := httptest.NewRecorder()
 
 		mux.ServeHTTP(rec, setCtxValue(req))
@@ -77,19 +111,22 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<img src="https://cdn.discordapp.com/avatars/123/test.webp?size=64" alt="Discordアイコン">`)
 		assert.Contains(t, rec.Body.String(), `<p>LINEアカウント: 未ログイン</p>`)
 
+		assert.Contains(t, rec.Body.String(), `<a href="/guild/123">`)
+		assert.Contains(t, rec.Body.String(), `<img src="https://cdn.discordapp.com/icons/123/test.png" alt="test">`)
+		assert.Contains(t, rec.Body.String(), `<li>test</li>`)
 	})
 }
 
 func setCtxValue(r *http.Request) *http.Request {
 	ctx := r.Context()
-	ctx = ctxvalue.ContextWithDiscordPermission(ctx, &model.DiscordPermissionData{
-		PermissionCode: 8,
+	ctx = ctxvalue.ContextWithDiscordUser(ctx, &model.DiscordOAuthSession{
+		Token: "test",
 		User: model.DiscordUser{
 			ID:       "123",
 			Username: "test",
 			Avatar:   "test",
 		},
-		Permission: "all",
-	})
+	},
+	)
 	return r.WithContext(ctx)
 }

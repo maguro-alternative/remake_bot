@@ -7,13 +7,13 @@ import (
 
 type WebhookRoleMention struct {
 	WebhookID int64  `db:"webhook_id"`
-	RoleID        string `db:"role_id"`
+	RoleID    string `db:"role_id"`
 }
 
 func NewWebhookMention(ctx context.Context, setter ...func(b *WebhookRoleMention)) *ModelConnector {
 	webhookRoleMention := &WebhookRoleMention{
 		WebhookID: 1,
-		RoleID:        "1111111111111",
+		RoleID:    "1111111111111",
 	}
 
 	return &ModelConnector{

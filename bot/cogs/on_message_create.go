@@ -23,7 +23,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func (h *cogHandler) OnMessageCreate(s *discordgo.Session, vs *discordgo.MessageCreate) {
+func (h *cogHandler) onMessageCreate(s *discordgo.Session, vs *discordgo.MessageCreate) {
 	ctx := context.Background()
 	repo := repository.NewRepository(h.db)
 	ffmpeg := onMessageCreate.NewFfmpeg(ctx)

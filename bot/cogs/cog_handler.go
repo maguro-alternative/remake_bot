@@ -31,6 +31,6 @@ func RegisterHandlers(
 ) {
 	cogs := newCogHandler(sqlxdb, client)
 	fmt.Println(s.State.User.Username + "としてログインしました")
-	//s.AddHandler(cogs.onVoiceStateUpdate)
+	s.AddHandler(cogs.onVoiceStateUpdate)
 	s.AddHandler(cogs.onMessageCreate)
 }

@@ -14,7 +14,7 @@ func (h *cogHandler) onVoiceStateUpdate(s *discordgo.Session, vs *discordgo.Voic
 	ctx := context.Background()
 	repo := repository.NewRepository(h.db)
 	slog.InfoContext(ctx, "OnVoiceStateUpdate")
-	err := h.onVoiceStateUpdateFunc(ctx, repo, s, vs)
+	_, err := h.onVoiceStateUpdateFunc(ctx, repo, s, vs)
 	if err != nil {
 		slog.ErrorContext(ctx, "", "", err.Error())
 	}
@@ -26,7 +26,7 @@ func (h *cogHandler) onVoiceStateUpdateFunc(
 	//s mock.Session,
 	s *discordgo.Session,
 	m *discordgo.VoiceStateUpdate,
-) error {
+) (*discordgo.Message, error) {
 	slog.InfoContext(ctx, "OnVoiceStateUpdateFunc")
 	//fmt.Println(m.ChannelID)				// After
 	//fmt.Println(m.BeforeUpdate.ChannelID)	// Before
@@ -47,5 +47,5 @@ func (h *cogHandler) onVoiceStateUpdateFunc(
 	// m.BeforeUpdate.SelfStream == false && m.SelfStream // haishin start
 
 	_, err := s.ChannelMessageSend(vcChannelID, "Hello")
-	return err
+	return nil, err
 }

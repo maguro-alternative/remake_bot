@@ -4,7 +4,16 @@ import (
 	"context"
 )
 
-type VcSignalChannel struct {
+type VcSignalChannelAllColumns struct {
+	VcChannelID     string `db:"vc_channel_id"`
+	GuildID         string `db:"guild_id"`
+	SendSignal      bool   `db:"send_signal"`
+	SendChannelID   string `db:"send_channel_id"`
+	JoinBot         bool   `db:"join_bot"`
+	EveryoneMention bool   `db:"everyone_mention"`
+}
+
+type VcSignalChannelNotGuildID struct {
 	VcChannelID     string `db:"vc_channel_id"`
 	GuildID         string `db:"guild_id"`
 	SendSignal      bool   `db:"send_signal"`
@@ -37,8 +46,8 @@ func (r *Repository) InsertVcSignalChannel(ctx context.Context, vcChannelID stri
 	return nil
 }
 
-func (r *Repository) GetVcSignalChennel(ctx context.Context, vcChannelID string) (*VcSignalChannel, error) {
-	var vcSignalChannel VcSignalChannel
+func (r *Repository) GetVcSignalChennel(ctx context.Context, vcChannelID string) (*VcSignalChannelAllColumns, error) {
+	var vcSignalChannel VcSignalChannelAllColumns
 	err := r.db.GetContext(ctx, &vcSignalChannel, "SELECT * FROM vc_signal_channel WHERE vc_channel_id = ?", vcChannelID)
 	if err != nil {
 		return nil, err
@@ -46,7 +55,7 @@ func (r *Repository) GetVcSignalChennel(ctx context.Context, vcChannelID string)
 	return &vcSignalChannel, nil
 }
 
-func (r *Repository) UpdateVcSignalChannel(ctx context.Context, vcChannel VcSignalChannel) error {
+func (r *Repository) UpdateVcSignalChannel(ctx context.Context, vcChannel VcSignalChannelNotGuildID) error {
 	_, err := r.db.ExecContext(ctx, `
 	UPDATE
 		vc_signal_channel

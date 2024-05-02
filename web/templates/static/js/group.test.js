@@ -24,8 +24,8 @@ describe('fetchGroupData', () => {
             json: () => Promise.resolve(mockResponse),
         });
         const formData = new FormData();
-        formData.append("username", "Groucho");
-        formData.append("accountnum", 123456);
+        formData.append("default_channel_id", "111");
+        formData.append("debug_mode", false);
 
         const jsonData = await createJsonData(formData)
         const data = await fetchGroupData(guildId, jsonData);

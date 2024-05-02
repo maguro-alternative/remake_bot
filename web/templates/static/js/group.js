@@ -9,24 +9,39 @@ document.getElementById('form').onsubmit = async function (event) {
     event.preventDefault();
     const guildId = location.pathname.match(/[0-9]/g).join('');
     const formData = new FormData(document.getElementById('form'));
-    const data = Object.fromEntries(formData.entries());
 
-    const jsonData = JSON.stringify(data);
+    const jsonData = await createJsonData(formData);
 
     // データを送信
-    await fetch(`/api/${guildId}/group`, {
+    const data = await fetchGroupData(guildId, jsonData);
+    if (data.ok) {
+        alert('設定を保存しました');
+        window.location.href = `/guild/${guildId}`;
+    } else {
+        window.alert('送信に失敗しました');
+    }
+
+}
+
+const createJsonData = async function(formData) {
+    const data = Object.fromEntries(formData.entries());
+
+    return JSON.stringify(data);
+}
+
+const fetchGroupData = async function(guildId, jsonData) {
+    const res = await fetch(`/api/${guildId}/group`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: jsonData
-    }).then((res) => {
-        if (res.ok && res.status === 200) {
-            alert('設定を保存しました');
-            window.location.href = `/guild/${guildId}`;
-        } else {
-            alert('設定の保存に失敗しました');
-        }
-    });
+    })
 
+    return await res;
+}
+
+try {
+    module.exports = { fetchGroupData, createJsonData };
+} catch (e) {
 }

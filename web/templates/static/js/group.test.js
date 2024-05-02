@@ -16,7 +16,7 @@ describe('fetchGroupData', () => {
     });
 
     // ここにテストケースを書く
-    it('should send a POST request with correct headers and body', async () => {
+    it('formからjsonに変換できること', async () => {
         const guildId = '123';
         const mockResponse = { status: 'success' };
         global.fetch.mockResolvedValue({
@@ -46,6 +46,7 @@ describe('fetchGroupData', () => {
             ok: false,
         });
         const jsonData = await createJsonData(formData)
+        const data = await fetchGroupData(guildId, jsonData);
 
         await expect(fetchGroupData(guildId, jsonData)).rejects.toThrow('Error');
     });*/

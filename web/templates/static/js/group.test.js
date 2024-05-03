@@ -1,4 +1,3 @@
-// FILEPATH: /c:/Users/bi_wa/gopro/remake_bot/web/templates/static/js/group.test.js
 const { JSDOM } = require('jsdom');
 
 const dom = new JSDOM('<!doctype html><html><body><form id="form"><input id="id" type="text" name="name" value="pas"/></form></body></html>');

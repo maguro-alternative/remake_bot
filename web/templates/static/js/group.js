@@ -31,7 +31,6 @@ document.getElementById('form').onsubmit = async function (event) {
 
 const createJsonData = async function(formData) {
     const data = Object.fromEntries(formData.entries());
-
     return JSON.stringify(data);
 }
 

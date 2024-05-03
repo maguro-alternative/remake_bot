@@ -31,7 +31,7 @@ document.getElementById('form').onsubmit = async function (event) {
     })
 }
 
-async function createJsonData(formElements, formData) {
+const createJsonData = async function(formElements, formData) {
     // それぞれ入力内容を配列に格納
     let ngTypeArray, ngUserArray, ngRoleArray;
     const channelArray = [];
@@ -77,4 +77,9 @@ async function createJsonData(formElements, formData) {
     return JSON.stringify({
         "channels": channelArray
     });
+}
+
+try {
+    module.exports = { createJsonData };
+} catch (e) {
 }

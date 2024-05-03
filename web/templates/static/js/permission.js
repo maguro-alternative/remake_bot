@@ -10,13 +10,34 @@ document.getElementById('form').onsubmit = async function (event) {
     const guildId = location.pathname.match(/[0-9]/g).join('');
     const formData = new FormData(document.getElementById('form'));
     const formElements = document.forms['form'].elements;
+
+    const jsonData = await createJsonData(guildId, formData, formElements);
+
+    // データを送信
+    await fetch(`/api/${guildId}/permission`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: jsonData
+    }).then((res) => {
+        if (res.ok && res.status === 200) {
+            alert('設定を保存しました');
+            window.location.href = `/guild/${guildId}`;
+        } else {
+            alert('設定の保存に失敗しました');
+        }
+    });
+}
+
+const createJsonData = async function(guildId, formData, formElements) {
     let permissionName;
     let jsonTmp = {
         "permission_codes": [],
         "permission_user_ids": [],
         "permission_role_ids": [],
     };
-    console.log(formElements)
+
     // 各formのkeyを取得
     for (let i = 0; i < formElements.length; i++) {
         formKey = formElements[i].name;
@@ -52,23 +73,5 @@ document.getElementById('form').onsubmit = async function (event) {
         }
     }
 
-    const jsonData = JSON.stringify(jsonTmp);
-
-    console.log(jsonData)
-
-    // データを送信
-    await fetch(`/api/${guildId}/permission`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: jsonData
-    }).then((res) => {
-        if (res.ok && res.status === 200) {
-            alert('設定を保存しました');
-            window.location.href = `/guild/${guildId}`;
-        } else {
-            alert('設定の保存に失敗しました');
-        }
-    });
+    return JSON.stringify(jsonTmp);
 }

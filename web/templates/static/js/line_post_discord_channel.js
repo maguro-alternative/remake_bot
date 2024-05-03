@@ -11,11 +11,31 @@ document.getElementById('form').onsubmit = async function (event) {
     const formData = new FormData(document.getElementById('form'));
     const formElements = document.forms['form'].elements;
     // それぞれ入力内容を配列に格納
+
+    const jsonData = await createJsonData(formElements, formData);
+
+    // データを送信
+    await fetch(`/api/${guildId}/line-post-discord-channel`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: jsonData
+    }).then((res) => {
+        if (res.ok && res.status === 200) {
+            alert('設定を保存しました');
+            window.location.href = `/guild/${guildId}`;
+        } else {
+            alert('設定の保存に失敗しました');
+        }
+    })
+}
+
+async function createJsonData(formElements, formData) {
+    // それぞれ入力内容を配列に格納
     let ngTypeArray, ngUserArray, ngRoleArray;
     const channelArray = [];
     let jsonTmp = {};
-
-    // 各formのkeyを取得
     for (let i = 0; i < formElements.length; i++) {
         formKey = formElements[i].name;
         channelIdmatch = formKey.match(/[0-9]/g);
@@ -54,24 +74,7 @@ document.getElementById('form').onsubmit = async function (event) {
         channelArray.push(jsonTmp[key]);
     }
 
-    const jsonData = JSON.stringify({
+    return JSON.stringify({
         "channels": channelArray
     });
-
-    // データを送信
-    await fetch(`/api/${guildId}/line-post-discord-channel`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: jsonData
-    }).then((res) => {
-        if (res.ok && res.status === 200) {
-            alert('設定を保存しました');
-            window.location.href = `/guild/${guildId}`;
-        } else {
-            alert('設定の保存に失敗しました');
-        }
-    })
-
 }

@@ -9,7 +9,6 @@ document.getElementById('form').onsubmit = async function (event) {
     event.preventDefault();
     const guildId = location.pathname.match(/[0-9]/g).join('');
     const formData = new FormData(document.getElementById('form'));
-    const data = Object.fromEntries(formData.entries());
 
     const jsonData = await createJsonData(formData);
 

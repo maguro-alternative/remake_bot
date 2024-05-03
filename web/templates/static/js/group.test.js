@@ -8,7 +8,7 @@ global.window = dom.window;
 global.fetch = jest.fn();
 container = global.document.getElementById('form');
 
-const { fetchGroupData, createJsonData } = require('./group');
+const { createJsonData } = require('./group');
 
 describe('fetchGroupData', () => {
     afterEach(() => {
@@ -17,7 +17,6 @@ describe('fetchGroupData', () => {
 
     // ここにテストケースを書く
     it('formからjsonに変換できること', async () => {
-        const guildId = '123';
         const mockResponse = { status: 'success' };
         global.fetch.mockResolvedValue({
             ok: true,
@@ -31,28 +30,4 @@ describe('fetchGroupData', () => {
 
         expect(jsonData).toEqual('{"default_channel_id":"111","debug_mode":"false"}');
     });
-
-    /*it('should throw an error if the response is not ok', async () => {
-        const guildId = '123';
-        const mockResponse = { status: 'success' };
-        global.fetch.mockResolvedValue({
-            ok: true,
-            json: () => Promise.resolve(mockResponse),
-        });
-        const formData = new FormData();
-        formData.append("default_channel_id", "111");
-        formData.append("debug_mode", false);
-
-        const jsonData = await createJsonData(formData)
-        const data = await fetchGroupData(guildId, jsonData);
-
-        expect(fetch).toHaveBeenCalledWith(`/api/${guildId}/group`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: jsonData
-        });
-        expect(data).toEqual(jsonData);
-    });*/
 });

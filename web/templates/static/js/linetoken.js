@@ -11,7 +11,7 @@ document.getElementById('form').onsubmit = async function (event) {
     const formData = new FormData(document.getElementById('form'));
     const data = Object.fromEntries(formData.entries());
 
-    const jsonData = JSON.stringify(data);
+    const jsonData = await createJsonData(formData);
 
     // データを送信
     await fetch(`/api/${guildId}/linetoken`, {
@@ -28,5 +28,14 @@ document.getElementById('form').onsubmit = async function (event) {
             alert('設定の保存に失敗しました');
         }
     });
+}
 
+const createJsonData = async function(formData) {
+    const data = Object.fromEntries(formData.entries());
+    return JSON.stringify(data);
+}
+
+try {
+    module.exports = { createJsonData };
+} catch (e) {
 }

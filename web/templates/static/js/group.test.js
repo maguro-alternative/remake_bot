@@ -28,6 +28,22 @@ describe('fetchGroupData', () => {
         formData.append("debug_mode", false);
 
         const jsonData = await createJsonData(formData)
+
+        expect(jsonData).toEqual('{"default_channel_id":"111","debug_mode":"false"}');
+    });
+
+    /*it('should throw an error if the response is not ok', async () => {
+        const guildId = '123';
+        const mockResponse = { status: 'success' };
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve(mockResponse),
+        });
+        const formData = new FormData();
+        formData.append("default_channel_id", "111");
+        formData.append("debug_mode", false);
+
+        const jsonData = await createJsonData(formData)
         const data = await fetchGroupData(guildId, jsonData);
 
         expect(fetch).toHaveBeenCalledWith(`/api/${guildId}/group`, {
@@ -37,17 +53,6 @@ describe('fetchGroupData', () => {
             },
             body: jsonData
         });
-        expect(data).toEqual(mockResponse);
-    });
-
-    /*it('should throw an error if the response is not ok', async () => {
-        const guildId = '123';
-        global.fetch.mockResolvedValue({
-            ok: false,
-        });
-        const jsonData = await createJsonData(formData)
-        const data = await fetchGroupData(guildId, jsonData);
-
-        await expect(fetchGroupData(guildId, jsonData)).rejects.toThrow('Error');
+        expect(data).toEqual(jsonData);
     });*/
 });

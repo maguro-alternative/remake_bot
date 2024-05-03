@@ -16,7 +16,7 @@ document.getElementById('form').onsubmit = async function (event) {
     const data = await fetchGroupData(guildId, jsonData);
     if (data.ok) {
         alert('設定を保存しました');
-        window.location.href = `/guild/${guildId}`;
+        window.location.href = `/`;
     } else {
         window.alert('送信に失敗しました');
     }

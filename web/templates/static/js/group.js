@@ -38,7 +38,7 @@ const fetchGroupData = async function(guildId, jsonData) {
         body: jsonData
     })
 
-    return await res;
+    return res;
 }
 
 try {

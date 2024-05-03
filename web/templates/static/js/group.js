@@ -13,14 +13,20 @@ document.getElementById('form').onsubmit = async function (event) {
     const jsonData = await createJsonData(formData);
 
     // データを送信
-    const data = await fetchGroupData(guildId, jsonData);
-    if (data.ok) {
-        alert('設定を保存しました');
-        window.location.href = `/`;
-    } else {
-        window.alert('送信に失敗しました');
-    }
-
+    await fetch(`/api/${guildId}/group`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: jsonData
+    }).then((res) => {
+        if (res.ok && res.status === 200) {
+            alert('設定を保存しました');
+            window.location.href = `/guild/${guildId}`;
+        } else {
+            alert('設定の保存に失敗しました');
+        }
+    });
 }
 
 const createJsonData = async function(formData) {
@@ -29,19 +35,7 @@ const createJsonData = async function(formData) {
     return JSON.stringify(data);
 }
 
-const fetchGroupData = async function(guildId, jsonData) {
-    const res = await fetch(`/api/${guildId}/group`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: jsonData
-    })
-
-    return res;
-}
-
 try {
-    module.exports = { fetchGroupData, createJsonData };
+    module.exports = { createJsonData };
 } catch (e) {
 }

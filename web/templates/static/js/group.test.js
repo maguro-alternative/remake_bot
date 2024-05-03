@@ -16,11 +16,6 @@ describe('fetchGroupData', () => {
 
     // ここにテストケースを書く
     it('formからjsonに変換できること', async () => {
-        const mockResponse = { status: 'success' };
-        global.fetch.mockResolvedValue({
-            ok: true,
-            json: () => Promise.resolve(mockResponse),
-        });
         const formData = new FormData();
         formData.append("default_channel_id", "111");
         formData.append("debug_mode", false);

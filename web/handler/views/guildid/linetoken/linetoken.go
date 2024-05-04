@@ -120,7 +120,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました:"+err.Error())
 		return
 	}
-	slog.InfoContext(ctx, "line_bot:", "notify", lineBot.LineNotifyToken, "bot", lineBot.LineBotToken, "secret", lineBot.LineBotSecret, "group", lineBot.LineGroupID, "client_id", lineBot.LineClientID, "client_secret", lineBot.LineClientSecret, "debug", lineBot.DebugMode, "default_channel", lineBot.DefaultChannelID)
+
 	lineBotByte := internal.LineBotByteEntered{
 		LineNotifyToken:  lineBot.LineNotifyToken,
 		LineBotToken:     lineBot.LineBotToken,

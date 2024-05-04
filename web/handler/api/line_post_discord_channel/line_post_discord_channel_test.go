@@ -11,7 +11,6 @@ import (
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel/internal"
-	"github.com/maguro-alternative/remake_bot/web/service"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -63,7 +62,6 @@ func TestLinePostDiscordChannelHandler_ServeHTTP(t *testing.T) {
 
 	t.Run("LinePostDiscordChannelの更新が成功すること", func(t *testing.T) {
 		h := &LinePostDiscordChannelHandler{
-			indexService: &service.IndexService{},
 			repo: &repository.RepositoryFuncMock{
 				UpdateLinePostDiscordChannelFunc: func(ctx context.Context, lineChannel repository.LinePostDiscordChannelAllColumns) error {
 					return nil

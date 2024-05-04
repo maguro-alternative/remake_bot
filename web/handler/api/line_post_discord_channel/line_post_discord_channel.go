@@ -9,21 +9,17 @@ import (
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel/internal"
-	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
 type LinePostDiscordChannelHandler struct {
-	indexService          *service.IndexService
-	repo                  repository.RepositoryFunc
+	repo repository.RepositoryFunc
 }
 
 func NewLinePostDiscordChannelHandler(
-	indexService *service.IndexService,
 	repo repository.RepositoryFunc,
 ) *LinePostDiscordChannelHandler {
 	return &LinePostDiscordChannelHandler{
-		indexService:          indexService,
-		repo:                  repo,
+		repo: repo,
 	}
 }
 

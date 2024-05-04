@@ -12,14 +12,14 @@ import (
 )
 
 type LineGroupHandler struct {
-	repo            repository.RepositoryFunc
+	repo repository.RepositoryFunc
 }
 
 func NewLineGroupHandler(
 	repo repository.RepositoryFunc,
 ) *LineGroupHandler {
 	return &LineGroupHandler{
-		repo:            repo,
+		repo: repo,
 	}
 }
 

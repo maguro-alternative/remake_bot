@@ -9,21 +9,17 @@ import (
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
-	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
 type PermissionHandler struct {
-	IndexService *service.IndexService
-	Repo         repository.RepositoryFunc
+	repo repository.RepositoryFunc
 }
 
 func NewPermissionHandler(
-	indexService *service.IndexService,
 	repo repository.RepositoryFunc,
 ) *PermissionHandler {
 	return &PermissionHandler{
-		IndexService: indexService,
-		Repo:         repo,
+		repo: repo,
 	}
 }
 
@@ -80,31 +76,31 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	if err := h.Repo.UpdatePermissionCodes(ctx, permissionCodes); err != nil {
+	if err := h.repo.UpdatePermissionCodes(ctx, permissionCodes); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの更新に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	if err := h.Repo.DeletePermissionUserIDs(ctx, guildId); err != nil {
+	if err := h.repo.DeletePermissionUserIDs(ctx, guildId); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの削除に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	if err := h.Repo.InsertPermissionUserIDs(ctx, permissionUserIDs); err != nil {
+	if err := h.repo.InsertPermissionUserIDs(ctx, permissionUserIDs); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの追加に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	if err := h.Repo.DeletePermissionRoleIDs(ctx, guildId); err != nil {
+	if err := h.repo.DeletePermissionRoleIDs(ctx, guildId); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの削除に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	if err := h.Repo.InsertPermissionRoleIDs(ctx, permissionRoleIDs); err != nil {
+	if err := h.repo.InsertPermissionRoleIDs(ctx, permissionRoleIDs); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの追加に失敗しました。", "エラー:", err.Error())
 		return

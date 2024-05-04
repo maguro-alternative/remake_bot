@@ -9,12 +9,9 @@ import (
 	"testing"
 
 	"github.com/maguro-alternative/remake_bot/repository"
-	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission/internal"
-	"github.com/maguro-alternative/remake_bot/web/service"
 
-	"github.com/bwmarrin/discordgo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -56,36 +53,7 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 
 	t.Run("パーミッションの更新が成功すること", func(t *testing.T) {
 		h := &PermissionHandler{
-			IndexService: &service.IndexService{
-				DiscordSession: &mock.SessionMock{
-					GuildFunc: func(guildID string, options ...discordgo.RequestOption) (*discordgo.Guild, error) {
-						return &discordgo.Guild{
-							ID: "987654321",
-						}, nil
-					},
-					GuildChannelsFunc: func(guildID string, options ...discordgo.RequestOption) ([]*discordgo.Channel, error) {
-						return []*discordgo.Channel{
-							{
-								ID: "123456789",
-							},
-						}, nil
-					},
-					GuildMemberFunc: func(guildID string, userID string, options ...discordgo.RequestOption) (*discordgo.Member, error) {
-						return &discordgo.Member{
-							User: &discordgo.User{
-								ID: "123456789",
-							},
-						}, nil
-					},
-					GuildRolesFunc: func(guildID string, options ...discordgo.RequestOption) ([]*discordgo.Role, error) {
-						return []*discordgo.Role{}, nil
-					},
-					UserChannelPermissionsFunc: func(userID, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error) {
-						return 8, nil
-					},
-				},
-			},
-			Repo: &repository.RepositoryFuncMock{
+			repo: &repository.RepositoryFuncMock{
 				UpdatePermissionCodesFunc: func(ctx context.Context, permissionsCode []repository.PermissionCode) error {
 					return nil
 				},

@@ -230,11 +230,11 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 
 	t.Run("LineBotがない場合Bad Requestを返すこと", func(t *testing.T) {
 		h := &LineBotHandler{
-			IndexService: &service.IndexService{
+			indexService: &service.IndexService{
 				Client:         stubClient,
 				DiscordSession: &discordgo.Session{},
 			},
-			Repo: &repository.RepositoryFuncMock{
+			repo: &repository.RepositoryFuncMock{
 				GetAllColumnsLineBotsFunc: func(ctx context.Context) ([]*repository.LineBot, error) {
 					return []*repository.LineBot{}, nil
 				},
@@ -251,7 +251,7 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 
 	t.Run("LineBotが正常に送信できること", func(t *testing.T) {
 		h := &LineBotHandler{
-			IndexService: &service.IndexService{
+			indexService: &service.IndexService{
 				Client:         stubClient,
 				DiscordSession: &mock.SessionMock{
 					ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
@@ -259,7 +259,7 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 					},
 				},
 			},
-			Repo: &repository.RepositoryFuncMock{
+			repo: &repository.RepositoryFuncMock{
 				GetAllColumnsLineBotsFunc: func(ctx context.Context) ([]*repository.LineBot, error) {
 					return []*repository.LineBot{
 						{

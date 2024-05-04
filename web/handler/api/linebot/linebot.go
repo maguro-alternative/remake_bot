@@ -20,8 +20,8 @@ import (
 
 // A LineBotHandler handles requests for the line bot.
 type LineBotHandler struct {
-	IndexService *service.IndexService
-	Repo         repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 }
 
 // NewLineBotHandler returns new LineBotHandler.
@@ -30,8 +30,8 @@ func NewLineBotHandler(
 	repo repository.RepositoryFunc,
 ) *LineBotHandler {
 	return &LineBotHandler{
-		IndexService: indexService,
-		Repo:         repo,
+		indexService: indexService,
+		repo:         repo,
 	}
 }
 
@@ -51,7 +51,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ctx = context.Background()
 	}
 
-	lineBots, err := h.Repo.GetAllColumnsLineBots(ctx)
+	lineBots, err := h.repo.GetAllColumnsLineBots(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -72,7 +72,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i, lineBot := range lineBots {
-		lineBotIv, err = h.Repo.GetLineBotIvNotClient(ctx, lineBot.GuildID)
+		lineBotIv, err = h.repo.GetLineBotIvNotClient(ctx, lineBot.GuildID)
 		if err != nil {
 			slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -121,7 +121,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	lineEvent := lineResponses.Events[0]
 
 	lineRequ := line.NewLineRequest(
-		*h.IndexService.Client,
+		*h.indexService.Client,
 		lineBotDecrypt.LineNotifyToken,
 		lineBotDecrypt.LineBotToken,
 		lineBotDecrypt.LineGroupID,
@@ -139,7 +139,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// メッセージの種類によって処理を分岐
 	switch lineEvent.Message.Type {
 	case "text":
-		_, err = h.IndexService.DiscordSession.ChannelMessageSend(
+		_, err = h.indexService.DiscordSession.ChannelMessageSend(
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\n「 "+lineResponses.Events[0].Message.Text+" 」",
 		)
@@ -149,7 +149,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case "sticker":
-		_, err = h.IndexService.DiscordSession.ChannelMessageSend(
+		_, err = h.indexService.DiscordSession.ChannelMessageSend(
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\nスタンプを送信しました\nhttps://stickershop.line-scdn.net/stickershop/v1/sticker/"+lineResponses.Events[0].Message.StickerID+"/iPhone/sticker.png",
 		)
@@ -172,7 +172,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
+		_, err = h.indexService.DiscordSession.ChannelFileSendWithMessage(
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\n ",
 			"image."+imageType,
@@ -199,7 +199,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
+			_, err = h.indexService.DiscordSession.ChannelFileSendWithMessage(
 				lineBotDecrypt.DefaultChannelID,
 				lineProfile.DisplayName+"\n ",
 				"video."+videoType,
@@ -234,7 +234,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			_, err = h.IndexService.DiscordSession.ChannelMessageSend(
+			_, err = h.indexService.DiscordSession.ChannelMessageSend(
 				lineBotDecrypt.DefaultChannelID,
 				lineProfile.DisplayName+"\nhttps://www.youtube.com/watch?v="+videoID,
 			)
@@ -258,7 +258,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		_, err = h.IndexService.DiscordSession.ChannelFileSendWithMessage(
+		_, err = h.indexService.DiscordSession.ChannelFileSendWithMessage(
 			lineBotDecrypt.DefaultChannelID,
 			lineProfile.DisplayName+"\n ",
 			"audio."+audioType,

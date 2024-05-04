@@ -37,6 +37,7 @@ func (l *LineBotInfo) Validate() error {
 
 // LINEBotのプロフィール情報を取得
 func (r *LineRequest) GetBotInfo(ctx context.Context) (LineBotInfo, error) {
+	/* https://developers.line.biz/ja/reference/messaging-api/#get-group-summary */
 	var lineBotProfile LineBotInfo
 	url := "https://api.line.me/v2/bot/info"
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)

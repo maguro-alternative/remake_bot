@@ -27,6 +27,7 @@ func (l *LineProfile) Validate() error {
 
 // LINEのプロフィール情報を取得
 func (r *LineRequest) GetProfile(ctx context.Context, userID string) (LineProfile, error) {
+	/* https://developers.line.biz/ja/reference/messaging-api/#get-a-list-of-unit-names-assigned-during-this-month */
 	var lineProfile LineProfile
 	url := "https://api.line.me/v2/bot/profile/" + userID
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)

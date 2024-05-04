@@ -24,6 +24,7 @@ func (l *LineBotQuota) Validate() error {
 
 // LINEのプッシュ通知の使用可能回数を取得
 func (r *LineRequest) GetPushLimit(ctx context.Context) (int, error) {
+	/* https://developers.line.biz/ja/reference/messaging-api/#get-quota */
 	url := "https://api.line.me/v2/bot/message/quota"
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {

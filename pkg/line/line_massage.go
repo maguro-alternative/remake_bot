@@ -35,6 +35,7 @@ type LineMessageType struct {
 
 // テキストメッセージを作成
 func (r *LineRequest) NewLineTextMessage(message string) *LineMessageType {
+	/* https://developers.line.biz/ja/reference/messaging-api/#text-message */
 	return &LineMessageType{
 		Type: "text",
 		Text: message,
@@ -43,6 +44,7 @@ func (r *LineRequest) NewLineTextMessage(message string) *LineMessageType {
 
 // 画像メッセージを作成
 func (r *LineRequest) NewLineImageMessage(imageThumbnail, imageFullsize string) *LineMessageType {
+	/* https://developers.line.biz/ja/reference/messaging-api/#image-message */
 	return &LineMessageType{
 		Type:           "image",
 		ImageThumbnail: imageThumbnail,
@@ -52,6 +54,7 @@ func (r *LineRequest) NewLineImageMessage(imageThumbnail, imageFullsize string) 
 
 // 動画メッセージを作成
 func (r *LineRequest) NewLineVideoMessage(originalContentUrl, previewImageUrl string) *LineMessageType {
+	/* https://developers.line.biz/ja/reference/messaging-api/#video-message */
 	return &LineMessageType{
 		Type:               "video",
 		OriginalContentUrl: originalContentUrl,
@@ -61,6 +64,7 @@ func (r *LineRequest) NewLineVideoMessage(originalContentUrl, previewImageUrl st
 
 // 音声メッセージを作成
 func (r *LineRequest) NewLineAudioMessage(originalContentUrl string, duration float64) *LineMessageType {
+	/* https://developers.line.biz/ja/reference/messaging-api/#audio-message */
 	return &LineMessageType{
 		Type:               "audio",
 		OriginalContentUrl: originalContentUrl,
@@ -70,6 +74,7 @@ func (r *LineRequest) NewLineAudioMessage(originalContentUrl string, duration fl
 
 // LINEにメッセージを送信
 func (r *LineRequest) PushMessageBotInGroup(ctx context.Context, messages []*LineMessageType) error {
+	/* https://developers.line.biz/ja/reference/messaging-api/#send-push-message */
 	url := "https://api.line.me/v2/bot/message/push"
 	lineMessage := LineMessage{
 		To:       r.lineGroupID,

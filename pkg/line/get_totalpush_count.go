@@ -22,6 +22,7 @@ func (l *LineBotConsumption) Validate() error {
 
 // LINEのプッシュ通知の使用した回数を取得
 func (r *LineRequest) GetTotalPushCount(ctx context.Context) (int, error) {
+	/* https://developers.line.biz/ja/reference/messaging-api/#get-consumption */
 	url := "https://api.line.me/v2/bot/message/quota/consumption"
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {

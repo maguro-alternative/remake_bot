@@ -28,6 +28,7 @@ func (l *LineBotFriend) Validate() error {
 
 // LINEの友達数を取得
 func (r *LineRequest) GetFriendCount(ctx context.Context) (int, error) {
+	/* https://developers.line.biz/ja/reference/messaging-api/#get-number-of-followers */
 	url := "https://api.line.me/v2/bot/followers/count"
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {

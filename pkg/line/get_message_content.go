@@ -15,6 +15,7 @@ type LineMessageContent struct {
 
 // LINEメッセージ内のファイルを取得
 func (r *LineRequest) GetContent(ctx context.Context, messageID string) (LineMessageContent, error) {
+	/* https://developers.line.biz/ja/reference/messaging-api/#get-content */
 	url := "https://api-data.line.me/v2/bot/message/" + messageID + "/content"
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {

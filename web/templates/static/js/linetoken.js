@@ -12,6 +12,8 @@ document.getElementById('form').onsubmit = async function (event) {
 
     const jsonData = await createJsonData(formData);
 
+    console.log(jsonData);
+
     // データを送信
     await fetch(`/api/${guildId}/linetoken`, {
         method: 'POST',
@@ -31,6 +33,7 @@ document.getElementById('form').onsubmit = async function (event) {
 
 const createJsonData = async function(formData) {
     const data = Object.fromEntries(formData.entries());
+    data['debug_mode'] === 'on' ? data['debug_mode'] = true : data['debug_mode'] = false;
     return JSON.stringify(data);
 }
 

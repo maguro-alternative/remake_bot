@@ -122,18 +122,6 @@ func (r *Repository) GetAllColumnsLineBot(ctx context.Context, guildId string) (
 		FROM
 			line_bot
 		WHERE
-			line_notify_token IS NOT NULL
-		AND
-			line_bot_token IS NOT NULL
-		AND
-			line_bot_secret IS NOT NULL
-		AND
-			line_group_id IS NOT NULL
-		AND
-			line_client_id IS NOT NULL
-		AND
-			line_client_secret IS NOT NULL
-		AND
 			guild_id = $1
 	`
 	err := r.db.GetContext(ctx, &lineBot, query, guildId)
@@ -185,14 +173,37 @@ func (r *Repository) UpdateLineBot(ctx context.Context, lineBot *LineBot) error 
 	var setNameQuery string
 	var setQueryArray []string
 
+	if len(lineBot.LineNotifyToken) > 0 && len(lineBot.LineNotifyToken[0]) > 0 {
+		setQueryArray = append(setQueryArray, "line_notify_token = :line_notify_token")
+	}
+	if len(lineBot.LineBotToken) > 0 && len(lineBot.LineBotToken[0]) > 0 {
+		setQueryArray = append(setQueryArray, "line_bot_token = :line_bot_token")
+	}
+	if len(lineBot.LineBotSecret) > 0 && len(lineBot.LineBotSecret[0]) > 0 {
+		setQueryArray = append(setQueryArray, "line_bot_secret = :line_bot_secret")
+	}
+	if len(lineBot.LineGroupID) > 0 && len(lineBot.LineGroupID[0]) > 0 {
+		setQueryArray = append(setQueryArray, "line_group_id = :line_group_id")
+	}
+	if len(lineBot.LineClientID) > 0 && len(lineBot.LineClientID[0]) > 0 {
+		setQueryArray = append(setQueryArray, "line_client_id = :line_client_id")
+	}
+	if len(lineBot.LineClientSecret) > 0 && len(lineBot.LineClientSecret[0]) > 0 {
+		setQueryArray = append(setQueryArray, "line_client_secret = :line_client_secret")
+	}
 	if lineBot.DefaultChannelID != "" {
 		setQueryArray = append(setQueryArray, "default_channel_id = :default_channel_id")
 	}
+	if lineBot.DebugMode {
+		setQueryArray = append(setQueryArray, "debug_mode = :debug_mode")
+	}
 	setNameQuery = strings.Join(setQueryArray, ",")
 	if setNameQuery == "" {
-		fmt.Println("setNameQuery is empty")
+		fmt.Println("No update value")
 		return nil
 	}
+	fmt.Println(setNameQuery)
+	fmt.Println(lineBot.DebugMode)
 
 	query := fmt.Sprintf(`
 		UPDATE

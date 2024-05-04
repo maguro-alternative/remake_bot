@@ -52,7 +52,7 @@
             <br/>
 
             <label for="debugMode">デバッグモード</label>
-            <input id="debugMode" type="checkbox" name="debug_mode" value="{{ .LineEntered.LineDebugMode }}">
+            <input id="debugMode" type="checkbox" name="debug_mode" {{ if .LineEntered.LineDebugMode }} checked {{ end }}>
             <br/>
 
             {{ .SubmitTag }}

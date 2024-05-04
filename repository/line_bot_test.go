@@ -337,6 +337,7 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 		repo := NewRepository(tx)
 		updateLineBot := &LineBot{
 			GuildID:          "987654321",
+			DebugMode:        true,
 			DefaultChannelID: "123456789",
 		}
 		err = repo.UpdateLineBot(ctx, updateLineBot)
@@ -347,5 +348,6 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", lineBot.GuildID)
 		assert.Equal(t, "123456789", lineBot.DefaultChannelID)
+		assert.Equal(t, true, lineBot.DebugMode)
 	})
 }

@@ -4,10 +4,13 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 
 	"github.com/lib/pq"
+
+	"github.com/maguro-alternative/remake_bot/pkg/line"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 
@@ -52,6 +55,17 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := lineTokenJson.Validate(); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		slog.ErrorContext(ctx, "jsonのバリデーションに失敗しました:"+err.Error())
+		return
+	}
+
+	guildId := r.PathValue("guildId")
+	if lineTokenJson.GuildID == "" {
+		lineTokenJson.GuildID = guildId
+	}
+
+	if err := verifyLineToken(ctx, h.indexService.Client, &lineTokenJson); err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		slog.ErrorContext(ctx, "トークンの検証に失敗しました:"+err.Error())
 		return
 	}
 
@@ -135,4 +149,40 @@ func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (B
 	lineBot.DefaultChannelID = lineBotJson.DefaultChannelID
 	lineBot.DebugMode = lineBotJson.DebugMode
 	return &lineBot, &lineBotIv, nil
+}
+
+func verifyLineToken(
+	ctx context.Context,
+	client *http.Client,
+	lineTokenJson *internal.LineBotJson,
+) error {
+	lineRequ := line.NewLineRequest(
+		*client,
+		lineTokenJson.LineNotifyToken,
+		lineTokenJson.LineBotToken,
+		lineTokenJson.LineGroupID,
+	)
+	// Line Notify Tokenの検証
+	if lineTokenJson.LineNotifyToken != "" {
+		err := lineRequ.PushMessageNotify(ctx, "トークン検証のテストメッセージです。")
+		if err != nil {
+			return err
+		}
+	}
+	// Line Bot Tokenの検証
+	if lineTokenJson.LineBotToken != "" {
+		botInfo, err := lineRequ.GetBotInfo(ctx)
+		if err != nil {
+			return err
+		}
+		if botInfo.Message != "" {
+			return errors.New(botInfo.Message)
+		}
+	}
+	// Line Group IDの検証
+	if lineTokenJson.LineGroupID == "" {
+		return nil
+	}
+	_, err := lineRequ.GetGroupUserCount(ctx)
+	return err
 }

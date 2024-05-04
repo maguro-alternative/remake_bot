@@ -18,8 +18,8 @@ import (
 )
 
 type LineTokenHandler struct {
-	IndexService *service.IndexService
-	Repo         repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 }
 
 func NewLineTokenHandler(
@@ -27,8 +27,8 @@ func NewLineTokenHandler(
 	repo repository.RepositoryFunc,
 ) *LineTokenHandler {
 	return &LineTokenHandler{
-		IndexService: indexService,
-		Repo:         repo,
+		indexService: indexService,
+		repo:         repo,
 	}
 }
 
@@ -64,12 +64,12 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.Repo.UpdateLineBot(ctx, lineBot); err != nil {
+	if err := h.repo.UpdateLineBot(ctx, lineBot); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "line_botの更新に失敗しました:"+err.Error())
 		return
 	}
-	if err := h.Repo.UpdateLineBotIv(ctx, lineBotIv); err != nil {
+	if err := h.repo.UpdateLineBotIv(ctx, lineBotIv); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "line_bot_ivの更新に失敗しました:"+err.Error())
 		return

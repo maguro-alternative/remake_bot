@@ -44,7 +44,7 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 
 	t.Run("jsonのバリデーションに失敗すると、Unprocessable Entityが返ること", func(t *testing.T) {
 		h := &LineTokenHandler{
-			IndexService: &service.IndexService{},
+			indexService: &service.IndexService{},
 		}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/linetoken", bytes.NewReader([]byte(`{"channel_id":"123456789"}`)))
@@ -54,10 +54,10 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 
 	t.Run("LineBotの更新が成功すること", func(t *testing.T) {
 		h := &LineTokenHandler{
-			IndexService: &service.IndexService{
+			indexService: &service.IndexService{
 				DiscordSession: &discordgo.Session{},
 			},
-			Repo: &repository.RepositoryFuncMock{
+			repo: &repository.RepositoryFuncMock{
 				UpdateLineBotFunc: func(ctx context.Context, lineBot *repository.LineBot) error {
 					return nil
 				},

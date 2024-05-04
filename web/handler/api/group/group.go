@@ -9,21 +9,17 @@ import (
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/group/internal"
-	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
 type LineGroupHandler struct {
-	IndexService    *service.IndexService
-	Repo            repository.RepositoryFunc
+	repo            repository.RepositoryFunc
 }
 
 func NewLineGroupHandler(
-	indexService *service.IndexService,
 	repo repository.RepositoryFunc,
 ) *LineGroupHandler {
 	return &LineGroupHandler{
-		IndexService:    indexService,
-		Repo:            repo,
+		repo:            repo,
 	}
 }
 
@@ -49,7 +45,7 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	guildId := r.PathValue("guildId")
-	err := g.Repo.UpdateLineBot(ctx, &repository.LineBot{
+	err := g.repo.UpdateLineBot(ctx, &repository.LineBot{
 		GuildID:          guildId,
 		DefaultChannelID: lineGroupJson.DefaultChannelID,
 	})

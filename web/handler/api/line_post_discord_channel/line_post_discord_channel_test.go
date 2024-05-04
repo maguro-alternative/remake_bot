@@ -63,8 +63,8 @@ func TestLinePostDiscordChannelHandler_ServeHTTP(t *testing.T) {
 
 	t.Run("LinePostDiscordChannelの更新が成功すること", func(t *testing.T) {
 		h := &LinePostDiscordChannelHandler{
-			IndexService: &service.IndexService{},
-			Repo: &repository.RepositoryFuncMock{
+			indexService: &service.IndexService{},
+			repo: &repository.RepositoryFuncMock{
 				UpdateLinePostDiscordChannelFunc: func(ctx context.Context, lineChannel repository.LinePostDiscordChannelAllColumns) error {
 					return nil
 				},

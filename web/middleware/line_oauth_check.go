@@ -78,18 +78,13 @@ func LineOAuthCheckMiddleware(
 			}
 			ctx = ctxvalue.ContextWithLineUser(ctx, lineLoginUser)
 
-			guildId := r.PathValue("guildId")
-			if guildId == "" {
-				guildId = lineLoginUser.DiscordGuildID
-			}
-
-			lineBotApi, err := repo.GetLineBotNotClient(ctx, guildId)
+			lineBotApi, err := repo.GetLineBotNotClient(ctx, sessionGuildId)
 			if err != nil {
 				slog.ErrorContext(ctx, "lineBotの取得に失敗しました", "エラー:", err.Error())
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			lineBotIv, err := repo.GetLineBotIvNotClient(ctx, guildId)
+			lineBotIv, err := repo.GetLineBotIvNotClient(ctx, sessionGuildId)
 			if err != nil {
 				slog.ErrorContext(ctx, "lineBotIvの取得に失敗しました", "エラー:", err.Error())
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)

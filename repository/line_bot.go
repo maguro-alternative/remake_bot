@@ -202,8 +202,6 @@ func (r *Repository) UpdateLineBot(ctx context.Context, lineBot *LineBot) error 
 		fmt.Println("No update value")
 		return nil
 	}
-	fmt.Println(setNameQuery)
-	fmt.Println(lineBot.DebugMode)
 
 	query := fmt.Sprintf(`
 		UPDATE

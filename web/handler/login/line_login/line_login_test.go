@@ -14,6 +14,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
+	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -122,6 +123,14 @@ func TestIndex(t *testing.T) {
 					}, nil
 				},
 			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
+				},
+			},
 		)
 
 		handler.Index(rr, req)
@@ -166,6 +175,14 @@ func TestIndex(t *testing.T) {
 					return repository.LineBotIv{}, nil
 				},
 			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
+				},
+			},
 		)
 
 		handler.Index(rr, req)
@@ -190,6 +207,14 @@ func TestIndex(t *testing.T) {
 			&repository.RepositoryFuncMock{
 				GetAllColumnsLineBotsFunc: func(ctx context.Context) ([]*repository.LineBot, error) {
 					return nil, errors.New("failed to get all columns of line bots")
+				},
+			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
 				},
 			},
 		)
@@ -264,6 +289,14 @@ func TestLineLogin(t *testing.T) {
 					}, nil
 				},
 			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
+				},
+			},
 		)
 
 		req, err := http.NewRequest("GET", "/login/line/111", nil)
@@ -306,6 +339,14 @@ func TestLineLogin(t *testing.T) {
 					}, nil
 				},
 			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
+				},
+			},
 		)
 
 		req, err := http.NewRequest("GET", "/login/line/111", nil)
@@ -328,6 +369,14 @@ func TestLineLogin(t *testing.T) {
 			&repository.RepositoryFuncMock{
 				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 					return repository.LineBot{}, errors.New("failed to get all columns of line bots")
+				},
+			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
 				},
 			},
 		)

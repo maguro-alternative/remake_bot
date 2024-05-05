@@ -2,7 +2,6 @@ package linetoken
 
 import (
 	"context"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"log/slog"
@@ -10,12 +9,11 @@ import (
 
 	"github.com/lib/pq"
 
+	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 
-	"github.com/maguro-alternative/remake_bot/pkg/crypto"
-	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
 )
@@ -23,15 +21,18 @@ import (
 type LineTokenHandler struct {
 	indexService *service.IndexService
 	repo         repository.RepositoryFunc
+	aesCrypto    crypto.AESInterface
 }
 
 func NewLineTokenHandler(
 	indexService *service.IndexService,
 	repo repository.RepositoryFunc,
+	aesCrypto crypto.AESInterface,
 ) *LineTokenHandler {
 	return &LineTokenHandler{
 		indexService: indexService,
 		repo:         repo,
+		aesCrypto:    aesCrypto,
 	}
 }
 
@@ -63,15 +64,14 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		lineTokenJson.GuildID = guildId
 	}
 
-	if err := verifyLineToken(ctx, h.indexService.Client, &lineTokenJson); err != nil {
+	if err := verifyLineToken(ctx, h.repo, h.aesCrypto, h.indexService.Client, &lineTokenJson); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		slog.ErrorContext(ctx, "トークンの検証に失敗しました:"+err.Error())
 		return
 	}
 
 	// 暗号化キーの取得
-	privateKey := config.PrivateKey()
-	lineBot, lineBotIv, err := lineBotJsonEncrypt(privateKey, &lineTokenJson)
+	lineBot, lineBotIv, err := lineBotJsonEncrypt(h.aesCrypto, &lineTokenJson)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "暗号化に失敗しました:"+err.Error())
@@ -92,7 +92,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("OK")
 }
 
-func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (Bot *repository.LineBot, BotIv *repository.LineBotIv, err error) {
+func lineBotJsonEncrypt(aesCrypto crypto.AESInterface, lineBotJson *internal.LineBotJson) (Bot *repository.LineBot, BotIv *repository.LineBotIv, err error) {
 	lineBot := repository.LineBot{
 		LineNotifyToken:  make(pq.ByteaArray, 1),
 		LineBotToken:     make(pq.ByteaArray, 1),
@@ -109,38 +109,34 @@ func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (B
 		LineClientIDIv:     make(pq.ByteaArray, 1),
 		LineClientSecretIv: make(pq.ByteaArray, 1),
 	}
-	key, err := hex.DecodeString(privateKey)
-	if err != nil {
-		return nil, nil, err
-	}
 	// 暗号化
 	if len(lineBotJson.LineNotifyToken) > 0 {
-		if lineBotIv.LineNotifyTokenIv[0], lineBot.LineNotifyToken[0], err = crypto.Encrypt([]byte(lineBotJson.LineNotifyToken), key); err != nil {
+		if lineBotIv.LineNotifyTokenIv[0], lineBot.LineNotifyToken[0], err = aesCrypto.Encrypt([]byte(lineBotJson.LineNotifyToken)); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBotJson.LineBotToken) > 0 {
-		if lineBotIv.LineBotTokenIv[0], lineBot.LineBotToken[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotToken), key); err != nil {
+		if lineBotIv.LineBotTokenIv[0], lineBot.LineBotToken[0], err = aesCrypto.Encrypt([]byte(lineBotJson.LineBotToken)); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBotJson.LineBotSecret) > 0 {
-		if lineBotIv.LineBotSecretIv[0], lineBot.LineBotSecret[0], err = crypto.Encrypt([]byte(lineBotJson.LineBotSecret), key); err != nil {
+		if lineBotIv.LineBotSecretIv[0], lineBot.LineBotSecret[0], err = aesCrypto.Encrypt([]byte(lineBotJson.LineBotSecret)); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBotJson.LineGroupID) > 0 {
-		if lineBotIv.LineGroupIDIv[0], lineBot.LineGroupID[0], err = crypto.Encrypt([]byte(lineBotJson.LineGroupID), key); err != nil {
+		if lineBotIv.LineGroupIDIv[0], lineBot.LineGroupID[0], err = aesCrypto.Encrypt([]byte(lineBotJson.LineGroupID)); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBotJson.LineClientID) > 0 {
-		if lineBotIv.LineClientIDIv[0], lineBot.LineClientID[0], err = crypto.Encrypt([]byte(lineBotJson.LineClientID), key); err != nil {
+		if lineBotIv.LineClientIDIv[0], lineBot.LineClientID[0], err = aesCrypto.Encrypt([]byte(lineBotJson.LineClientID)); err != nil {
 			return nil, nil, err
 		}
 	}
 	if len(lineBotJson.LineClientSecret) > 0 {
-		if lineBotIv.LineClientSecretIv[0], lineBot.LineClientSecret[0], err = crypto.Encrypt([]byte(lineBotJson.LineClientSecret), key); err != nil {
+		if lineBotIv.LineClientSecretIv[0], lineBot.LineClientSecret[0], err = aesCrypto.Encrypt([]byte(lineBotJson.LineClientSecret)); err != nil {
 			return nil, nil, err
 		}
 	}
@@ -153,9 +149,43 @@ func lineBotJsonEncrypt(privateKey string, lineBotJson *internal.LineBotJson) (B
 
 func verifyLineToken(
 	ctx context.Context,
+	repo repository.RepositoryFunc,
+	aesCrypto crypto.AESInterface,
 	client *http.Client,
 	lineTokenJson *internal.LineBotJson,
 ) error {
+	lineNotifyToken := lineTokenJson.LineNotifyToken
+	lineBotToken := lineTokenJson.LineBotToken
+	lineGroupID := lineTokenJson.LineGroupID
+	linebot, err := repo.GetAllColumnsLineBot(ctx, lineTokenJson.GuildID)
+	if err != nil {
+		return err
+	}
+	linebotIv, err := repo.GetAllColumnsLineBotIv(ctx, lineTokenJson.GuildID)
+	if err != nil {
+		return err
+	}
+	if lineNotifyToken == "" && len(linebot.LineNotifyToken) > 0 && len(linebotIv.LineNotifyTokenIv) > 0 {
+		notifyByte, err := aesCrypto.Decrypt(linebot.LineNotifyToken[0], linebotIv.LineNotifyTokenIv[0])
+		if err != nil {
+			return err
+		}
+		lineTokenJson.LineNotifyToken = string(notifyByte)
+	}
+	if lineBotToken == "" && len(linebot.LineBotToken) > 0 && len(linebotIv.LineBotTokenIv) > 0 {
+		botByte, err := aesCrypto.Decrypt(linebot.LineBotToken[0], linebotIv.LineBotTokenIv[0])
+		if err != nil {
+			return err
+		}
+		lineTokenJson.LineBotToken = string(botByte)
+	}
+	if lineGroupID == "" && len(linebot.LineGroupID) > 0 && len(linebotIv.LineGroupIDIv) > 0 {
+		groupByte, err := aesCrypto.Decrypt(linebot.LineGroupID[0], linebotIv.LineGroupIDIv[0])
+		if err != nil {
+			return err
+		}
+		lineTokenJson.LineGroupID = string(groupByte)
+	}
 	lineRequ := line.NewLineRequest(
 		*client,
 		lineTokenJson.LineNotifyToken,
@@ -183,6 +213,6 @@ func verifyLineToken(
 	if lineTokenJson.LineGroupID == "" {
 		return nil
 	}
-	_, err := lineRequ.GetGroupUserCount(ctx)
+	_, err = lineRequ.GetGroupUserCount(ctx)
 	return err
 }

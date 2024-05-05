@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/web/config"
@@ -93,8 +94,17 @@ func TestDiscordCallbackHandler_ServeHTTP(t *testing.T) {
 			},
 		}
 
+		aesCrypto := &crypto.AESMock{
+			EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+				return nil, nil, nil
+			},
+			DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+				return nil, nil
+			},
+		}
+
 		// Create a new handler with the mocked service
-		handler := NewLineCallbackHandler(svc, repo)
+		handler := NewLineCallbackHandler(svc, repo, aesCrypto)
 
 		// Create a new HTTP request
 		req, err := http.NewRequest(http.MethodGet, "/callback?state=123&code=abc&nonce=456", nil)
@@ -133,7 +143,7 @@ func TestDiscordCallbackHandler_ServeHTTP(t *testing.T) {
 		repo := &repository.RepositoryFuncMock{}
 
 		// Create a new handler with the mocked service
-		handler := NewLineCallbackHandler(svc, repo)
+		handler := NewLineCallbackHandler(svc, repo, nil)
 
 		// Create a new HTTP request with a different state
 		req, err := http.NewRequest(http.MethodGet, "/callback?state=456&code=abc&nonce=456", nil)

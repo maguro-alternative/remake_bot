@@ -13,6 +13,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
+	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 
 	onMessageCreate "github.com/maguro-alternative/remake_bot/bot/cogs/on_message_create"
 
@@ -102,6 +103,14 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					return 0.0, nil
 				},
 			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
+				},
+			},
 			&mock.SessionMock{
 				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
 					return &discordgo.Channel{
@@ -165,6 +174,14 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				},
 				GetAudioFileSecondFunc: func(tmpFile, tmpFileNotExt string) (float64, error) {
 					return 0.0, nil
+				},
+			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
 				},
 			},
 			&mock.SessionMock{
@@ -236,6 +253,14 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				},
 				GetAudioFileSecondFunc: func(tmpFile, tmpFileNotExt string) (float64, error) {
 					return 0.0, nil
+				},
+			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
 				},
 			},
 			&mock.SessionMock{
@@ -339,6 +364,14 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 				},
 				GetAudioFileSecondFunc: func(tmpFile, tmpFileNotExt string) (float64, error) {
 					return 0.0, nil
+				},
+			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
 				},
 			},
 			&mock.SessionMock{

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"encoding/hex"
 	"log/slog"
 	"net/http"
 
@@ -28,6 +27,7 @@ type LineBotDecrypt struct {
 func LineOAuthCheckMiddleware(
 	indexService service.IndexService,
 	repo Repository,
+	aesCrypto crypto.AESInterface,
 	loginRequiredFlag bool,
 ) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
@@ -91,27 +91,20 @@ func LineOAuthCheckMiddleware(
 				return
 			}
 			var lineBotDecrypt LineBotDecrypt
-			// 暗号化キーのバイトへの変換
-			keyBytes, err := hex.DecodeString(config.PrivateKey())
-			if err != nil {
-				slog.ErrorContext(ctx, "暗号化キーのバイトへの変換に失敗しました", "エラー:", err.Error())
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
 
-			lineNotifyTokenByte, err := crypto.Decrypt(lineBotApi.LineNotifyToken[0], keyBytes, lineBotIv.LineNotifyTokenIv[0])
+			lineNotifyTokenByte, err := aesCrypto.Decrypt(lineBotApi.LineNotifyToken[0], lineBotIv.LineNotifyTokenIv[0])
 			if err != nil {
 				slog.ErrorContext(ctx, "LineNotifyTokenの復号に失敗しました", "エラー:", err.Error())
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			lineBotTokenByte, err := crypto.Decrypt(lineBotApi.LineBotToken[0], keyBytes, lineBotIv.LineBotTokenIv[0])
+			lineBotTokenByte, err := aesCrypto.Decrypt(lineBotApi.LineBotToken[0], lineBotIv.LineBotTokenIv[0])
 			if err != nil {
 				slog.ErrorContext(ctx, "LineBotTokenの復号に失敗しました", "エラー:", err.Error())
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			lineGroupIDByte, err := crypto.Decrypt(lineBotApi.LineGroupID[0], keyBytes, lineBotIv.LineGroupIDIv[0])
+			lineGroupIDByte, err := aesCrypto.Decrypt(lineBotApi.LineGroupID[0], lineBotIv.LineGroupIDIv[0])
 			if err != nil {
 				slog.ErrorContext(ctx, "LineGuildIDの復号に失敗しました", "エラー:", err.Error())
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)

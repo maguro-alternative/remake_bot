@@ -10,6 +10,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/repository"
 
+	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 	"github.com/maguro-alternative/remake_bot/pkg/youtube"
 
@@ -22,16 +23,19 @@ import (
 type LineBotHandler struct {
 	indexService *service.IndexService
 	repo         repository.RepositoryFunc
+	aesCrypto crypto.AESInterface
 }
 
 // NewLineBotHandler returns new LineBotHandler.
 func NewLineBotHandler(
 	indexService *service.IndexService,
 	repo repository.RepositoryFunc,
+	aesCrypto crypto.AESInterface,
 ) *LineBotHandler {
 	return &LineBotHandler{
 		indexService: indexService,
 		repo:         repo,
+		aesCrypto:    aesCrypto,
 	}
 }
 
@@ -79,7 +83,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// リクエストボディの検証
-		lineBotDecrypt, err = internal.LineHmac(privateKey, requestBodyByte, lineBot, lineBotIv, r.Header.Get("X-Line-Signature"))
+		lineBotDecrypt, err = internal.LineHmac(privateKey, requestBodyByte, h.aesCrypto, lineBot, lineBotIv, r.Header.Get("X-Line-Signature"))
 		if err != nil {
 			slog.ErrorContext(ctx, "署名の検証に失敗しました。", "エラー:", err.Error())
 			http.Error(w, "Bad Request", http.StatusBadRequest)

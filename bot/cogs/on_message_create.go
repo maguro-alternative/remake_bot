@@ -2,7 +2,6 @@ package cogs
 
 import (
 	"context"
-	"encoding/hex"
 	"io"
 	"log/slog"
 	"net/http"
@@ -27,7 +26,12 @@ func (h *cogHandler) onMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	ctx := context.Background()
 	repo := repository.NewRepository(h.db)
 	ffmpeg := onMessageCreate.NewFfmpeg(ctx)
-	err := onMessageCreateFunc(ctx, h.client, repo, ffmpeg, s, vs)
+	// 暗号化キーのバイトへの変換
+	aesCrypto, err := crypto.NewAESCrypto(config.PrivateKey())
+	if err != nil {
+		slog.ErrorContext(ctx, "暗号化キーのバイト変換に失敗しました", "エラー:", err.Error())
+	}
+	err = onMessageCreateFunc(ctx, h.client, repo, ffmpeg, aesCrypto, s, vs)
 	if err != nil {
 		slog.ErrorContext(ctx, "OnMessageCreate Error", "Error:", err.Error())
 	}
@@ -38,6 +42,7 @@ func onMessageCreateFunc(
 	client *http.Client,
 	repo repository.RepositoryFunc,
 	ffmpeg onMessageCreate.FfmpegInterface,
+	aesCrypto crypto.AESInterface,
 	s mock.Session,
 	vs *discordgo.MessageCreate,
 ) error {
@@ -116,24 +121,18 @@ func onMessageCreateFunc(
 		return err
 	}
 	var lineBotDecrypt onMessageCreate.LineBotDecrypt
-	// 暗号化キーのバイトへの変換
-	keyBytes, err := hex.DecodeString(config.PrivateKey())
-	if err != nil {
-		slog.ErrorContext(ctx, "暗号化キーのバイト変換に失敗しました", "エラー:", err.Error())
-		return err
-	}
 
-	lineNotifyTokenByte, err := crypto.Decrypt(lineBotApi.LineNotifyToken[0], keyBytes, lineBotIv.LineNotifyTokenIv[0])
+	lineNotifyTokenByte, err := aesCrypto.Decrypt(lineBotApi.LineNotifyToken[0], lineBotIv.LineNotifyTokenIv[0])
 	if err != nil {
 		slog.ErrorContext(ctx, "line_notify_tokenの復号化に失敗しました", "エラー:", err.Error())
 		return err
 	}
-	lineBotTokenByte, err := crypto.Decrypt(lineBotApi.LineBotToken[0], keyBytes, lineBotIv.LineBotTokenIv[0])
+	lineBotTokenByte, err := aesCrypto.Decrypt(lineBotApi.LineBotToken[0], lineBotIv.LineBotTokenIv[0])
 	if err != nil {
 		slog.ErrorContext(ctx, "line_bot_tokenの復号化に失敗しました", "エラー:", err.Error())
 		return err
 	}
-	lineGroupIDByte, err := crypto.Decrypt(lineBotApi.LineGroupID[0], keyBytes, lineBotIv.LineGroupIDIv[0])
+	lineGroupIDByte, err := aesCrypto.Decrypt(lineBotApi.LineGroupID[0], lineBotIv.LineGroupIDIv[0])
 	if err != nil {
 		slog.ErrorContext(ctx, "line_group_idの復号化に失敗しました", "エラー:", err.Error())
 		return err

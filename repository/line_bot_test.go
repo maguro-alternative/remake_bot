@@ -152,8 +152,6 @@ func TestGetLineBotNotClient(t *testing.T) {
 	tx.ExecContext(ctx, "DELETE FROM line_bot")
 
 	keyString := "645E739A7F9F162725C1533DC2C5E827"
-	key, err := hex.DecodeString(keyString)
-	assert.NoError(t, err)
 
 	notifyToken := "testnotifytoken"
 	botToken := "testbottoken"
@@ -214,13 +212,16 @@ func TestGetLineBotNotClient(t *testing.T) {
 		lineGroupStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineGroupID[0]))
 		assert.NoError(t, err)
 
-		notifyTokenDecrypted, err := crypto.Decrypt(lineNotifyStr, key, decodeNotifyToken)
+		aesCrypto, err := crypto.NewAESCrypto(keyString)
 		assert.NoError(t, err)
-		botTokenDecrypted, err := crypto.Decrypt(lineBotStr, key, decodeBotToken)
+
+		notifyTokenDecrypted, err := aesCrypto.Decrypt(lineNotifyStr, decodeNotifyToken)
 		assert.NoError(t, err)
-		botSecretDecrypted, err := crypto.Decrypt(lineBotSecretStr, key, decodeBotSecret)
+		botTokenDecrypted, err := aesCrypto.Decrypt(lineBotStr, decodeBotToken)
 		assert.NoError(t, err)
-		groupIDDecrypted, err := crypto.Decrypt(lineGroupStr, key, decodeGroupID)
+		botSecretDecrypted, err := aesCrypto.Decrypt(lineBotSecretStr, decodeBotSecret)
+		assert.NoError(t, err)
+		groupIDDecrypted, err := aesCrypto.Decrypt(lineGroupStr, decodeGroupID)
 		assert.NoError(t, err)
 
 		assert.Equal(t, notifyToken, string(notifyTokenDecrypted))

@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
@@ -117,6 +118,14 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 					}, nil
 				},
 			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
+				},
+			},
 			false,
 		)(handler)
 
@@ -176,6 +185,14 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 						LineBotSecretIv:   pq.ByteaArray{decodeBotSecret},
 						LineGroupIDIv:     pq.ByteaArray{decodeGroupID},
 					}, nil
+				},
+			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
 				},
 			},
 			true,
@@ -238,6 +255,14 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 					}, nil
 				},
 			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
+				},
+			},
 			true,
 		)(handler)
 
@@ -297,6 +322,14 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 						LineBotSecretIv:   pq.ByteaArray{decodeBotSecret},
 						LineGroupIDIv:     pq.ByteaArray{decodeGroupID},
 					}, nil
+				},
+			},
+			&crypto.AESMock{
+				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
+					return nil, nil, nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return nil, nil
 				},
 			},
 			true,

@@ -4,7 +4,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"encoding/hex"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 
@@ -14,18 +13,14 @@ import (
 func LineHmac(
 	privateKey string,
 	requestBodyByte []byte,
+	aesCrypto crypto.AESInterface,
 	lineBot *repository.LineBot,
 	lineBotIv repository.LineBotIvNotClient,
 	header string,
 ) (decrypt *LineBotDecrypt, err error) {
 	lineBotDecrypt := &LineBotDecrypt{}
-	// 暗号化キーのバイトへの変換
-	keyBytes, err := hex.DecodeString(privateKey)
-	if err != nil {
-		return nil, err
-	}
 
-	lineBotSecretKey, err := crypto.Decrypt(lineBot.LineBotSecret[0], keyBytes, lineBotIv.LineBotSecretIv[0])
+	lineBotSecretKey, err := aesCrypto.Decrypt(lineBot.LineBotSecret[0], lineBotIv.LineBotSecretIv[0])
 	if err != nil {
 		return nil, err
 	}
@@ -41,15 +36,15 @@ func LineHmac(
 	if header != signature {
 		return nil, nil
 	}
-	lineNotifyTokenByte, err := crypto.Decrypt(lineBot.LineNotifyToken[0], keyBytes, lineBotIv.LineNotifyTokenIv[0])
+	lineNotifyTokenByte, err := aesCrypto.Decrypt(lineBot.LineNotifyToken[0], lineBotIv.LineNotifyTokenIv[0])
 	if err != nil {
 		return nil, err
 	}
-	lineBotTokenByte, err := crypto.Decrypt(lineBot.LineBotToken[0], keyBytes, lineBotIv.LineBotTokenIv[0])
+	lineBotTokenByte, err := aesCrypto.Decrypt(lineBot.LineBotToken[0], lineBotIv.LineBotTokenIv[0])
 	if err != nil {
 		return nil, err
 	}
-	lineGroupByte, err := crypto.Decrypt(lineBot.LineGroupID[0], keyBytes, lineBotIv.LineGroupIDIv[0])
+	lineGroupByte, err := aesCrypto.Decrypt(lineBot.LineGroupID[0], lineBotIv.LineGroupIDIv[0])
 	if err != nil {
 		return nil, err
 	}

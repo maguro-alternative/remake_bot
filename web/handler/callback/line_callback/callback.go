@@ -2,7 +2,6 @@ package linecallback
 
 import (
 	"context"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -21,17 +20,20 @@ import (
 )
 
 type LineCallbackHandler struct {
-	svc  *service.IndexService
-	repo repository.RepositoryFunc
+	svc       *service.IndexService
+	repo      repository.RepositoryFunc
+	aesCrypto crypto.AESInterface
 }
 
 func NewLineCallbackHandler(
 	svc *service.IndexService,
 	repo repository.RepositoryFunc,
+	aesCrypto crypto.AESInterface,
 ) *LineCallbackHandler {
 	return &LineCallbackHandler{
-		svc:  svc,
-		repo: repo,
+		svc:       svc,
+		repo:      repo,
+		aesCrypto: aesCrypto,
 	}
 }
 
@@ -39,13 +41,6 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	ctx := r.Context()
 	if ctx == nil {
 		ctx = context.Background()
-	}
-	privateKey := config.PrivateKey()
-	keyBytes, err := hex.DecodeString(privateKey)
-	if err != nil {
-		slog.ErrorContext(ctx, "暗号化キーのバイトへの変換に失敗しました。", "エラー:", err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
 	}
 
 	sessionStore, err := session.NewSessionStore(r, h.svc.CookieStore, config.SessionSecret())
@@ -102,13 +97,13 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	lineClientIDByte, err := crypto.Decrypt(lineBot.LineClientID[0], keyBytes, lineBotIv.LineClientIDIv[0])
+	lineClientIDByte, err := h.aesCrypto.Decrypt(lineBot.LineClientID[0], lineBotIv.LineClientIDIv[0])
 	if err != nil {
 		slog.ErrorContext(ctx, "line_client_idの復号に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	lineClientSecretByte, err := crypto.Decrypt(lineBot.LineClientSecret[0], keyBytes, lineBotIv.LineClientSecretIv[0])
+	lineClientSecretByte, err := h.aesCrypto.Decrypt(lineBot.LineClientSecret[0], lineBotIv.LineClientSecretIv[0])
 	if err != nil {
 		slog.ErrorContext(ctx, "line_client_secretの復号に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

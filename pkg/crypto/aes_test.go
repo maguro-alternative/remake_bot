@@ -19,43 +19,40 @@ func TestGenerateIV(t *testing.T) {
 	emptyPlain := []byte(emptyText)
 	tokenPlain := []byte(tokenText)
 	t.Run("暗号化と復号化が正常に行われること", func(t *testing.T) {
-		key, err := hex.DecodeString(keyString)
+		aesCrypto, err := NewAESCrypto(keyString)
 		assert.NoError(t, err)
-		assert.Equal(t, []uint8([]byte{0x64, 0x5e, 0x73, 0x9a, 0x7f, 0x9f, 0x16, 0x27, 0x25, 0xc1, 0x53, 0x3d, 0xc2, 0xc5, 0xe8, 0x27}), key)
 
-		iv, encrypted, err := Encrypt(plain, key)
+		iv, encrypted, err := aesCrypto.Encrypt(plain)
 		assert.NoError(t, err)
 
 		fmt.Println("IV:", hex.EncodeToString(iv))
 		fmt.Println("Encrypted:", base64.StdEncoding.EncodeToString(encrypted))
-		decrypted, err := Decrypt(encrypted, key, iv)
+		decrypted, err := aesCrypto.Decrypt(encrypted, iv)
 		assert.NoError(t, err)
 		fmt.Println(text, string(decrypted))
 		assert.Equal(t, text, string(decrypted))
 	})
 
 	t.Run("空文字の暗号化と復号化が正常に行われること", func(t *testing.T) {
-		key, err := hex.DecodeString(keyString)
+		aesCrypto, err := NewAESCrypto(keyString)
 		assert.NoError(t, err)
-		assert.Equal(t, []uint8([]byte{0x64, 0x5e, 0x73, 0x9a, 0x7f, 0x9f, 0x16, 0x27, 0x25, 0xc1, 0x53, 0x3d, 0xc2, 0xc5, 0xe8, 0x27}), key)
 
-		iv, encrypted, err := Encrypt(emptyPlain, key)
+		iv, encrypted, err := aesCrypto.Encrypt(emptyPlain)
 		assert.NoError(t, err)
 
 		fmt.Println("IV:", hex.EncodeToString(iv))
 		fmt.Println("Encrypted:", base64.StdEncoding.EncodeToString(encrypted))
-		decrypted, err := Decrypt(encrypted, key, iv)
+		decrypted, err := aesCrypto.Decrypt(encrypted, iv)
 		assert.NoError(t, err)
 		fmt.Println(emptyText, string(decrypted))
 		assert.Equal(t, emptyText, string(decrypted))
 	})
 
 	t.Run("ivの暗号化と復号化が正常に行われること", func(t *testing.T) {
-		key, err := hex.DecodeString(keyString)
+		aesCrypto, err := NewAESCrypto(keyString)
 		assert.NoError(t, err)
-		assert.Equal(t, []uint8([]byte{0x64, 0x5e, 0x73, 0x9a, 0x7f, 0x9f, 0x16, 0x27, 0x25, 0xc1, 0x53, 0x3d, 0xc2, 0xc5, 0xe8, 0x27}), key)
 
-		iv, encrypted, err := Encrypt(tokenPlain, key)
+		iv, encrypted, err := aesCrypto.Encrypt(tokenPlain)
 		assert.NoError(t, err)
 
 		encodeIv := hex.EncodeToString(iv)
@@ -64,16 +61,15 @@ func TestGenerateIV(t *testing.T) {
 
 		fmt.Println("IV:", hex.EncodeToString(iv))
 		fmt.Println("Encrypted:", base64.StdEncoding.EncodeToString(encrypted))
-		decrypted, err := Decrypt(encrypted, key, decodeIv)
+		decrypted, err := aesCrypto.Decrypt(encrypted, decodeIv)
 		assert.NoError(t, err)
 		fmt.Println(tokenText, string(decrypted))
 		assert.Equal(t, tokenText, string(decrypted))
 	})
 
 	t.Run("iv2の暗号化と復号化が正常に行われること", func(t *testing.T) {
-		key, err := hex.DecodeString(keyString)
+		aesCrypto, err := NewAESCrypto(keyString)
 		assert.NoError(t, err)
-		assert.Equal(t, []uint8([]byte{0x64, 0x5e, 0x73, 0x9a, 0x7f, 0x9f, 0x16, 0x27, 0x25, 0xc1, 0x53, 0x3d, 0xc2, 0xc5, 0xe8, 0x27}), key)
 
 		decodeIv, err := hex.DecodeString("76a9cfafaaaf35c1d337ab5dc113d1ce")
 		assert.NoError(t, err)
@@ -83,7 +79,7 @@ func TestGenerateIV(t *testing.T) {
 
 		fmt.Println("IV:", decodeIv)
 		fmt.Println("Encrypted:", decodeStr)
-		decrypted, err := Decrypt(decodeStr, key, decodeIv)
+		decrypted, err := aesCrypto.Decrypt(decodeStr, decodeIv)
 		assert.NoError(t, err)
 		fmt.Println(tokenText, string(decrypted))
 		assert.Equal(t, tokenText, string(decrypted))

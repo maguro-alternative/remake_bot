@@ -2,8 +2,6 @@ package cogs
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/hex"
 	"io"
 	"net/http"
 	"os"
@@ -32,41 +30,21 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 		}
 	})
 
-	decodeNotifyToken, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
-	assert.NoError(t, err)
-	lineNotifyStr, err := base64.StdEncoding.DecodeString(string([]byte("X+P6kmO6DnEjM3TVqXkwNA==")))
-	assert.NoError(t, err)
-
-	decodeBotToken, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
-	assert.NoError(t, err)
-	lineBotStr, err := base64.StdEncoding.DecodeString(string([]byte("uy2qtvYTnSoB5qIntwUdVQ==")))
-	assert.NoError(t, err)
-
-	decodeBotSecret, err := hex.DecodeString("0ffa8ed72efcb5f1d834e4ce8463a62c")
-	assert.NoError(t, err)
-	lineBotSecretStr, err := base64.StdEncoding.DecodeString(string([]byte("i2uHQCyn58wRR/b03fRw6w==")))
-	assert.NoError(t, err)
-
-	decodeGroupID, err := hex.DecodeString("e14db710b23520766fd652c0f19d437a")
-	assert.NoError(t, err)
-	lineGroupStr, err := base64.StdEncoding.DecodeString(string([]byte("YgexFQQlLcaXmsw9mFN35Q==")))
-	assert.NoError(t, err)
-
 	lineBot := &repository.LineBotNotClient{
-		LineNotifyToken: pq.ByteaArray{lineNotifyStr},
-		LineBotToken:    pq.ByteaArray{lineBotStr},
-		LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
-		LineGroupID:     pq.ByteaArray{lineGroupStr},
+		LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
+		LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
+		LineBotSecret:    pq.ByteaArray{[]byte("lineBotSecretStr")},
+		LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
 	}
 	lineBotIv := repository.LineBotIvNotClient{
-		LineNotifyTokenIv: pq.ByteaArray{decodeNotifyToken},
-		LineBotTokenIv:    pq.ByteaArray{decodeBotToken},
-		LineBotSecretIv:   pq.ByteaArray{decodeBotSecret},
-		LineGroupIDIv:     pq.ByteaArray{decodeGroupID},
+		LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
+		LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
+		LineBotSecretIv:    pq.ByteaArray{[]byte("decodeBotSecret")},
+		LineGroupIDIv:      pq.ByteaArray{[]byte("decodeGroupID")},
 	}
 
 	t.Run("正常系", func(t *testing.T) {
-		err = onMessageCreateFunc(
+		err := onMessageCreateFunc(
 			ctx,
 			stubClient,
 			&repository.RepositoryFuncMock{
@@ -139,7 +117,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 	})
 
 	t.Run("正常系(画像)", func(t *testing.T) {
-		err = onMessageCreateFunc(
+		err := onMessageCreateFunc(
 			ctx,
 			stubClient,
 			&repository.RepositoryFuncMock{
@@ -218,7 +196,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 	})
 
 	t.Run("正常系(NGユーザー)", func(t *testing.T) {
-		err = onMessageCreateFunc(
+		err := onMessageCreateFunc(
 			ctx,
 			stubClient,
 			&repository.RepositoryFuncMock{
@@ -371,7 +349,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					return nil, nil, nil
 				},
 				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
-					return nil, nil
+					return []byte("aaa"), nil
 				},
 			},
 			&mock.SessionMock{

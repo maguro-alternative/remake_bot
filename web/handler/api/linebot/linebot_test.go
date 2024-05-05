@@ -3,8 +3,6 @@ package linebot
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -13,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
@@ -152,26 +151,6 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	decodeNotifyToken, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
-	assert.NoError(t, err)
-	lineNotifyStr, err := base64.StdEncoding.DecodeString(string([]byte("X+P6kmO6DnEjM3TVqXkwNA==")))
-	assert.NoError(t, err)
-
-	decodeBotToken, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
-	assert.NoError(t, err)
-	lineBotStr, err := base64.StdEncoding.DecodeString(string([]byte("uy2qtvYTnSoB5qIntwUdVQ==")))
-	assert.NoError(t, err)
-
-	decodeBotSecret, err := hex.DecodeString("0ffa8ed72efcb5f1d834e4ce8463a62c")
-	assert.NoError(t, err)
-	lineBotSecretStr, err := base64.StdEncoding.DecodeString(string([]byte("i2uHQCyn58wRR/b03fRw6w==")))
-	assert.NoError(t, err)
-
-	decodeGroupID, err := hex.DecodeString("e14db710b23520766fd652c0f19d437a")
-	assert.NoError(t, err)
-	lineGroupStr, err := base64.StdEncoding.DecodeString(string([]byte("YgexFQQlLcaXmsw9mFN35Q==")))
-	assert.NoError(t, err)
-
 	// スタブHTTPクライアントを作成
 	stubClient := mock.NewStubHttpClient(func(req *http.Request) *http.Response {
 		if strings.Contains(req.URL.String(), "https://api.line.me/v2/bot/profile/") {
@@ -212,20 +191,48 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 		assert.Equal(t, http.StatusMethodNotAllowed, w.Code)
 	})
 
-	t.Run("jsonの読み取りに失敗すると、Internal Server Errorが返ること", func(t *testing.T) {
-		h := &LineBotHandler{}
+	t.Run("署名に失敗すると、Bad Requestが返ること", func(t *testing.T) {
+		h := &LineBotHandler{
+			repo: &repository.RepositoryFuncMock{
+				GetAllColumnsLineBotsFunc: func(ctx context.Context) ([]*repository.LineBot, error) {
+					return []*repository.LineBot{
+						{
+							GuildID:         "123456789",
+							LineNotifyToken: pq.ByteaArray{[]byte("lineNotifyStr")},
+							LineBotToken:    pq.ByteaArray{[]byte("lineBotStr")},
+							LineBotSecret:   pq.ByteaArray{[]byte("lineBotSecretStr")},
+							LineGroupID:     pq.ByteaArray{[]byte("lineGroupStr")},
+						},
+					}, nil
+				},
+				GetLineBotIvNotClientFunc: func(ctx context.Context, guildId string) (repository.LineBotIvNotClient, error) {
+					return repository.LineBotIvNotClient{
+						LineNotifyTokenIv: pq.ByteaArray{[]byte("decodeNotifyToken")},
+						LineBotTokenIv:    pq.ByteaArray{[]byte("decodeBotToken")},
+						LineBotSecretIv:   pq.ByteaArray{[]byte("decodeBotSecret")},
+						LineGroupIDIv:     pq.ByteaArray{[]byte("decodeGroupID")},
+					}, nil
+				},
+			},
+			aesCrypto: &crypto.AESMock{
+				DecryptFunc: func(data []byte, iv []byte) ([]byte, error) {
+					if string(iv) == string("decodeNotifyToken") {
+						return []byte("testnotifytoken"), nil
+					} else if string(iv) == string("decodeBotToken") {
+						return []byte("testbottoken"), nil
+					} else if string(iv) == string("decodeBotSecret") {
+						return []byte("testbotsecret"), nil
+					} else if string(iv) == string("decodeGroupID") {
+						return []byte("testgroupid"), nil
+					}
+					return nil, nil
+				},
+			},
+		}
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest(http.MethodPost, "/api/linebot", bytes.NewReader([]byte("")))
+		r := httptest.NewRequest(http.MethodPost, "/api/linebot", bytes.NewReader([]byte(`{"line_bot_secret":123456789}`)))
 		h.ServeHTTP(w, r)
-		assert.Equal(t, http.StatusInternalServerError, w.Code)
-	})
-
-	t.Run("jsonのバリデーションに失敗すると、Internal Server Errorが返ること", func(t *testing.T) {
-		h := &LineBotHandler{}
-		w := httptest.NewRecorder()
-		r := httptest.NewRequest(http.MethodPost, "/api/linebot", bytes.NewReader([]byte(`{"line_bot_secret":"123456789"}`)))
-		h.ServeHTTP(w, r)
-		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 
 	t.Run("LineBotがない場合Bad Requestを返すこと", func(t *testing.T) {
@@ -252,7 +259,7 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 	t.Run("LineBotが正常に送信できること", func(t *testing.T) {
 		h := &LineBotHandler{
 			indexService: &service.IndexService{
-				Client:         stubClient,
+				Client: stubClient,
 				DiscordSession: &mock.SessionMock{
 					ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
 						return &discordgo.Message{}, nil
@@ -264,20 +271,34 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 					return []*repository.LineBot{
 						{
 							GuildID:         "123456789",
-							LineNotifyToken: pq.ByteaArray{lineNotifyStr},
-							LineBotToken:    pq.ByteaArray{lineBotStr},
-							LineBotSecret:   pq.ByteaArray{lineBotSecretStr},
-							LineGroupID:     pq.ByteaArray{lineGroupStr},
+							LineNotifyToken: pq.ByteaArray{[]byte("lineNotifyStr")},
+							LineBotToken:    pq.ByteaArray{[]byte("lineBotStr")},
+							LineBotSecret:   pq.ByteaArray{[]byte("lineBotSecretStr")},
+							LineGroupID:     pq.ByteaArray{[]byte("lineGroupStr")},
 						},
 					}, nil
 				},
 				GetLineBotIvNotClientFunc: func(ctx context.Context, guildId string) (repository.LineBotIvNotClient, error) {
 					return repository.LineBotIvNotClient{
-						LineNotifyTokenIv: pq.ByteaArray{decodeNotifyToken},
-						LineBotTokenIv:    pq.ByteaArray{decodeBotToken},
-						LineBotSecretIv:   pq.ByteaArray{decodeBotSecret},
-						LineGroupIDIv:     pq.ByteaArray{decodeGroupID},
+						LineNotifyTokenIv: pq.ByteaArray{[]byte("decodeNotifyToken")},
+						LineBotTokenIv:    pq.ByteaArray{[]byte("decodeBotToken")},
+						LineBotSecretIv:   pq.ByteaArray{[]byte("decodeBotSecret")},
+						LineGroupIDIv:     pq.ByteaArray{[]byte("decodeGroupID")},
 					}, nil
+				},
+			},
+			aesCrypto: &crypto.AESMock{
+				DecryptFunc: func(data []byte, iv []byte) ([]byte, error) {
+					if string(iv) == string("decodeNotifyToken") {
+						return []byte("testnotifytoken"), nil
+					} else if string(iv) == string("decodeBotToken") {
+						return []byte("testbottoken"), nil
+					} else if string(iv) == string("decodeBotSecret") {
+						return []byte("testbotsecret"), nil
+					} else if string(iv) == string("decodeGroupID") {
+						return []byte("testgroupid"), nil
+					}
+					return nil, nil
 				},
 			},
 		}

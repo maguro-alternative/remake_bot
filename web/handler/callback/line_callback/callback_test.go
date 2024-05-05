@@ -2,8 +2,6 @@ package linecallback
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/hex"
 	"encoding/gob"
 	"io"
 	"net/http"
@@ -33,15 +31,6 @@ func init() {
 
 func TestDiscordCallbackHandler_ServeHTTP(t *testing.T) {
 	cookieStore := sessions.NewCookieStore([]byte(config.SessionSecret()))
-	decodeClientID, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
-	assert.NoError(t, err)
-	lineClientID, err := base64.StdEncoding.DecodeString(string([]byte("X+P6kmO6DnEjM3TVqXkwNA==")))
-	assert.NoError(t, err)
-
-	decodeClientSecret, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
-	assert.NoError(t, err)
-	lineClientSecret, err := base64.StdEncoding.DecodeString(string([]byte("uy2qtvYTnSoB5qIntwUdVQ==")))
-	assert.NoError(t, err)
 	t.Run("successful callback", func(t *testing.T) {
 		middlewareStartFixture := func(h http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -82,14 +71,14 @@ func TestDiscordCallbackHandler_ServeHTTP(t *testing.T) {
 			GetAllColumnsLineBotFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
 				return repository.LineBot{
 					GuildID:          "",
-					LineClientID:     pq.ByteaArray{lineClientID},
-					LineClientSecret: pq.ByteaArray{lineClientSecret},
+					LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
+					LineClientID:     pq.ByteaArray{[]byte("lineClientID")},
 				}, nil
 			},
 			GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 				return repository.LineBotIv{
-					LineClientIDIv:     pq.ByteaArray{decodeClientID},
-					LineClientSecretIv: pq.ByteaArray{decodeClientSecret},
+					LineClientIDIv:     pq.ByteaArray{[]byte("decodeClientID")},
+					LineClientSecretIv: pq.ByteaArray{[]byte("decodeClientSecret")},
 				}, nil
 			},
 		}

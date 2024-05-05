@@ -3,8 +3,6 @@ package linelogin
 import (
 	"context"
 	"errors"
-	"encoding/base64"
-	"encoding/hex"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -26,36 +24,6 @@ import (
 )
 
 func TestIndex(t *testing.T) {
-	decodeNotifyToken, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
-	assert.NoError(t, err)
-	lineNotifyStr, err := base64.StdEncoding.DecodeString(string([]byte("X+P6kmO6DnEjM3TVqXkwNA==")))
-	assert.NoError(t, err)
-
-	decodeBotToken, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
-	assert.NoError(t, err)
-	lineBotStr, err := base64.StdEncoding.DecodeString(string([]byte("uy2qtvYTnSoB5qIntwUdVQ==")))
-	assert.NoError(t, err)
-
-	decodeBotSecret, err := hex.DecodeString("0ffa8ed72efcb5f1d834e4ce8463a62c")
-	assert.NoError(t, err)
-	lineBotSecretStr, err := base64.StdEncoding.DecodeString(string([]byte("i2uHQCyn58wRR/b03fRw6w==")))
-	assert.NoError(t, err)
-
-	decodeGroupID, err := hex.DecodeString("e14db710b23520766fd652c0f19d437a")
-	assert.NoError(t, err)
-	lineGroupStr, err := base64.StdEncoding.DecodeString(string([]byte("YgexFQQlLcaXmsw9mFN35Q==")))
-	assert.NoError(t, err)
-
-	decodeClientID, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
-	assert.NoError(t, err)
-	lineClientID, err := base64.StdEncoding.DecodeString(string([]byte("X+P6kmO6DnEjM3TVqXkwNA==")))
-	assert.NoError(t, err)
-
-	decodeClientSecret, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
-	assert.NoError(t, err)
-	lineClientSecret, err := base64.StdEncoding.DecodeString(string([]byte("uy2qtvYTnSoB5qIntwUdVQ==")))
-	assert.NoError(t, err)
-
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	t.Cleanup(func() {
@@ -103,30 +71,27 @@ func TestIndex(t *testing.T) {
 					return []*repository.LineBot{
 						{
 							GuildID:          "123",
-							LineNotifyToken:  pq.ByteaArray{lineNotifyStr},
-							LineBotToken:     pq.ByteaArray{lineBotStr},
-							LineBotSecret:    pq.ByteaArray{lineBotSecretStr},
-							LineGroupID:      pq.ByteaArray{lineGroupStr},
-							LineClientID:     pq.ByteaArray{lineClientID},
-							LineClientSecret: pq.ByteaArray{lineClientSecret},
+							LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
+							LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
+							LineBotSecret:    pq.ByteaArray{[]byte("lineBotSecretStr")},
+							LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
+							LineClientID:     pq.ByteaArray{[]byte("lineClientID")},
+							LineClientSecret: pq.ByteaArray{[]byte("lineClientSecret")},
 						},
 					}, nil
 				},
 				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 					return repository.LineBotIv{
-						LineNotifyTokenIv:  pq.ByteaArray{decodeNotifyToken},
-						LineBotTokenIv:     pq.ByteaArray{decodeBotToken},
-						LineBotSecretIv:    pq.ByteaArray{decodeBotSecret},
-						LineGroupIDIv:      pq.ByteaArray{decodeGroupID},
-						LineClientIDIv:     pq.ByteaArray{decodeClientID},
-						LineClientSecretIv: pq.ByteaArray{decodeClientSecret},
+						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
+						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
+						LineBotSecretIv:    pq.ByteaArray{[]byte("decodeBotSecret")},
+						LineGroupIDIv:      pq.ByteaArray{[]byte("decodeGroupID")},
+						LineClientIDIv:     pq.ByteaArray{[]byte("decodeClientID")},
+						LineClientSecretIv: pq.ByteaArray{[]byte("decodeClientSecret")},
 					}, nil
 				},
 			},
 			&crypto.AESMock{
-				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
-					return nil, nil, nil
-				},
 				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
 					return nil, nil
 				},
@@ -176,9 +141,6 @@ func TestIndex(t *testing.T) {
 				},
 			},
 			&crypto.AESMock{
-				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
-					return nil, nil, nil
-				},
 				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
 					return nil, nil
 				},
@@ -210,9 +172,6 @@ func TestIndex(t *testing.T) {
 				},
 			},
 			&crypto.AESMock{
-				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
-					return nil, nil, nil
-				},
 				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
 					return nil, nil
 				},
@@ -230,36 +189,6 @@ func TestIndex(t *testing.T) {
 func TestLineLogin(t *testing.T) {
 	cookieStore := sessions.NewCookieStore([]byte(config.SessionSecret()))
 
-	decodeNotifyToken, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
-	assert.NoError(t, err)
-	lineNotifyStr, err := base64.StdEncoding.DecodeString(string([]byte("X+P6kmO6DnEjM3TVqXkwNA==")))
-	assert.NoError(t, err)
-
-	decodeBotToken, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
-	assert.NoError(t, err)
-	lineBotStr, err := base64.StdEncoding.DecodeString(string([]byte("uy2qtvYTnSoB5qIntwUdVQ==")))
-	assert.NoError(t, err)
-
-	decodeBotSecret, err := hex.DecodeString("0ffa8ed72efcb5f1d834e4ce8463a62c")
-	assert.NoError(t, err)
-	lineBotSecretStr, err := base64.StdEncoding.DecodeString(string([]byte("i2uHQCyn58wRR/b03fRw6w==")))
-	assert.NoError(t, err)
-
-	decodeGroupID, err := hex.DecodeString("e14db710b23520766fd652c0f19d437a")
-	assert.NoError(t, err)
-	lineGroupStr, err := base64.StdEncoding.DecodeString(string([]byte("YgexFQQlLcaXmsw9mFN35Q==")))
-	assert.NoError(t, err)
-
-	decodeClientID, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
-	assert.NoError(t, err)
-	lineClientID, err := base64.StdEncoding.DecodeString(string([]byte("X+P6kmO6DnEjM3TVqXkwNA==")))
-	assert.NoError(t, err)
-
-	decodeClientSecret, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
-	assert.NoError(t, err)
-	lineClientSecret, err := base64.StdEncoding.DecodeString(string([]byte("uy2qtvYTnSoB5qIntwUdVQ==")))
-	assert.NoError(t, err)
-
 	t.Run("Lineログインのリダイレクトに成功する", func(t *testing.T) {
 		// Mocking the necessary dependencies
 		h := NewLineLoginHandler(
@@ -269,30 +198,27 @@ func TestLineLogin(t *testing.T) {
 			&repository.RepositoryFuncMock{
 				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 					return repository.LineBot{
-							GuildID:          "111",
-							LineNotifyToken:  pq.ByteaArray{lineNotifyStr},
-							LineBotToken:     pq.ByteaArray{lineBotStr},
-							LineBotSecret:    pq.ByteaArray{lineBotSecretStr},
-							LineGroupID:      pq.ByteaArray{lineGroupStr},
-							LineClientID:     pq.ByteaArray{lineClientID},
-							LineClientSecret: pq.ByteaArray{lineClientSecret},
+						GuildID:          "123",
+						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
+						LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
+						LineBotSecret:    pq.ByteaArray{[]byte("lineBotSecretStr")},
+						LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
+						LineClientID:     pq.ByteaArray{[]byte("lineClientID")},
+						LineClientSecret: pq.ByteaArray{[]byte("lineClientSecret")},
 					}, nil
 				},
 				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 					return repository.LineBotIv{
-						LineNotifyTokenIv:  pq.ByteaArray{decodeNotifyToken},
-						LineBotTokenIv:     pq.ByteaArray{decodeBotToken},
-						LineBotSecretIv:    pq.ByteaArray{decodeBotSecret},
-						LineGroupIDIv:      pq.ByteaArray{decodeGroupID},
-						LineClientIDIv:     pq.ByteaArray{decodeClientID},
-						LineClientSecretIv: pq.ByteaArray{decodeClientSecret},
+						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
+						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
+						LineBotSecretIv:    pq.ByteaArray{[]byte("decodeBotSecret")},
+						LineGroupIDIv:      pq.ByteaArray{[]byte("decodeGroupID")},
+						LineClientIDIv:     pq.ByteaArray{[]byte("decodeClientID")},
+						LineClientSecretIv: pq.ByteaArray{[]byte("decodeClientSecret")},
 					}, nil
 				},
 			},
 			&crypto.AESMock{
-				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
-					return nil, nil, nil
-				},
 				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
 					return nil, nil
 				},
@@ -319,30 +245,27 @@ func TestLineLogin(t *testing.T) {
 			&repository.RepositoryFuncMock{
 				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 					return repository.LineBot{
-							GuildID:          "111",
-							LineNotifyToken:  pq.ByteaArray{lineNotifyStr},
-							LineBotToken:     pq.ByteaArray{lineBotStr},
-							LineBotSecret:    pq.ByteaArray{lineBotSecretStr},
-							LineGroupID:      pq.ByteaArray{lineGroupStr},
-							LineClientID:     pq.ByteaArray{lineClientID},
-							LineClientSecret: pq.ByteaArray{lineClientSecret},
+						GuildID:          "123",
+						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
+						LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
+						LineBotSecret:    pq.ByteaArray{[]byte("lineBotSecretStr")},
+						LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
+						LineClientID:     pq.ByteaArray{[]byte("lineClientID")},
+						LineClientSecret: pq.ByteaArray{[]byte("lineClientSecret")},
 					}, nil
 				},
 				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 					return repository.LineBotIv{
-						LineNotifyTokenIv:  pq.ByteaArray{decodeNotifyToken},
-						LineBotTokenIv:     pq.ByteaArray{decodeBotToken},
-						LineBotSecretIv:    pq.ByteaArray{decodeBotSecret},
-						LineGroupIDIv:      pq.ByteaArray{decodeGroupID},
-						LineClientIDIv:     pq.ByteaArray{decodeClientID},
-						LineClientSecretIv: pq.ByteaArray{decodeClientSecret},
+						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
+						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
+						LineBotSecretIv:    pq.ByteaArray{[]byte("decodeBotSecret")},
+						LineGroupIDIv:      pq.ByteaArray{[]byte("decodeGroupID")},
+						LineClientIDIv:     pq.ByteaArray{[]byte("decodeClientID")},
+						LineClientSecretIv: pq.ByteaArray{[]byte("decodeClientSecret")},
 					}, nil
 				},
 			},
 			&crypto.AESMock{
-				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
-					return nil, nil, nil
-				},
 				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
 					return nil, nil
 				},
@@ -372,9 +295,6 @@ func TestLineLogin(t *testing.T) {
 				},
 			},
 			&crypto.AESMock{
-				EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
-					return nil, nil, nil
-				},
 				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
 					return nil, nil
 				},

@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"log/slog"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 
@@ -34,6 +35,7 @@ func LineHmac(
 
 	// 署名が一致しない場合は両方nilを返す
 	if header != signature {
+		slog.Error("signature is not match", "header", header, "signature", signature)
 		return nil, nil
 	}
 	lineNotifyTokenByte, err := aesCrypto.Decrypt(lineBot.LineNotifyToken[0], lineBotIv.LineNotifyTokenIv[0])

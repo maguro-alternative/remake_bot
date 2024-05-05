@@ -54,7 +54,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := lineTokenJson.Validate(); err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusUnprocessableEntity)
 		slog.ErrorContext(ctx, "jsonのバリデーションに失敗しました:"+err.Error())
 		return
 	}

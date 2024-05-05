@@ -48,10 +48,16 @@ func TestHmac_LineHmac(t *testing.T) {
 	}
 
 	aesCrypto := &crypto.AESMock{
-		EncryptFunc: func(data []byte) (iv []byte, encrypted []byte, err error) {
-			return nil, nil, nil
-		},
 		DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+			if string(iv) == string(decodeNotifyToken) {
+				return []byte("testnotifytoken"), nil
+			}else if string(iv) == string(decodeBotToken) {
+				return []byte("testbottoken"), nil
+			} else if string(iv) == string(decodeBotSecret) {
+				return []byte("testbotsecret"), nil
+			} else if string(iv) == string(decodeGroupID) {
+				return []byte("testgroupid"), nil
+			}
 			return nil, nil
 		},
 	}

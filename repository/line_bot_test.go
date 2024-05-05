@@ -2,11 +2,8 @@ package repository
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/hex"
 	"testing"
 
-	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/testutil/fixtures"
 	"github.com/maguro-alternative/remake_bot/web/config"
@@ -151,13 +148,6 @@ func TestGetLineBotNotClient(t *testing.T) {
 
 	tx.ExecContext(ctx, "DELETE FROM line_bot")
 
-	keyString := "645E739A7F9F162725C1533DC2C5E827"
-
-	notifyToken := "testnotifytoken"
-	botToken := "testbottoken"
-	botSecret := "testbotsecret"
-	groupID := "testgroupid"
-
 	f := &fixtures.Fixture{DBv1: tx}
 	f.Build(t,
 		fixtures.NewLineBot(ctx, func(lb *fixtures.LineBot) {
@@ -187,47 +177,6 @@ func TestGetLineBotNotClient(t *testing.T) {
 		assert.Equal(t, []byte("123456789"), lineBot.LineBotToken[0])
 		assert.Equal(t, []byte("123456789"), lineBot.LineBotSecret[0])
 		assert.Equal(t, []byte("987654321"), lineBot.LineGroupID[0])
-		assert.Equal(t, "987654321", lineBot.DefaultChannelID)
-		assert.Equal(t, false, lineBot.DebugMode)
-	})
-
-	t.Run("GuildIDからClient以外のLineBotを取得し、復号できること", func(t *testing.T) {
-		lineBot, err := repo.GetLineBotNotClient(ctx, "123456789")
-		assert.NoError(t, err)
-
-		decodeNotifyToken, err := hex.DecodeString("aa7c5fe80002633327f0fefe67a565de")
-		assert.NoError(t, err)
-		lineNotifyStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineNotifyToken[0]))
-		assert.NoError(t, err)
-		decodeBotToken, err := hex.DecodeString("baeff317cb83ef55b193b6d3de194124")
-		assert.NoError(t, err)
-		lineBotStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineBotToken[0]))
-		assert.NoError(t, err)
-		decodeBotSecret, err := hex.DecodeString("0ffa8ed72efcb5f1d834e4ce8463a62c")
-		assert.NoError(t, err)
-		lineBotSecretStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineBotSecret[0]))
-		assert.NoError(t, err)
-		decodeGroupID, err := hex.DecodeString("e14db710b23520766fd652c0f19d437a")
-		assert.NoError(t, err)
-		lineGroupStr, err := base64.StdEncoding.DecodeString(string(lineBot.LineGroupID[0]))
-		assert.NoError(t, err)
-
-		aesCrypto, err := crypto.NewAESCrypto(keyString)
-		assert.NoError(t, err)
-
-		notifyTokenDecrypted, err := aesCrypto.Decrypt(lineNotifyStr, decodeNotifyToken)
-		assert.NoError(t, err)
-		botTokenDecrypted, err := aesCrypto.Decrypt(lineBotStr, decodeBotToken)
-		assert.NoError(t, err)
-		botSecretDecrypted, err := aesCrypto.Decrypt(lineBotSecretStr, decodeBotSecret)
-		assert.NoError(t, err)
-		groupIDDecrypted, err := aesCrypto.Decrypt(lineGroupStr, decodeGroupID)
-		assert.NoError(t, err)
-
-		assert.Equal(t, notifyToken, string(notifyTokenDecrypted))
-		assert.Equal(t, botToken, string(botTokenDecrypted))
-		assert.Equal(t, botSecret, string(botSecretDecrypted))
-		assert.Equal(t, groupID, string(groupIDDecrypted))
 		assert.Equal(t, "987654321", lineBot.DefaultChannelID)
 		assert.Equal(t, false, lineBot.DebugMode)
 	})

@@ -75,3 +75,8 @@ const createJsonData = async function(guildId, formData, formElements) {
 
     return JSON.stringify(jsonTmp);
 }
+
+try {
+    module.exports = { createJsonData };
+} catch (e) {
+}

@@ -88,6 +88,7 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "line_bot_ivの更新に失敗しました:"+err.Error())
 		return
 	}
+	slog.InfoContext(ctx, "LineTokenの更新に成功しました","debugmode", lineTokenJson.DebugMode)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("OK")
 }

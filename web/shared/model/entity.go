@@ -42,7 +42,7 @@ type DiscordUser struct {
 
 type LineOAuthSession struct {
 	Token          string          `json:"token"`
-	DiscordGuildID string          `json:"guild_id"`
+	DiscordGuildID string          `json:"guildId"`
 	User           LineIdTokenUser `json:"user"`
 }
 

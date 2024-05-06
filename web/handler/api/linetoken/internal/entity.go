@@ -7,15 +7,15 @@ import (
 )
 
 type LineBotJson struct {
-	GuildID          string `json:"guild_id" db:"guild_id"`
-	LineNotifyToken  string `json:"line_notify_token,omitempty" db:"line_notify_token"`
-	LineBotToken     string `json:"line_bot_token,omitempty" db:"line_bot_token"`
-	LineBotSecret    string `json:"line_bot_secret,omitempty" db:"line_bot_secret"`
-	LineGroupID      string `json:"line_group_id,omitempty" db:"line_group_id"`
-	LineClientID     string `json:"line_client_id,omitempty" db:"line_client_id"`
-	LineClientSecret string `json:"line_client_secret,omitempty" db:"line_client_secret"`
-	DefaultChannelID string `json:"default_channel_id,omitempty" db:"default_channel_id"`
-	DebugMode        bool   `json:"debug_mode,omitempty" db:"debug_mode"`
+	GuildID          string `json:"guildId" db:"guild_id"`
+	LineNotifyToken  string `json:"lineNotifyToken,omitempty" db:"line_notify_token"`
+	LineBotToken     string `json:"lineBotToken,omitempty" db:"line_bot_token"`
+	LineBotSecret    string `json:"lineBotSecret,omitempty" db:"line_bot_secret"`
+	LineGroupID      string `json:"lineGroupId,omitempty" db:"line_group_id"`
+	LineClientID     string `json:"lineClientId,omitempty" db:"line_client_id"`
+	LineClientSecret string `json:"lineClientSecret,omitempty" db:"line_client_secret"`
+	DefaultChannelID string `json:"defaultChannelId,omitempty" db:"default_channel_id"`
+	DebugMode        bool   `json:"debugMode,omitempty" db:"debug_mode"`
 }
 
 func (g LineBotJson) Validate() error {

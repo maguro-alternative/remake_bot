@@ -33,39 +33,38 @@ document.getElementById('form').onsubmit = async function (event) {
 const createJsonData = async function(guildId, formData, formElements) {
     let permissionName;
     let jsonTmp = {
-        "permission_codes": [],
-        "permission_user_ids": [],
-        "permission_role_ids": [],
+        "permissionCodes": [],
+        "permissionUserIds": [],
+        "permissionRoleIds": [],
     };
 
     // 各formのkeyを取得
     for (let i = 0; i < formElements.length; i++) {
         formKey = formElements[i].name;
-        if (formKey.includes('permission_code')) {
-            permissionName = formKey.substr(0, formKey.indexOf('_permission_code'));
-            jsonTmp['permission_codes'].push({
-                "guild_id": guildId,
+        if (formKey.includes('PermissionCode')) {
+            permissionName = formKey.substr(0, formKey.indexOf('PermissionCode'));
+            jsonTmp['permissionCodes'].push({
+                "guildId": guildId,
                 "type": permissionName,
                 "code": parseInt(formData.get(formKey))
             })
-        } else if (formKey.includes('member_permission_id')) {
-            permissionName = formKey.substr(0, formKey.indexOf('_member_permission_id'));
+        } else if (formKey.includes('MemberPermissionId')) {
+            permissionName = formKey.substr(0, formKey.indexOf('MemberPermissionId'));
             for (let user of formData.getAll(formKey)) {
-                console.log(user);
-                jsonTmp['permission_user_ids'].push({
-                    "guild_id": guildId,
+                jsonTmp['permissionUserIds'].push({
+                    "guildId": guildId,
                     "type": permissionName,
-                    "user_id": user,
+                    "userId": user,
                     "permission": "all"
                 })
             }
-        } else if (formKey.includes('role_permission_id')) {
-            permissionName = formKey.substr(0, formKey.indexOf('_role_permission_id'));
+        } else if (formKey.includes('RolePermissionId')) {
+            permissionName = formKey.substr(0, formKey.indexOf('RolePermissionId'));
             for (let role of formData.getAll(formKey)) {
-                jsonTmp['permission_role_ids'].push({
-                    "guild_id": guildId,
+                jsonTmp['permissionRoleIds'].push({
+                    "guildId": guildId,
                     "type": permissionName,
-                    "role_id": role,
+                    "roleId": role,
                     "permission": "all"
                 })
             }

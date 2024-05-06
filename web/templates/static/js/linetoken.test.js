@@ -76,17 +76,17 @@ describe('fetchLineTokenData', () => {
 
     it('formからjsonに変換できること', async () => {
         const formData = new FormData();
-        formData.append('guild_id', '111');
-        formData.append('line_notify_token', 'line_notify_token');
-        formData.append('line_bot_token', 'line_bot_token');
-        formData.append('line_bot_secret', 'line_bot_secret');
-        formData.append('line_group_id', 'line_group_id');
-        formData.append('line_client_id', 'line_client_id');
-        formData.append('line_client_secret', 'line_client_secret');
-        formData.append('debug_mode', 'on');
+        formData.append('guildId', '111');
+        formData.append('lineNotifyToken', 'line_notify_token');
+        formData.append('lineBotToken', 'line_bot_token');
+        formData.append('lineBotSecret', 'line_bot_secret');
+        formData.append('lineGroupId', 'line_group_id');
+        formData.append('lineClientId', 'line_client_id');
+        formData.append('lineClientSecret', 'line_client_secret');
+        formData.append('debugMode', 'on');
 
         const jsonData = await createJsonData(formData)
 
-        expect(jsonData).toEqual('{"guild_id":"111","line_notify_token":"line_notify_token","line_bot_token":"line_bot_token","line_bot_secret":"line_bot_secret","line_group_id":"line_group_id","line_client_id":"line_client_id","line_client_secret":"line_client_secret","debug_mode":true}');
+        expect(jsonData).toEqual('{"guildId":"111","lineNotifyToken":"line_notify_token","lineBotToken":"line_bot_token","lineBotSecret":"line_bot_secret","lineGroupId":"line_group_id","lineClientId":"line_client_id","lineClientSecret":"line_client_secret","debugMode":true}');
     })
 });

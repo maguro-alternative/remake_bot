@@ -68,24 +68,24 @@ func CreateLinePostDiscordChannelForm(
 			<details style="margin: 0 0 0 1em;">
                 <summary>` + channel.Name + `</summary>
 				<div style="margin: 0 0 0 1em;">
-					<label for="ng_` + channel.ID + `">LINEへ送信しない</label>
-					<input type="checkbox" id="ng_` + channel.ID + `" name="ng_` + channel.ID + `" ` + messageNgFlag + ` />
+					<label for="ng` + channel.ID + `">LINEへ送信しない</label>
+					<input type="checkbox" id="ng` + channel.ID + `" name="ng` + channel.ID + `" ` + messageNgFlag + ` />
 					<br/>
-					<label for="bot_message_` + channel.ID + `">Botのメッセージを送信しない</label>
-					<input type="checkbox" id="bot_message_` + channel.ID + `" name="bot_message_` + channel.ID + `"` + botNgFlag + ` />
+					<label for="botMessage` + channel.ID + `">Botのメッセージを送信しない</label>
+					<input type="checkbox" id="botMessage` + channel.ID + `" name="botMessage` + channel.ID + `"` + botNgFlag + ` />
 					<br/>
-					<label for="ng_types_` + channel.ID + `[]">NGタイプ</label><br/>
-					<select id="ng_types_` + channel.ID + `[]" name="ng_types_` + channel.ID + `[]" multiple>
+					<label for="ngTypes` + channel.ID + `[]">NGタイプ</label><br/>
+					<select id="ngTypes` + channel.ID + `[]" name="ngTypes` + channel.ID + `[]" multiple>
 						` + selectMessageTypeForm + `
 					</select>
 					<br/>
-					<label for="ng_users_` + channel.ID + `[]">NGユーザー</label><br/>
-					<select id="ng_users_` + channel.ID + `[]" name="ng_users_` + channel.ID + `[]" multiple>
+					<label for="ngUsers` + channel.ID + `[]">NGユーザー</label><br/>
+					<select id="ng_users` + channel.ID + `[]" name="ngUsers` + channel.ID + `[]" multiple>
 						` + selectMemberForm + `
 					</select>
 					<br/>
-					<label for="ng_roles_` + channel.ID + `[]">NGロール</label><br/>
-					<select id="ng_roles_` + channel.ID + `[]" name="ng_roles_` + channel.ID + `[]" multiple>
+					<label for="ngRoles` + channel.ID + `[]">NGロール</label><br/>
+					<select id="ngRoles` + channel.ID + `[]" name="ngRoles` + channel.ID + `[]" multiple>
 						` + selectRoleForm + `
 					</select>
 					<br/>

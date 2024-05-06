@@ -194,9 +194,7 @@ func (r *Repository) UpdateLineBot(ctx context.Context, lineBot *LineBot) error 
 	if lineBot.DefaultChannelID != "" {
 		setQueryArray = append(setQueryArray, "default_channel_id = :default_channel_id")
 	}
-	if lineBot.DebugMode {
-		setQueryArray = append(setQueryArray, "debug_mode = :debug_mode")
-	}
+	setQueryArray = append(setQueryArray, "debug_mode = :debug_mode")
 	setNameQuery = strings.Join(setQueryArray, ",")
 	if setNameQuery == "" {
 		fmt.Println("No update value")

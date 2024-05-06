@@ -76,7 +76,7 @@ func main() {
 }
 
 func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo.Session) error {
-	permissionTypes := []string{"line_bot", "line_post_discord_channel", "vc_signal", "webhook"}
+	permissionTypes := []string{"lineBot", "linePostDiscordChannel", "vcSignal", "webhook"}
 	// データベースにユーザーを追加
 	// ここにユーザーを追加するコードを書く
 	// 例: dbV1.ExecContext(ctx, "INSERT INTO users (discord_id) VALUES ($1)", discordSession.State.User.ID)

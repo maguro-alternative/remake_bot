@@ -17,11 +17,11 @@ describe('fetchGroupData', () => {
     // ここにテストケースを書く
     it('formからjsonに変換できること', async () => {
         const formData = new FormData();
-        formData.append("default_channel_id", "111");
-        formData.append("debug_mode", false);
+        formData.append("defaultChannelId", "111");
+        formData.append("debugMode", false);
 
         const jsonData = await createJsonData(formData)
 
-        expect(jsonData).toEqual('{"default_channel_id":"111","debug_mode":"false"}');
+        expect(jsonData).toEqual('{"defaultChannelId":"111","debugMode":"false"}');
     });
 });

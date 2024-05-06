@@ -6,8 +6,8 @@ import (
 )
 
 type LineBotJson struct {
-	DefaultChannelID string `json:"default_channel_id,omitempty" db:"default_channel_id"`
-	DebugMode        bool   `json:"debug_mode,omitempty" db:"debug_mode"`
+	DefaultChannelID string `json:"defaultChannelId,omitempty" db:"default_channel_id"`
+	DebugMode        bool   `json:"debugMode,omitempty" db:"debug_mode"`
 }
 
 func (g LineBotJson) Validate() error {

@@ -14,16 +14,16 @@ type PermissionCode struct {
 }
 
 type PermissionUserID struct {
-	GuildID    string `json:"guild_id"`
+	GuildID    string `json:"guildId"`
 	Type       string `json:"type"`
-	UserID     string `json:"user_id"`
+	UserID     string `json:"userId"`
 	Permission string `json:"permission"`
 }
 
 type PermissionRoleID struct {
-	GuildID    string `json:"guild_id"`
+	GuildID    string `json:"guildId"`
 	Type       string `json:"type"`
-	RoleID     string `json:"role_id"`
+	RoleID     string `json:"roleId"`
 	Permission string `json:"permission"`
 }
 
@@ -31,7 +31,7 @@ func CreatePermissionCodeForm(guildID string, permissionCode PermissionCode) str
 	return fmt.Sprintf(`
 	<h3>%s</h3>
 	<h6>編集を許可する権限コード</h6>
-	<input type="number" name="%s_permission_code" value=%d min=0 max=1099511627775/>
+	<input type="number" name="%sPermissionCode" value=%d min=0 max=1099511627775/>
 	`, permissionCode.Type, permissionCode.Type, permissionCode.Code)
 }
 
@@ -73,9 +73,9 @@ func CreatePermissionSelectForm(
 	}
 	return fmt.Sprintf(`
 	<h6>編集を許可するメンバー</h6>
-	<select name="%s_member_permission_id" multiple>%s</select>
+	<select name="%sMemberPermissionId" multiple>%s</select>
 	<h6>編集を許可するロール</h6>
-	<select name="%s_role_permission_id" multiple>%s</select>
+	<select name="%sRolePermissionId" multiple>%s</select>
 	<br/><br/>
 	`, permission, selectMemberFormBuilder.String(), permission, selectRoleFormBuilder.String())
 }

@@ -45,28 +45,28 @@ const createJsonData = async function(formElements, formData) {
         channelId = channelIdmatch.join('');
         if (jsonTmp[channelId] === undefined) {
             jsonTmp[channelId] = {
-                "channel_id": channelId,
+                "channelId": channelId,
                 "ng": false,
-                "bot_message": false,
-                "ng_types": ngTypeArray,
-                "ng_users": ngUserArray,
-                "ng_roles": ngRoleArray
+                "botMessage": false,
+                "ngTypes": ngTypeArray,
+                "ngUsers": ngUserArray,
+                "ngRoles": ngRoleArray
             }
         }
-        if ((formKey.includes('ng_types')) && (formKey.includes('[]'))) {
-            jsonTmp[channelId]['ng_types'] = formData.getAll(formKey).map( str => parseInt(str, 10) );
+        if ((formKey.includes('ngTypes')) && (formKey.includes('[]'))) {
+            jsonTmp[channelId]['ngTypes'] = formData.getAll(formKey).map( str => parseInt(str, 10) );
         }
-        if ((formKey.includes('ng_users')) && (formKey.includes('[]'))) {
-            jsonTmp[channelId]['ng_users'] = formData.getAll(formKey);
+        if ((formKey.includes('ngUsers')) && (formKey.includes('[]'))) {
+            jsonTmp[channelId]['ngUsers'] = formData.getAll(formKey);
         }
-        if ((formKey.includes('ng_roles')) && (formKey.includes('[]'))) {
-            jsonTmp[channelId]['ng_roles'] = formData.getAll(formKey);
+        if ((formKey.includes('ngRoles')) && (formKey.includes('[]'))) {
+            jsonTmp[channelId]['ngRoles'] = formData.getAll(formKey);
         }
-        if ((formKey.includes('ng_')) && (!formKey.includes('[]'))) {
+        if ((formKey.includes('ng')) && (!formKey.includes('[]'))) {
             document.getElementById(formKey).checked ? jsonTmp[channelId]["ng"] = true : jsonTmp[channelId]["ng"] = false;
         }
-        if (formKey.includes('bot_message')) {
-            document.getElementById(formKey).checked ? jsonTmp[channelId]["bot_message"] = true : jsonTmp[channelId]["bot_message"] = false;
+        if (formKey.includes('botMessage')) {
+            document.getElementById(formKey).checked ? jsonTmp[channelId]["botMessage"] = true : jsonTmp[channelId]["botMessage"] = false;
         }
     }
 

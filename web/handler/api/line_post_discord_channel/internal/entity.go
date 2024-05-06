@@ -6,14 +6,14 @@ import (
 )
 
 type LinePostDiscordChannelJson struct {
-	GuildID  string `json:"guild_id"`
+	GuildID  string `json:"guildId"`
 	Channels []struct {
-		ChannelID  string   `json:"channel_id"`
+		ChannelID  string   `json:"channelId"`
 		Ng         bool     `json:"ng"`
-		BotMessage bool     `json:"bot_message"`
-		NgTypes    []int    `json:"ng_types"`
-		NgUsers    []string `json:"ng_users"`
-		NgRoles    []string `json:"ng_roles"`
+		BotMessage bool     `json:"botMessage"`
+		NgTypes    []int    `json:"ngTypes"`
+		NgUsers    []string `json:"ngUsers"`
+		NgRoles    []string `json:"ngRoles"`
 	} `json:"channels"`
 }
 
@@ -25,14 +25,14 @@ func (g LinePostDiscordChannelJson) Validate() error {
 }
 
 type LinePostDiscordChannel struct {
-	ChannelID  string `db:"channel_id"`
-	GuildID    string `db:"guild_id"`
+	ChannelID  string `db:"channelId"`
+	GuildID    string `db:"guildId"`
 	Ng         bool   `db:"ng"`
-	BotMessage bool   `db:"bot_message"`
+	BotMessage bool   `db:"botMessage"`
 }
 
 type LineNgDiscordMessageType struct {
-	ChannelID string `db:"channel_id"`
-	GuildID   string `db:"guild_id"`
+	ChannelID string `db:"channelId"`
+	GuildID   string `db:"guildId"`
 	Type      int    `db:"type"`
 }

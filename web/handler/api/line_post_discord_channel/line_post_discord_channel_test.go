@@ -19,12 +19,12 @@ func TestLinePostDiscordChannelHandler_ServeHTTP(t *testing.T) {
 	bodyJson, err := json.Marshal(internal.LinePostDiscordChannelJson{
 		GuildID: "987654321",
 		Channels: []struct {
-			ChannelID   string   `json:"channel_id"`
+			ChannelID   string   `json:"channelId"`
 			Ng          bool     `json:"ng"`
-			BotMessage  bool     `json:"bot_message"`
-			NgTypes     []int    `json:"ng_types"`
-			NgUsers     []string `json:"ng_users"`
-			NgRoles     []string `json:"ng_roles"`
+			BotMessage  bool     `json:"botMessage"`
+			NgTypes     []int    `json:"ngTypes"`
+			NgUsers     []string `json:"ngUsers"`
+			NgRoles     []string `json:"ngRoles"`
 		}{
 			{
 				ChannelID:   "123456789",

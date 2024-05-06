@@ -33,7 +33,7 @@ document.getElementById('form').onsubmit = async function (event) {
 
 const createJsonData = async function(formData) {
     const data = Object.fromEntries(formData.entries());
-    data['debug_mode'] === 'on' ? data['debug_mode'] = true : data['debug_mode'] = false;
+    data['debugMode'] === 'on' ? data['debugMode'] = true : data['debugMode'] = false;
     return JSON.stringify(data);
 }
 

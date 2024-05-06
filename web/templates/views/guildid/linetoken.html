@@ -16,43 +16,43 @@
         <!-- 入力フォーム -->
         <form action="#" id="form">
             <label for="lineNotifyToken">LINE Notifyのトークン</label>
-            <input id="lineNotifyToken" type="password" name="line_notify_token">
+            <input id="lineNotifyToken" type="password" name="lineNotifyToken">
             {{ .LineEntered.LineNotifyToken }}
             <br/>
 
             <label for="lineBotToken">LINE Botのトークン</label>
-            <input id="lineBotToken" type="password" name="line_bot_token">
+            <input id="lineBotToken" type="password" name="lineBotToken">
             {{ .LineEntered.LineBotToken }}
             <br/>
 
             <label for="lineBotSecret">LINE Botのシークレット</label>
-            <input id="lineBotSecret" type="password" name="line_bot_secret">
+            <input id="lineBotSecret" type="password" name="lineBotSecret">
             {{ .LineEntered.LineBotSecret }}
             <br/>
 
             <label for="lineGroupId">LINEグループID</label>
-            <input id="lineGroupId" type="password" name="line_group_id">
+            <input id="lineGroupId" type="password" name="lineGroupId">
             {{ .LineEntered.LineGroupID }}
             <br/>
 
             <label for="lineClientId">LINEのクライアントID</label>
-            <input id="lineClientId" type="password" name="line_client_id">
+            <input id="lineClientId" type="password" name="lineClientId">
             {{ .LineEntered.LineClientID }}
             <br/>
 
             <label for="lineClientSecret">LINEのクライアントシークレット</label>
-            <input id="lineClientSecret" type="password" name="line_client_secret">
+            <input id="lineClientSecret" type="password" name="lineClientSecret">
             {{ .LineEntered.LineClientSecret }}
             <br/>
 
             <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>
-            <select id="defaultChannel" name="default_channel_id" >
+            <select id="defaultChannel" name="defaultChannelId" >
                 {{ .Channels }}
             </select>
             <br/>
 
             <label for="debugMode">デバッグモード</label>
-            <input id="debugMode" type="checkbox" name="debug_mode" {{ if .LineEntered.LineDebugMode }} checked {{ end }}>
+            <input id="debugMode" type="checkbox" name="debugMode" {{ if .LineEntered.LineDebugMode }} checked {{ end }}>
             <br/>
 
             {{ .SubmitTag }}

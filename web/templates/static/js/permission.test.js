@@ -69,30 +69,30 @@ describe('fetchPermissionData', () => {
 
         const lineBotPermissionCodeInput = document.createElement('input');
         lineBotPermissionCodeInput.type = 'number';
-        lineBotPermissionCodeInput.name = 'line_bot_permission_code';
+        lineBotPermissionCodeInput.name = 'lineBotPermissionCode';
         lineBotPermissionCodeInput.value = 8;
         document.forms['form'].appendChild(lineBotPermissionCodeInput);
 
         const linePostDiscordChannelPermissionCodeInput = document.createElement('input');
         linePostDiscordChannelPermissionCodeInput.type = 'number';
-        linePostDiscordChannelPermissionCodeInput.name = 'line_post_discord_channel_permission_code';
+        linePostDiscordChannelPermissionCodeInput.name = 'linePostDiscordChannelPermissionCode';
         linePostDiscordChannelPermissionCodeInput.value = 8;
         document.forms['form'].appendChild(linePostDiscordChannelPermissionCodeInput);
 
         const vcSignalPermissionCodeInput = document.createElement('input');
         vcSignalPermissionCodeInput.type = 'number';
-        vcSignalPermissionCodeInput.name = 'vc_signal_permission_code';
+        vcSignalPermissionCodeInput.name = 'vcSignalPermissionCode';
         vcSignalPermissionCodeInput.value = 8;
         document.forms['form'].appendChild(vcSignalPermissionCodeInput);
 
         const webhookPermissionCodeInput = document.createElement('input');
         webhookPermissionCodeInput.type = 'number';
-        webhookPermissionCodeInput.name = 'webhook_permission_code';
+        webhookPermissionCodeInput.name = 'webhookPermissionCode';
         webhookPermissionCodeInput.value = 8;
         document.forms['form'].appendChild(webhookPermissionCodeInput);
 
         const lineBotMemberPermissionIdSelect = document.createElement('select');
-        lineBotMemberPermissionIdSelect.name = 'line_bot_member_permission_id';
+        lineBotMemberPermissionIdSelect.name = 'lineBotMemberPermissionId';
         lineBotMemberPermissionIdSelect.multiple = true;
         lineBotMemberPermissionIdSelect.appendChild(testUser1Option);
         lineBotMemberPermissionIdSelect.appendChild(testUser2Option);
@@ -101,7 +101,7 @@ describe('fetchPermissionData', () => {
         document.forms['form'].appendChild(lineBotMemberPermissionIdSelect);
 
         const linePostDiscordChannelMemberPermissionIdSelect = document.createElement('select');
-        linePostDiscordChannelMemberPermissionIdSelect.name = 'line_post_discord_channel_member_permission_id';
+        linePostDiscordChannelMemberPermissionIdSelect.name = 'linePostDiscordChannelMemberPermissionId';
         linePostDiscordChannelMemberPermissionIdSelect.multiple = true;
         linePostDiscordChannelMemberPermissionIdSelect.appendChild(testUser1Option);
         linePostDiscordChannelMemberPermissionIdSelect.appendChild(testUser2Option);
@@ -110,7 +110,7 @@ describe('fetchPermissionData', () => {
         document.forms['form'].appendChild(linePostDiscordChannelMemberPermissionIdSelect);
 
         const vcSignalMemberPermissionIdSelect = document.createElement('select');
-        vcSignalMemberPermissionIdSelect.name = 'vc_signal_member_permission_id';
+        vcSignalMemberPermissionIdSelect.name = 'vcSignalMemberPermissionId';
         vcSignalMemberPermissionIdSelect.multiple = true;
         vcSignalMemberPermissionIdSelect.appendChild(testUser1Option);
         vcSignalMemberPermissionIdSelect.appendChild(testUser2Option);
@@ -119,7 +119,7 @@ describe('fetchPermissionData', () => {
         document.forms['form'].appendChild(vcSignalMemberPermissionIdSelect);
 
         const webhookMemberPermissionIdSelect = document.createElement('select');
-        webhookMemberPermissionIdSelect.name = 'webhook_member_permission_id';
+        webhookMemberPermissionIdSelect.name = 'webhookMemberPermissionId';
         webhookMemberPermissionIdSelect.multiple = true;
         webhookMemberPermissionIdSelect.appendChild(testUser1Option);
         webhookMemberPermissionIdSelect.appendChild(testUser2Option);
@@ -128,7 +128,7 @@ describe('fetchPermissionData', () => {
         document.forms['form'].appendChild(webhookMemberPermissionIdSelect);
 
         const lineBotRolePermissionIdSelect = document.createElement('select');
-        lineBotRolePermissionIdSelect.name = 'line_bot_role_permission_id';
+        lineBotRolePermissionIdSelect.name = 'lineBotRolePermissionId';
         lineBotRolePermissionIdSelect.multiple = true;
         lineBotRolePermissionIdSelect.appendChild(testRole1Option);
         lineBotRolePermissionIdSelect.appendChild(testRole2Option);
@@ -137,7 +137,7 @@ describe('fetchPermissionData', () => {
         document.forms['form'].appendChild(lineBotRolePermissionIdSelect);
 
         const linePostDiscordChannelRolePermissionIdSelect = document.createElement('select');
-        linePostDiscordChannelRolePermissionIdSelect.name = 'line_post_discord_channel_role_permission_id';
+        linePostDiscordChannelRolePermissionIdSelect.name = 'linePostDiscordChannelRolePermissionId';
         linePostDiscordChannelRolePermissionIdSelect.multiple = true;
         linePostDiscordChannelRolePermissionIdSelect.appendChild(testRole1Option);
         linePostDiscordChannelRolePermissionIdSelect.appendChild(testRole2Option);
@@ -146,7 +146,7 @@ describe('fetchPermissionData', () => {
         document.forms['form'].appendChild(linePostDiscordChannelRolePermissionIdSelect);
 
         const vcSignalRolePermissionIdSelect = document.createElement('select');
-        vcSignalRolePermissionIdSelect.name = 'vc_signal_role_permission_id';
+        vcSignalRolePermissionIdSelect.name = 'vcSignalRolePermissionId';
         vcSignalRolePermissionIdSelect.multiple = true;
         vcSignalRolePermissionIdSelect.appendChild(testRole1Option);
         vcSignalRolePermissionIdSelect.appendChild(testRole2Option);
@@ -155,7 +155,7 @@ describe('fetchPermissionData', () => {
         document.forms['form'].appendChild(vcSignalRolePermissionIdSelect);
 
         const webhookRolePermissionIdSelect = document.createElement('select');
-        webhookRolePermissionIdSelect.name = 'webhook_role_permission_id';
+        webhookRolePermissionIdSelect.name = 'webhookRolePermissionId';
         webhookRolePermissionIdSelect.multiple = true;
         webhookRolePermissionIdSelect.appendChild(testRole1Option);
         webhookRolePermissionIdSelect.appendChild(testRole2Option);
@@ -166,30 +166,30 @@ describe('fetchPermissionData', () => {
 
     test('createJsonData', async () => {
         const formData = new FormData();
-        formData.append('guild_id', '111');
-        formData.append('line_bot_permission_code', '8');
-        formData.append('line_post_discord_channel_permission_code', '8');
-        formData.append('vc_signal_permission_code', '8');
-        formData.append('webhook_permission_code', '8');
-        formData.append('line_bot_member_permission_id', '111');
-        formData.append('line_bot_member_permission_id', '222');
-        formData.append('line_post_discord_channel_member_permission_id', '111');
-        formData.append('line_post_discord_channel_member_permission_id', '222');
-        formData.append('vc_signal_member_permission_id', '111');
-        formData.append('vc_signal_member_permission_id', '222');
-        formData.append('webhook_member_permission_id', '111');
-        formData.append('webhook_member_permission_id', '222');
-        formData.append('line_bot_role_permission_id', '111');
-        formData.append('line_bot_role_permission_id', '222');
-        formData.append('line_post_discord_channel_role_permission_id', '111');
-        formData.append('line_post_discord_channel_role_permission_id', '222');
-        formData.append('vc_signal_role_permission_id', '111');
-        formData.append('vc_signal_role_permission_id', '222');
-        formData.append('webhook_role_permission_id', '111');
-        formData.append('webhook_role_permission_id', '222');
+        formData.append('guildId', '111');
+        formData.append('lineBotPermissionCode', '8');
+        formData.append('linePostDiscordChannelPermissionCode', '8');
+        formData.append('vcSignalPermissionCode', '8');
+        formData.append('webhookPermissionCode', '8');
+        formData.append('lineBotMemberPermissionId', '111');
+        formData.append('lineBotMemberPermissionId', '222');
+        formData.append('linePostDiscordChannelMemberPermissionId', '111');
+        formData.append('linePostDiscordChannelMemberPermissionId', '222');
+        formData.append('vcSignalMemberPermissionId', '111');
+        formData.append('vcSignalMemberPermissionId', '222');
+        formData.append('webhookMemberPermissionId', '111');
+        formData.append('webhookMemberPermissionId', '222');
+        formData.append('lineBotRolePermissionId', '111');
+        formData.append('lineBotRolePermissionId', '222');
+        formData.append('linePostDiscordChannelRolePermissionId', '111');
+        formData.append('linePostDiscordChannelRolePermissionId', '222');
+        formData.append('vcSignalRolePermissionId', '111');
+        formData.append('vcSignalRolePermissionId', '222');
+        formData.append('webhookRolePermissionId', '111');
+        formData.append('webhookRolePermissionId', '222');
 
         const jsonData = await createJsonData(111, formData, document.forms['form'].elements);
 
-        expect(jsonData).toBe('{"permission_codes":[{"guild_id":111,"type":"line_bot","code":8},{"guild_id":111,"type":"line_post_discord_channel","code":8},{"guild_id":111,"type":"vc_signal","code":8},{"guild_id":111,"type":"webhook","code":8}],"permission_user_ids":[{"guild_id":111,"type":"line_bot","user_id":"111","permission":"all"},{"guild_id":111,"type":"line_bot","user_id":"222","permission":"all"},{"guild_id":111,"type":"line_post_discord_channel","user_id":"111","permission":"all"},{"guild_id":111,"type":"line_post_discord_channel","user_id":"222","permission":"all"},{"guild_id":111,"type":"vc_signal","user_id":"111","permission":"all"},{"guild_id":111,"type":"vc_signal","user_id":"222","permission":"all"},{"guild_id":111,"type":"webhook","user_id":"111","permission":"all"},{"guild_id":111,"type":"webhook","user_id":"222","permission":"all"}],"permission_role_ids":[{"guild_id":111,"type":"line_bot","role_id":"111","permission":"all"},{"guild_id":111,"type":"line_bot","role_id":"222","permission":"all"},{"guild_id":111,"type":"line_post_discord_channel","role_id":"111","permission":"all"},{"guild_id":111,"type":"line_post_discord_channel","role_id":"222","permission":"all"},{"guild_id":111,"type":"vc_signal","role_id":"111","permission":"all"},{"guild_id":111,"type":"vc_signal","role_id":"222","permission":"all"},{"guild_id":111,"type":"webhook","role_id":"111","permission":"all"},{"guild_id":111,"type":"webhook","role_id":"222","permission":"all"}]}');
+        expect(jsonData).toBe('{"permissionCodes":[{"guildId":111,"type":"lineBot","code":8},{"guildId":111,"type":"linePostDiscordChannel","code":8},{"guildId":111,"type":"vcSignal","code":8},{"guildId":111,"type":"webhook","code":8}],"permissionUserIds":[{"guildId":111,"type":"lineBot","userId":"111","permission":"all"},{"guildId":111,"type":"lineBot","userId":"222","permission":"all"},{"guildId":111,"type":"linePostDiscordChannel","userId":"111","permission":"all"},{"guildId":111,"type":"linePostDiscordChannel","userId":"222","permission":"all"},{"guildId":111,"type":"vcSignal","userId":"111","permission":"all"},{"guildId":111,"type":"vcSignal","userId":"222","permission":"all"},{"guildId":111,"type":"webhook","userId":"111","permission":"all"},{"guildId":111,"type":"webhook","userId":"222","permission":"all"}],"permissionRoleIds":[{"guildId":111,"type":"lineBot","roleId":"111","permission":"all"},{"guildId":111,"type":"lineBot","roleId":"222","permission":"all"},{"guildId":111,"type":"linePostDiscordChannel","roleId":"111","permission":"all"},{"guildId":111,"type":"linePostDiscordChannel","roleId":"222","permission":"all"},{"guildId":111,"type":"vcSignal","roleId":"111","permission":"all"},{"guildId":111,"type":"vcSignal","roleId":"222","permission":"all"},{"guildId":111,"type":"webhook","roleId":"111","permission":"all"},{"guildId":111,"type":"webhook","roleId":"222","permission":"all"}]}');
     });
 });

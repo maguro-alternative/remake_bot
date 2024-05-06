@@ -41,7 +41,6 @@ const createJsonData = async function(guildId, formData, formElements) {
     // 各formのkeyを取得
     for (let i = 0; i < formElements.length; i++) {
         formKey = formElements[i].name;
-        console.log(formKey);
         if (formKey.includes('permission_code')) {
             permissionName = formKey.substr(0, formKey.indexOf('_permission_code'));
             jsonTmp['permission_codes'].push({

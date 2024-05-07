@@ -173,22 +173,22 @@ func (r *Repository) UpdateLineBot(ctx context.Context, lineBot *LineBot) error 
 	var setNameQuery string
 	var setQueryArray []string
 
-	if len(lineBot.LineNotifyToken) > 0 && len(lineBot.LineNotifyToken[0]) > 0 {
+	if len(lineBot.LineNotifyToken) > 0 && len(lineBot.LineNotifyToken[0]) > 0 || lineBot.LineNotifyToken == nil {
 		setQueryArray = append(setQueryArray, "line_notify_token = :line_notify_token")
 	}
-	if len(lineBot.LineBotToken) > 0 && len(lineBot.LineBotToken[0]) > 0 {
+	if len(lineBot.LineBotToken) > 0 && len(lineBot.LineBotToken[0]) > 0 || lineBot.LineBotToken == nil {
 		setQueryArray = append(setQueryArray, "line_bot_token = :line_bot_token")
 	}
-	if len(lineBot.LineBotSecret) > 0 && len(lineBot.LineBotSecret[0]) > 0 {
+	if len(lineBot.LineBotSecret) > 0 && len(lineBot.LineBotSecret[0]) > 0 || lineBot.LineBotSecret == nil {
 		setQueryArray = append(setQueryArray, "line_bot_secret = :line_bot_secret")
 	}
-	if len(lineBot.LineGroupID) > 0 && len(lineBot.LineGroupID[0]) > 0 {
+	if len(lineBot.LineGroupID) > 0 && len(lineBot.LineGroupID[0]) > 0 || lineBot.LineGroupID == nil {
 		setQueryArray = append(setQueryArray, "line_group_id = :line_group_id")
 	}
-	if len(lineBot.LineClientID) > 0 && len(lineBot.LineClientID[0]) > 0 {
+	if len(lineBot.LineClientID) > 0 && len(lineBot.LineClientID[0]) > 0 || lineBot.LineClientID == nil{
 		setQueryArray = append(setQueryArray, "line_client_id = :line_client_id")
 	}
-	if len(lineBot.LineClientSecret) > 0 && len(lineBot.LineClientSecret[0]) > 0 {
+	if len(lineBot.LineClientSecret) > 0 && len(lineBot.LineClientSecret[0]) > 0 || lineBot.LineClientSecret == nil{
 		setQueryArray = append(setQueryArray, "line_client_secret = :line_client_secret")
 	}
 	if lineBot.DefaultChannelID != "" {

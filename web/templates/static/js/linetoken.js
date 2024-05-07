@@ -34,6 +34,12 @@ document.getElementById('form').onsubmit = async function (event) {
 const createJsonData = async function(formData) {
     const data = Object.fromEntries(formData.entries());
     data['debugMode'] === 'on' ? data['debugMode'] = true : data['debugMode'] = false;
+    data['lineNotifyTokenDelete'] === 'on' ? data['lineNotifyTokenDelete'] = true : data['lineNotifyTokenDelete'] = false;
+    data['lineBotTokenDelete'] === 'on' ? data['lineBotTokenDelete'] = true : data['lineBotTokenDelete'] = false;
+    data['lineBotSecretDelete'] === 'on' ? data['lineBotSecretDelete'] = true : data['lineBotSecretDelete'] = false;
+    data['lineGroupIdDelete'] === 'on' ? data['lineGroupIdDelete'] = true : data['lineGroupIdDelete'] = false;
+    data['lineClientIdDelete'] === 'on' ? data['lineClientIdDelete'] = true : data['lineClientIdDelete'] = false;
+    data['lineClientSecretDelete'] === 'on' ? data['lineClientSecretDelete'] = true : data['lineClientSecretDelete'] = false;
     return JSON.stringify(data);
 }
 

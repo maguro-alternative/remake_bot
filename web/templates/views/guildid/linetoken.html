@@ -19,30 +19,48 @@
             <input id="lineNotifyToken" type="password" name="lineNotifyToken">
             {{ .LineEntered.LineNotifyToken }}
             <br/>
+            <label for="linnNotifyTokenDelete">LINE Notifyのトークン削除</label>
+            <input id="lineNotifyTokenDelete" type="checkbox" name="lineNotifyTokenDelete">
+            <br/>
 
             <label for="lineBotToken">LINE Botのトークン</label>
             <input id="lineBotToken" type="password" name="lineBotToken">
             {{ .LineEntered.LineBotToken }}
+            <br/>
+            <label for="lineBotTokenDelete">LINE Botのトークン削除</label>
+            <input id="lineBotTokenDelete" type="checkbox" name="lineBotTokenDelete">
             <br/>
 
             <label for="lineBotSecret">LINE Botのシークレット</label>
             <input id="lineBotSecret" type="password" name="lineBotSecret">
             {{ .LineEntered.LineBotSecret }}
             <br/>
+            <label for="lineBotSecretDelete">LINE Botのシークレット削除</label>
+            <input id="lineBotSecretDelete" type="checkbox" name="lineBotSecretDelete">
+            <br/>
 
             <label for="lineGroupId">LINEグループID</label>
             <input id="lineGroupId" type="password" name="lineGroupId">
             {{ .LineEntered.LineGroupID }}
+            <br/>
+            <label for="lineGroupIdDelete">LINEグループID削除</label>
+            <input id="lineGroupIdDelete" type="checkbox" name="lineGroupIdDelete">
             <br/>
 
             <label for="lineClientId">LINEのクライアントID</label>
             <input id="lineClientId" type="password" name="lineClientId">
             {{ .LineEntered.LineClientID }}
             <br/>
+            <label for="lineClientIdDelete">LINEのクライアントID削除</label>
+            <input id="lineClientIdDelete" type="checkbox" name="lineClientIdDelete">
+            <br/>
 
             <label for="lineClientSecret">LINEのクライアントシークレット</label>
             <input id="lineClientSecret" type="password" name="lineClientSecret">
             {{ .LineEntered.LineClientSecret }}
+            <br/>
+            <label for="lineClientSecretDelete">LINEのクライアントシークレット削除</label>
+            <input id="lineClientSecretDelete" type="checkbox" name="lineClientSecretDelete">
             <br/>
 
             <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>

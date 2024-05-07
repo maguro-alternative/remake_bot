@@ -78,6 +78,9 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 削除フラグの確認
+	deleteFlagChecker(&lineTokenJson, lineBot)
+
 	if err := h.repo.UpdateLineBot(ctx, lineBot); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "line_botの更新に失敗しました:"+err.Error())
@@ -88,7 +91,6 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "line_bot_ivの更新に失敗しました:"+err.Error())
 		return
 	}
-	slog.InfoContext(ctx, "LineTokenの更新に成功しました","debugmode", lineTokenJson.DebugMode)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("OK")
 }
@@ -216,4 +218,28 @@ func verifyLineToken(
 	}
 	_, err = lineRequ.GetGroupUserCount(ctx)
 	return err
+}
+
+func deleteFlagChecker(
+	lineBotJson *internal.LineBotJson,
+	bot *repository.LineBot,
+) {
+	if lineBotJson.LineNotifyTokenDelete {
+		bot.LineNotifyToken = nil
+	}
+	if lineBotJson.LineBotTokenDelete {
+		bot.LineBotToken = nil
+	}
+	if lineBotJson.LineBotSecretDelete {
+		bot.LineBotSecret = nil
+	}
+	if lineBotJson.LineGroupIDDelete {
+		bot.LineGroupID = nil
+	}
+	if lineBotJson.LineClientIDDelete {
+		bot.LineClientID = nil
+	}
+	if lineBotJson.LineClientSecretDelete {
+		bot.LineClientSecret = nil
+	}
 }

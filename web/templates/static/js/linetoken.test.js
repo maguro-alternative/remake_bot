@@ -13,58 +13,58 @@ const { createJsonData } = require('./linetoken');
 describe('fetchLineTokenData', () => {
     beforeAll(() => {
         const guildIdInput = document.createElement('input');
-        guildIdInput.id = 'guild_id';
+        guildIdInput.id = 'guildId';
         guildIdInput.type = 'text';
-        guildIdInput.name = 'guild_id';
+        guildIdInput.name = 'guildId';
         guildIdInput.value = '111';
         document.body.appendChild(guildIdInput);
 
         const lineNotifyTokenInput = document.createElement('input');
-        lineNotifyTokenInput.id = 'line_notify_token';
+        lineNotifyTokenInput.id = 'lineNotifyToken';
         lineNotifyTokenInput.type = 'password';
-        lineNotifyTokenInput.name = 'line_notify_token';
-        lineNotifyTokenInput.value = 'line_notify_token';
+        lineNotifyTokenInput.name = 'lineNotifyToken';
+        lineNotifyTokenInput.value = 'lineNotifyToken';
         document.body.appendChild(lineNotifyTokenInput);
 
         const lineBotTokenInput = document.createElement('input');
-        lineBotTokenInput.id = 'line_bot_token';
+        lineBotTokenInput.id = 'lineBotToken';
         lineBotTokenInput.type = 'password';
-        lineBotTokenInput.name = 'line_bot_token';
-        lineBotTokenInput.value = 'line_bot_token';
+        lineBotTokenInput.name = 'lineBotToken';
+        lineBotTokenInput.value = 'lineBotToken';
         document.body.appendChild(lineBotTokenInput);
 
         const lineBotSecretInput = document.createElement('input');
-        lineBotSecretInput.id = 'line_bot_secret';
+        lineBotSecretInput.id = 'lineBotSecret';
         lineBotSecretInput.type = 'password';
-        lineBotSecretInput.name = 'line_bot_secret';
-        lineBotSecretInput.value = 'line_bot_secret';
+        lineBotSecretInput.name = 'lineBotSecret';
+        lineBotSecretInput.value = 'lineBotSecret';
         document.body.appendChild(lineBotSecretInput);
 
         const lineGroupIDInput = document.createElement('input');
-        lineGroupIDInput.id = 'line_group_id';
+        lineGroupIDInput.id = 'lineGroupId';
         lineGroupIDInput.type = 'password';
-        lineGroupIDInput.name = 'line_group_id';
-        lineGroupIDInput.value = 'line_group_id';
+        lineGroupIDInput.name = 'lineGroupId';
+        lineGroupIDInput.value = 'lineGroupId';
         document.body.appendChild(lineGroupIDInput);
 
         const lineClientIDInput = document.createElement('input');
-        lineClientIDInput.id = 'line_client_id';
+        lineClientIDInput.id = 'lineClientId';
         lineClientIDInput.type = 'password';
-        lineClientIDInput.name = 'line_client_id';
-        lineClientIDInput.value = 'line_client_id';
+        lineClientIDInput.name = 'lineClientId';
+        lineClientIDInput.value = 'lineClientId';
         document.body.appendChild(lineClientIDInput);
 
         const lineClientSecretInput = document.createElement('input');
-        lineClientSecretInput.id = 'line_client_secret';
+        lineClientSecretInput.id = 'lineClientSecret';
         lineClientSecretInput.type = 'password';
-        lineClientSecretInput.name = 'line_client_secret';
-        lineClientSecretInput.value = 'line_client_secret';
+        lineClientSecretInput.name = 'lineClientSecret';
+        lineClientSecretInput.value = 'lineClientSecret';
         document.body.appendChild(lineClientSecretInput);
 
         const debugModeInput = document.createElement('input');
-        debugModeInput.id = 'debug_mode';
+        debugModeInput.id = 'debugMode';
         debugModeInput.type = 'checkbox';
-        debugModeInput.name = 'debug_mode';
+        debugModeInput.name = 'debugMode';
         debugModeInput.value = 'on';
         debugModeInput.checked = true;
         document.body.appendChild(debugModeInput);
@@ -87,6 +87,35 @@ describe('fetchLineTokenData', () => {
 
         const jsonData = await createJsonData(formData)
 
-        expect(jsonData).toEqual('{"guildId":"111","lineNotifyToken":"line_notify_token","lineBotToken":"line_bot_token","lineBotSecret":"line_bot_secret","lineGroupId":"line_group_id","lineClientId":"line_client_id","lineClientSecret":"line_client_secret","debugMode":true}');
+        expect(jsonData).toEqual('{"guildId":"111","lineNotifyToken":"line_notify_token","lineBotToken":"line_bot_token","lineBotSecret":"line_bot_secret","lineGroupId":"line_group_id","lineClientId":"line_client_id","lineClientSecret":"line_client_secret","debugMode":true,"lineNotifyTokenDelete":false,"lineBotTokenDelete":false,"lineBotSecretDelete":false,"lineGroupIdDelete":false,"lineClientIdDelete":false,"lineClientSecretDelete":false}');
+    })
+});
+
+describe('fetchLineTokenData', () => {
+    beforeAll(() => {
+        const guildIdInput = document.createElement('input');
+        guildIdInput.id = 'guildId';
+        guildIdInput.type = 'text';
+        guildIdInput.name = 'guildId';
+        guildIdInput.value = '111';
+        document.body.appendChild(guildIdInput);
+
+        const debugModeInput = document.createElement('input');
+        debugModeInput.id = 'lineBotTokenDelete';
+        debugModeInput.type = 'checkbox';
+        debugModeInput.name = 'lineBotTokenDelete';
+        debugModeInput.value = 'on';
+        debugModeInput.checked = true;
+        document.body.appendChild(debugModeInput);
+    });
+
+    it('formからjsonに変換できること(deleteフラグ)', async () => {
+        const formData = new FormData();
+        formData.append('guildId', '111');
+        formData.append('lineBotTokenDelete', 'on')
+
+        const jsonData = await createJsonData(formData)
+
+        expect(jsonData).toEqual('{"guildId":"111","lineBotTokenDelete":true,"debugMode":false,"lineNotifyTokenDelete":false,"lineBotSecretDelete":false,"lineGroupIdDelete":false,"lineClientIdDelete":false,"lineClientSecretDelete":false}')
     })
 });

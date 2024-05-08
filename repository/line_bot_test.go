@@ -287,8 +287,8 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 		repo := NewRepository(tx)
 		updateLineBot := &LineBot{
 			GuildID:          "987654321",
-			DebugMode:        true,
-			DefaultChannelID: "123456789",
+			LineNotifyToken:  pq.ByteaArray{[]byte("987654321")},
+			LineBotToken:     pq.ByteaArray{[]byte("987654321")},
 		}
 		err = repo.UpdateLineBot(ctx, updateLineBot)
 		assert.NoError(t, err)
@@ -297,7 +297,7 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 		err = tx.GetContext(ctx, &lineBot, "SELECT * FROM line_bot WHERE guild_id = $1", "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", lineBot.GuildID)
-		assert.Equal(t, "123456789", lineBot.DefaultChannelID)
-		assert.Equal(t, true, lineBot.DebugMode)
+		assert.Equal(t, pq.ByteaArray{[]byte("987654321")}, lineBot.LineNotifyToken)
+		assert.Equal(t, pq.ByteaArray{[]byte("987654321")}, lineBot.LineBotToken)
 	})
 }

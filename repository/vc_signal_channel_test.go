@@ -113,3 +113,69 @@ func TestGetVcSignalChannel(t *testing.T) {
 		assert.Nil(t, vcSignalChannel)
 	})
 }
+
+func TestUpdateVcSignalChannel(t *testing.T) {
+	ctx := context.Background()
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	require.NoError(t, err)
+	defer cleanup()
+	tx, err := dbV1.BeginTxx(ctx, nil)
+	require.NoError(t, err)
+
+	defer tx.RollbackCtx(ctx)
+
+	tx.ExecContext(ctx, "DELETE FROM vc_signal_channel")
+
+	f := &fixtures.Fixture{DBv1: tx}
+	f.Build(t,
+		fixtures.NewVcSignalChannel(ctx, func(v *fixtures.VcSignalChannel) {
+			v.VcChannelID = "111"
+			v.GuildID = "1111"
+			v.SendChannelID = "11111"
+		}),
+		fixtures.NewVcSignalChannel(ctx, func(v *fixtures.VcSignalChannel) {
+			v.VcChannelID = "222"
+			v.GuildID = "2222"
+			v.SendChannelID = "22222"
+		}),
+		fixtures.NewVcSignalChannel(ctx, func(v *fixtures.VcSignalChannel) {
+			v.VcChannelID = "333"
+			v.GuildID = "3333"
+			v.SendChannelID = "33333"
+		}),
+	)
+
+	repo := NewRepository(tx)
+	t.Run("ボイスチャンネルの情報を更新できること", func(t *testing.T) {
+		err := repo.UpdateVcSignalChannel(ctx, VcSignalChannelNotGuildID{
+			VcChannelID:     "111",
+			SendSignal:      false,
+			SendChannelID:   "11111",
+			JoinBot:         true,
+			EveryoneMention: false,
+		})
+		assert.NoError(t, err)
+
+		vcSignalChannel, err := repo.GetVcSignalChennelAllColumn(ctx, "111")
+		assert.NoError(t, err)
+
+		assert.Equal(t, false, vcSignalChannel.SendSignal)
+		assert.Equal(t, true, vcSignalChannel.JoinBot)
+		assert.Equal(t, false, vcSignalChannel.EveryoneMention)
+	})
+
+	t.Run("ボイスチャンネルの情報が存在しない場合反映されないこと", func(t *testing.T) {
+		err := repo.UpdateVcSignalChannel(ctx, VcSignalChannelNotGuildID{
+			VcChannelID:     "444",
+			SendSignal:      false,
+			SendChannelID:   "44444",
+			JoinBot:         true,
+			EveryoneMention: false,
+		})
+		assert.NoError(t, err)
+
+		var vcSignalChannel VcSignalChannelAllColumn
+		err = tx.GetContext(ctx, &vcSignalChannel, "SELECT * FROM vc_signal_channel WHERE vc_channel_id = $1", "444")
+		assert.Error(t, err)
+	})
+}

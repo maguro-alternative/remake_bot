@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type VcSignalChannelAllColumns struct {
+type VcSignalChannelAllColumn struct {
 	VcChannelID     string `db:"vc_channel_id"`
 	GuildID         string `db:"guild_id"`
 	SendSignal      bool   `db:"send_signal"`
@@ -46,9 +46,9 @@ func (r *Repository) InsertVcSignalChannel(ctx context.Context, vcChannelID stri
 	return nil
 }
 
-func (r *Repository) GetVcSignalChennel(ctx context.Context, vcChannelID string) (*VcSignalChannelAllColumns, error) {
-	var vcSignalChannel VcSignalChannelAllColumns
-	err := r.db.GetContext(ctx, &vcSignalChannel, "SELECT * FROM vc_signal_channel WHERE vc_channel_id = ?", vcChannelID)
+func (r *Repository) GetVcSignalChennelAllColumn(ctx context.Context, vcChannelID string) (*VcSignalChannelAllColumn, error) {
+	var vcSignalChannel VcSignalChannelAllColumn
+	err := r.db.GetContext(ctx, &vcSignalChannel, "SELECT * FROM vc_signal_channel WHERE vc_channel_id = $1", vcChannelID)
 	if err != nil {
 		return nil, err
 	}

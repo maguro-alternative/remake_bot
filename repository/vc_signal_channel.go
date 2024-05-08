@@ -56,7 +56,7 @@ func (r *Repository) GetVcSignalChennelAllColumn(ctx context.Context, vcChannelI
 }
 
 func (r *Repository) UpdateVcSignalChannel(ctx context.Context, vcChannel VcSignalChannelNotGuildID) error {
-	_, err := r.db.ExecContext(ctx, `
+	_, err := r.db.NamedExecContext(ctx, `
 	UPDATE
 		vc_signal_channel
 	SET
@@ -71,7 +71,7 @@ func (r *Repository) UpdateVcSignalChannel(ctx context.Context, vcChannel VcSign
 }
 
 func (r *Repository) DeleteVcSignalChannel(ctx context.Context, vcChannelID string) error {
-	_, err := r.db.ExecContext(ctx, "DELETE FROM vc_signal_channel WHERE vc_channel_id = ?", vcChannelID)
+	_, err := r.db.ExecContext(ctx, "DELETE FROM vc_signal_channel WHERE vc_channel_id = $1", vcChannelID)
 	if err != nil {
 		return err
 	}

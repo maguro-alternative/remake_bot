@@ -300,4 +300,53 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 		assert.Equal(t, pq.ByteaArray{[]byte("987654321")}, lineBot.LineNotifyToken)
 		assert.Equal(t, pq.ByteaArray{[]byte("987654321")}, lineBot.LineBotToken)
 	})
+
+	t.Run("deleteフラグがある場合、該当する部分がnilで更新されること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewLineBot(ctx, func(lb *fixtures.LineBot) {
+				lb.GuildID = "987654321"
+				lb.LineNotifyToken = pq.ByteaArray{[]byte("123456789")}
+				lb.LineBotToken = pq.ByteaArray{[]byte("123456789")}
+				lb.LineBotSecret = pq.ByteaArray{[]byte("123456789")}
+				lb.LineGroupID = pq.ByteaArray{[]byte("987654321")}
+				lb.LineClientID = pq.ByteaArray{[]byte("987654321")}
+				lb.LineClientSecret = pq.ByteaArray{[]byte("987654321")}
+				lb.DefaultChannelID = "987654321"
+				lb.DebugMode = false
+			}),
+		)
+
+		repo := NewRepository(tx)
+		updateLineBot := &LineBot{
+			GuildID:          "987654321",
+			LineNotifyToken:  nil,
+			LineBotToken:     nil,
+			LineBotSecret:    nil,
+			LineGroupID:      nil,
+			LineClientID:     nil,
+			LineClientSecret: nil,
+		}
+		err = repo.UpdateLineBot(ctx, updateLineBot)
+		assert.NoError(t, err)
+
+		var lineBot LineBot
+		err = tx.GetContext(ctx, &lineBot, "SELECT * FROM line_bot WHERE guild_id = $1", "987654321")
+		assert.NoError(t, err)
+		assert.Equal(t, "987654321", lineBot.GuildID)
+		assert.Nil(t, lineBot.LineNotifyToken)
+		assert.Nil(t, lineBot.LineBotToken)
+		assert.Nil(t, lineBot.LineBotSecret)
+		assert.Nil(t, lineBot.LineGroupID)
+		assert.Nil(t, lineBot.LineClientID)
+		assert.Nil(t, lineBot.LineClientSecret)
+	})
 }

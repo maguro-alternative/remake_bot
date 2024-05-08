@@ -173,6 +173,7 @@ func (r *Repository) UpdateLineBot(ctx context.Context, lineBot *LineBot) error 
 	var setNameQuery string
 	var setQueryArray []string
 
+	// nilの場合初期化
 	if len(lineBot.LineNotifyToken) > 0 && len(lineBot.LineNotifyToken[0]) > 0 || lineBot.LineNotifyToken == nil {
 		setQueryArray = append(setQueryArray, "line_notify_token = :line_notify_token")
 	}

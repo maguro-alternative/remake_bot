@@ -134,7 +134,7 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
-	t.Run("Deleteフラグが立った場合、該当するものがnilになること", func(t *testing.T) {
+	t.Run("Deleteフラグが立った場合、該当する(すべて)ものがnilになること", func(t *testing.T) {
 		h := &LineTokenHandler{
 			indexService: &service.IndexService{
 				Client:         stubClient,
@@ -205,6 +205,81 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 			LineGroupIDDelete:      true,
 			LineClientIDDelete:     true,
 			LineClientSecretDelete: true,
+		})
+		assert.NoError(t, err)
+
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/linetoken", bytes.NewReader(bodyJsonDelete))
+		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("Deleteフラグが立った場合、該当する(notifyとbotのtoken)ものがnilになること", func(t *testing.T) {
+		h := &LineTokenHandler{
+			indexService: &service.IndexService{
+				Client:         stubClient,
+				DiscordSession: &discordgo.Session{},
+			},
+			repo: &repository.RepositoryFuncMock{
+				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+					return repository.LineBot{
+						GuildID:          "123",
+						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
+						LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
+						LineBotSecret:    pq.ByteaArray{[]byte("lineBotSecretStr")},
+						LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
+						LineClientID:     pq.ByteaArray{[]byte("lineClientID")},
+						LineClientSecret: pq.ByteaArray{[]byte("lineClientSecret")},
+					}, nil
+				},
+				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+					return repository.LineBotIv{
+						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
+						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
+						LineBotSecretIv:    pq.ByteaArray{[]byte("decodeBotSecret")},
+						LineGroupIDIv:      pq.ByteaArray{[]byte("decodeGroupID")},
+						LineClientIDIv:     pq.ByteaArray{[]byte("decodeClientID")},
+						LineClientSecretIv: pq.ByteaArray{[]byte("decodeClientSecret")},
+					}, nil
+				},
+				UpdateLineBotFunc: func(ctx context.Context, lineBot *repository.LineBot) error {
+					assert.Nil(t, lineBot.LineNotifyToken)
+					assert.Nil(t, lineBot.LineBotToken)
+					assert.NotNil(t, lineBot.LineBotSecret)
+					assert.NotNil(t, lineBot.LineGroupID)
+					assert.NotNil(t, lineBot.LineClientID)
+					assert.NotNil(t, lineBot.LineClientSecret)
+					return nil
+				},
+				UpdateLineBotIvFunc: func(ctx context.Context, lineBotIv *repository.LineBotIv) error {
+					return nil
+				},
+			},
+			aesCrypto: &crypto.AESMock{
+				EncryptFunc: func(data []byte) (encrypted []byte, iv []byte, err error) {
+					return []byte("test"), []byte("test"), nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) ([]byte, error) {
+					if string(iv) == string("decodeNotifyToken") {
+						return []byte("testnotifytoken"), nil
+					} else if string(iv) == string("decodeBotToken") {
+						return []byte("testbottoken"), nil
+					} else if string(iv) == string("decodeBotSecret") {
+						return []byte("testbotsecret"), nil
+					} else if string(iv) == string("decodeGroupID") {
+						return []byte("testgroupid"), nil
+					}
+					return nil, nil
+				},
+			},
+		}
+		w := httptest.NewRecorder()
+
+		bodyJsonDelete, err := json.Marshal(internal.LineBotJson{
+			GuildID:                "987654321",
+			DefaultChannelID:       "123456789",
+			DebugMode:              true,
+			LineNotifyTokenDelete:  true,
+			LineBotTokenDelete:     true,
 		})
 		assert.NoError(t, err)
 

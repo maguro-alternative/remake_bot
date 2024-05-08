@@ -46,7 +46,7 @@ func (r *Repository) InsertVcSignalChannel(ctx context.Context, vcChannelID stri
 	return nil
 }
 
-func (r *Repository) GetVcSignalChennelAllColumn(ctx context.Context, vcChannelID string) (*VcSignalChannelAllColumn, error) {
+func (r *Repository) GetVcSignalChannelAllColumn(ctx context.Context, vcChannelID string) (*VcSignalChannelAllColumn, error) {
 	var vcSignalChannel VcSignalChannelAllColumn
 	err := r.db.GetContext(ctx, &vcSignalChannel, "SELECT * FROM vc_signal_channel WHERE vc_channel_id = $1", vcChannelID)
 	if err != nil {

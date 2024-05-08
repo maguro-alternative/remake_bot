@@ -99,7 +99,7 @@ func TestGetVcSignalChannel(t *testing.T) {
 
 	repo := NewRepository(tx)
 	t.Run("ボイスチャンネルの情報を取得できること", func(t *testing.T) {
-		vcSignalChannel, err := repo.GetVcSignalChennelAllColumn(ctx, "111")
+		vcSignalChannel, err := repo.GetVcSignalChannelAllColumn(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Equal(t, true, vcSignalChannel.SendSignal)
@@ -108,7 +108,7 @@ func TestGetVcSignalChannel(t *testing.T) {
 	})
 
 	t.Run("ボイスチャンネルの情報が存在しない場合はエラーを返すこと", func(t *testing.T) {
-		vcSignalChannel, err := repo.GetVcSignalChennelAllColumn(ctx, "444")
+		vcSignalChannel, err := repo.GetVcSignalChannelAllColumn(ctx, "444")
 		assert.Error(t, err)
 		assert.Nil(t, vcSignalChannel)
 	})
@@ -156,7 +156,7 @@ func TestUpdateVcSignalChannel(t *testing.T) {
 		})
 		assert.NoError(t, err)
 
-		vcSignalChannel, err := repo.GetVcSignalChennelAllColumn(ctx, "111")
+		vcSignalChannel, err := repo.GetVcSignalChannelAllColumn(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Equal(t, false, vcSignalChannel.SendSignal)

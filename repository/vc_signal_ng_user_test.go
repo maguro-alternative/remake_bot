@@ -14,16 +14,16 @@ import (
 
 func TestInsertVcSignalNgUserID(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
-	require.NoError(t, err)
-	defer cleanup()
-	tx, err := dbV1.BeginTxx(ctx, nil)
-	require.NoError(t, err)
-
-	defer tx.RollbackCtx(ctx)
-
-	tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 	t.Run("NgUserIDを追加できること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 		repo := NewRepository(tx)
 		err = repo.InsertVcSignalNgUser(ctx, "111","1111","11111")
 		assert.NoError(t, err)
@@ -38,6 +38,15 @@ func TestInsertVcSignalNgUserID(t *testing.T) {
 	})
 
 	t.Run("既にある場合はエラーを返さずそのまま", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 		f := &fixtures.Fixture{DBv1: tx}
 		f.Build(t,
 			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {

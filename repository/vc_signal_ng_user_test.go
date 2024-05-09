@@ -9,7 +9,6 @@ import (
 	"github.com/maguro-alternative/remake_bot/testutil/fixtures"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestInsertVcSignalNgUserID(t *testing.T) {
@@ -69,16 +68,16 @@ func TestInsertVcSignalNgUserID(t *testing.T) {
 
 func TestGetVcSignalNgUsersByChannelIDAllColumn(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
-	require.NoError(t, err)
-	defer cleanup()
-	tx, err := dbV1.BeginTxx(ctx, nil)
-	require.NoError(t, err)
-
-	defer tx.RollbackCtx(ctx)
-
-	tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 	t.Run("NgUserIDを取得できること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 		f := &fixtures.Fixture{DBv1: tx}
 		f.Build(t,
 			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
@@ -99,6 +98,15 @@ func TestGetVcSignalNgUsersByChannelIDAllColumn(t *testing.T) {
 	})
 
 	t.Run("存在しない場合は空のスライスを返す", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 		repo := NewRepository(tx)
 		ngUsers, err := repo.GetVcSignalNgUsersByChannelIDAllColumn(ctx, "111")
 		assert.NoError(t, err)
@@ -109,16 +117,16 @@ func TestGetVcSignalNgUsersByChannelIDAllColumn(t *testing.T) {
 
 func TestDeleteVcNgUserByChannelID(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
-	require.NoError(t, err)
-	defer cleanup()
-	tx, err := dbV1.BeginTxx(ctx, nil)
-	require.NoError(t, err)
-
-	defer tx.RollbackCtx(ctx)
-
-	tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 	t.Run("NgUserIDを削除できること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 		f := &fixtures.Fixture{DBv1: tx}
 		f.Build(t,
 			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
@@ -140,6 +148,15 @@ func TestDeleteVcNgUserByChannelID(t *testing.T) {
 	})
 
 	t.Run("存在しない場合はエラーを返さずに終了すること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 		repo := NewRepository(tx)
 		err = repo.DeleteVcNgUserByChannelID(ctx, "111")
 		assert.NoError(t, err)
@@ -153,16 +170,16 @@ func TestDeleteVcNgUserByChannelID(t *testing.T) {
 
 func TestDeleteVcNgUserByUserID(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
-	require.NoError(t, err)
-	defer cleanup()
-	tx, err := dbV1.BeginTxx(ctx, nil)
-	require.NoError(t, err)
-
-	defer tx.RollbackCtx(ctx)
-
-	tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 	t.Run("NgUserIDを削除できること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 		f := &fixtures.Fixture{DBv1: tx}
 		f.Build(t,
 			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
@@ -184,6 +201,15 @@ func TestDeleteVcNgUserByUserID(t *testing.T) {
 	})
 
 	t.Run("存在しない場合はエラーを返さずに終了すること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 		repo := NewRepository(tx)
 		err = repo.DeleteVcNgUserByUserID(ctx, "11111")
 		assert.NoError(t, err)

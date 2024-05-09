@@ -37,7 +37,7 @@ func TestInsertVcSignalNgUserID(t *testing.T) {
 		assert.Equal(t, "11111", ngUser.UserID)
 	})
 
-	t.Run("既にある場合はエラーを返す", func(t *testing.T) {
+	t.Run("既にある場合はエラーを返さずそのまま", func(t *testing.T) {
 		f := &fixtures.Fixture{DBv1: tx}
 		f.Build(t,
 			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
@@ -49,7 +49,12 @@ func TestInsertVcSignalNgUserID(t *testing.T) {
 
 		repo := NewRepository(tx)
 		err = repo.InsertVcSignalNgUser(ctx, "111","1111","11111")
-		assert.Error(t, err)
+		assert.NoError(t, err)
+
+		var ngUsers []VcSignalNgUserAllColumn
+		err = tx.SelectContext(ctx, &ngUsers, "SELECT * FROM vc_signal_ng_user_id")
+		assert.NoError(t, err)
+		assert.Len(t, ngUsers, 1)
 	})
 }
 

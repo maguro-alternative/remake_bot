@@ -20,7 +20,7 @@ func (r *Repository) InsertVcSignalNgUser(ctx context.Context, vcChannelID, guil
 			$1,
 			$2,
 			$3
-		)
+		) ON CONFLICT (vc_channel_id, user_id) DO NOTHING
 	`, vcChannelID, guildID, userID)
 	return err
 }

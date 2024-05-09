@@ -11,7 +11,7 @@ type VcSignalNgRoleID struct {
 	RoleID      string `db:"role_id"`
 }
 
-func NewVcSignalNgID(ctx context.Context, setter ...func(b *VcSignalNgRoleID)) *ModelConnector {
+func NewVcSignalNgRoleID(ctx context.Context, setter ...func(b *VcSignalNgRoleID)) *ModelConnector {
 	vcSignalNgRoleID := &VcSignalNgRoleID{
 		VcChannelID: "1111111111111",
 		GuildID:     "1111111111111",

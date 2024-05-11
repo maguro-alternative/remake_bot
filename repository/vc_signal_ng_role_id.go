@@ -53,6 +53,16 @@ func (r *Repository) DeleteVcNgRoleByChannelID(ctx context.Context, vcChannelID 
 	return err
 }
 
+func (r *Repository) DeleteVcNgRoleByGuildID(ctx context.Context, guildID string) error {
+	_, err := r.db.ExecContext(ctx, `
+		DELETE FROM
+			vc_signal_ng_role_id
+		WHERE
+			guild_id = $1
+	`, guildID)
+	return err
+}
+
 func (r *Repository) DeleteVcNgRoleByRoleID(ctx context.Context, roleID string) error {
 	_, err := r.db.ExecContext(ctx, `
 		DELETE FROM

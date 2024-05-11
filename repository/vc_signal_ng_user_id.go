@@ -52,6 +52,17 @@ func (r *Repository) DeleteVcNgUserByChannelID(ctx context.Context, vcChannelID 
 	`, vcChannelID)
 	return err
 }
+
+func (r *Repository) DeleteVcNgUserByGuildID(ctx context.Context, guildID string) error {
+	_, err := r.db.ExecContext(ctx, `
+		DELETE FROM
+			vc_signal_ng_user_id
+		WHERE
+			guild_id = $1
+	`, guildID)
+	return err
+}
+
 func (r *Repository) DeleteVcNgUserByUserID(ctx context.Context, userID string) error {
 	_, err := r.db.ExecContext(ctx, `
 		DELETE FROM
@@ -67,15 +78,15 @@ func (r *Repository) DeleteNgUsersNotInProvidedList(ctx context.Context, vcChann
 	DELETE FROM
 		vc_signal_ng_user_id
 	WHERE
-		vc_channel_id = $1
+		vc_channel_id = ?
 		AND user_id NOT IN (?)
 	`
-	query, args, err := db.In(query, userIDs)
+	query, args, err := db.In(query, vcChannelID, userIDs)
 	if err != nil {
 		return err
 	}
-	args = append([]any{vcChannelID}, args...)
-	_, err = r.db.ExecContext(ctx, query, args)
+	query = db.Rebind(2, query)
+	_, err = r.db.ExecContext(ctx, query, args...)
 	return err
 }
 

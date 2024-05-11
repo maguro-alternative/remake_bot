@@ -168,6 +168,58 @@ func TestDeleteVcSignalNgRoleID(t *testing.T) {
 	})
 }
 
+func TestDeleteVcSignalNgRoleByGuildID(t *testing.T) {
+	ctx := context.Background()
+	t.Run("NgRoleIDを削除できること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_role_id")
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewVcSignalNgRoleID(ctx, func(v *fixtures.VcSignalNgRoleID) {
+				v.VcChannelID = "111"
+				v.GuildID = "1111"
+				v.RoleID = "11111"
+			}),
+		)
+
+		repo := NewRepository(tx)
+		err = repo.DeleteVcNgRoleByGuildID(ctx, "1111")
+		assert.NoError(t, err)
+
+		var ngRoles []VcSignalNgRoleAllColumn
+		err = tx.SelectContext(ctx, &ngRoles, "SELECT * FROM vc_signal_ng_role_id")
+		assert.NoError(t, err)
+		assert.Len(t, ngRoles, 0)
+	})
+
+	t.Run("存在しない場合はエラーを返さずそのまま", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_role_id")
+		repo := NewRepository(tx)
+		err = repo.DeleteVcNgRoleByGuildID(ctx, "1111")
+		assert.NoError(t, err)
+
+		var ngRoles []VcSignalNgRoleAllColumn
+		err = tx.SelectContext(ctx, &ngRoles, "SELECT * FROM vc_signal_ng_role_id")
+		assert.NoError(t, err)
+		assert.Len(t, ngRoles, 0)
+	})
+}
+
 func TestDeleteVcSignalNgRoleByRoleID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NgRoleIDを削除できること", func(t *testing.T) {
@@ -220,7 +272,7 @@ func TestDeleteVcSignalNgRoleByRoleID(t *testing.T) {
 	})
 }
 
-func TestDeleteNotInsertVcSignalNgRole(t *testing.T) {
+func TestDeleteRolesNotInProvidedList(t *testing.T) {
 	ctx := context.Background()
 	t.Run("指定されたNgRoleID以外を削除できること", func(t *testing.T) {
 		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())

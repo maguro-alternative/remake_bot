@@ -168,6 +168,59 @@ func TestDeleteVcNgUserByChannelID(t *testing.T) {
 	})
 }
 
+func TestDeleteVcNgUserByGuildID(t *testing.T) {
+	ctx := context.Background()
+	t.Run("NgUserIDを削除できること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
+				v.VcChannelID = "111"
+				v.GuildID = "1111"
+				v.UserID = "11111"
+			}),
+		)
+
+		repo := NewRepository(tx)
+		err = repo.DeleteVcNgUserByGuildID(ctx, "1111")
+		assert.NoError(t, err)
+
+		var ngUsers []VcSignalNgUserAllColumn
+		err = tx.SelectContext(ctx, &ngUsers, "SELECT * FROM vc_signal_ng_user_id")
+		assert.NoError(t, err)
+
+		assert.Len(t, ngUsers, 0)
+	})
+
+	t.Run("存在しない場合はエラーを返さずに終了すること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
+		repo := NewRepository(tx)
+		err = repo.DeleteVcNgUserByGuildID(ctx, "1111")
+		assert.NoError(t, err)
+
+		var ngUsers []VcSignalNgUserAllColumn
+		err = tx.SelectContext(ctx, &ngUsers, "SELECT * FROM vc_signal_ng_user_id")
+		assert.NoError(t, err)
+		assert.Len(t, ngUsers, 0)
+	})
+}
+
 func TestDeleteVcNgUserByUserID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NgUserIDを削除できること", func(t *testing.T) {
@@ -218,5 +271,81 @@ func TestDeleteVcNgUserByUserID(t *testing.T) {
 		err = tx.SelectContext(ctx, &ngUsers, "SELECT * FROM vc_signal_ng_user_id")
 		assert.NoError(t, err)
 		assert.Len(t, ngUsers, 0)
+	})
+}
+
+func TestDeleteNgUsersNotInProvidedList(t *testing.T) {
+	ctx := context.Background()
+	t.Run("指定したリストに含まれないNgUserIDを削除できること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
+				v.VcChannelID = "111"
+				v.GuildID = "1111"
+				v.UserID = "11111"
+			}),
+			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
+				v.VcChannelID = "111"
+				v.GuildID = "1111"
+				v.UserID = "22222"
+			}),
+		)
+
+		repo := NewRepository(tx)
+		err = repo.DeleteNgUsersNotInProvidedList(ctx, "111", []string{"11111", "33333"})
+		assert.NoError(t, err)
+
+		var ngUsers []VcSignalNgUserAllColumn
+		err = tx.SelectContext(ctx, &ngUsers, "SELECT * FROM vc_signal_ng_user_id")
+		assert.NoError(t, err)
+
+		assert.Len(t, ngUsers, 1)
+		assert.Equal(t, "111", ngUsers[0].VcChannelID)
+		assert.Equal(t, "1111", ngUsers[0].GuildID)
+		assert.Equal(t, "11111", ngUsers[0].UserID)
+	})
+
+	t.Run("指定したリストに含まれないNgUserIDがない場合は何もしないこと", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
+				v.VcChannelID = "111"
+				v.GuildID = "1111"
+				v.UserID = "11111"
+			}),
+			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
+				v.VcChannelID = "222"
+				v.GuildID = "2222"
+				v.UserID = "22222"
+			}),
+		)
+
+		repo := NewRepository(tx)
+		err = repo.DeleteNgUsersNotInProvidedList(ctx, "111", []string{"11111", "22222"})
+		assert.NoError(t, err)
+
+		var ngUsers []VcSignalNgUserAllColumn
+		err = tx.SelectContext(ctx, &ngUsers, "SELECT * FROM vc_signal_ng_user_id")
+		assert.NoError(t, err)
+
+		assert.Len(t, ngUsers, 2)
 	})
 }

@@ -31,7 +31,7 @@ type RepositoryFuncMock struct {
 	GetLineNgDiscordRoleIDFunc              func(ctx context.Context, channelID string) ([]string, error)
 	InsertLineNgDiscordUserIDsFunc          func(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
 	InsertLineNgDiscordRoleIDsFunc          func(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
-	DeleteNotInsertLineNgDiscordUserIDsFunc func(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
+	DeleteUserIDsNotInProvidedListFunc      func(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
 	DeleteRoleIDsNotInProvidedListFunc      func(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
 	InsertLineNgDiscordMessageTypesFunc     func(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
 	DeleteMessageTypesNotInProvidedListFunc func(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
@@ -108,8 +108,8 @@ func (r *RepositoryFuncMock) InsertLineNgDiscordRoleIDs(ctx context.Context, lin
 	return r.InsertLineNgDiscordRoleIDsFunc(ctx, lineNgDiscordRoleIDs)
 }
 
-func (r *RepositoryFuncMock) DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error {
-	return r.DeleteNotInsertLineNgDiscordUserIDsFunc(ctx, lineNgDiscordUserIDs)
+func (r *RepositoryFuncMock) DeleteUserIDsNotInProvidedList(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error {
+	return r.DeleteUserIDsNotInProvidedListFunc(ctx, lineNgDiscordUserIDs)
 }
 
 func (r *RepositoryFuncMock) DeleteRoleIDsNotInProvidedList(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error {
@@ -200,7 +200,7 @@ type RepositoryFunc interface {
 	GetLineNgDiscordRoleID(ctx context.Context, channelID string) ([]string, error)
 	InsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
 	InsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
-	DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
+	DeleteUserIDsNotInProvidedList(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
 	DeleteRoleIDsNotInProvidedList(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
 	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
 	DeleteMessageTypesNotInProvidedList(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error

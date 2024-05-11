@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	"fmt"
-	"strings"
+
+	"github.com/maguro-alternative/remake_bot/pkg/db"
 )
 
 type LineNgDiscordUserIDAllCoulmns struct {
@@ -55,28 +55,28 @@ func (r *Repository) InsertLineNgDiscordUserIDs(ctx context.Context, lineNgDisco
 	return nil
 }
 
-func (r *Repository) DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error {
-	var values []string
-	for _, lineNgType := range lineNgDiscordUserIDs {
-		values = append(values, fmt.Sprintf("('%s', '%s', '%s')", lineNgType.ChannelID, lineNgType.GuildID, lineNgType.UserID))
-		_, err := r.db.ExecContext(ctx, "DELETE FROM line_ng_discord_user_id WHERE channel_id = $1", lineNgType.ChannelID)
+func (r *Repository) DeleteUserIDsNotInProvidedList(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error {
+	query := `
+		DELETE FROM
+			line_ng_discord_user_id
+		WHERE
+			channel_id = ? AND
+			user_id NOT IN (?)
+	`
+	idValues := make(map[string][]string)
+	for _, lineNgUser := range lineNgDiscordUserIDs {
+		idValues[lineNgUser.ChannelID] = append(idValues[lineNgUser.ChannelID], lineNgUser.UserID)
+	}
+	for channelID, roleIDs := range idValues {
+		query, args, err := db.In(query, channelID, roleIDs)
+		if err != nil {
+			return err
+		}
+		query = db.Rebind(2, query)
+		_, err = r.db.ExecContext(ctx, query, args...)
 		if err != nil {
 			return err
 		}
 	}
-	if len(values) == 0 {
-		return nil
-	}
-	// INSERT されるもの以外を削除
-	query := fmt.Sprintf(`
-		INSERT INTO line_ng_discord_user_id (
-			channel_id,
-			guild_id,
-			user_id
-		) VALUES
-			%s
-		ON CONFLICT (channel_id, user_id) DO NOTHING
-	`, strings.Join(values, ","))
-	_, err := r.db.ExecContext(ctx, query)
-	return err
+	return nil
 }

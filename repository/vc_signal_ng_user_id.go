@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+
+	"github.com/maguro-alternative/remake_bot/pkg/db"
 )
 
 type VcSignalNgUserAllColumn struct {
@@ -59,3 +61,21 @@ func (r *Repository) DeleteVcNgUserByUserID(ctx context.Context, userID string) 
 	`, userID)
 	return err
 }
+
+func (r *Repository) DeleteNgUsersNotInProvidedList(ctx context.Context, vcChannelID string, userIDs []string) error {
+	query := `
+	DELETE FROM
+		vc_signal_ng_user_id
+	WHERE
+		vc_channel_id = $1
+		AND user_id NOT IN (?)
+	`
+	query, args, err := db.In(query, userIDs)
+	if err != nil {
+		return err
+	}
+	args = append([]any{vcChannelID}, args...)
+	_, err = r.db.ExecContext(ctx, query, args)
+	return err
+}
+

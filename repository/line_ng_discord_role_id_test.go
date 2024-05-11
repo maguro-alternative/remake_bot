@@ -120,7 +120,7 @@ func TestRepository_DeleteLineNgDiscordRoleIDs(t *testing.T) {
 			},
 		}
 
-		err = repo.DeleteNotInsertLineNgDiscordRoleIDs(ctx, insertLineNgDiscordIDs)
+		err = repo.DeleteRoleIDsNotInProvidedList(ctx, insertLineNgDiscordIDs)
 		assert.NoError(t, err)
 
 		var lineChannelCount int

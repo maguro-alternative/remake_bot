@@ -23,7 +23,7 @@ type Repository interface {
 	InsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []repository.LineNgDiscordUserIDAllCoulmns) error
 	InsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns) error
 	DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []repository.LineNgDiscordUserIDAllCoulmns) error
-	DeleteNotInsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns) error
+	DeleteRoleIDsNotInProvidedList(ctx context.Context, lineNgDiscordRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns) error
 	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []repository.LineNgDiscordMessageType) error
 	DeleteMessageTypesNotInProvidedList(ctx context.Context, lineNgDiscordTypes []repository.LineNgDiscordMessageType) error
 	GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error)

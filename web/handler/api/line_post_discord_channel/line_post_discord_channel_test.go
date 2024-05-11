@@ -81,7 +81,7 @@ func TestLinePostDiscordChannelHandler_ServeHTTP(t *testing.T) {
 				DeleteNotInsertLineNgDiscordUserIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordUserIDAllCoulmns) error {
 					return nil
 				},
-				DeleteNotInsertLineNgDiscordRoleIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordRoleIDAllCoulmns) error {
+				DeleteRoleIDsNotInProvidedListFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordRoleIDAllCoulmns) error {
 					return nil
 				},
 			},

@@ -43,7 +43,6 @@ func NewVcSignalMentionUserID(ctx context.Context, setter ...func(b *VcSignalMen
 				) VALUES (
 					:vc_channel_id,
 					:guild_id,
-					:id_type,
 					:user_id
 				)
 			`, vcSignalMentionUserID)

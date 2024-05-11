@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"fmt"
+	"strings"
 )
 
 type VcSignalNgRoleAllColumn struct {
@@ -59,4 +61,27 @@ func (r *Repository) DeleteVcNgRoleByRoleID(ctx context.Context, roleID string) 
 			role_id = $1
 	`, roleID)
 	return err
+}
+
+func (r *Repository) DeleteNotInsertNgRoles(ctx context.Context, vcChannelID string, roleIDs []string) error {
+    placeholders := make([]string, len(roleIDs))
+    for i := range roleIDs {
+        placeholders[i] = fmt.Sprintf("$%d", i+2) // Start from $2 because $1 is used for vcChannelID
+    }
+    query := fmt.Sprintf(`
+        DELETE FROM
+            vc_signal_ng_role_id
+        WHERE
+            vc_channel_id = $1 AND
+            role_id NOT IN (%s)
+    `, strings.Join(placeholders, ","))
+
+    args := make([]interface{}, len(roleIDs)+1)
+    args[0] = vcChannelID
+    for i, v := range roleIDs {
+        args[i+1] = v
+    }
+
+    _, err := r.db.ExecContext(ctx, query, args...)
+    return err
 }

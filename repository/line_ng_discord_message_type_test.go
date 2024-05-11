@@ -121,7 +121,7 @@ func TestRepository_DeleteLineNgDiscordMessageTypes(t *testing.T) {
 			},
 		}
 
-		err = repo.DeleteNotInsertLineNgDiscordMessageTypes(ctx, insertLineNgDiscordTypes)
+		err = repo.DeleteMessageTypesNotInProvidedList(ctx, insertLineNgDiscordTypes)
 		assert.NoError(t, err)
 
 		var lineChannelCount int

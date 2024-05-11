@@ -19,18 +19,18 @@ func TestLinePostDiscordChannelHandler_ServeHTTP(t *testing.T) {
 	bodyJson, err := json.Marshal(internal.LinePostDiscordChannelJson{
 		GuildID: "987654321",
 		Channels: []struct {
-			ChannelID   string   `json:"channelId"`
-			Ng          bool     `json:"ng"`
-			BotMessage  bool     `json:"botMessage"`
-			NgTypes     []int    `json:"ngTypes"`
-			NgUsers     []string `json:"ngUsers"`
-			NgRoles     []string `json:"ngRoles"`
+			ChannelID  string   `json:"channelId"`
+			Ng         bool     `json:"ng"`
+			BotMessage bool     `json:"botMessage"`
+			NgTypes    []int    `json:"ngTypes"`
+			NgUsers    []string `json:"ngUsers"`
+			NgRoles    []string `json:"ngRoles"`
 		}{
 			{
-				ChannelID:   "123456789",
-				NgTypes:     []int{},
-				NgUsers:     []string{},
-				NgRoles:     []string{},
+				ChannelID: "123456789",
+				NgTypes:   []int{},
+				NgUsers:   []string{},
+				NgRoles:   []string{},
 			},
 		},
 	})
@@ -69,7 +69,7 @@ func TestLinePostDiscordChannelHandler_ServeHTTP(t *testing.T) {
 				InsertLineNgDiscordMessageTypesFunc: func(ctx context.Context, lineNgDiscordMessageTypes []repository.LineNgDiscordMessageType) error {
 					return nil
 				},
-				DeleteNotInsertLineNgDiscordMessageTypesFunc: func(ctx context.Context, lineNgDiscordMessageTypes []repository.LineNgDiscordMessageType) error {
+				DeleteMessageTypesNotInProvidedListFunc: func(ctx context.Context, lineNgDiscordMessageTypes []repository.LineNgDiscordMessageType) error {
 					return nil
 				},
 				InsertLineNgDiscordUserIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordUserIDAllCoulmns) error {

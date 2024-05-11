@@ -17,39 +17,39 @@ func NewRepository(db db.Driver) *Repository {
 }
 
 type RepositoryFuncMock struct {
-	InsertLineBotIvFunc                          func(ctx context.Context, guildId string) error
-	GetAllColumnsLineBotIvFunc                   func(ctx context.Context, guildID string) (LineBotIv, error)
-	GetLineBotIvNotClientFunc                    func(ctx context.Context, guildID string) (LineBotIvNotClient, error)
-	UpdateLineBotIvFunc                          func(ctx context.Context, lineBotIv *LineBotIv) error
-	InsertLineBotFunc                            func(ctx context.Context, lineBot *LineBot) error
-	GetAllColumnsLineBotsFunc                    func(ctx context.Context) ([]*LineBot, error)
-	GetAllColumnsLineBotFunc                     func(ctx context.Context, guildId string) (LineBot, error)
-	GetLineBotDefaultChannelIDFunc               func(ctx context.Context, guildID string) (LineBotDefaultChannelID, error)
-	GetLineBotNotClientFunc                      func(ctx context.Context, guildID string) (LineBotNotClient, error)
-	UpdateLineBotFunc                            func(ctx context.Context, lineBot *LineBot) error
-	GetLineNgDiscordUserIDFunc                   func(ctx context.Context, channelID string) ([]string, error)
-	GetLineNgDiscordRoleIDFunc                   func(ctx context.Context, channelID string) ([]string, error)
-	InsertLineNgDiscordUserIDsFunc               func(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
-	InsertLineNgDiscordRoleIDsFunc               func(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
-	DeleteNotInsertLineNgDiscordUserIDsFunc      func(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
-	DeleteNotInsertLineNgDiscordRoleIDsFunc      func(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
-	InsertLineNgDiscordMessageTypesFunc          func(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
-	DeleteNotInsertLineNgDiscordMessageTypesFunc func(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
-	GetLineNgDiscordMessageTypeFunc              func(ctx context.Context, channelID string) ([]int, error)
-	GetLinePostDiscordChannelFunc                func(ctx context.Context, channelID string) (LinePostDiscordChannel, error)
-	UpdateLinePostDiscordChannelFunc             func(ctx context.Context, lineChannel LinePostDiscordChannelAllColumns) error
-	InsertLinePostDiscordChannelFunc             func(ctx context.Context, channelID string, guildID string) error
-	GetPermissionCodeFunc                        func(ctx context.Context, guildID, permissionType string) (int64, error)
-	GetPermissionCodesFunc                       func(ctx context.Context, guildID string) ([]PermissionCode, error)
-	UpdatePermissionCodesFunc                    func(ctx context.Context, permissionsCode []PermissionCode) error
-	InsertPermissionUserIDsFunc                  func(ctx context.Context, permissionsUserID []PermissionUserIDAllColumns) error
-	InsertPermissionRoleIDsFunc                  func(ctx context.Context, permissionsRoleID []PermissionRoleIDAllColumns) error
-	GetGuildPermissionUserIDsAllColumnsFunc      func(ctx context.Context, guildID string) ([]PermissionUserIDAllColumns, error)
-	GetGuildPermissionRoleIDsAllColumnsFunc      func(ctx context.Context, guildID string) ([]PermissionRoleIDAllColumns, error)
-	GetPermissionUserIDsFunc                     func(ctx context.Context, guildID, permissionType string) ([]PermissionUserID, error)
-	GetPermissionRoleIDsFunc                     func(ctx context.Context, guildID, permissionType string) ([]PermissionRoleID, error)
-	DeletePermissionUserIDsFunc                  func(ctx context.Context, guildId string) error
-	DeletePermissionRoleIDsFunc                  func(ctx context.Context, guildId string) error
+	InsertLineBotIvFunc                     func(ctx context.Context, guildId string) error
+	GetAllColumnsLineBotIvFunc              func(ctx context.Context, guildID string) (LineBotIv, error)
+	GetLineBotIvNotClientFunc               func(ctx context.Context, guildID string) (LineBotIvNotClient, error)
+	UpdateLineBotIvFunc                     func(ctx context.Context, lineBotIv *LineBotIv) error
+	InsertLineBotFunc                       func(ctx context.Context, lineBot *LineBot) error
+	GetAllColumnsLineBotsFunc               func(ctx context.Context) ([]*LineBot, error)
+	GetAllColumnsLineBotFunc                func(ctx context.Context, guildId string) (LineBot, error)
+	GetLineBotDefaultChannelIDFunc          func(ctx context.Context, guildID string) (LineBotDefaultChannelID, error)
+	GetLineBotNotClientFunc                 func(ctx context.Context, guildID string) (LineBotNotClient, error)
+	UpdateLineBotFunc                       func(ctx context.Context, lineBot *LineBot) error
+	GetLineNgDiscordUserIDFunc              func(ctx context.Context, channelID string) ([]string, error)
+	GetLineNgDiscordRoleIDFunc              func(ctx context.Context, channelID string) ([]string, error)
+	InsertLineNgDiscordUserIDsFunc          func(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
+	InsertLineNgDiscordRoleIDsFunc          func(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
+	DeleteNotInsertLineNgDiscordUserIDsFunc func(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
+	DeleteNotInsertLineNgDiscordRoleIDsFunc func(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
+	InsertLineNgDiscordMessageTypesFunc     func(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
+	DeleteMessageTypesNotInProvidedListFunc func(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
+	GetLineNgDiscordMessageTypeFunc         func(ctx context.Context, channelID string) ([]int, error)
+	GetLinePostDiscordChannelFunc           func(ctx context.Context, channelID string) (LinePostDiscordChannel, error)
+	UpdateLinePostDiscordChannelFunc        func(ctx context.Context, lineChannel LinePostDiscordChannelAllColumns) error
+	InsertLinePostDiscordChannelFunc        func(ctx context.Context, channelID string, guildID string) error
+	GetPermissionCodeFunc                   func(ctx context.Context, guildID, permissionType string) (int64, error)
+	GetPermissionCodesFunc                  func(ctx context.Context, guildID string) ([]PermissionCode, error)
+	UpdatePermissionCodesFunc               func(ctx context.Context, permissionsCode []PermissionCode) error
+	InsertPermissionUserIDsFunc             func(ctx context.Context, permissionsUserID []PermissionUserIDAllColumns) error
+	InsertPermissionRoleIDsFunc             func(ctx context.Context, permissionsRoleID []PermissionRoleIDAllColumns) error
+	GetGuildPermissionUserIDsAllColumnsFunc func(ctx context.Context, guildID string) ([]PermissionUserIDAllColumns, error)
+	GetGuildPermissionRoleIDsAllColumnsFunc func(ctx context.Context, guildID string) ([]PermissionRoleIDAllColumns, error)
+	GetPermissionUserIDsFunc                func(ctx context.Context, guildID, permissionType string) ([]PermissionUserID, error)
+	GetPermissionRoleIDsFunc                func(ctx context.Context, guildID, permissionType string) ([]PermissionRoleID, error)
+	DeletePermissionUserIDsFunc             func(ctx context.Context, guildId string) error
+	DeletePermissionRoleIDsFunc             func(ctx context.Context, guildId string) error
 }
 
 func (r *RepositoryFuncMock) InsertLineBotIv(ctx context.Context, guildId string) error {
@@ -120,8 +120,8 @@ func (r *RepositoryFuncMock) InsertLineNgDiscordMessageTypes(ctx context.Context
 	return r.InsertLineNgDiscordMessageTypesFunc(ctx, lineNgDiscordTypes)
 }
 
-func (r *RepositoryFuncMock) DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error {
-	return r.DeleteNotInsertLineNgDiscordMessageTypesFunc(ctx, lineNgDiscordTypes)
+func (r *RepositoryFuncMock) DeleteMessageTypesNotInProvidedList(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error {
+	return r.DeleteMessageTypesNotInProvidedListFunc(ctx, lineNgDiscordTypes)
 }
 
 func (r *RepositoryFuncMock) GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error) {
@@ -203,7 +203,7 @@ type RepositoryFunc interface {
 	DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []LineNgDiscordUserIDAllCoulmns) error
 	DeleteNotInsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error
 	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
-	DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
+	DeleteMessageTypesNotInProvidedList(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error
 	GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error)
 	GetLinePostDiscordChannel(ctx context.Context, channelID string) (LinePostDiscordChannel, error)
 	UpdateLinePostDiscordChannel(ctx context.Context, lineChannel LinePostDiscordChannelAllColumns) error

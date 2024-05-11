@@ -71,7 +71,7 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 		return
 	}
 
-	if err := h.repo.DeleteNotInsertLineNgDiscordMessageTypes(ctx, lineNgTypes); err != nil {
+	if err := h.repo.DeleteMessageTypesNotInProvidedList(ctx, lineNgTypes); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "line_ng_discord_message_type更新に失敗しました。 ", "エラー:", err.Error())
 		return

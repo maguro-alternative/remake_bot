@@ -41,7 +41,7 @@ func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNg
 	return nil
 }
 
-func (r *Repository) DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error {
+func (r *Repository) DeleteMessageTypesNotInProvidedList(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error {
 	query := `
 		DELETE FROM
 			line_ng_discord_message_type
@@ -80,5 +80,3 @@ func (r *Repository) GetLineNgDiscordMessageType(ctx context.Context, channelID 
 	err := r.db.SelectContext(ctx, &ngTypes, query, channelID)
 	return ngTypes, err
 }
-
-

@@ -25,7 +25,7 @@ type Repository interface {
 	DeleteNotInsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []repository.LineNgDiscordUserIDAllCoulmns) error
 	DeleteNotInsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns) error
 	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []repository.LineNgDiscordMessageType) error
-	DeleteNotInsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []repository.LineNgDiscordMessageType) error
+	DeleteMessageTypesNotInProvidedList(ctx context.Context, lineNgDiscordTypes []repository.LineNgDiscordMessageType) error
 	GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error)
 	GetLinePostDiscordChannel(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error)
 	UpdateLinePostDiscordChannel(ctx context.Context, lineChannel repository.LinePostDiscordChannelAllColumns) error

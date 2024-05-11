@@ -76,7 +76,7 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i, lineBot := range lineBots {
-		lineBotIv, err = h.repo.GetLineBotIvNotClient(ctx, lineBot.GuildID)
+		lineBotIv, err = h.repo.GetLineBotIvNotClientByGuildID(ctx, lineBot.GuildID)
 		if err != nil {
 			slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

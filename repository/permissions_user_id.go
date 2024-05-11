@@ -48,7 +48,7 @@ func (r *Repository) InsertPermissionUserIDs(ctx context.Context, permissionsUse
 	return nil
 }
 
-func (r *Repository) GetGuildPermissionUserIDsAllColumns(ctx context.Context, guildID string) ([]PermissionUserIDAllColumns, error) {
+func (r *Repository) GetGuildPermissionUserIDsAllColumnsByGuildID(ctx context.Context, guildID string) ([]PermissionUserIDAllColumns, error) {
 	var permissionsID []PermissionUserIDAllColumns
 	query := `
 		SELECT
@@ -62,7 +62,7 @@ func (r *Repository) GetGuildPermissionUserIDsAllColumns(ctx context.Context, gu
 	return permissionsID, err
 }
 
-func (r *Repository) GetPermissionUserIDs(ctx context.Context, guildID, permissionType string) ([]PermissionUserID, error) {
+func (r *Repository) GetPermissionUserIDsByGuildIDAndType(ctx context.Context, guildID, permissionType string) ([]PermissionUserID, error) {
 	var permissionIDs []PermissionUserID
 	query := `
 		SELECT
@@ -78,7 +78,7 @@ func (r *Repository) GetPermissionUserIDs(ctx context.Context, guildID, permissi
 	return permissionIDs, err
 }
 
-func (r *Repository) DeletePermissionUserIDs(ctx context.Context, guildId string) error {
+func (r *Repository) DeletePermissionUserIDsByGuildID(ctx context.Context, guildId string) error {
 	query := `
 		DELETE FROM
 			permissions_user_id

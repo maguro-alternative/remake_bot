@@ -77,7 +77,7 @@ func TestGetGuildPermissionRoleIDsAllColumns(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからPermissionIDを取得できること", func(t *testing.T) {
-		permissionIDs, err := repo.GetGuildPermissionRoleIDsAllColumns(ctx, "987654321")
+		permissionIDs, err := repo.GetGuildPermissionRoleIDsAllColumnsByGuildID(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", permissionIDs[0].GuildID)
 		assert.Equal(t, "line_bot", permissionIDs[0].Type)
@@ -127,7 +127,7 @@ func TestGetPermissionRoleIDs(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからPermissionIDを取得できること", func(t *testing.T) {
-		permissionIDs, err := repo.GetPermissionRoleIDs(ctx, "987654321", "line_bot")
+		permissionIDs, err := repo.GetPermissionRoleIDsByGuildIDAndType(ctx, "987654321", "line_bot")
 		assert.NoError(t, err)
 		assert.Equal(t, "123456789", permissionIDs[0].RoleID)
 		assert.Equal(t, "read", permissionIDs[0].Permission)
@@ -160,7 +160,7 @@ func TestRepository_DeletePermissionsRoleID(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeletePermissionUserIDs(ctx, "987654321")
+		err = repo.DeletePermissionUserIDsByGuildID(ctx, "987654321")
 		assert.NoError(t, err)
 
 		var permissionsID PermissionRoleID

@@ -31,7 +31,7 @@ func TestGetLineNgDiscordUserID(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからNG Discord User IDを取得できること", func(t *testing.T) {
-		ngDiscordIDs, err := repo.GetLineNgDiscordUserID(ctx, "987654321")
+		ngDiscordIDs, err := repo.GetLineNgDiscordUserIDByChannelID(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, "123456789", ngDiscordIDs[0])
 	})

@@ -62,13 +62,13 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 				CookieStore: sessions.NewCookieStore([]byte(config.SessionSecret())),
 			},
 			&repository.RepositoryFuncMock{
-				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+				GetPermissionCodeByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 0, nil
 				},
-				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+				GetPermissionUserIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return nil, nil
 				},
-				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+				GetPermissionRoleIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return nil, nil
 				},
 			},
@@ -113,13 +113,13 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 				CookieStore: sessions.NewCookieStore([]byte(config.SessionSecret())),
 			},
 			&repository.RepositoryFuncMock{
-				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+				GetPermissionCodeByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 0, nil
 				},
-				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+				GetPermissionUserIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return nil, nil
 				},
-				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+				GetPermissionRoleIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return nil, nil
 				},
 			},
@@ -175,13 +175,13 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 				CookieStore: cookieStore,
 			},
 			&repository.RepositoryFuncMock{
-				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+				GetPermissionCodeByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 0, nil
 				},
-				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+				GetPermissionUserIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return nil, nil
 				},
-				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+				GetPermissionRoleIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return nil, nil
 				},
 			},
@@ -265,13 +265,13 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		middleware := DiscordOAuthCheckMiddleware(
 			indexService,
 			&repository.RepositoryFuncMock{
-				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+				GetPermissionCodeByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 0, nil
 				},
-				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+				GetPermissionUserIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return nil, nil
 				},
-				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+				GetPermissionRoleIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return nil, nil
 				},
 			},
@@ -370,13 +370,13 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		middleware := DiscordOAuthCheckMiddleware(
 			indexService,
 			&repository.RepositoryFuncMock{
-				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+				GetPermissionCodeByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 0, nil
 				},
-				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+				GetPermissionUserIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return nil, nil
 				},
-				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+				GetPermissionRoleIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return nil, nil
 				},
 			},
@@ -475,13 +475,13 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		middleware := DiscordOAuthCheckMiddleware(
 			indexService,
 			&repository.RepositoryFuncMock{
-				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+				GetPermissionCodeByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 0, nil
 				},
-				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+				GetPermissionUserIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return nil, nil
 				},
-				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+				GetPermissionRoleIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return nil, nil
 				},
 			},
@@ -580,13 +580,13 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		middleware := DiscordOAuthCheckMiddleware(
 			indexService,
 			&repository.RepositoryFuncMock{
-				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+				GetPermissionCodeByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 8, nil
 				},
-				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+				GetPermissionUserIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return nil, nil
 				},
-				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+				GetPermissionRoleIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return nil, nil
 				},
 			},
@@ -686,10 +686,10 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		middleware := DiscordOAuthCheckMiddleware(
 			indexService,
 			&repository.RepositoryFuncMock{
-				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+				GetPermissionCodeByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 8, nil
 				},
-				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+				GetPermissionUserIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return []repository.PermissionUserID{
 						{
 							UserID:     "123",
@@ -697,7 +697,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 						},
 					}, nil
 				},
-				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+				GetPermissionRoleIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return nil, nil
 				},
 			},
@@ -801,13 +801,13 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		middleware := DiscordOAuthCheckMiddleware(
 			indexService,
 			&repository.RepositoryFuncMock{
-				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+				GetPermissionCodeByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 8, nil
 				},
-				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+				GetPermissionUserIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return nil, nil
 				},
-				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+				GetPermissionRoleIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return []repository.PermissionRoleID{
 						{
 							RoleID:     "123",
@@ -911,13 +911,13 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		middleware := DiscordOAuthCheckMiddleware(
 			indexService,
 			&repository.RepositoryFuncMock{
-				GetPermissionCodeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
+				GetPermissionCodeByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) (int64, error) {
 					return 0, nil
 				},
-				GetPermissionUserIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
+				GetPermissionUserIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error) {
 					return nil, nil
 				},
-				GetPermissionRoleIDsFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
+				GetPermissionRoleIDsByGuildIDAndTypeFunc: func(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error) {
 					return nil, nil
 				},
 			},

@@ -59,7 +59,7 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+			GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 				return repository.LineBot{
 					GuildID:          "123",
 					DefaultChannelID: "123",
@@ -122,7 +122,7 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+			GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 				return repository.LineBot{
 					GuildID:          "123",
 					DefaultChannelID: "123",
@@ -149,7 +149,7 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		}
 		indexService.DiscordBotState = discordgo.NewState()
 		err := indexService.DiscordBotState.GuildAdd(&discordgo.Guild{
-			ID: "123",
+			ID:       "123",
 			Channels: []*discordgo.Channel{},
 		})
 		assert.NoError(t, err)
@@ -158,7 +158,7 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+			GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 				return repository.LineBot{
 					GuildID:          "123",
 					DefaultChannelID: "123",

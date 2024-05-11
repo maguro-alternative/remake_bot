@@ -66,19 +66,19 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+			GetLinePostDiscordChannelByChannelIDFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
 				return repository.LinePostDiscordChannel{
 					Ng: 		true,
 					BotMessage: false,
 				}, nil
 			},
-			GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+			GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 				return []int{}, nil
 			},
-			GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+			GetLineNgDiscordUserIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 				return []string{}, nil
 			},
-			GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+			GetLineNgDiscordRoleIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 				return []string{}, nil
 			},
 		}
@@ -173,19 +173,19 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+			GetLinePostDiscordChannelByChannelIDFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
 				return repository.LinePostDiscordChannel{
 					Ng: 		true,
 					BotMessage: false,
 				}, nil
 			},
-			GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+			GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 				return []int{4}, nil
 			},
-			GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+			GetLineNgDiscordUserIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 				return []string{}, nil
 			},
-			GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+			GetLineNgDiscordRoleIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 				return []string{}, nil
 			},
 		}
@@ -262,19 +262,19 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+			GetLinePostDiscordChannelByChannelIDFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
 				return repository.LinePostDiscordChannel{
 					Ng: 		true,
 					BotMessage: false,
 				}, nil
 			},
-			GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+			GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 				return []int{}, nil
 			},
-			GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+			GetLineNgDiscordUserIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 				return []string{"123"}, nil
 			},
-			GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+			GetLineNgDiscordRoleIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 				return []string{}, nil
 			},
 		}
@@ -350,19 +350,19 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+			GetLinePostDiscordChannelByChannelIDFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
 				return repository.LinePostDiscordChannel{
 					Ng: 		true,
 					BotMessage: false,
 				}, nil
 			},
-			GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+			GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 				return []int{}, nil
 			},
-			GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+			GetLineNgDiscordUserIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 				return []string{}, nil
 			},
-			GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+			GetLineNgDiscordRoleIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 				return []string{"234"}, nil
 			},
 		}
@@ -433,19 +433,19 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+			GetLinePostDiscordChannelByChannelIDFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
 				return repository.LinePostDiscordChannel{
 					Ng: 		true,
 					BotMessage: false,
 				}, nil
 			},
-			GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+			GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 				return []int{}, nil
 			},
-			GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+			GetLineNgDiscordUserIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 				return []string{}, nil
 			},
-			GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+			GetLineNgDiscordRoleIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 				return []string{}, nil
 			},
 		}

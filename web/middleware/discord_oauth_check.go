@@ -19,14 +19,14 @@ import (
 )
 
 type Repository interface {
-	GetPermissionCode(ctx context.Context, guildID string, permissionType string) (int64, error)
-	GetPermissionUserIDs(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error)
-	GetPermissionRoleIDs(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error)
-	GetAllColumnsLineBot(ctx context.Context, guildID string) (repository.LineBot, error)
-	GetLineBotNotClient(ctx context.Context, guildID string) (repository.LineBotNotClient, error)
-	GetLineBotIvNotClient(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error)
+	GetPermissionCodeByGuildIDAndType(ctx context.Context, guildID string, permissionType string) (int64, error)
+	GetPermissionUserIDsByGuildIDAndType(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionUserID, error)
+	GetPermissionRoleIDsByGuildIDAndType(ctx context.Context, guildID string, permissionType string) ([]repository.PermissionRoleID, error)
+	GetAllColumnsLineBotByGuildID(ctx context.Context, guildID string) (repository.LineBot, error)
+	GetLineBotNotClientByGuildID(ctx context.Context, guildID string) (repository.LineBotNotClient, error)
+	GetLineBotIvNotClientByGuildID(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error)
 	InsertLineBot(ctx context.Context, lineBot *repository.LineBot) error
-	InsertLineBotIv(ctx context.Context, guildId string) error
+	InsertLineBotIvByGuildID(ctx context.Context, guildId string) error
 }
 
 var (
@@ -138,19 +138,19 @@ func DiscordOAuthCheckMiddleware(
 				h.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
-			permissionCode, err := repo.GetPermissionCode(ctx, guildId, permissionType)
+			permissionCode, err := repo.GetPermissionCodeByGuildIDAndType(ctx, guildId, permissionType)
 			if err != nil {
 				slog.WarnContext(ctx, "権限コードの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			permissionUserIDs, err := repo.GetPermissionUserIDs(ctx, guildId, permissionType)
+			permissionUserIDs, err := repo.GetPermissionUserIDsByGuildIDAndType(ctx, guildId, permissionType)
 			if err != nil {
 				slog.WarnContext(ctx, "権限IDの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			permissionRoleIDs, err := repo.GetPermissionRoleIDs(ctx, guildId, permissionType)
+			permissionRoleIDs, err := repo.GetPermissionRoleIDsByGuildIDAndType(ctx, guildId, permissionType)
 			if err != nil {
 				slog.WarnContext(ctx, "権限IDの取得に失敗しました。", "guildId", guildId, "permissionType", permissionType)
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)

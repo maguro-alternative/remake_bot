@@ -97,7 +97,7 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	lineBot, err := g.Repo.GetAllColumnsLineBot(ctx, guildId)
+	lineBot, err := g.Repo.GetAllColumnsLineBotByGuildID(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました:"+err.Error())

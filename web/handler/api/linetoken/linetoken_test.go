@@ -82,7 +82,7 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 				DiscordSession: &discordgo.Session{},
 			},
 			repo: &repository.RepositoryFuncMock{
-				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+				GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 					return repository.LineBot{
 						GuildID:          "123",
 						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
@@ -93,7 +93,7 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 						LineClientSecret: pq.ByteaArray{[]byte("lineClientSecret")},
 					}, nil
 				},
-				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+				GetAllColumnsLineBotIvByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 					return repository.LineBotIv{
 						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
@@ -141,7 +141,7 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 				DiscordSession: &discordgo.Session{},
 			},
 			repo: &repository.RepositoryFuncMock{
-				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+				GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 					return repository.LineBot{
 						GuildID:          "123",
 						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
@@ -152,7 +152,7 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 						LineClientSecret: pq.ByteaArray{[]byte("lineClientSecret")},
 					}, nil
 				},
-				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+				GetAllColumnsLineBotIvByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 					return repository.LineBotIv{
 						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
@@ -220,7 +220,7 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 				DiscordSession: &discordgo.Session{},
 			},
 			repo: &repository.RepositoryFuncMock{
-				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+				GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 					return repository.LineBot{
 						GuildID:          "123",
 						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
@@ -231,7 +231,7 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 						LineClientSecret: pq.ByteaArray{[]byte("lineClientSecret")},
 					}, nil
 				},
-				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+				GetAllColumnsLineBotIvByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 					return repository.LineBotIv{
 						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
@@ -275,11 +275,11 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		bodyJsonDelete, err := json.Marshal(internal.LineBotJson{
-			GuildID:                "987654321",
-			DefaultChannelID:       "123456789",
-			DebugMode:              true,
-			LineNotifyTokenDelete:  true,
-			LineBotTokenDelete:     true,
+			GuildID:               "987654321",
+			DefaultChannelID:      "123456789",
+			DebugMode:             true,
+			LineNotifyTokenDelete: true,
+			LineBotTokenDelete:    true,
 		})
 		assert.NoError(t, err)
 

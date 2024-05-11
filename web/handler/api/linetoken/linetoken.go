@@ -160,11 +160,11 @@ func verifyLineToken(
 	lineNotifyToken := lineTokenJson.LineNotifyToken
 	lineBotToken := lineTokenJson.LineBotToken
 	lineGroupID := lineTokenJson.LineGroupID
-	linebot, err := repo.GetAllColumnsLineBot(ctx, lineTokenJson.GuildID)
+	linebot, err := repo.GetAllColumnsLineBotByGuildID(ctx, lineTokenJson.GuildID)
 	if err != nil {
 		return err
 	}
-	linebotIv, err := repo.GetAllColumnsLineBotIv(ctx, lineTokenJson.GuildID)
+	linebotIv, err := repo.GetAllColumnsLineBotIvByGuildID(ctx, lineTokenJson.GuildID)
 	if err != nil {
 		return err
 	}

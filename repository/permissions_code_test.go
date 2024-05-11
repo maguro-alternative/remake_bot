@@ -31,7 +31,7 @@ func TestGetPermissionsCode(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからPermissionsCodeを取得できること", func(t *testing.T) {
-		permissionCode, err := repo.GetPermissionCode(ctx, "987654321", "line_bot")
+		permissionCode, err := repo.GetPermissionCodeByGuildIDAndType(ctx, "987654321", "line_bot")
 		assert.NoError(t, err)
 		assert.Equal(t, int64(8), permissionCode)
 	})
@@ -62,7 +62,7 @@ func TestGetPermissionsCodes(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからPermissionsCodeを取得できること", func(t *testing.T) {
-		permissionCode, err := repo.GetPermissionCodes(ctx, "987654321")
+		permissionCode, err := repo.GetPermissionCodesByGuildID(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, 2, len(permissionCode))
 		assert.Equal(t, int64(8), permissionCode[0].Code)

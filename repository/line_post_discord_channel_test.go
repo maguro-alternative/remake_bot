@@ -34,7 +34,7 @@ func TestGetLinePostDiscordChannel(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("ChannelIDから送信しないかどうか取得できること", func(t *testing.T) {
-		channel, err := repo.GetLinePostDiscordChannel(ctx, "123456789")
+		channel, err := repo.GetLinePostDiscordChannelByChannelID(ctx, "123456789")
 		assert.NoError(t, err)
 		assert.Equal(t, false, channel.Ng)
 		assert.Equal(t, false, channel.BotMessage)
@@ -57,7 +57,7 @@ func TestInsertLinePostDiscordChannel(t *testing.T) {
 
 	var channels []LinePostDiscordChannelAllColumns
 	t.Run("ChannelIDを追加できること", func(t *testing.T) {
-		err := repo.InsertLinePostDiscordChannel(ctx, "123456789", "987654321")
+		err := repo.InsertLinePostDiscordChannelByChannelIDAndGuildID(ctx, "123456789", "987654321")
 		assert.NoError(t, err)
 		query := `
 			SELECT

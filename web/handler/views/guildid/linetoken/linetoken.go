@@ -12,10 +12,10 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/repository"
 
-	"github.com/maguro-alternative/remake_bot/web/shared/ctxvalue"
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken/internal"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/shared/ctxvalue"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
@@ -96,7 +96,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			channelsInCategory,
 		)
 	}
-	lineBot, err := g.Repo.GetAllColumnsLineBot(ctx, guildId)
+	lineBot, err := g.Repo.GetAllColumnsLineBotByGuildID(ctx, guildId)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		slog.InfoContext(ctx, "line_botが存在しないため新規作成します")
 		err = g.Repo.InsertLineBot(ctx, &repository.LineBot{
@@ -109,7 +109,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			slog.ErrorContext(ctx, "line_botの作成に失敗しました:"+err.Error())
 			return
 		}
-		err = g.Repo.InsertLineBotIv(ctx, guildId)
+		err = g.Repo.InsertLineBotIvByGuildID(ctx, guildId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "line_bot_ivの作成に失敗しました:"+err.Error())

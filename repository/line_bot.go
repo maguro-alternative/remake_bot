@@ -106,7 +106,7 @@ func (r *Repository) GetAllColumnsLineBots(ctx context.Context) ([]*LineBot, err
 	return lineBots, err
 }
 
-func (r *Repository) GetAllColumnsLineBot(ctx context.Context, guildId string) (LineBot, error) {
+func (r *Repository) GetAllColumnsLineBotByGuildID(ctx context.Context, guildId string) (LineBot, error) {
 	var lineBot LineBot
 	query := `
 		SELECT
@@ -128,7 +128,7 @@ func (r *Repository) GetAllColumnsLineBot(ctx context.Context, guildId string) (
 	return lineBot, err
 }
 
-func (r *Repository) GetLineBotDefaultChannelID(ctx context.Context, guildID string) (LineBotDefaultChannelID, error) {
+func (r *Repository) GetLineBotDefaultChannelIDByGuildID(ctx context.Context, guildID string) (LineBotDefaultChannelID, error) {
 	var lineBot LineBotDefaultChannelID
 	query := `
 		SELECT
@@ -142,7 +142,7 @@ func (r *Repository) GetLineBotDefaultChannelID(ctx context.Context, guildID str
 	return lineBot, err
 }
 
-func (r *Repository) GetLineBotNotClient(ctx context.Context, guildID string) (LineBotNotClient, error) {
+func (r *Repository) GetLineBotNotClientByGuildID(ctx context.Context, guildID string) (LineBotNotClient, error) {
 	var lineBot LineBotNotClient
 	query := `
 		SELECT
@@ -186,10 +186,10 @@ func (r *Repository) UpdateLineBot(ctx context.Context, lineBot *LineBot) error 
 	if len(lineBot.LineGroupID) > 0 && len(lineBot.LineGroupID[0]) > 0 || lineBot.LineGroupID == nil {
 		setQueryArray = append(setQueryArray, "line_group_id = :line_group_id")
 	}
-	if len(lineBot.LineClientID) > 0 && len(lineBot.LineClientID[0]) > 0 || lineBot.LineClientID == nil{
+	if len(lineBot.LineClientID) > 0 && len(lineBot.LineClientID[0]) > 0 || lineBot.LineClientID == nil {
 		setQueryArray = append(setQueryArray, "line_client_id = :line_client_id")
 	}
-	if len(lineBot.LineClientSecret) > 0 && len(lineBot.LineClientSecret[0]) > 0 || lineBot.LineClientSecret == nil{
+	if len(lineBot.LineClientSecret) > 0 && len(lineBot.LineClientSecret[0]) > 0 || lineBot.LineClientSecret == nil {
 		setQueryArray = append(setQueryArray, "line_client_secret = :line_client_secret")
 	}
 	if lineBot.DefaultChannelID != "" {

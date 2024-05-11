@@ -20,7 +20,7 @@ func NewLineNgDiscordUserID(channelID, guildID, userID string) *LineNgDiscordUse
 	}
 }
 
-func (r *Repository) GetLineNgDiscordUserID(ctx context.Context, channelID string) ([]string, error) {
+func (r *Repository) GetLineNgDiscordUserIDByChannelID(ctx context.Context, channelID string) ([]string, error) {
 	var ngIDs []string
 	query := `
 		SELECT

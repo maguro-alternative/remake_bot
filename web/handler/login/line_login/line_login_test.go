@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
-	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
@@ -80,7 +80,7 @@ func TestIndex(t *testing.T) {
 						},
 					}, nil
 				},
-				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+				GetAllColumnsLineBotIvByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 					return repository.LineBotIv{
 						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
@@ -136,7 +136,7 @@ func TestIndex(t *testing.T) {
 				GetAllColumnsLineBotsFunc: func(ctx context.Context) ([]*repository.LineBot, error) {
 					return nil, nil
 				},
-				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+				GetAllColumnsLineBotIvByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 					return repository.LineBotIv{}, nil
 				},
 			},
@@ -157,7 +157,6 @@ func TestIndex(t *testing.T) {
 		assert.NotContains(t, rr.Body.String(), `<img src="pictureUrl"/>`)
 		assert.NotContains(t, rr.Body.String(), `<li>displayName</li>`)
 	})
-
 
 	t.Run("lineBotの読み込みに失敗した場合、500エラーを返す", func(t *testing.T) {
 		req, err := http.NewRequest(http.MethodGet, "/login/line", nil)
@@ -196,7 +195,7 @@ func TestLineLogin(t *testing.T) {
 				CookieStore: cookieStore,
 			},
 			&repository.RepositoryFuncMock{
-				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+				GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 					return repository.LineBot{
 						GuildID:          "123",
 						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
@@ -207,7 +206,7 @@ func TestLineLogin(t *testing.T) {
 						LineClientSecret: pq.ByteaArray{[]byte("lineClientSecret")},
 					}, nil
 				},
-				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+				GetAllColumnsLineBotIvByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 					return repository.LineBotIv{
 						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
@@ -243,7 +242,7 @@ func TestLineLogin(t *testing.T) {
 				CookieStore: sessions.NewCookieStore([]byte("")),
 			},
 			&repository.RepositoryFuncMock{
-				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+				GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 					return repository.LineBot{
 						GuildID:          "123",
 						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
@@ -254,7 +253,7 @@ func TestLineLogin(t *testing.T) {
 						LineClientSecret: pq.ByteaArray{[]byte("lineClientSecret")},
 					}, nil
 				},
-				GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+				GetAllColumnsLineBotIvByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 					return repository.LineBotIv{
 						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
@@ -290,7 +289,7 @@ func TestLineLogin(t *testing.T) {
 				CookieStore: cookieStore,
 			},
 			&repository.RepositoryFuncMock{
-				GetAllColumnsLineBotFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+				GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
 					return repository.LineBot{}, errors.New("failed to get all columns of line bots")
 				},
 			},

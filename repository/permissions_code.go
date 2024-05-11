@@ -18,7 +18,7 @@ func NewPermissionCode(guildID, permissionType string, code int64) *PermissionCo
 	}
 }
 
-func (r *Repository) GetPermissionCode(ctx context.Context, guildID, permissionType string) (int64, error) {
+func (r *Repository) GetPermissionCodeByGuildIDAndType(ctx context.Context, guildID, permissionType string) (int64, error) {
 	var code int64
 	if permissionType == "" {
 		return 8, nil
@@ -36,7 +36,7 @@ func (r *Repository) GetPermissionCode(ctx context.Context, guildID, permissionT
 	return code, err
 }
 
-func (r *Repository) GetPermissionCodes(ctx context.Context, guildID string) ([]PermissionCode, error) {
+func (r *Repository) GetPermissionCodesByGuildID(ctx context.Context, guildID string) ([]PermissionCode, error) {
 	var permissionsCode []PermissionCode
 	query := `
 		SELECT

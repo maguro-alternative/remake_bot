@@ -80,7 +80,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 				}),
 			},
 			&repository.RepositoryFuncMock{
-				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+				GetLineBotNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return repository.LineBotNotClient{
 						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
 						LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
@@ -88,7 +88,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 						LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
 					}, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
 					return repository.LineBotIvNotClient{
 						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
@@ -149,7 +149,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 				CookieStore: cookieStore,
 			},
 			&repository.RepositoryFuncMock{
-				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+				GetLineBotNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return repository.LineBotNotClient{
 						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
 						LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
@@ -157,7 +157,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 						LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
 					}, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
 					return repository.LineBotIvNotClient{
 						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
@@ -214,7 +214,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 				CookieStore: cookieStore,
 			},
 			&repository.RepositoryFuncMock{
-				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+				GetLineBotNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return repository.LineBotNotClient{
 						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
 						LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
@@ -222,7 +222,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 						LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
 					}, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
 					return repository.LineBotIvNotClient{
 						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
@@ -283,7 +283,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 				CookieStore: cookieStore,
 			},
 			&repository.RepositoryFuncMock{
-				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+				GetLineBotNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return repository.LineBotNotClient{
 						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
 						LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
@@ -291,7 +291,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 						LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
 					}, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
 					return repository.LineBotIvNotClient{
 						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},

@@ -20,7 +20,7 @@ func NewLineNgDiscordRoleID(channelID, guildID, roleID string) *LineNgDiscordRol
 	}
 }
 
-func (r *Repository) GetLineNgDiscordRoleID(ctx context.Context, channelID string) ([]string, error) {
+func (r *Repository) GetLineNgDiscordRoleIDByChannelID(ctx context.Context, channelID string) ([]string, error) {
 	var ngIDs []string
 	query := `
 		SELECT

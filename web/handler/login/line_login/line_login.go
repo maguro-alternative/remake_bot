@@ -61,7 +61,7 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, lineBot := range lineBots {
-		lineBotIv, err = h.Repo.GetAllColumnsLineBotIv(ctx, lineBot.GuildID)
+		lineBotIv, err = h.Repo.GetAllColumnsLineBotIvByGuildID(ctx, lineBot.GuildID)
 		if err != nil {
 			slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。")
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -155,13 +155,13 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 		ctx = context.Background()
 	}
 
-	lineBot, err := h.Repo.GetAllColumnsLineBot(ctx, guildID)
+	lineBot, err := h.Repo.GetAllColumnsLineBotByGuildID(ctx, guildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	lineBotIv, err := h.Repo.GetAllColumnsLineBotIv(ctx, lineBot.GuildID)
+	lineBotIv, err := h.Repo.GetAllColumnsLineBotIvByGuildID(ctx, lineBot.GuildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

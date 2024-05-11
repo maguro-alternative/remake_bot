@@ -25,7 +25,7 @@ func NewLinePostDiscordChannel(channelID, guildID string, ng, botMessage bool) *
 	}
 }
 
-func (r *Repository) GetLinePostDiscordChannel(ctx context.Context, channelID string) (LinePostDiscordChannel, error) {
+func (r *Repository) GetLinePostDiscordChannelByChannelID(ctx context.Context, channelID string) (LinePostDiscordChannel, error) {
 	var channel LinePostDiscordChannel
 	query := `
 		SELECT
@@ -54,7 +54,7 @@ func (r *Repository) UpdateLinePostDiscordChannel(ctx context.Context, lineChann
 	return err
 }
 
-func (r *Repository) InsertLinePostDiscordChannel(ctx context.Context, channelID string, guildID string) error {
+func (r *Repository) InsertLinePostDiscordChannelByChannelIDAndGuildID(ctx context.Context, channelID string, guildID string) error {
 	query := `
 		INSERT INTO line_post_discord_channel (
 			channel_id,

@@ -39,7 +39,7 @@ func TestInsertLineBotIv(t *testing.T) {
 		lineBotIv := &LineBotIv{
 			GuildID: "987654321",
 		}
-		err := repo.InsertLineBotIv(ctx, lineBotIv.GuildID)
+		err := repo.InsertLineBotIvByGuildID(ctx, lineBotIv.GuildID)
 		assert.NoError(t, err)
 
 		var lineBotIvResult LineBotIv
@@ -73,7 +73,7 @@ func TestGetLineBotIvNotClient(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからLineBotIvを取得できること", func(t *testing.T) {
-		lineBotIv, err := repo.GetLineBotIvNotClient(ctx, "987654321")
+		lineBotIv, err := repo.GetLineBotIvNotClientByGuildID(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, []byte("123456789"), lineBotIv.LineNotifyTokenIv[0])
 		assert.Equal(t, []byte("123456789"), lineBotIv.LineBotTokenIv[0])
@@ -108,7 +108,7 @@ func TestRepository_GetAllColumnsLineBotIv(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからLineBotIvを取得できること", func(t *testing.T) {
-		lineBotIv, err := repo.GetAllColumnsLineBotIv(ctx, "987654321")
+		lineBotIv, err := repo.GetAllColumnsLineBotIvByGuildID(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, pq.ByteaArray{[]byte("123456789")}, lineBotIv.LineNotifyTokenIv)
 		assert.Equal(t, pq.ByteaArray{[]byte("123456789")}, lineBotIv.LineBotTokenIv)

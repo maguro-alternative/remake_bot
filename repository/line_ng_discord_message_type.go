@@ -67,7 +67,7 @@ func (r *Repository) DeleteMessageTypesNotInProvidedList(ctx context.Context, li
 	return nil
 }
 
-func (r *Repository) GetLineNgDiscordMessageType(ctx context.Context, channelID string) ([]int, error) {
+func (r *Repository) GetLineNgDiscordMessageTypeByChannelID(ctx context.Context, channelID string) ([]int, error) {
 	var ngTypes []int
 	query := `
 		SELECT

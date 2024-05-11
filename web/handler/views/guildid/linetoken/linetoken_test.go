@@ -68,7 +68,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetAllColumnsLineBotFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
+			GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
 				return repository.LineBot{
 					LineNotifyToken:  pq.ByteaArray{[]byte("test")},
 					LineBotToken:     pq.ByteaArray{[]byte("test")},
@@ -100,7 +100,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<input id="lineGroupId" type="password" name="line_group_id">`)
 		assert.Contains(t, rec.Body.String(), `<input id="lineClientId" type="password" name="line_client_id">`)
 		assert.Contains(t, rec.Body.String(), `<input id="lineClientSecret" type="password" name="line_client_secret">`)
-		assert.Equal(t, strings.Count(rec.Body.String(),"入力済み"), 6)
+		assert.Equal(t, strings.Count(rec.Body.String(), "入力済み"), 6)
 
 		assert.Contains(t, rec.Body.String(), `<option value="123">カテゴリーなし:📝:test</option>`)
 		assert.Contains(t, rec.Body.String(), `<option value="1234">カテゴリーなし:📝:test</option>`)
@@ -148,7 +148,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetAllColumnsLineBotFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
+			GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
 				return repository.LineBot{
 					LineNotifyToken:  pq.ByteaArray{[]byte("test")},
 					LineBotToken:     pq.ByteaArray{[]byte("test")},
@@ -181,7 +181,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<input id="lineGroupId" type="password" name="line_group_id">`)
 		assert.Contains(t, rec.Body.String(), `<input id="lineClientId" type="password" name="line_client_id">`)
 		assert.Contains(t, rec.Body.String(), `<input id="lineClientSecret" type="password" name="line_client_secret">`)
-		assert.Equal(t, strings.Count(rec.Body.String(),"入力済み"), 6)
+		assert.Equal(t, strings.Count(rec.Body.String(), "入力済み"), 6)
 
 		assert.Contains(t, rec.Body.String(), `<option value="123" selected>カテゴリーなし:📝:test</option>`)
 		assert.Contains(t, rec.Body.String(), `<option value="1234">カテゴリーなし:📝:test</option>`)
@@ -229,9 +229,9 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetAllColumnsLineBotFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
+			GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
 				return repository.LineBot{
-					GuildID:          "111",
+					GuildID: "111",
 				}, nil
 			},
 		}
@@ -256,7 +256,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<input id="lineGroupId" type="password" name="line_group_id">`)
 		assert.Contains(t, rec.Body.String(), `<input id="lineClientId" type="password" name="line_client_id">`)
 		assert.Contains(t, rec.Body.String(), `<input id="lineClientSecret" type="password" name="line_client_secret">`)
-		assert.Equal(t, strings.Count(rec.Body.String(),"入力済み"), 0)
+		assert.Equal(t, strings.Count(rec.Body.String(), "入力済み"), 0)
 
 		assert.Contains(t, rec.Body.String(), `<option value="123">カテゴリーなし:📝:test</option>`)
 		assert.Contains(t, rec.Body.String(), `<option value="1234">カテゴリーなし:📝:test</option>`)
@@ -304,7 +304,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetAllColumnsLineBotFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
+			GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
 				return repository.LineBot{}, nil
 			},
 		}

@@ -82,7 +82,7 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.repo.DeletePermissionUserIDs(ctx, guildId); err != nil {
+	if err := h.repo.DeletePermissionUserIDsByGuildID(ctx, guildId); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの削除に失敗しました。", "エラー:", err.Error())
 		return
@@ -94,7 +94,7 @@ func (h *PermissionHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.repo.DeletePermissionRoleIDs(ctx, guildId); err != nil {
+	if err := h.repo.DeletePermissionRoleIDsByGuildID(ctx, guildId); err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "パーミッションの削除に失敗しました。", "エラー:", err.Error())
 		return

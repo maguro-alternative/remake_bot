@@ -205,7 +205,7 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 						},
 					}, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildId string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildId string) (repository.LineBotIvNotClient, error) {
 					return repository.LineBotIvNotClient{
 						LineNotifyTokenIv: pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:    pq.ByteaArray{[]byte("decodeBotToken")},
@@ -245,7 +245,7 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 				GetAllColumnsLineBotsFunc: func(ctx context.Context) ([]*repository.LineBot, error) {
 					return []*repository.LineBot{}, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildId string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildId string) (repository.LineBotIvNotClient, error) {
 					return repository.LineBotIvNotClient{}, nil
 				},
 			},
@@ -278,7 +278,7 @@ func TestLineBotHandler_ServeHTTP(t *testing.T) {
 						},
 					}, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildId string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildId string) (repository.LineBotIvNotClient, error) {
 					return repository.LineBotIvNotClient{
 						LineNotifyTokenIv: pq.ByteaArray{[]byte("decodeNotifyToken")},
 						LineBotTokenIv:    pq.ByteaArray{[]byte("decodeBotToken")},

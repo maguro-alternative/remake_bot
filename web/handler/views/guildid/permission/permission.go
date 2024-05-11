@@ -74,21 +74,21 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		lineSession = &model.LineOAuthSession{}
 	}
 
-	permissionCodes, err := h.Repo.GetPermissionCodes(ctx, guildId)
+	permissionCodes, err := h.Repo.GetPermissionCodesByGuildID(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "permissions_codeの取得に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	permissionUserIDs, err := h.Repo.GetGuildPermissionUserIDsAllColumns(ctx, guildId)
+	permissionUserIDs, err := h.Repo.GetGuildPermissionUserIDsAllColumnsByGuildID(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "permissions_idの取得に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	permissionRoleIDs, err := h.Repo.GetGuildPermissionRoleIDsAllColumns(ctx, guildId)
+	permissionRoleIDs, err := h.Repo.GetGuildPermissionRoleIDsAllColumnsByGuildID(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "permissions_idの取得に失敗しました。", "エラー:", err.Error())

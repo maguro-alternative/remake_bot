@@ -202,13 +202,13 @@ func createCategoryInChannels(
 	if len(channelsInCategory[categoryPosition.ID]) == 0 {
 		channelsInCategory[categoryPosition.ID] = make([]internal.DiscordChannelSet, len(guild.Channels)+1)
 	}
-	discordChannel, err := repo.GetLinePostDiscordChannel(ctx, channel.ID)
+	discordChannel, err := repo.GetLinePostDiscordChannelByChannelID(ctx, channel.ID)
 	if err != nil && err.Error() != "sql: no rows in result set" {
 		slog.ErrorContext(ctx, "line_post_discord_channelの読み取りに失敗しました:"+err.Error())
 		return err
 	} else if err != nil {
 		// チャンネルが存在しない場合は追加
-		if err := repo.InsertLinePostDiscordChannel(ctx, channel.ID, guild.ID); err != nil {
+		if err := repo.InsertLinePostDiscordChannelByChannelIDAndGuildID(ctx, channel.ID, guild.ID); err != nil {
 			slog.ErrorContext(ctx, "line_post_discord_channelの追加に失敗しました:"+err.Error())
 			return err
 		}
@@ -217,17 +217,17 @@ func createCategoryInChannels(
 			BotMessage: false,
 		}
 	}
-	ngTypes, err := repo.GetLineNgDiscordMessageType(ctx, channel.ID)
+	ngTypes, err := repo.GetLineNgDiscordMessageTypeByChannelID(ctx, channel.ID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_ng_typeの読み取りに失敗しました:"+err.Error())
 		return err
 	}
-	ngDiscordUserIDs, err := repo.GetLineNgDiscordUserID(ctx, channel.ID)
+	ngDiscordUserIDs, err := repo.GetLineNgDiscordUserIDByChannelID(ctx, channel.ID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_ng_discord_user_idの読み取りに失敗しました:"+err.Error())
 		return err
 	}
-	ngDiscordRoleIDs, err := repo.GetLineNgDiscordRoleID(ctx, channel.ID)
+	ngDiscordRoleIDs, err := repo.GetLineNgDiscordRoleIDByChannelID(ctx, channel.ID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_ng_discord_role_idの読み取りに失敗しました:"+err.Error())
 		return err

@@ -122,7 +122,7 @@ func TestRepository_GetLineBot(t *testing.T) {
 
 	repo := NewRepository(tx)
 	t.Run("GuildIDからLineBotを取得できること", func(t *testing.T) {
-		lineBot, err := repo.GetAllColumnsLineBot(ctx, "987654321")
+		lineBot, err := repo.GetAllColumnsLineBotByGuildID(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", lineBot.GuildID)
 		assert.Equal(t, pq.ByteaArray{[]byte("123456789")}, lineBot.LineNotifyToken)
@@ -171,7 +171,7 @@ func TestGetLineBotNotClient(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからClient以外のLineBotを取得できること", func(t *testing.T) {
-		lineBot, err := repo.GetLineBotNotClient(ctx, "987654321")
+		lineBot, err := repo.GetLineBotNotClientByGuildID(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, []byte("123456789"), lineBot.LineNotifyToken[0])
 		assert.Equal(t, []byte("123456789"), lineBot.LineBotToken[0])
@@ -211,7 +211,7 @@ func TestRepository_GetLineBotDefaultChannelID(t *testing.T) {
 
 	repo := NewRepository(tx)
 	t.Run("GuildIDからLineBotのDefaultChannelUDを取得できること", func(t *testing.T) {
-		lineBot, err := repo.GetLineBotDefaultChannelID(ctx, "987654321")
+		lineBot, err := repo.GetLineBotDefaultChannelIDByGuildID(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, "987654321", lineBot.DefaultChannelID)
 	})
@@ -286,9 +286,9 @@ func TestRepository_UpdateLineBot(t *testing.T) {
 
 		repo := NewRepository(tx)
 		updateLineBot := &LineBot{
-			GuildID:          "987654321",
-			LineNotifyToken:  pq.ByteaArray{[]byte("987654321")},
-			LineBotToken:     pq.ByteaArray{[]byte("987654321")},
+			GuildID:         "987654321",
+			LineNotifyToken: pq.ByteaArray{[]byte("987654321")},
+			LineBotToken:    pq.ByteaArray{[]byte("987654321")},
 		}
 		err = repo.UpdateLineBot(ctx, updateLineBot)
 		assert.NoError(t, err)

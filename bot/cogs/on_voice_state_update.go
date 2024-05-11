@@ -22,7 +22,8 @@ func (h *cogHandler) onVoiceStateUpdate(s *discordgo.Session, vs *discordgo.Voic
 
 func (h *cogHandler) onVoiceStateUpdateFunc(
 	ctx context.Context,
-	repo repository.RepositoryFunc,
+	//repo repository.RepositoryFunc,
+	repo *repository.Repository,
 	//s mock.Session,
 	s *discordgo.Session,
 	m *discordgo.VoiceStateUpdate,
@@ -37,7 +38,19 @@ func (h *cogHandler) onVoiceStateUpdateFunc(
 	}
 	// ngUserIDs, err := repo.GetVcSignalNgUserIDs(ctx, vcChannelID)
 	// ngRoleIDs, err := repo.GetVcSignalNgRoleIDs(ctx, vcChannelID)
-	// vcSignalChannel, err := repo.GetVcSignalChannel(ctx, vcChannelID)
+	vcSignalChannel, err := repo.GetVcSignalChannelAllColumnByVcChannelID(ctx, vcChannelID)
+	if err != nil {
+		return nil, err
+	}
+	if !vcSignalChannel.SendSignal {
+		return nil, nil
+	}
+	if vcSignalChannel.SendChannelID == "" {
+		return nil, nil
+	}
+	if vcSignalChannel.JoinBot && m.UserID == s.State.User.ID {
+		return nil, nil
+	}
 	// mentionUserIDs, err := repo.GetMentionUserIDs(ctx, vcChannelID)
 	// mentionRoleIDs, err := repo.GetMentionRoleIDs(ctx, vcChannelID)
 	// chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
@@ -46,6 +59,6 @@ func (h *cogHandler) onVoiceStateUpdateFunc(
 	// m.BeforeUpdate.SelfVideo == false && m.SelfVideo //kamera start
 	// m.BeforeUpdate.SelfStream == false && m.SelfStream // haishin start
 
-	_, err := s.ChannelMessageSend(vcChannelID, "Hello")
+	_, err = s.ChannelMessageSend(vcSignalChannel.SendChannelID, "Hello")
 	return nil, err
 }

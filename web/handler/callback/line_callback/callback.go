@@ -85,13 +85,13 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	sessionStore.CleanupLineNonce()
 	// 1. 認可ページのURL
 	code := r.URL.Query().Get("code")
-	lineBot, err := h.repo.GetAllColumnsLineBot(ctx, guildId)
+	lineBot, err := h.repo.GetAllColumnsLineBotByGuildID(ctx, guildId)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	lineBotIv, err := h.repo.GetAllColumnsLineBotIv(ctx, lineBot.GuildID)
+	lineBotIv, err := h.repo.GetAllColumnsLineBotIvByGuildID(ctx, lineBot.GuildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

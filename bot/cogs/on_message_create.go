@@ -53,12 +53,12 @@ func onMessageCreateFunc(
 
 	sendTextBuilder := strings.Builder{}
 
-	channel, err := repo.GetLinePostDiscordChannel(ctx, vs.ChannelID)
+	channel, err := repo.GetLinePostDiscordChannelByChannelID(ctx, vs.ChannelID)
 	if err != nil && err.Error() != "sql: no rows in result set" {
 		slog.ErrorContext(ctx, "line_post_discord_channelの取得に失敗しました", "エラー:", err.Error())
 		return err
 	} else if err != nil {
-		err = repo.InsertLinePostDiscordChannel(ctx, vs.ChannelID, vs.GuildID)
+		err = repo.InsertLinePostDiscordChannelByChannelIDAndGuildID(ctx, vs.ChannelID, vs.GuildID)
 		if err != nil {
 			slog.ErrorContext(ctx, "line_post_discord_channelの登録に失敗しました", "エラー:", err.Error())
 			return err
@@ -68,17 +68,17 @@ func onMessageCreateFunc(
 			BotMessage: false,
 		}
 	}
-	ngTypes, err := repo.GetLineNgDiscordMessageType(ctx, vs.ChannelID)
+	ngTypes, err := repo.GetLineNgDiscordMessageTypeByChannelID(ctx, vs.ChannelID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
 		return err
 	}
-	ngDiscordUserIDs, err := repo.GetLineNgDiscordUserID(ctx, vs.ChannelID)
+	ngDiscordUserIDs, err := repo.GetLineNgDiscordUserIDByChannelID(ctx, vs.ChannelID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
 		return err
 	}
-	ngDiscordRoleIDs, err := repo.GetLineNgDiscordRoleID(ctx, vs.ChannelID)
+	ngDiscordRoleIDs, err := repo.GetLineNgDiscordRoleIDByChannelID(ctx, vs.ChannelID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
 		return err
@@ -110,12 +110,12 @@ func onMessageCreateFunc(
 		slog.InfoContext(ctx, "NG Channel or Bot Message")
 		return err
 	}
-	lineBotApi, err := repo.GetLineBotNotClient(ctx, vs.GuildID)
+	lineBotApi, err := repo.GetLineBotNotClientByGuildID(ctx, vs.GuildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました", "エラー:", err.Error())
 		return err
 	}
-	lineBotIv, err := repo.GetLineBotIvNotClient(ctx, vs.GuildID)
+	lineBotIv, err := repo.GetLineBotIvNotClientByGuildID(ctx, vs.GuildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました", "エラー:", err.Error())
 		return err

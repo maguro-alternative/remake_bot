@@ -48,28 +48,28 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 			ctx,
 			stubClient,
 			&repository.RepositoryFuncMock{
-				GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+				GetLinePostDiscordChannelByChannelIDFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
 					return repository.LinePostDiscordChannel{
 						Ng:         false,
 						BotMessage: false,
 					}, nil
 				},
-				InsertLinePostDiscordChannelFunc: func(ctx context.Context, channelID string, guildID string) error {
+				InsertLinePostDiscordChannelByChannelIDAndGuildIDFunc: func(ctx context.Context, channelID string, guildID string) error {
 					return nil
 				},
-				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+				GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+				GetLineNgDiscordUserIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+				GetLineNgDiscordRoleIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return nil, nil
 				},
-				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+				GetLineBotNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return *lineBot, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
 					return lineBotIv, nil
 				},
 			},
@@ -121,28 +121,28 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 			ctx,
 			stubClient,
 			&repository.RepositoryFuncMock{
-				GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+				GetLinePostDiscordChannelByChannelIDFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
 					return repository.LinePostDiscordChannel{
 						Ng:         false,
 						BotMessage: false,
 					}, nil
 				},
-				InsertLinePostDiscordChannelFunc: func(ctx context.Context, channelID string, guildID string) error {
+				InsertLinePostDiscordChannelByChannelIDAndGuildIDFunc: func(ctx context.Context, channelID string, guildID string) error {
 					return nil
 				},
-				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+				GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+				GetLineNgDiscordUserIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+				GetLineNgDiscordRoleIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return nil, nil
 				},
-				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+				GetLineBotNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return *lineBot, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
 					return lineBotIv, nil
 				},
 			},
@@ -200,28 +200,28 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 			ctx,
 			stubClient,
 			&repository.RepositoryFuncMock{
-				GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+				GetLinePostDiscordChannelByChannelIDFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
 					return repository.LinePostDiscordChannel{
 						Ng:         true,
 						BotMessage: false,
 					}, nil
 				},
-				InsertLinePostDiscordChannelFunc: func(ctx context.Context, channelID string, guildID string) error {
+				InsertLinePostDiscordChannelByChannelIDAndGuildIDFunc: func(ctx context.Context, channelID string, guildID string) error {
 					return nil
 				},
-				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+				GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+				GetLineNgDiscordUserIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return []string{"userID"}, nil
 				},
-				GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+				GetLineNgDiscordRoleIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return []string{"roleID"}, nil
 				},
-				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+				GetLineBotNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return *lineBot, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
 					return lineBotIv, nil
 				},
 			},
@@ -311,28 +311,28 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 			ctx,
 			stubClient,
 			&repository.RepositoryFuncMock{
-				GetLinePostDiscordChannelFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
+				GetLinePostDiscordChannelByChannelIDFunc: func(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error) {
 					return repository.LinePostDiscordChannel{
 						Ng:         false,
 						BotMessage: false,
 					}, nil
 				},
-				InsertLinePostDiscordChannelFunc: func(ctx context.Context, channelID string, guildID string) error {
+				InsertLinePostDiscordChannelByChannelIDAndGuildIDFunc: func(ctx context.Context, channelID string, guildID string) error {
 					return nil
 				},
-				GetLineNgDiscordMessageTypeFunc: func(ctx context.Context, channelID string) ([]int, error) {
+				GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordUserIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+				GetLineNgDiscordUserIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return nil, nil
 				},
-				GetLineNgDiscordRoleIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
+				GetLineNgDiscordRoleIDByChannelIDFunc: func(ctx context.Context, channelID string) ([]string, error) {
 					return nil, nil
 				},
-				GetLineBotNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
+				GetLineBotNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotNotClient, error) {
 					return *lineBot, nil
 				},
-				GetLineBotIvNotClientFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
+				GetLineBotIvNotClientByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIvNotClient, error) {
 					return lineBotIv, nil
 				},
 			},

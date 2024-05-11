@@ -10,12 +10,12 @@ import (
 	"testing"
 
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
-	"github.com/maguro-alternative/remake_bot/testutil/mock"
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
-	"github.com/maguro-alternative/remake_bot/web/shared/session"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
+	"github.com/maguro-alternative/remake_bot/web/shared/session"
 
 	"github.com/gorilla/sessions"
 	"github.com/lib/pq"
@@ -68,14 +68,14 @@ func TestDiscordCallbackHandler_ServeHTTP(t *testing.T) {
 			CookieStore: cookieStore,
 		}
 		repo := &repository.RepositoryFuncMock{
-			GetAllColumnsLineBotFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
+			GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildId string) (repository.LineBot, error) {
 				return repository.LineBot{
-					GuildID:          "",
-					LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
-					LineClientID:     pq.ByteaArray{[]byte("lineClientID")},
+					GuildID:      "",
+					LineGroupID:  pq.ByteaArray{[]byte("lineGroupStr")},
+					LineClientID: pq.ByteaArray{[]byte("lineClientID")},
 				}, nil
 			},
-			GetAllColumnsLineBotIvFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+			GetAllColumnsLineBotIvByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
 				return repository.LineBotIv{
 					LineClientIDIv:     pq.ByteaArray{[]byte("decodeClientID")},
 					LineClientSecretIv: pq.ByteaArray{[]byte("decodeClientSecret")},

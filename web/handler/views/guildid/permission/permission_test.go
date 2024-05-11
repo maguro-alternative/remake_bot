@@ -66,7 +66,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		mux := http.NewServeMux()
 
 		repo := &repository.RepositoryFuncMock{
-			GetPermissionCodesFunc: func(ctx context.Context, guildID string) ([]repository.PermissionCode, error) {
+			GetPermissionCodesByGuildIDFunc: func(ctx context.Context, guildID string) ([]repository.PermissionCode, error) {
 				return []repository.PermissionCode{
 					{
 						GuildID: "123",
@@ -90,10 +90,10 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 					},
 				}, nil
 			},
-			GetGuildPermissionUserIDsAllColumnsFunc: func(ctx context.Context, guildID string) ([]repository.PermissionUserIDAllColumns, error) {
+			GetGuildPermissionUserIDsAllColumnsByGuildIDFunc: func(ctx context.Context, guildID string) ([]repository.PermissionUserIDAllColumns, error) {
 				return nil, nil
 			},
-			GetGuildPermissionRoleIDsAllColumnsFunc: func(ctx context.Context, guildID string) ([]repository.PermissionRoleIDAllColumns, error) {
+			GetGuildPermissionRoleIDsAllColumnsByGuildIDFunc: func(ctx context.Context, guildID string) ([]repository.PermissionRoleIDAllColumns, error) {
 				return nil, nil
 			},
 		}

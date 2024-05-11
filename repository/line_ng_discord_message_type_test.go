@@ -30,7 +30,7 @@ func TestGetLineNgDiscordMessageType(t *testing.T) {
 	)
 	repo := NewRepository(tx)
 	t.Run("GuildIDからNGタイプを取得できること", func(t *testing.T) {
-		ngTypes, err := repo.GetLineNgDiscordMessageType(ctx, "987654321")
+		ngTypes, err := repo.GetLineNgDiscordMessageTypeByChannelID(ctx, "987654321")
 		assert.NoError(t, err)
 		assert.Equal(t, []int{6}, ngTypes)
 	})

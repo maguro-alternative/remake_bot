@@ -45,7 +45,7 @@ func NewLineBotIv(
 	}
 }
 
-func (r *Repository) InsertLineBotIv(ctx context.Context, guildId string) error {
+func (r *Repository) InsertLineBotIvByGuildID(ctx context.Context, guildId string) error {
 	query := `
 		INSERT INTO line_bot_iv (
 			guild_id
@@ -57,7 +57,7 @@ func (r *Repository) InsertLineBotIv(ctx context.Context, guildId string) error 
 	return err
 }
 
-func (r *Repository) GetAllColumnsLineBotIv(ctx context.Context, guildID string) (LineBotIv, error) {
+func (r *Repository) GetAllColumnsLineBotIvByGuildID(ctx context.Context, guildID string) (LineBotIv, error) {
 	var lineBotIv LineBotIv
 	query := `
 		SELECT
@@ -76,7 +76,7 @@ func (r *Repository) GetAllColumnsLineBotIv(ctx context.Context, guildID string)
 	return lineBotIv, err
 }
 
-func (r *Repository) GetLineBotIvNotClient(ctx context.Context, guildID string) (LineBotIvNotClient, error) {
+func (r *Repository) GetLineBotIvNotClientByGuildID(ctx context.Context, guildID string) (LineBotIvNotClient, error) {
 	var lineBotIv LineBotIvNotClient
 	query := `
 		SELECT

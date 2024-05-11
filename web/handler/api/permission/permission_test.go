@@ -57,13 +57,13 @@ func TestPermissionHandler_ServeHTTP(t *testing.T) {
 				UpdatePermissionCodesFunc: func(ctx context.Context, permissionsCode []repository.PermissionCode) error {
 					return nil
 				},
-				DeletePermissionUserIDsFunc: func(ctx context.Context, guildId string) error {
+				DeletePermissionUserIDsByGuildIDFunc: func(ctx context.Context, guildId string) error {
 					return nil
 				},
 				InsertPermissionUserIDsFunc: func(ctx context.Context, permissionsID []repository.PermissionUserIDAllColumns) error {
 					return nil
 				},
-				DeletePermissionRoleIDsFunc: func(ctx context.Context, guildId string) error {
+				DeletePermissionRoleIDsByGuildIDFunc: func(ctx context.Context, guildId string) error {
 					return nil
 				},
 				InsertPermissionRoleIDsFunc: func(ctx context.Context, permissionsID []repository.PermissionRoleIDAllColumns) error {

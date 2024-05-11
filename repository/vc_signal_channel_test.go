@@ -99,7 +99,7 @@ func TestGetVcSignalChannel(t *testing.T) {
 
 	repo := NewRepository(tx)
 	t.Run("ボイスチャンネルの情報を取得できること", func(t *testing.T) {
-		vcSignalChannel, err := repo.GetVcSignalChannelAllColumn(ctx, "111")
+		vcSignalChannel, err := repo.GetVcSignalChannelAllColumnByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Equal(t, true, vcSignalChannel.SendSignal)
@@ -108,7 +108,7 @@ func TestGetVcSignalChannel(t *testing.T) {
 	})
 
 	t.Run("ボイスチャンネルの情報が存在しない場合はエラーを返すこと", func(t *testing.T) {
-		vcSignalChannel, err := repo.GetVcSignalChannelAllColumn(ctx, "444")
+		vcSignalChannel, err := repo.GetVcSignalChannelAllColumnByVcChannelID(ctx, "444")
 		assert.Error(t, err)
 		assert.Nil(t, vcSignalChannel)
 	})
@@ -156,7 +156,7 @@ func TestUpdateVcSignalChannel(t *testing.T) {
 		})
 		assert.NoError(t, err)
 
-		vcSignalChannel, err := repo.GetVcSignalChannelAllColumn(ctx, "111")
+		vcSignalChannel, err := repo.GetVcSignalChannelAllColumnByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Equal(t, false, vcSignalChannel.SendSignal)
@@ -213,7 +213,7 @@ func TestDeleteVcSignalChannel(t *testing.T) {
 
 	repo := NewRepository(tx)
 	t.Run("ボイスチャンネルの情報を削除できること", func(t *testing.T) {
-		err := repo.DeleteVcSignalChannel(ctx, "111")
+		err := repo.DeleteVcSignalChannelByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		var vcSignalChannel VcSignalChannelAllColumn
@@ -222,7 +222,7 @@ func TestDeleteVcSignalChannel(t *testing.T) {
 	})
 
 	t.Run("ボイスチャンネルの情報が存在しない場合反映されないこと", func(t *testing.T) {
-		err := repo.DeleteVcSignalChannel(ctx, "444")
+		err := repo.DeleteVcSignalChannelByVcChannelID(ctx, "444")
 		assert.NoError(t, err)
 
 		var vcSignalChannel VcSignalChannelAllColumn

@@ -133,4 +133,48 @@ func TestRepository_DeleteLineNgDiscordMessageTypes(t *testing.T) {
 
 		assert.Equal(t, 2, lineChannelCount)
 	})
+
+	t.Run("指定されたサーバーのNGなメッセージタイプがすべて削除されること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		_, err = tx.ExecContext(ctx, "DELETE FROM line_ng_discord_message_type")
+		assert.NoError(t, err)
+
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewLineNgDiscordMessageType(ctx, func(lnt *fixtures.LineNgDiscordMessageType) {
+				lnt.ChannelID = "123456789"
+				lnt.GuildID = "987654321"
+				lnt.Type = 6
+			}),
+			fixtures.NewLineNgDiscordMessageType(ctx, func(lnt *fixtures.LineNgDiscordMessageType) {
+				lnt.ChannelID = "123456789"
+				lnt.GuildID = "987654321"
+				lnt.Type = 7
+			}),
+			fixtures.NewLineNgDiscordMessageType(ctx, func(lnt *fixtures.LineNgDiscordMessageType) {
+				lnt.ChannelID = "987654321"
+				lnt.GuildID = "123456789"
+				lnt.Type = 6
+			}),
+		)
+
+		repo := NewRepository(tx)
+		insertLineNgDiscordTypes := []LineNgDiscordMessageType{}
+
+		err = repo.DeleteMessageTypesNotInProvidedList(ctx, "987654321", insertLineNgDiscordTypes)
+		assert.NoError(t, err)
+
+		var lineChannelCount int
+		err = tx.GetContext(ctx, &lineChannelCount, "SELECT COUNT(*) FROM line_ng_discord_message_type")
+		assert.NoError(t, err)
+
+		assert.Equal(t, 1, lineChannelCount)
+	})
 }

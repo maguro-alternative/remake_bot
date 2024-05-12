@@ -97,14 +97,17 @@ func TestRepository_DeleteLineNgDiscordMessageTypes(t *testing.T) {
 		f.Build(t,
 			fixtures.NewLineNgDiscordMessageType(ctx, func(lnt *fixtures.LineNgDiscordMessageType) {
 				lnt.ChannelID = "123456789"
+				lnt.GuildID = "987654321"
 				lnt.Type = 6
 			}),
 			fixtures.NewLineNgDiscordMessageType(ctx, func(lnt *fixtures.LineNgDiscordMessageType) {
 				lnt.ChannelID = "123456789"
+				lnt.GuildID = "987654321"
 				lnt.Type = 7
 			}),
 			fixtures.NewLineNgDiscordMessageType(ctx, func(lnt *fixtures.LineNgDiscordMessageType) {
 				lnt.ChannelID = "987654321"
+				lnt.GuildID = "123456789"
 				lnt.Type = 6
 			}),
 		)
@@ -121,7 +124,7 @@ func TestRepository_DeleteLineNgDiscordMessageTypes(t *testing.T) {
 			},
 		}
 
-		err = repo.DeleteMessageTypesNotInProvidedList(ctx, insertLineNgDiscordTypes)
+		err = repo.DeleteMessageTypesNotInProvidedList(ctx, "987654321", insertLineNgDiscordTypes)
 		assert.NoError(t, err)
 
 		var lineChannelCount int

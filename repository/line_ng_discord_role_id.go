@@ -55,7 +55,7 @@ func (r *Repository) InsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDisco
 	return nil
 }
 
-func (r *Repository) DeleteRoleIDsNotInProvidedList(ctx context.Context, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error {
+func (r *Repository) DeleteRoleIDsNotInProvidedList(ctx context.Context, guildId string, lineNgDiscordRoleIDs []LineNgDiscordRoleIDAllCoulmns) error {
 	query := `
 		DELETE FROM
 			line_ng_discord_role_id
@@ -63,6 +63,16 @@ func (r *Repository) DeleteRoleIDsNotInProvidedList(ctx context.Context, lineNgD
 			channel_id = ? AND
 			role_id NOT IN (?)
 	`
+	if len(lineNgDiscordRoleIDs) == 0 {
+		query = `
+			DELETE FROM
+				line_ng_discord_role_id
+			WHERE
+				guild_id = $1
+		`
+		_, err := r.db.ExecContext(ctx, query, guildId)
+		return err
+	}
 	idValues := make(map[string][]string)
 	for _, lineNgRole := range lineNgDiscordRoleIDs {
 		idValues[lineNgRole.ChannelID] = append(idValues[lineNgRole.ChannelID], lineNgRole.RoleID)

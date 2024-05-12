@@ -96,14 +96,17 @@ func TestRepository_DeleteLineNgDiscordUserIDs(t *testing.T) {
 		f.Build(t,
 			fixtures.NewLineNgDiscordUserID(ctx, func(lnt *fixtures.LineNgDiscordUserID) {
 				lnt.ChannelID = "123456789"
+				lnt.GuildID = "987654321"
 				lnt.UserID = "123456789"
 			}),
 			fixtures.NewLineNgDiscordUserID(ctx, func(lnt *fixtures.LineNgDiscordUserID) {
 				lnt.ChannelID = "123456789"
+				lnt.GuildID = "123456789"
 				lnt.UserID = "987654321"
 			}),
 			fixtures.NewLineNgDiscordUserID(ctx, func(lnt *fixtures.LineNgDiscordUserID) {
 				lnt.ChannelID = "987654321"
+				lnt.GuildID = "123456789"
 				lnt.UserID = "123456789"
 			}),
 		)
@@ -120,7 +123,7 @@ func TestRepository_DeleteLineNgDiscordUserIDs(t *testing.T) {
 			},
 		}
 
-		err = repo.DeleteUserIDsNotInProvidedList(ctx, insertLineNgDiscordIDs)
+		err = repo.DeleteUserIDsNotInProvidedList(ctx, "123456789", insertLineNgDiscordIDs)
 		assert.NoError(t, err)
 
 		var lineChannelCount int

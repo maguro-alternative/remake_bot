@@ -69,7 +69,7 @@ func TestLinePostDiscordChannelHandler_ServeHTTP(t *testing.T) {
 				InsertLineNgDiscordMessageTypesFunc: func(ctx context.Context, lineNgDiscordMessageTypes []repository.LineNgDiscordMessageType) error {
 					return nil
 				},
-				DeleteMessageTypesNotInProvidedListFunc: func(ctx context.Context, lineNgDiscordMessageTypes []repository.LineNgDiscordMessageType) error {
+				DeleteMessageTypesNotInProvidedListFunc: func(ctx context.Context, guildId string, lineNgDiscordMessageTypes []repository.LineNgDiscordMessageType) error {
 					return nil
 				},
 				InsertLineNgDiscordUserIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordUserIDAllCoulmns) error {
@@ -78,10 +78,10 @@ func TestLinePostDiscordChannelHandler_ServeHTTP(t *testing.T) {
 				InsertLineNgDiscordRoleIDsFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordRoleIDAllCoulmns) error {
 					return nil
 				},
-				DeleteUserIDsNotInProvidedListFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordUserIDAllCoulmns) error {
+				DeleteUserIDsNotInProvidedListFunc: func(ctx context.Context, guildId string, lineNgDiscordIDs []repository.LineNgDiscordUserIDAllCoulmns) error {
 					return nil
 				},
-				DeleteRoleIDsNotInProvidedListFunc: func(ctx context.Context, lineNgDiscordIDs []repository.LineNgDiscordRoleIDAllCoulmns) error {
+				DeleteRoleIDsNotInProvidedListFunc: func(ctx context.Context, guildId string, lineNgDiscordIDs []repository.LineNgDiscordRoleIDAllCoulmns) error {
 					return nil
 				},
 			},

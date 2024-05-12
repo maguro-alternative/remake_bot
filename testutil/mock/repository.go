@@ -23,10 +23,10 @@ type Repository interface {
 	GetLineNgDiscordRoleIDByChannelID(ctx context.Context, channelID string) ([]string, error)
 	InsertLineNgDiscordUserIDs(ctx context.Context, lineNgDiscordUserIDs []repository.LineNgDiscordUserIDAllCoulmns) error
 	InsertLineNgDiscordRoleIDs(ctx context.Context, lineNgDiscordRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns) error
-	DeleteUserIDsNotInProvidedList(ctx context.Context, lineNgDiscordUserIDs []repository.LineNgDiscordUserIDAllCoulmns) error
-	DeleteRoleIDsNotInProvidedList(ctx context.Context, lineNgDiscordRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns) error
+	DeleteUserIDsNotInProvidedList(ctx context.Context, guildId string, lineNgDiscordUserIDs []repository.LineNgDiscordUserIDAllCoulmns) error
+	DeleteRoleIDsNotInProvidedList(ctx context.Context, guildId string, lineNgDiscordRoleIDs []repository.LineNgDiscordRoleIDAllCoulmns) error
 	InsertLineNgDiscordMessageTypes(ctx context.Context, lineNgDiscordTypes []repository.LineNgDiscordMessageType) error
-	DeleteMessageTypesNotInProvidedList(ctx context.Context, lineNgDiscordTypes []repository.LineNgDiscordMessageType) error
+	DeleteMessageTypesNotInProvidedList(ctx context.Context, guildId string, lineNgDiscordTypes []repository.LineNgDiscordMessageType) error
 	GetLineNgDiscordMessageTypeByChannelID(ctx context.Context, channelID string) ([]int, error)
 	GetLinePostDiscordChannelByChannelID(ctx context.Context, channelID string) (repository.LinePostDiscordChannel, error)
 	UpdateLinePostDiscordChannel(ctx context.Context, lineChannel repository.LinePostDiscordChannelAllColumns) error

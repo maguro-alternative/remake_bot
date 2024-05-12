@@ -41,7 +41,7 @@ func (r *Repository) InsertLineNgDiscordMessageTypes(ctx context.Context, lineNg
 	return nil
 }
 
-func (r *Repository) DeleteMessageTypesNotInProvidedList(ctx context.Context, lineNgDiscordTypes []LineNgDiscordMessageType) error {
+func (r *Repository) DeleteMessageTypesNotInProvidedList(ctx context.Context, guildId string, lineNgDiscordTypes []LineNgDiscordMessageType) error {
 	query := `
 		DELETE FROM
 			line_ng_discord_message_type
@@ -49,6 +49,16 @@ func (r *Repository) DeleteMessageTypesNotInProvidedList(ctx context.Context, li
 			channel_id = ? AND
 			type NOT IN (?)
 	`
+	if len(lineNgDiscordTypes) == 0 {
+		query = `
+			DELETE FROM
+				line_ng_discord_message_type
+			WHERE
+				guild_id = $1
+		`
+		_, err := r.db.ExecContext(ctx, query, guildId)
+		return err
+	}
 	typeValues := make(map[string][]int)
 	for _, lineNgType := range lineNgDiscordTypes {
 		typeValues[lineNgType.ChannelID] = append(typeValues[lineNgType.ChannelID], lineNgType.Type)

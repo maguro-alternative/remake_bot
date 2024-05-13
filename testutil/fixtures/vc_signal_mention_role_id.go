@@ -8,14 +8,14 @@ import (
 type VcSignalMentionRoleID struct {
 	VcChannelID string `db:"vc_channel_id"`
 	GuildID     string `db:"guild_id"`
-	RoleID          string `db:"role_id"`
+	RoleID      string `db:"role_id"`
 }
 
-func NewVcSignalMentionID(ctx context.Context, setter ...func(b *VcSignalMentionRoleID)) *ModelConnector {
+func NewVcSignalMentionRoleID(ctx context.Context, setter ...func(b *VcSignalMentionRoleID)) *ModelConnector {
 	vcSignalMentionRoleID := &VcSignalMentionRoleID{
 		VcChannelID: "1111111111111",
 		GuildID:     "1111111111111",
-		RoleID:          "1111111111111",
+		RoleID:      "1111111111111",
 	}
 
 	return &ModelConnector{

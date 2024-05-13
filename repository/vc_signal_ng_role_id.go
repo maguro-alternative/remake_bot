@@ -27,7 +27,7 @@ func (r *Repository) InsertVcSignalNgRole(ctx context.Context, vcChannelID, guil
 	return err
 }
 
-func (r *Repository) GetVcSignalNgRolesByChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]*VcSignalNgRoleAllColumn, error) {
+func (r *Repository) GetVcSignalNgRolesByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]*VcSignalNgRoleAllColumn, error) {
 	var ngRoleIDs []*VcSignalNgRoleAllColumn
 	err := r.db.SelectContext(ctx, &ngRoleIDs, `
 		SELECT
@@ -43,7 +43,7 @@ func (r *Repository) GetVcSignalNgRolesByChannelIDAllColumn(ctx context.Context,
 	return ngRoleIDs, nil
 }
 
-func (r *Repository) DeleteVcNgRoleByChannelID(ctx context.Context, vcChannelID string) error {
+func (r *Repository) DeleteVcNgRoleByVcChannelID(ctx context.Context, vcChannelID string) error {
 	_, err := r.db.ExecContext(ctx, `
 		DELETE FROM
 			vc_signal_ng_role_id

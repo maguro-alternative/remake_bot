@@ -27,7 +27,7 @@ func (r *Repository) InsertVcSignalMentionRole(ctx context.Context, vcChannelID,
 	return err
 }
 
-func (r *Repository) GetVcSignalMentionRolesByChannelID(ctx context.Context, vcChannelID string) ([]*VcSignalMentionRole, error) {
+func (r *Repository) GetVcSignalMentionRolesByVcChannelID(ctx context.Context, vcChannelID string) ([]*VcSignalMentionRole, error) {
 	var mentionRoleIDs []*VcSignalMentionRole
 	err := r.db.SelectContext(ctx, &mentionRoleIDs, `
 		SELECT
@@ -55,7 +55,7 @@ func (r *Repository) DeleteVcSignalMentionRole(ctx context.Context, vcChannelID,
 	return err
 }
 
-func (r *Repository) DeleteVcSignalMentionRolesByChannelID(ctx context.Context, vcChannelID string) error {
+func (r *Repository) DeleteVcSignalMentionRolesByVcChannelID(ctx context.Context, vcChannelID string) error {
 	_, err := r.db.ExecContext(ctx, `
 		DELETE FROM
 			vc_signal_mention_role_id

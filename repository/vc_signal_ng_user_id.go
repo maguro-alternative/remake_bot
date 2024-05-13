@@ -27,7 +27,7 @@ func (r *Repository) InsertVcSignalNgUser(ctx context.Context, vcChannelID, guil
 	return err
 }
 
-func (r *Repository) GetVcSignalNgUsersByChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]*VcSignalNgUserAllColumn, error) {
+func (r *Repository) GetVcSignalNgUsersByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]*VcSignalNgUserAllColumn, error) {
 	var ngUserIDs []*VcSignalNgUserAllColumn
 	err := r.db.SelectContext(ctx, &ngUserIDs, `
 		SELECT
@@ -43,7 +43,7 @@ func (r *Repository) GetVcSignalNgUsersByChannelIDAllColumn(ctx context.Context,
 	return ngUserIDs, nil
 }
 
-func (r *Repository) DeleteVcNgUserByChannelID(ctx context.Context, vcChannelID string) error {
+func (r *Repository) DeleteVcNgUserByVcChannelID(ctx context.Context, vcChannelID string) error {
 	_, err := r.db.ExecContext(ctx, `
 		DELETE FROM
 			vc_signal_ng_user_id

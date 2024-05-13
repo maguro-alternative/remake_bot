@@ -93,7 +93,7 @@ func TestGetVcSignalNgRolesByChannelIDAllColumn(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		ngRoles, err := repo.GetVcSignalNgRolesByChannelIDAllColumn(ctx, "111")
+		ngRoles, err := repo.GetVcSignalNgRolesByVcChannelIDAllColumn(ctx, "111")
 		assert.NoError(t, err)
 		assert.Len(t, ngRoles, 2)
 	})
@@ -109,7 +109,7 @@ func TestGetVcSignalNgRolesByChannelIDAllColumn(t *testing.T) {
 
 		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_role_id")
 		repo := NewRepository(tx)
-		ngRoles, err := repo.GetVcSignalNgRolesByChannelIDAllColumn(ctx, "111")
+		ngRoles, err := repo.GetVcSignalNgRolesByVcChannelIDAllColumn(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Len(t, ngRoles, 0)
@@ -138,7 +138,7 @@ func TestDeleteVcSignalNgRoleID(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgRoleByChannelID(ctx, "111")
+		err = repo.DeleteVcNgRoleByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -158,7 +158,7 @@ func TestDeleteVcSignalNgRoleID(t *testing.T) {
 
 		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_role_id")
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgRoleByChannelID(ctx, "111")
+		err = repo.DeleteVcNgRoleByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn

@@ -101,7 +101,7 @@ func TestGetVcSignalMentionRolesByChannelID(t *testing.T) {
 			}),
 		)
 
-		mentionRoleIDs, err := repo.GetVcSignalMentionRolesByChannelID(ctx, "111")
+		mentionRoleIDs, err := repo.GetVcSignalMentionRolesByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Len(t, mentionRoleIDs, 1)
@@ -122,7 +122,7 @@ func TestGetVcSignalMentionRolesByChannelID(t *testing.T) {
 		tx.ExecContext(ctx, "DELETE FROM vc_signal_mention_role_id")
 		repo := NewRepository(tx)
 
-		mentionRoleIDs, err := repo.GetVcSignalMentionRolesByChannelID(ctx, "111")
+		mentionRoleIDs, err := repo.GetVcSignalMentionRolesByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Len(t, mentionRoleIDs, 0)
@@ -235,7 +235,7 @@ func TestDeleteVcSignalMentionRoleByChannelID(t *testing.T) {
 			}),
 		)
 
-		err = repo.DeleteVcSignalMentionRolesByChannelID(ctx, "111")
+		err = repo.DeleteVcSignalMentionRolesByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		var mentionRoleIDs []*VcSignalMentionRole
@@ -261,7 +261,7 @@ func TestDeleteVcSignalMentionRoleByChannelID(t *testing.T) {
 
 		repo := NewRepository(tx)
 
-		err = repo.DeleteVcSignalMentionRolesByChannelID(ctx, "111")
+		err = repo.DeleteVcSignalMentionRolesByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		var mentionRoleIDs []*VcSignalMentionRole

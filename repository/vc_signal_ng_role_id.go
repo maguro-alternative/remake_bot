@@ -81,6 +81,16 @@ func (r *Repository) DeleteRolesNotInProvidedList(ctx context.Context, vcChannel
 			vc_channel_id = ? AND
 			role_id NOT IN (?)
 	`
+	if len(roleIDs) == 0 {
+		query = `
+			DELETE FROM
+				vc_signal_ng_role_id
+			WHERE
+				vc_channel_id = $1
+		`
+		_, err := r.db.ExecContext(ctx, query, vcChannelID)
+		return err
+	}
 	query, args, err := db.In(query, vcChannelID, roleIDs)
 	if err != nil {
 		return err

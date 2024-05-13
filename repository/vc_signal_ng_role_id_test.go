@@ -376,5 +376,37 @@ func TestDeleteRolesNotInProvidedList(t *testing.T) {
 		assert.Len(t, ngRoles, 2)
 	})
 
+	t.Run("指定されたNgRoleID以外を削除できること(チャンネルidの指定のみの場合すべて削除)", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
 
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_role_id")
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewVcSignalNgRoleID(ctx, func(v *fixtures.VcSignalNgRoleID) {
+				v.VcChannelID = "111"
+				v.GuildID = "1111"
+				v.RoleID = "11111"
+			}),
+			fixtures.NewVcSignalNgRoleID(ctx, func(v *fixtures.VcSignalNgRoleID) {
+				v.VcChannelID = "111"
+				v.GuildID = "1111"
+				v.RoleID = "11112"
+			}),
+		)
+
+		repo := NewRepository(tx)
+		err = repo.DeleteRolesNotInProvidedList(ctx, "111", []string{})
+		assert.NoError(t, err)
+
+		var ngRoles []VcSignalNgRoleAllColumn
+		err = tx.SelectContext(ctx, &ngRoles, "SELECT * FROM vc_signal_ng_role_id")
+		assert.NoError(t, err)
+		assert.Len(t, ngRoles, 0)
+	})
 }

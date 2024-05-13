@@ -348,4 +348,39 @@ func TestDeleteNgUsersNotInProvidedList(t *testing.T) {
 
 		assert.Len(t, ngUsers, 2)
 	})
+
+	t.Run("指定したリストが空の場合、チャンネルidのものをすべて削除すること", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		assert.NoError(t, err)
+		defer cleanup()
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
+				v.VcChannelID = "111"
+				v.GuildID = "1111"
+				v.UserID = "11111"
+			}),
+			fixtures.NewVcSignalNgUserID(ctx, func(v *fixtures.VcSignalNgUserID) {
+				v.VcChannelID = "222"
+				v.GuildID = "2222"
+				v.UserID = "22222"
+			}),
+		)
+
+		repo := NewRepository(tx)
+		err = repo.DeleteNgUsersNotInProvidedList(ctx, "111", []string{})
+		assert.NoError(t, err)
+
+		var ngUsers []VcSignalNgUserAllColumn
+		err = tx.SelectContext(ctx, &ngUsers, "SELECT * FROM vc_signal_ng_user_id")
+		assert.NoError(t, err)
+
+		assert.Len(t, ngUsers, 1)
+	})
 }

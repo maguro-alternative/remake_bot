@@ -81,6 +81,16 @@ func (r *Repository) DeleteNgUsersNotInProvidedList(ctx context.Context, vcChann
 		vc_channel_id = ?
 		AND user_id NOT IN (?)
 	`
+	if len(userIDs) == 0 {
+		query = `
+		DELETE FROM
+			vc_signal_ng_user_id
+		WHERE
+			vc_channel_id = $1
+		`
+		_, err := r.db.ExecContext(ctx, query, vcChannelID)
+		return err
+	}
 	query, args, err := db.In(query, vcChannelID, userIDs)
 	if err != nil {
 		return err

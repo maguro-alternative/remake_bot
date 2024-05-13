@@ -27,7 +27,7 @@ func (r *Repository) InsertVcSignalMentionUser(ctx context.Context, vcChannelID,
 	return err
 }
 
-func (r *Repository) GetVcSignalMentionUsersByChannelID(ctx context.Context, channelID string) ([]*VcSignalMentionUser, error) {
+func (r *Repository) GetVcSignalMentionUsersByChannelID(ctx context.Context, vcChannelID string) ([]*VcSignalMentionUser, error) {
 	var mentionUserIDs []*VcSignalMentionUser
 	err := r.db.SelectContext(ctx, &mentionUserIDs, `
 		SELECT
@@ -36,7 +36,7 @@ func (r *Repository) GetVcSignalMentionUsersByChannelID(ctx context.Context, cha
 			vc_signal_mention_user_id
 		WHERE
 			vc_channel_id = $1
-	`, channelID)
+	`, vcChannelID)
 	if err != nil {
 		return nil, err
 	}
@@ -55,13 +55,13 @@ func (r *Repository) DeleteVcSignalMentionUser(ctx context.Context, vcChannelID,
 	return err
 }
 
-func (r *Repository) DeleteVcSignalMentionUsersByChannelID(ctx context.Context, channelID string) error {
+func (r *Repository) DeleteVcSignalMentionUsersByChannelID(ctx context.Context, vcChannelID string) error {
 	_, err := r.db.ExecContext(ctx, `
 		DELETE FROM
 			vc_signal_mention_user_id
 		WHERE
 			vc_channel_id = $1
-	`, channelID)
+	`, vcChannelID)
 	return err
 }
 
@@ -85,10 +85,7 @@ func (r *Repository) DeleteVcSignalMentionUsersByUserID(ctx context.Context, use
 	return err
 }
 
-func (r *Repository) DeleteVcSignalMentionUsersNotInProvidedList(ctx context.Context, channelID string, userIDs []string) error {
-	if len(userIDs) == 0 {
-		return nil
-	}
+func (r *Repository) DeleteVcSignalMentionUsersNotInProvidedList(ctx context.Context, vcChannelID string, userIDs []string) error {
 	query := `
 		DELETE FROM
 			vc_signal_mention_user_id
@@ -96,7 +93,17 @@ func (r *Repository) DeleteVcSignalMentionUsersNotInProvidedList(ctx context.Con
 			vc_channel_id = ?
 			AND user_id NOT IN (?)
 	`
-	query, args, err := db.In(query, channelID, userIDs)
+	if len(userIDs) == 0 {
+		query = `
+			DELETE FROM
+				vc_signal_mention_user_id
+			WHERE
+				vc_channel_id = $1
+		`
+		_, err := r.db.ExecContext(ctx, query, vcChannelID)
+		return err
+	}
+	query, args, err := db.In(query, vcChannelID, userIDs)
 	if err != nil {
 		return err
 	}

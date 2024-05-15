@@ -15,7 +15,7 @@ func (h *cogHandler) onVoiceStateUpdate(s *discordgo.Session, vs *discordgo.Voic
 	ctx := context.Background()
 	repo := repository.NewRepository(h.db)
 	slog.InfoContext(ctx, "OnVoiceStateUpdate")
-	_, err := h.onVoiceStateUpdateFunc(ctx, repo, s, vs)
+	_, err := h.onVoiceStateUpdateFunc(ctx, repo, s, s.State, vs)
 	if err != nil {
 		slog.ErrorContext(ctx, "", "", err.Error())
 	}
@@ -27,6 +27,7 @@ func (h *cogHandler) onVoiceStateUpdateFunc(
 	repo *repository.Repository,
 	//s mock.Session,
 	s *discordgo.Session,
+	state *discordgo.State,
 	m *discordgo.VoiceStateUpdate,
 ) ([]*discordgo.Message, error) {
 	slog.InfoContext(ctx, "OnVoiceStateUpdateFunc")
@@ -34,7 +35,6 @@ func (h *cogHandler) onVoiceStateUpdateFunc(
 	var sendText strings.Builder
 	var embed *discordgo.MessageEmbed
 	embed = nil
-	//p,_:=s.State.Presence(m.GuildID, m.UserID)
 	//slog.InfoContext(ctx, "OnVoiceStateUpdateFunc", "Presence", p.Activities[0].Name)
 	vcChannelID = m.ChannelID
 	if m.BeforeUpdate != nil {
@@ -70,7 +70,7 @@ func (h *cogHandler) onVoiceStateUpdateFunc(
 	if vcSignalChannel.SendChannelID == "" {
 		return nil, nil
 	}
-	if vcSignalChannel.JoinBot && m.UserID == s.State.User.ID {
+	if vcSignalChannel.JoinBot && m.UserID == state.User.ID {
 		return nil, nil
 	}
 	if vcSignalChannel.EveryoneMention {
@@ -102,10 +102,10 @@ func (h *cogHandler) onVoiceStateUpdateFunc(
 	}
 	chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
 	if chengeVcChannelFlag || m.ChannelID != "" {
-		sendText.WriteString("退室")
+		sendText.WriteString("入室")
 	}
 	if chengeVcChannelFlag || m.BeforeUpdate != nil {
-		sendText.WriteString("入室")
+		sendText.WriteString("退出")
 	}
 	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfVideo) && m.SelfVideo {
 		embed = &discordgo.MessageEmbed{
@@ -116,31 +116,49 @@ func (h *cogHandler) onVoiceStateUpdateFunc(
 				IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + ".webp?size=64",
 			},
 		}
-		s.ChannelMessageSendEmbed(vcChannelID, embed)
 		sendText.WriteString("ビデオON")
 	}
 	if (m.BeforeUpdate != nil && m.BeforeUpdate.SelfVideo) && !m.SelfVideo {
 		sendText.WriteString("ビデオOFF")
 	}
 	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfStream) && m.SelfStream {
-		embed = &discordgo.MessageEmbed{
-			Title:       "画面共有",
-			Description: m.Member.User.Username + "\n" + "<#" + m.ChannelID + ">",
-			/*Image: &discordgo.MessageEmbedImage{
-				URL: m.Member,
-			},*/
-			Author: &discordgo.MessageEmbedAuthor{
-				Name:    m.Member.User.Username,
-				IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + ".webp?size=64",
-			},
+		presence, err := state.Presence(m.GuildID, m.UserID)
+		if err != nil {
+			return nil, err
 		}
-		s.ChannelMessageSendEmbed(vcChannelID, embed)
-		sendText.WriteString("配信ON")
+		if len(presence.Activities) == 0 {
+			embed = &discordgo.MessageEmbed{
+				Title:       "画面共有",
+				Description: m.Member.User.Username + "\n" + "<#" + m.ChannelID + ">",
+				Author: &discordgo.MessageEmbedAuthor{
+					Name:    m.Member.User.Username,
+					IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + ".webp?size=64",
+				},
+			}
+			sendText.WriteString("配信ON")
+		} else {
+			embed = &discordgo.MessageEmbed{
+				Title:       "配信タイトル:" + presence.Activities[0].Name,
+				Description: m.Member.User.Username + "\n" + "<#" + m.ChannelID + ">",
+				Image: &discordgo.MessageEmbedImage{
+					URL: "https://cdn.discordapp.com/app-assets/" + presence.Activities[0].ApplicationID + "/" + presence.Activities[0].Assets.LargeImageID + ".png",
+				},
+				Author: &discordgo.MessageEmbedAuthor{
+					Name:    m.Member.User.Username,
+					IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + ".webp?size=64",
+				},
+			}
+			sendText.WriteString("配信ON")
+		}
 	}
 	if (m.BeforeUpdate != nil && m.BeforeUpdate.SelfStream) && !m.SelfStream {
 		sendText.WriteString("配信OFF")
 	}
 
 	_, err = s.ChannelMessageSend(vcSignalChannel.SendChannelID, sendText.String())
+	if err == nil && embed != nil {
+		_, err = s.ChannelMessageSendEmbed(vcSignalChannel.SendChannelID, embed)
+		return nil, err
+	}
 	return nil, err
 }

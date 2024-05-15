@@ -100,6 +100,8 @@ func (h *cogHandler) onVoiceStateUpdateFunc(
 			}
 		}
 	}
+	// 画像がアニメーションの場合はa_が先頭につく
+	//strings.HasPrefix(m.Member.Avatar, "a_")
 	chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
 	if chengeVcChannelFlag || m.ChannelID != "" {
 		sendText.WriteString("入室")

@@ -35,7 +35,6 @@ func onVoiceStateUpdateFunc(
 	var sendText strings.Builder
 	var embed *discordgo.MessageEmbed
 	embed = nil
-	//slog.InfoContext(ctx, "OnVoiceStateUpdateFunc", "Presence", p.Activities[0].Name)
 	vcChannelID = m.ChannelID
 	if m.BeforeUpdate != nil {
 		vcChannelID = m.BeforeUpdate.ChannelID

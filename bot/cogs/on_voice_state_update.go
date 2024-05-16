@@ -15,13 +15,13 @@ func (h *cogHandler) onVoiceStateUpdate(s *discordgo.Session, vs *discordgo.Voic
 	ctx := context.Background()
 	repo := repository.NewRepository(h.db)
 	slog.InfoContext(ctx, "OnVoiceStateUpdate")
-	_, err := h.onVoiceStateUpdateFunc(ctx, repo, s, s.State, vs)
+	_, err := onVoiceStateUpdateFunc(ctx, repo, s, s.State, vs)
 	if err != nil {
 		slog.ErrorContext(ctx, "", "", err.Error())
 	}
 }
 
-func (h *cogHandler) onVoiceStateUpdateFunc(
+func onVoiceStateUpdateFunc(
 	ctx context.Context,
 	//repo repository.RepositoryFunc,
 	repo *repository.Repository,

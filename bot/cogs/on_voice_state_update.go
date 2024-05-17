@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/maguro-alternative/remake_bot/repository"
-	//"github.com/maguro-alternative/remake_bot/testutil/mock"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -23,10 +23,10 @@ func (h *cogHandler) onVoiceStateUpdate(s *discordgo.Session, vs *discordgo.Voic
 
 func onVoiceStateUpdateFunc(
 	ctx context.Context,
-	//repo repository.RepositoryFunc,
-	repo *repository.Repository,
-	//s mock.Session,
-	s *discordgo.Session,
+	repo repository.RepositoryFunc,
+	//repo *repository.Repository,
+	s mock.Session,
+	//s *discordgo.Session,
 	state *discordgo.State,
 	m *discordgo.VoiceStateUpdate,
 ) ([]*discordgo.Message, error) {

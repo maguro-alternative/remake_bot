@@ -13,6 +13,7 @@ type SessionMock struct {
 	ChannelFunc                    func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error)
 	ChannelMessageSendFunc         func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error)
 	ChannelFileSendWithMessageFunc func(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error)
+	ChannelMessageSendEmbedFunc func(channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error)
 	GuildFunc                      func(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error)
 	GuildChannelsFunc              func(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Channel, err error)
 	GuildMemberFunc                func(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error)
@@ -45,6 +46,10 @@ func (s *SessionMock) ChannelMessageSend(channelID string, content string, optio
 
 func (s *SessionMock) ChannelFileSendWithMessage(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error) {
 	return s.ChannelFileSendWithMessageFunc(channelID, content, name, r, options...)
+}
+
+func (s *SessionMock) ChannelMessageSendEmbed(channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+	return s.ChannelMessageSendEmbedFunc(channelID, embed, options...)
 }
 
 func (s *SessionMock) Guild(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error) {
@@ -87,6 +92,7 @@ type Session interface {
 	Channel(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error)
 	ChannelMessageSend(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error)
 	ChannelFileSendWithMessage(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error)
+	ChannelMessageSendEmbed(channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error)
 	Guild(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error)
 	GuildChannels(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Channel, err error)
 	GuildMember(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error)

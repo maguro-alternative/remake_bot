@@ -102,7 +102,7 @@ func onVoiceStateUpdateFunc(
 	// 画像がアニメーションの場合はa_が先頭につく
 	//strings.HasPrefix(m.Member.Avatar, "a_")
 	//chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
-	if m.ChannelID != ""  && (!m.SelfVideo == !m.SelfStream) {
+	if m.BeforeUpdate == nil || m.ChannelID != ""  && (!m.SelfVideo == !m.SelfStream) && (m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream)) {
 		sendText.WriteString("入室")
 	}
 	if m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) && (!m.SelfVideo == !m.SelfStream) {

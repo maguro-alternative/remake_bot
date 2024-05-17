@@ -101,11 +101,11 @@ func onVoiceStateUpdateFunc(
 	}
 	// 画像がアニメーションの場合はa_が先頭につく
 	//strings.HasPrefix(m.Member.Avatar, "a_")
-	chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
-	if chengeVcChannelFlag || m.ChannelID != "" {
+	//chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
+	if m.ChannelID != ""  && (!m.SelfVideo == !m.SelfStream) {
 		sendText.WriteString("入室")
 	}
-	if chengeVcChannelFlag || m.BeforeUpdate != nil {
+	if m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) && (!m.SelfVideo == !m.SelfStream) {
 		sendText.WriteString("退出")
 	}
 	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfVideo) && m.SelfVideo {

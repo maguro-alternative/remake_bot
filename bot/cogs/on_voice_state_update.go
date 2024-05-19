@@ -24,18 +24,17 @@ func (h *cogHandler) onVoiceStateUpdate(s *discordgo.Session, vs *discordgo.Voic
 func onVoiceStateUpdateFunc(
 	ctx context.Context,
 	repo repository.RepositoryFunc,
-	//repo *repository.Repository,
 	s mock.Session,
-	//s *discordgo.Session,
 	state *discordgo.State,
 	m *discordgo.VoiceStateUpdate,
 ) ([]*discordgo.Message, error) {
 	slog.InfoContext(ctx, "OnVoiceStateUpdateFunc")
-	var vcChannelID string
-	var sendText strings.Builder
+	var vcChannelID, format string
+	var sendText, mentionText strings.Builder
 	var embed *discordgo.MessageEmbed
 	embed = nil
 	vcChannelID = m.ChannelID
+	format = ".png"
 	if m.BeforeUpdate != nil {
 		vcChannelID = m.BeforeUpdate.ChannelID
 	}
@@ -73,7 +72,7 @@ func onVoiceStateUpdateFunc(
 		return nil, nil
 	}
 	if vcSignalChannel.EveryoneMention {
-		sendText.WriteString("@everyone ")
+		mentionText.WriteString("@everyone ")
 	}
 	mentionUserIDs, err := repo.GetVcSignalMentionUsersByVcChannelID(ctx, vcChannelID)
 	if err != nil {
@@ -81,9 +80,9 @@ func onVoiceStateUpdateFunc(
 	}
 	for _, mentionUser := range mentionUserIDs {
 		if mentionUser.UserID == m.UserID {
-			sendText.WriteString("<@!")
-			sendText.WriteString(m.UserID)
-			sendText.WriteString("> ")
+			mentionText.WriteString("<@!")
+			mentionText.WriteString(m.UserID)
+			mentionText.WriteString("> ")
 		}
 	}
 	mentionRoleIDs, err := repo.GetVcSignalMentionRolesByVcChannelID(ctx, vcChannelID)
@@ -93,16 +92,19 @@ func onVoiceStateUpdateFunc(
 	for _, mentionRole := range mentionRoleIDs {
 		for _, roleID := range m.Member.Roles {
 			if mentionRole.RoleID == roleID {
-				sendText.WriteString("<@&")
-				sendText.WriteString(roleID)
-				sendText.WriteString("> ")
+				mentionText.WriteString("<@&")
+				mentionText.WriteString(roleID)
+				mentionText.WriteString("> ")
 			}
 		}
 	}
 	// 画像がアニメーションの場合はa_が先頭につく
-	//strings.HasPrefix(m.Member.Avatar, "a_")
+	if strings.HasPrefix(m.Member.Avatar, "a_") {
+		format = ".gif"
+	}
 	//chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
 	if m.BeforeUpdate == nil || m.ChannelID != ""  && (!m.SelfVideo == !m.SelfStream) && (m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream)) {
+		sendText.WriteString(mentionText.String())
 		sendText.WriteString("入室")
 	}
 	if m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) && (!m.SelfVideo == !m.SelfStream) {
@@ -114,9 +116,10 @@ func onVoiceStateUpdateFunc(
 			Description: m.Member.User.Username + "\n" + "<#" + m.ChannelID + ">",
 			Author: &discordgo.MessageEmbedAuthor{
 				Name:    m.Member.User.Username,
-				IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + ".webp?size=64",
+				IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + format,
 			},
 		}
+		sendText.WriteString(mentionText.String())
 		sendText.WriteString("ビデオON")
 	}
 	if (m.BeforeUpdate != nil && m.BeforeUpdate.SelfVideo) && !m.SelfVideo {
@@ -133,9 +136,10 @@ func onVoiceStateUpdateFunc(
 				Description: m.Member.User.Username + "\n" + "<#" + m.ChannelID + ">",
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    m.Member.User.Username,
-					IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + ".webp?size=64",
+					IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + format,
 				},
 			}
+			sendText.WriteString(mentionText.String())
 			sendText.WriteString("配信ON")
 		} else {
 			embed = &discordgo.MessageEmbed{
@@ -146,9 +150,10 @@ func onVoiceStateUpdateFunc(
 				},
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    m.Member.User.Username,
-					IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + ".webp?size=64",
+					IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + format,
 				},
 			}
+			sendText.WriteString(mentionText.String())
 			sendText.WriteString("配信ON")
 		}
 	}

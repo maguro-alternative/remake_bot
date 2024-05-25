@@ -29,12 +29,12 @@ func onVoiceStateUpdateFunc(
 	m *discordgo.VoiceStateUpdate,
 ) ([]*discordgo.Message, error) {
 	slog.InfoContext(ctx, "OnVoiceStateUpdateFunc")
-	var vcChannelID, format string
+	var vcChannelID string
 	var sendText, mentionText strings.Builder
 	var embed *discordgo.MessageEmbed
+	var sendMessages []*discordgo.Message
 	embed = nil
 	vcChannelID = m.ChannelID
-	format = ".png"
 	if m.BeforeUpdate != nil {
 		vcChannelID = m.BeforeUpdate.ChannelID
 	}
@@ -98,16 +98,16 @@ func onVoiceStateUpdateFunc(
 			}
 		}
 	}
-	// 画像がアニメーションの場合はa_が先頭につく
-	if strings.HasPrefix(m.Member.Avatar, "a_") {
-		format = ".gif"
-	}
 	//chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
 	if m.BeforeUpdate == nil || m.ChannelID != ""  && (!m.SelfVideo == !m.SelfStream) && (m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream)) {
+		c,_:=state.Channel(m.ChannelID)
+		slog.InfoContext(ctx,"","int",c.MemberCount)
 		sendText.WriteString(mentionText.String())
 		sendText.WriteString("入室")
 	}
 	if m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) && (!m.SelfVideo == !m.SelfStream) {
+		c,_:=state.Channel(m.BeforeUpdate.ChannelID)
+		slog.InfoContext(ctx,"","int",len(c.Members))
 		sendText.WriteString("退出")
 	}
 	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfVideo) && m.SelfVideo {
@@ -116,7 +116,7 @@ func onVoiceStateUpdateFunc(
 			Description: m.Member.User.Username + "\n" + "<#" + m.ChannelID + ">",
 			Author: &discordgo.MessageEmbedAuthor{
 				Name:    m.Member.User.Username,
-				IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + format,
+				IconURL: m.Member.AvatarURL("64"),
 			},
 		}
 		sendText.WriteString(mentionText.String())
@@ -136,7 +136,7 @@ func onVoiceStateUpdateFunc(
 				Description: m.Member.User.Username + "\n" + "<#" + m.ChannelID + ">",
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    m.Member.User.Username,
-					IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + format,
+					IconURL: m.Member.AvatarURL("64"),
 				},
 			}
 			sendText.WriteString(mentionText.String())
@@ -150,7 +150,7 @@ func onVoiceStateUpdateFunc(
 				},
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    m.Member.User.Username,
-					IconURL: "https://cdn.discordapp.com/avatars/" + m.Member.User.ID + "/" + m.Member.Avatar + format,
+					IconURL:m.Member.AvatarURL("64"),
 				},
 			}
 			sendText.WriteString(mentionText.String())
@@ -164,7 +164,7 @@ func onVoiceStateUpdateFunc(
 	_, err = s.ChannelMessageSend(vcSignalChannel.SendChannelID, sendText.String())
 	if err == nil && embed != nil {
 		_, err = s.ChannelMessageSendEmbed(vcSignalChannel.SendChannelID, embed)
-		return nil, err
+		return sendMessages, err
 	}
-	return nil, err
+	return sendMessages, err
 }

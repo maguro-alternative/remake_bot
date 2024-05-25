@@ -3,6 +3,7 @@ package cogs
 import (
 	"context"
 	"log/slog"
+	"strconv"
 	"strings"
 
 	"github.com/maguro-alternative/remake_bot/repository"
@@ -35,9 +36,16 @@ func onVoiceStateUpdateFunc(
 	var sendMessages []*discordgo.Message
 	embed = nil
 	vcChannelID = m.ChannelID
+	guildId := m.GuildID
 	if m.BeforeUpdate != nil {
 		vcChannelID = m.BeforeUpdate.ChannelID
+		guildId = m.BeforeUpdate.GuildID
 	}
+	vcChannel, err := state.Channel(vcChannelID)
+	if err != nil {
+		return nil, err
+	}
+	membersCount := vcMembersCount(state, guildId, vcChannelID)
 	ngUserIDs, err := repo.GetVcSignalNgUsersByVcChannelIDAllColumn(ctx, vcChannelID)
 	if err != nil {
 		return nil, err
@@ -80,7 +88,7 @@ func onVoiceStateUpdateFunc(
 	}
 	for _, mentionUser := range mentionUserIDs {
 		if mentionUser.UserID == m.UserID {
-			mentionText.WriteString("<@!")
+			mentionText.WriteString("<@")
 			mentionText.WriteString(m.UserID)
 			mentionText.WriteString("> ")
 		}
@@ -101,10 +109,10 @@ func onVoiceStateUpdateFunc(
 	//chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
 	if m.BeforeUpdate == nil || m.ChannelID != ""  && (!m.SelfVideo == !m.SelfStream) && (m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream)) {
 		sendText.WriteString(mentionText.String())
-		sendText.WriteString("入室")
+		sendText.WriteString("現在"+strconv.Itoa(membersCount)+"人 <@"+m.Member.User.ID+"> が "+ vcChannel.Name +"に入室しました。")
 	}
 	if m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) && (!m.SelfVideo == !m.SelfStream) {
-		sendText.WriteString("退出")
+		sendText.WriteString("現在"+strconv.Itoa(membersCount)+"人 <@"+m.Member.User.ID+"> が "+ vcChannel.Name +"から退室しました。")
 	}
 	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfVideo) && m.SelfVideo {
 		embed = &discordgo.MessageEmbed{
@@ -116,10 +124,10 @@ func onVoiceStateUpdateFunc(
 			},
 		}
 		sendText.WriteString(mentionText.String())
-		sendText.WriteString("ビデオON")
+		sendText.WriteString("<@"+m.Member.User.ID+"> が"+vcChannel.Name+"カメラ配信を開始しました。")
 	}
 	if (m.BeforeUpdate != nil && m.BeforeUpdate.SelfVideo) && !m.SelfVideo {
-		sendText.WriteString("ビデオOFF")
+		sendText.WriteString("<@"+m.Member.User.ID+"> がカメラ配信を終了しました。")
 	}
 	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfStream) && m.SelfStream {
 		presence, err := state.Presence(m.GuildID, m.UserID)
@@ -136,7 +144,7 @@ func onVoiceStateUpdateFunc(
 				},
 			}
 			sendText.WriteString(mentionText.String())
-			sendText.WriteString("配信ON")
+			sendText.WriteString("<@"+m.Member.User.ID+"> が"+vcChannel.Name+"で画面共有を開始しました。")
 		} else {
 			embed = &discordgo.MessageEmbed{
 				Title:       "配信タイトル:" + presence.Activities[0].Name,
@@ -150,11 +158,11 @@ func onVoiceStateUpdateFunc(
 				},
 			}
 			sendText.WriteString(mentionText.String())
-			sendText.WriteString("配信ON")
+			sendText.WriteString("<@"+m.Member.User.ID+"> が"+vcChannel.Name+"で"+presence.Activities[0].Name+"を配信開始しました。")
 		}
 	}
 	if (m.BeforeUpdate != nil && m.BeforeUpdate.SelfStream) && !m.SelfStream {
-		sendText.WriteString("配信OFF")
+		sendText.WriteString("<@"+m.Member.User.ID+"> が画面共有を終了しました。")
 	}
 
 	_, err = s.ChannelMessageSend(vcSignalChannel.SendChannelID, sendText.String())
@@ -163,4 +171,18 @@ func onVoiceStateUpdateFunc(
 		return sendMessages, err
 	}
 	return sendMessages, err
+}
+
+func vcMembersCount(state *discordgo.State, guildID, vcChannelID string) int {
+	guild, err := state.Guild(guildID)
+	if err != nil {
+		return 0
+	}
+	memberCount := 0
+	for _, voiceState := range guild.VoiceStates {
+		if voiceState.ChannelID == vcChannelID {
+			memberCount++
+		}
+	}
+	return memberCount
 }

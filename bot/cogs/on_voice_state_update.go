@@ -100,14 +100,10 @@ func onVoiceStateUpdateFunc(
 	}
 	//chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
 	if m.BeforeUpdate == nil || m.ChannelID != ""  && (!m.SelfVideo == !m.SelfStream) && (m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream)) {
-		c,_:=state.Channel(m.ChannelID)
-		slog.InfoContext(ctx,"","int",c.MemberCount)
 		sendText.WriteString(mentionText.String())
 		sendText.WriteString("入室")
 	}
 	if m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) && (!m.SelfVideo == !m.SelfStream) {
-		c,_:=state.Channel(m.BeforeUpdate.ChannelID)
-		slog.InfoContext(ctx,"","int",len(c.Members))
 		sendText.WriteString("退出")
 	}
 	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfVideo) && m.SelfVideo {

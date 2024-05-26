@@ -27,24 +27,23 @@ func onVoiceStateUpdateFunc(
 	repo repository.RepositoryFunc,
 	s mock.Session,
 	state *discordgo.State,
-	m *discordgo.VoiceStateUpdate,
+	vs *discordgo.VoiceStateUpdate,
 ) ([]*discordgo.Message, error) {
-	var vcChannelID string
 	var sendText, mentionText strings.Builder
 	var embed *discordgo.MessageEmbed
 	var sendMessages []*discordgo.Message
 	embed = nil
-	vcChannelID = m.ChannelID
-	guildId := m.GuildID
-	if m.BeforeUpdate != nil {
-		vcChannelID = m.BeforeUpdate.ChannelID
-		guildId = m.BeforeUpdate.GuildID
+	vcChannelID := vs.ChannelID
+	guildId := vs.GuildID
+	if vs.BeforeUpdate != nil {
+		vcChannelID = vs.BeforeUpdate.ChannelID
+		guildId = vs.BeforeUpdate.GuildID
 	}
 	vcChannel, err := state.Channel(vcChannelID)
 	if err != nil {
 		return nil, err
 	}
-	if m.BeforeUpdate != nil && (m.BeforeUpdate.SelfDeaf != m.SelfDeaf || m.BeforeUpdate.SelfMute != m.SelfMute) {
+	if vs.BeforeUpdate != nil && (vs.BeforeUpdate.SelfDeaf != vs.SelfDeaf || vs.BeforeUpdate.SelfMute != vs.SelfMute) {
 		return nil, nil
 	}
 	ngUserIDs, err := repo.GetVcSignalNgUsersByVcChannelIDAllColumn(ctx, vcChannelID)
@@ -52,7 +51,7 @@ func onVoiceStateUpdateFunc(
 		return nil, err
 	}
 	for _, ngUser := range ngUserIDs {
-		if ngUser.UserID == m.UserID {
+		if ngUser.UserID == vs.UserID {
 			return nil, nil
 		}
 	}
@@ -61,7 +60,7 @@ func onVoiceStateUpdateFunc(
 		return nil, err
 	}
 	for _, ngRole := range ngRoleIDs {
-		for _, roleID := range m.Member.Roles {
+		for _, roleID := range vs.Member.Roles {
 			if ngRole.RoleID == roleID {
 				return nil, nil
 			}
@@ -77,7 +76,7 @@ func onVoiceStateUpdateFunc(
 	if vcSignalChannel.SendChannelID == "" {
 		return nil, nil
 	}
-	if vcSignalChannel.JoinBot && m.UserID == state.User.ID {
+	if vcSignalChannel.JoinBot && vs.UserID == state.User.ID {
 		return nil, nil
 	}
 	if vcSignalChannel.EveryoneMention {
@@ -88,9 +87,9 @@ func onVoiceStateUpdateFunc(
 		return nil, err
 	}
 	for _, mentionUser := range mentionUserIDs {
-		if mentionUser.UserID == m.UserID {
+		if mentionUser.UserID == vs.UserID {
 			mentionText.WriteString("<@")
-			mentionText.WriteString(m.UserID)
+			mentionText.WriteString(vs.UserID)
 			mentionText.WriteString("> ")
 		}
 	}
@@ -99,7 +98,7 @@ func onVoiceStateUpdateFunc(
 		return nil, err
 	}
 	for _, mentionRole := range mentionRoleIDs {
-		for _, roleID := range m.Member.Roles {
+		for _, roleID := range vs.Member.Roles {
 			if mentionRole.RoleID == roleID {
 				mentionText.WriteString("<@&")
 				mentionText.WriteString(roleID)
@@ -107,22 +106,22 @@ func onVoiceStateUpdateFunc(
 			}
 		}
 	}
-	//chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
-	if m.BeforeUpdate == nil || m.ChannelID != "" && (!m.SelfVideo == !m.SelfStream) && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) {
-		vcChannel, err = state.Channel(m.ChannelID)
+	//chengeVcChannelFlag := (vs.BeforeUpdate != nil) && (vs.ChannelID != "") && (vs.BeforeUpdate.ChannelID != vs.ChannelID)
+	if vs.BeforeUpdate == nil || vs.ChannelID != "" && (!vs.SelfVideo == !vs.SelfStream) && (!vs.BeforeUpdate.SelfVideo == !vs.BeforeUpdate.SelfStream) {
+		vcChannel, err = state.Channel(vs.ChannelID)
 		if err != nil {
 			return nil, err
 		}
-		membersCount := vcMembersCount(state, guildId, m.ChannelID)
+		membersCount := vcMembersCount(state, guildId, vs.ChannelID)
 		sendText.WriteString(mentionText.String())
-		sendText.WriteString("現在" + strconv.Itoa(membersCount) + "人 <@" + m.Member.User.ID + "> が " + vcChannel.Name + "に入室しました。")
+		sendText.WriteString("現在" + strconv.Itoa(membersCount) + "人 <@" + vs.Member.User.ID + "> が " + vcChannel.Name + "に入室しました。")
 		if membersCount == 1 {
 			embed = &discordgo.MessageEmbed{
 				Title:       "通話開始",
-				Description: "<#" + m.ChannelID + ">",
+				Description: "<#" + vs.ChannelID + ">",
 				Author: &discordgo.MessageEmbedAuthor{
-					Name:    m.Member.User.Username,
-					IconURL: m.Member.AvatarURL("64"),
+					Name:    vs.Member.User.Username,
+					IconURL: vs.Member.AvatarURL("64"),
 				},
 			}
 		}
@@ -133,13 +132,13 @@ func onVoiceStateUpdateFunc(
 		sendMessages = append(sendMessages, sendMessage)
 		sendText.Reset()
 	}
-	if m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) && (!m.SelfVideo == !m.SelfStream) {
-		vcChannel, err = state.Channel(m.BeforeUpdate.ChannelID)
+	if vs.BeforeUpdate != nil && (!vs.BeforeUpdate.SelfVideo == !vs.BeforeUpdate.SelfStream) && (!vs.SelfVideo == !vs.SelfStream) {
+		vcChannel, err = state.Channel(vs.BeforeUpdate.ChannelID)
 		if err != nil {
 			return nil, err
 		}
-		membersCount := vcMembersCount(state, guildId, m.BeforeUpdate.ChannelID)
-		sendText.WriteString("現在" + strconv.Itoa(membersCount) + "人 <@" + m.Member.User.ID + "> が " + vcChannel.Name + "から退室しました。")
+		membersCount := vcMembersCount(state, guildId, vs.BeforeUpdate.ChannelID)
+		sendText.WriteString("現在" + strconv.Itoa(membersCount) + "人 <@" + vs.Member.User.ID + "> が " + vcChannel.Name + "から退室しました。")
 		sendMessage, err := s.ChannelMessageSend(vcSignalChannel.SendChannelID, sendText.String())
 		if err != nil {
 			return nil, err
@@ -163,17 +162,17 @@ func onVoiceStateUpdateFunc(
 			}
 		}
 	}
-	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfVideo) && m.SelfVideo {
+	if (vs.BeforeUpdate != nil && !vs.BeforeUpdate.SelfVideo) && vs.SelfVideo {
 		embed = &discordgo.MessageEmbed{
 			Title:       "カメラ配信",
-			Description: m.Member.User.Username + "\n" + "<#" + m.ChannelID + ">",
+			Description: vs.Member.User.Username + "\n" + "<#" + vs.ChannelID + ">",
 			Author: &discordgo.MessageEmbedAuthor{
-				Name:    m.Member.User.Username,
-				IconURL: m.Member.AvatarURL("64"),
+				Name:    vs.Member.User.Username,
+				IconURL: vs.Member.AvatarURL("64"),
 			},
 		}
 		sendText.WriteString(mentionText.String())
-		sendText.WriteString("<@" + m.Member.User.ID + "> が" + vcChannel.Name + "カメラ配信を開始しました。")
+		sendText.WriteString("<@" + vs.Member.User.ID + "> が" + vcChannel.Name + "カメラ配信を開始しました。")
 		sendMessage, err := s.ChannelMessageSend(vcSignalChannel.SendChannelID, sendText.String())
 		if err != nil {
 			return nil, err
@@ -181,8 +180,8 @@ func onVoiceStateUpdateFunc(
 		sendMessages = append(sendMessages, sendMessage)
 		sendText.Reset()
 	}
-	if (m.BeforeUpdate != nil && m.BeforeUpdate.SelfVideo) && !m.SelfVideo {
-		sendText.WriteString("<@" + m.Member.User.ID + "> がカメラ配信を終了しました。")
+	if (vs.BeforeUpdate != nil && vs.BeforeUpdate.SelfVideo) && !vs.SelfVideo {
+		sendText.WriteString("<@" + vs.Member.User.ID + "> がカメラ配信を終了しました。")
 		sendMessage, err := s.ChannelMessageSend(vcSignalChannel.SendChannelID, sendText.String())
 		if err != nil {
 			return nil, err
@@ -190,22 +189,22 @@ func onVoiceStateUpdateFunc(
 		sendMessages = append(sendMessages, sendMessage)
 		sendText.Reset()
 	}
-	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfStream) && m.SelfStream {
-		presence, err := state.Presence(m.GuildID, m.UserID)
+	if (vs.BeforeUpdate != nil && !vs.BeforeUpdate.SelfStream) && vs.SelfStream {
+		presence, err := state.Presence(vs.GuildID, vs.UserID)
 		if err != nil {
 			return nil, err
 		}
 		if len(presence.Activities) == 0 {
 			embed = &discordgo.MessageEmbed{
 				Title:       "画面共有",
-				Description: m.Member.User.Username + "\n" + "<#" + m.ChannelID + ">",
+				Description: vs.Member.User.Username + "\n" + "<#" + vs.ChannelID + ">",
 				Author: &discordgo.MessageEmbedAuthor{
-					Name:    m.Member.User.Username,
-					IconURL: m.Member.AvatarURL("64"),
+					Name:    vs.Member.User.Username,
+					IconURL: vs.Member.AvatarURL("64"),
 				},
 			}
 			sendText.WriteString(mentionText.String())
-			sendText.WriteString("<@" + m.Member.User.ID + "> が" + vcChannel.Name + "で画面共有を開始しました。")
+			sendText.WriteString("<@" + vs.Member.User.ID + "> が" + vcChannel.Name + "で画面共有を開始しました。")
 			sendMessage, err := s.ChannelMessageSend(vcSignalChannel.SendChannelID, sendText.String())
 			if err != nil {
 				return nil, err
@@ -215,17 +214,17 @@ func onVoiceStateUpdateFunc(
 		} else {
 			embed = &discordgo.MessageEmbed{
 				Title:       "配信タイトル:" + presence.Activities[0].Name,
-				Description: m.Member.User.Username + "\n" + "<#" + m.ChannelID + ">",
+				Description: vs.Member.User.Username + "\n" + "<#" + vs.ChannelID + ">",
 				Image: &discordgo.MessageEmbedImage{
 					URL: "https://cdn.discordapp.com/app-assets/" + presence.Activities[0].ApplicationID + "/" + presence.Activities[0].Assets.LargeImageID + ".png",
 				},
 				Author: &discordgo.MessageEmbedAuthor{
-					Name:    m.Member.User.Username,
-					IconURL: m.Member.AvatarURL("64"),
+					Name:    vs.Member.User.Username,
+					IconURL: vs.Member.AvatarURL("64"),
 				},
 			}
 			sendText.WriteString(mentionText.String())
-			sendText.WriteString("<@" + m.Member.User.ID + "> が" + vcChannel.Name + "で" + presence.Activities[0].Name + "を配信開始しました。")
+			sendText.WriteString("<@" + vs.Member.User.ID + "> が" + vcChannel.Name + "で" + presence.Activities[0].Name + "を配信開始しました。")
 			sendMessage, err := s.ChannelMessageSend(vcSignalChannel.SendChannelID, sendText.String())
 			if err != nil {
 				return nil, err
@@ -234,8 +233,8 @@ func onVoiceStateUpdateFunc(
 			sendText.Reset()
 		}
 	}
-	if (m.BeforeUpdate != nil && m.BeforeUpdate.SelfStream) && !m.SelfStream {
-		sendText.WriteString("<@" + m.Member.User.ID + "> が画面共有を終了しました。")
+	if (vs.BeforeUpdate != nil && vs.BeforeUpdate.SelfStream) && !vs.SelfStream {
+		sendText.WriteString("<@" + vs.Member.User.ID + "> が画面共有を終了しました。")
 		sendMessage, err := s.ChannelMessageSend(vcSignalChannel.SendChannelID, sendText.String())
 		if err != nil {
 			return nil, err

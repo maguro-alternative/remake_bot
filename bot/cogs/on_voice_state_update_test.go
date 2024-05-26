@@ -14,9 +14,12 @@ import (
 
 func TestVcSignal(t *testing.T) {
 	ctx := context.Background()
-	userid := "11"
-	username := "testuser"
-	useravater := "a_"
+	testUser := &discordgo.User{
+		ID:       "11",
+		Username: "testuser",
+		Avatar:   "a_",
+		Bot:      false,
+	}
 	beforeGuildId := "111"
 	afterGuildId := "222"
 	beforeChannelId := "1111"
@@ -46,12 +49,7 @@ func TestVcSignal(t *testing.T) {
 				GuildID:   afterGuildId,
 					ChannelID: afterChannelId,
 					Member: &discordgo.Member{
-						User: &discordgo.User{
-							ID:       userid,
-							Username: username,
-							Avatar:   useravater,
-							Bot:      false,
-						},
+						User: testUser,
 					},
 					SelfStream: false,
 					SelfVideo:  false,
@@ -79,7 +77,7 @@ func TestVcSignal(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	t.Run("正常系", func(t *testing.T) {
+	t.Run("正常系(通話開始)", func(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
@@ -122,12 +120,7 @@ func TestVcSignal(t *testing.T) {
 					GuildID:   afterGuildId,
 					ChannelID: afterChannelId,
 					Member: &discordgo.Member{
-						User: &discordgo.User{
-							ID:       userid,
-							Username: username,
-							Avatar:   useravater,
-							Bot:      false,
-						},
+						User: testUser,
 					},
 					SelfStream: false,
 					SelfVideo:  false,
@@ -136,5 +129,10 @@ func TestVcSignal(t *testing.T) {
 		)
 		assert.NoError(t, err)
 		assert.Len(t, messages, 2)
+		assert.Equal(t, messages[0].Content, "現在1人 <@11> が after_test_vcに入室しました。")
+		assert.Equal(t, messages[1].Embeds[0].Title, "通話開始")
+		assert.Equal(t, messages[1].Embeds[0].Description, "<#2222>")
+		assert.Equal(t, messages[1].Embeds[0].Author.Name, "testuser")
+		assert.Equal(t, messages[1].Embeds[0].Author.IconURL, "https://cdn.discordapp.com/avatars/11/a_.gif?size=64")
 	})
 }

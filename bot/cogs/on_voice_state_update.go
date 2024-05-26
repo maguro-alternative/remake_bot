@@ -45,6 +45,9 @@ func onVoiceStateUpdateFunc(
 	if err != nil {
 		return nil, err
 	}
+	if m.BeforeUpdate != nil && (m.BeforeUpdate.SelfDeaf != m.SelfDeaf || m.BeforeUpdate.SelfMute != m.SelfMute) {
+		return nil, nil
+	}
 	membersCount := vcMembersCount(state, guildId, vcChannelID)
 	ngUserIDs, err := repo.GetVcSignalNgUsersByVcChannelIDAllColumn(ctx, vcChannelID)
 	if err != nil {

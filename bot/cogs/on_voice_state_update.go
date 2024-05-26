@@ -110,7 +110,7 @@ func onVoiceStateUpdateFunc(
 		}
 	}
 	//chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
-	if m.BeforeUpdate == nil || m.ChannelID != ""  && (!m.SelfVideo == !m.SelfStream) && (m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream)) {
+	if m.BeforeUpdate == nil || m.ChannelID != ""  && (!m.SelfVideo == !m.SelfStream) && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) {
 		sendText.WriteString(mentionText.String())
 		sendText.WriteString("現在"+strconv.Itoa(membersCount)+"人 <@"+m.Member.User.ID+"> が "+ vcChannel.Name +"に入室しました。")
 	}

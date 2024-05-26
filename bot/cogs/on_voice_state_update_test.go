@@ -206,7 +206,7 @@ func TestVcSignal(t *testing.T) {
 		assert.Equal(t, messages[2].Embeds[0].Title, "通話終了")
 	})
 
-	t.Run("正常系(ボイスチャンネル移動で埋め込みなし)", func(t *testing.T) {
+	t.Run("正常系(ボイスチャンネル移動で移動前サーバー通話終了と移動先サーバー通話開始)", func(t *testing.T) {
 		discordState.Guilds[0].VoiceStates = []*discordgo.VoiceState{
 			{
 				GuildID:   afterGuildId,
@@ -218,17 +218,7 @@ func TestVcSignal(t *testing.T) {
 				SelfVideo:  false,
 			},
 		}
-		discordState.Guilds[1].VoiceStates = []*discordgo.VoiceState{
-			{
-				GuildID:   beforeGuildId,
-				ChannelID: beforeChannelId,
-				Member: &discordgo.Member{
-					User: testUser,
-				},
-				SelfStream: false,
-				SelfVideo:  false,
-			},
-		}
+		discordState.Guilds[1].VoiceStates = []*discordgo.VoiceState{}
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
@@ -300,7 +290,11 @@ func TestVcSignal(t *testing.T) {
 			},
 		)
 		assert.NoError(t, err)
-		assert.Len(t, messages, 1)
+		assert.Len(t, messages, 5)
 		assert.Equal(t, messages[0].Content, "現在1人 <@11> が after_test_vcに入室しました。")
+		assert.Equal(t, messages[1].Embeds[0].Title, "通話開始")
+		assert.Equal(t, messages[2].Content, "現在0人 <@11> が before_test_vcから退室しました。")
+		assert.Equal(t, messages[3].Content, "通話が終了しました。")
+		assert.Equal(t, messages[4].Embeds[0].Title, "通話終了")
 	})
 }

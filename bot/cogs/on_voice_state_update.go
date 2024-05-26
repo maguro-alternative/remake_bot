@@ -110,12 +110,29 @@ func onVoiceStateUpdateFunc(
 		}
 	}
 	//chengeVcChannelFlag := (m.BeforeUpdate != nil) && (m.ChannelID != "") && (m.BeforeUpdate.ChannelID != m.ChannelID)
-	if m.BeforeUpdate == nil || m.ChannelID != ""  && (!m.SelfVideo == !m.SelfStream) && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) {
+	if m.BeforeUpdate == nil || m.ChannelID != "" && (!m.SelfVideo == !m.SelfStream) && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) {
 		sendText.WriteString(mentionText.String())
-		sendText.WriteString("現在"+strconv.Itoa(membersCount)+"人 <@"+m.Member.User.ID+"> が "+ vcChannel.Name +"に入室しました。")
+		sendText.WriteString("現在" + strconv.Itoa(membersCount) + "人 <@" + m.Member.User.ID + "> が " + vcChannel.Name + "に入室しました。")
+		if membersCount == 1 {
+			embed = &discordgo.MessageEmbed{
+				Title:       "通話開始",
+				Description: vcChannel.Name,
+				Author: &discordgo.MessageEmbedAuthor{
+					Name:    m.Member.User.Username,
+					IconURL: m.Member.AvatarURL("64"),
+				},
+			}
+		}
 	}
 	if m.BeforeUpdate != nil && (!m.BeforeUpdate.SelfVideo == !m.BeforeUpdate.SelfStream) && (!m.SelfVideo == !m.SelfStream) {
-		sendText.WriteString("現在"+strconv.Itoa(membersCount)+"人 <@"+m.Member.User.ID+"> が "+ vcChannel.Name +"から退室しました。")
+		sendText.WriteString("現在" + strconv.Itoa(membersCount) + "人 <@" + m.Member.User.ID + "> が " + vcChannel.Name + "から退室しました。")
+		if membersCount == 0 {
+			embed = &discordgo.MessageEmbed{
+				Title: "通話終了",
+			}
+			sendText.WriteString(mentionText.String())
+			sendText.WriteString("通話が終了しました。")
+		}
 	}
 	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfVideo) && m.SelfVideo {
 		embed = &discordgo.MessageEmbed{
@@ -127,10 +144,10 @@ func onVoiceStateUpdateFunc(
 			},
 		}
 		sendText.WriteString(mentionText.String())
-		sendText.WriteString("<@"+m.Member.User.ID+"> が"+vcChannel.Name+"カメラ配信を開始しました。")
+		sendText.WriteString("<@" + m.Member.User.ID + "> が" + vcChannel.Name + "カメラ配信を開始しました。")
 	}
 	if (m.BeforeUpdate != nil && m.BeforeUpdate.SelfVideo) && !m.SelfVideo {
-		sendText.WriteString("<@"+m.Member.User.ID+"> がカメラ配信を終了しました。")
+		sendText.WriteString("<@" + m.Member.User.ID + "> がカメラ配信を終了しました。")
 	}
 	if (m.BeforeUpdate != nil && !m.BeforeUpdate.SelfStream) && m.SelfStream {
 		presence, err := state.Presence(m.GuildID, m.UserID)
@@ -147,7 +164,7 @@ func onVoiceStateUpdateFunc(
 				},
 			}
 			sendText.WriteString(mentionText.String())
-			sendText.WriteString("<@"+m.Member.User.ID+"> が"+vcChannel.Name+"で画面共有を開始しました。")
+			sendText.WriteString("<@" + m.Member.User.ID + "> が" + vcChannel.Name + "で画面共有を開始しました。")
 		} else {
 			embed = &discordgo.MessageEmbed{
 				Title:       "配信タイトル:" + presence.Activities[0].Name,
@@ -157,15 +174,15 @@ func onVoiceStateUpdateFunc(
 				},
 				Author: &discordgo.MessageEmbedAuthor{
 					Name:    m.Member.User.Username,
-					IconURL:m.Member.AvatarURL("64"),
+					IconURL: m.Member.AvatarURL("64"),
 				},
 			}
 			sendText.WriteString(mentionText.String())
-			sendText.WriteString("<@"+m.Member.User.ID+"> が"+vcChannel.Name+"で"+presence.Activities[0].Name+"を配信開始しました。")
+			sendText.WriteString("<@" + m.Member.User.ID + "> が" + vcChannel.Name + "で" + presence.Activities[0].Name + "を配信開始しました。")
 		}
 	}
 	if (m.BeforeUpdate != nil && m.BeforeUpdate.SelfStream) && !m.SelfStream {
-		sendText.WriteString("<@"+m.Member.User.ID+"> が画面共有を終了しました。")
+		sendText.WriteString("<@" + m.Member.User.ID + "> が画面共有を終了しました。")
 	}
 
 	_, err = s.ChannelMessageSend(vcSignalChannel.SendChannelID, sendText.String())

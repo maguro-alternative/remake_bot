@@ -200,7 +200,6 @@ func onVoiceStateUpdateFunc(
 		sendText.Reset()
 		if membersCount == 0 {
 			guildMembersCount := guildVcMembersCount(state, vs.BeforeUpdate.GuildID)
-			slog.InfoContext(ctx,"","",guildMembersCount)
 			if guildMembersCount == 0 {
 				embed = &discordgo.MessageEmbed{
 					Title: "通話終了",

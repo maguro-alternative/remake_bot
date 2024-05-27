@@ -20,12 +20,12 @@ func TestVcSignal(t *testing.T) {
 		Avatar:   "a_",
 		Bot:      false,
 	}
-	/*testUser2 := &discordgo.User{
+	testUser2 := &discordgo.User{
 		ID:       "22",
 		Username: "testuser2",
 		Avatar:   "a_",
 		Bot:      false,
-	}*/
+	}
 	beforeGuildId := "111"
 	afterGuildId := "222"
 	beforeChannelId := "1111"
@@ -408,5 +408,92 @@ func TestVcSignal(t *testing.T) {
 		assert.Equal(t, messages[0].Content, "現在1人 <@11> が after_test_vcに入室しました。")
 		assert.Equal(t, messages[1].Embeds[0].Title, "通話開始")
 		assert.Equal(t, messages[2].Content, "現在0人 <@11> が after_test_vc2から退室しました。")
+	})
+
+	t.Run("正常系(サーバー内での2人以降のボイスチャンネル入室)", func(t *testing.T) {
+		discordState.Guilds[0].VoiceStates = []*discordgo.VoiceState{
+			{
+				GuildID:   afterGuildId,
+				ChannelID: afterChannelId,
+				Member: &discordgo.Member{
+					User: testUser,
+				},
+				SelfStream: false,
+				SelfVideo:  false,
+			},
+			{
+				GuildID:   afterGuildId,
+				ChannelID: afterChannelId,
+				Member: &discordgo.Member{
+					User: testUser2,
+				},
+				SelfStream: false,
+				SelfVideo:  false,
+			},
+		}
+		messages, err := onVoiceStateUpdateFunc(
+			ctx,
+			&repository.RepositoryFuncMock{
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
+					return []*repository.VcSignalNgUserAllColumn{}, nil
+				},
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
+					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				},
+				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
+					if vcChannelID == afterChannelId {
+						return &repository.VcSignalChannelAllColumn{
+							VcChannelID:     vcChannelID,
+							GuildID:         afterGuildId,
+							SendSignal:      true,
+							SendChannelID:   afterSendChannelId,
+							JoinBot:         false,
+							EveryoneMention: false,
+						}, nil
+					}
+					return &repository.VcSignalChannelAllColumn{
+						VcChannelID:     vcChannelID,
+						GuildID:         beforeGuildId,
+						SendSignal:      true,
+						SendChannelID:   beforeSendChannelId,
+						JoinBot:         false,
+						EveryoneMention: false,
+					}, nil
+				},
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
+					return []*repository.VcSignalMentionUser{}, nil
+				},
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
+					return []*repository.VcSignalMentionRole{}, nil
+				},
+			},
+			&mock.SessionMock{
+				ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{
+						Content: content,
+					}, nil
+				},
+				ChannelMessageSendEmbedFunc: func(channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{
+						Embeds: []*discordgo.MessageEmbed{embed},
+					}, nil
+				},
+			},
+			discordState,
+			&discordgo.VoiceStateUpdate{
+				VoiceState: &discordgo.VoiceState{
+					GuildID:   afterGuildId,
+					ChannelID: afterChannelId,
+					Member: &discordgo.Member{
+						User: testUser,
+					},
+					SelfStream: false,
+					SelfVideo:  false,
+				},
+			},
+		)
+		assert.NoError(t, err)
+		assert.Len(t, messages, 1)
+		assert.Equal(t, messages[0].Content, "現在2人 <@11> が after_test_vcに入室しました。")
 	})
 }

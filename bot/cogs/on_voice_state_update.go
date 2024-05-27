@@ -229,7 +229,7 @@ func onVoiceStateUpdateFunc(
 			},
 		}
 		sendText.WriteString(afterMentionText.String())
-		sendText.WriteString("<@" + vs.Member.User.ID + "> が" + vcChannel.Name + "カメラ配信を開始しました。")
+		sendText.WriteString("<@" + vs.Member.User.ID + "> が" + vcChannel.Name + "でカメラ配信を開始しました。")
 		sendMessage, err := s.ChannelMessageSend(afterVcSignalChannel.SendChannelID, sendText.String())
 		if err != nil {
 			return nil, err

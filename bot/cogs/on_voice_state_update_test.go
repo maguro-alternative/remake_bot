@@ -325,7 +325,7 @@ func TestVcSignal(t *testing.T) {
 		discordState.Guilds[0].VoiceStates = []*discordgo.VoiceState{
 			{
 				GuildID:   afterGuildId,
-				ChannelID: afterChannelId2,
+				ChannelID: afterChannelId,
 				Member: &discordgo.Member{
 					User: testUser,
 				},
@@ -404,8 +404,9 @@ func TestVcSignal(t *testing.T) {
 			},
 		)
 		assert.NoError(t, err)
-		assert.Len(t, messages, 2)
-		assert.Equal(t, messages[0].Content, "現在0人 <@11> が after_test_vcに入室しました。")
-		assert.Equal(t, messages[1].Content, "現在1人 <@11> が after_test_vc2から退室しました。")
+		assert.Len(t, messages, 3)
+		assert.Equal(t, messages[0].Content, "現在1人 <@11> が after_test_vcに入室しました。")
+		assert.Equal(t, messages[1].Embeds[0].Title, "通話開始")
+		assert.Equal(t, messages[2].Content, "現在0人 <@11> が after_test_vc2から退室しました。")
 	})
 }

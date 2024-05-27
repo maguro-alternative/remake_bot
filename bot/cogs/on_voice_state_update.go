@@ -199,7 +199,8 @@ func onVoiceStateUpdateFunc(
 		sendMessages = append(sendMessages, sendMessage)
 		sendText.Reset()
 		if membersCount == 0 {
-			guildMembersCount := guildVcMembersCount(state, vs.BeforeUpdate.GuildID,)
+			guildMembersCount := guildVcMembersCount(state, vs.BeforeUpdate.GuildID)
+			slog.InfoContext(ctx,"","",guildMembersCount)
 			if guildMembersCount == 0 {
 				embed = &discordgo.MessageEmbed{
 					Title: "通話終了",
@@ -319,14 +320,6 @@ func onVoiceStateUpdateFunc(
 		sendText.Reset()
 	}
 
-	if embed != nil {
-		sendMessage, err := s.ChannelMessageSendEmbed(afterVcSignalChannel.SendChannelID, embed)
-		if err != nil {
-			return sendMessages, err
-		}
-		sendMessages = append(sendMessages, sendMessage)
-		sendText.Reset()
-	}
 	return sendMessages, err
 }
 

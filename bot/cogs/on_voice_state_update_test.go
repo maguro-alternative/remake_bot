@@ -24,6 +24,8 @@ func TestVcSignal(t *testing.T) {
 	afterGuildId := "222"
 	beforeChannelId := "1111"
 	afterChannelId := "2222"
+	beforeChannelId2 := "1112"
+	afterChannelId2 := "2223"
 	beforeSendChannelId := "11111"
 	afterSendChannelId := "22222"
 
@@ -43,6 +45,12 @@ func TestVcSignal(t *testing.T) {
 				Position: 2,
 				Type:     discordgo.ChannelTypeGuildText,
 			},
+			{
+				ID:       afterChannelId2,
+				Name:     "after_test_vc2",
+				Position: 3,
+				Type:     discordgo.ChannelTypeGuildVoice,
+			},
 		},
 	})
 	require.NoError(t, err)
@@ -61,6 +69,12 @@ func TestVcSignal(t *testing.T) {
 				Name:     "vefore_test_text",
 				Position: 2,
 				Type:     discordgo.ChannelTypeGuildText,
+			},
+			{
+				ID:       beforeChannelId2,
+				Name:     "vefore_test_vc2",
+				Position: 3,
+				Type:     discordgo.ChannelTypeGuildVoice,
 			},
 		},
 	})

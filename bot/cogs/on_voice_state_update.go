@@ -38,14 +38,10 @@ func onVoiceStateUpdateFunc(
 	var beforeMentionUserIDs, afterMentionUserIDs []*repository.VcSignalMentionUser
 	var beforeMentionRoleIDs, afterMentionRoleIDs []*repository.VcSignalMentionRole
 	embed = nil
-	vcChannel, err := state.Channel(vs.ChannelID)
-	if err != nil {
-		return nil, err
-	}
 	if vs.BeforeUpdate != nil && (vs.BeforeUpdate.SelfDeaf != vs.SelfDeaf || vs.BeforeUpdate.SelfMute != vs.SelfMute) {
 		return nil, nil
 	}
-	afterNgUserIDs, err = repo.GetVcSignalNgUsersByVcChannelIDAllColumn(ctx, vs.ChannelID)
+	afterNgUserIDs, err := repo.GetVcSignalNgUsersByVcChannelIDAllColumn(ctx, vs.ChannelID)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +156,7 @@ func onVoiceStateUpdateFunc(
 	}
 	//chengeVcChannelFlag := (vs.BeforeUpdate != nil) && (vs.ChannelID != "") && (vs.BeforeUpdate.ChannelID != vs.ChannelID)
 	if vs.BeforeUpdate == nil || vs.ChannelID != "" && (!vs.SelfVideo == !vs.SelfStream) && (!vs.BeforeUpdate.SelfVideo == !vs.BeforeUpdate.SelfStream) {
-		vcChannel, err = state.Channel(vs.ChannelID)
+		vcChannel, err := state.Channel(vs.ChannelID)
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +186,7 @@ func onVoiceStateUpdateFunc(
 		}
 	}
 	if vs.BeforeUpdate != nil && (!vs.BeforeUpdate.SelfVideo == !vs.BeforeUpdate.SelfStream) && (!vs.SelfVideo == !vs.SelfStream) {
-		vcChannel, err = state.Channel(vs.BeforeUpdate.ChannelID)
+		vcChannel, err := state.Channel(vs.BeforeUpdate.ChannelID)
 		if err != nil {
 			return nil, err
 		}
@@ -220,6 +216,10 @@ func onVoiceStateUpdateFunc(
 		}
 	}
 	if (vs.BeforeUpdate != nil && !vs.BeforeUpdate.SelfVideo) && vs.SelfVideo {
+		vcChannel, err := state.Channel(vs.BeforeUpdate.ChannelID)
+		if err != nil {
+			return nil, err
+		}
 		embed = &discordgo.MessageEmbed{
 			Title:       "カメラ配信",
 			Description: vs.Member.User.Username + "\n" + "<#" + vs.ChannelID + ">",
@@ -253,6 +253,10 @@ func onVoiceStateUpdateFunc(
 	}
 	if (vs.BeforeUpdate != nil && !vs.BeforeUpdate.SelfStream) && vs.SelfStream {
 		presence, err := state.Presence(vs.GuildID, vs.UserID)
+		if err != nil {
+			return nil, err
+		}
+		vcChannel, err := state.Channel(vs.BeforeUpdate.ChannelID)
 		if err != nil {
 			return nil, err
 		}

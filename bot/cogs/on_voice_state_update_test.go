@@ -566,9 +566,9 @@ func TestVcSignal(t *testing.T) {
 			discordState,
 			&discordgo.VoiceStateUpdate{
 				VoiceState: &discordgo.VoiceState{
-					GuildID:    "",
-					ChannelID:  "",
-					Member:     &discordgo.Member{
+					GuildID:   "",
+					ChannelID: "",
+					Member: &discordgo.Member{
 						User: testUser,
 					},
 					SelfStream: false,
@@ -837,7 +837,7 @@ func TestVcSignal(t *testing.T) {
 						User: testUser,
 					},
 					SelfStream: false,
-					SelfVideo: false,
+					SelfVideo:  false,
 				},
 				BeforeUpdate: &discordgo.VoiceState{
 					GuildID:   afterGuildId,
@@ -846,7 +846,7 @@ func TestVcSignal(t *testing.T) {
 						User: testUser,
 					},
 					SelfStream: false,
-					SelfVideo: true,
+					SelfVideo:  true,
 				},
 			},
 		)
@@ -854,4 +854,89 @@ func TestVcSignal(t *testing.T) {
 		assert.Len(t, messages, 1)
 		assert.Equal(t, messages[0].Content, "<@11> がカメラ配信を終了しました。")
 	})
+
+	t.Run("正常系(画面共有開始)", func(t *testing.T) {
+		discordState.Guilds[0].VoiceStates = []*discordgo.VoiceState{
+			{
+				GuildID:   afterGuildId,
+				ChannelID: afterChannelId,
+				Member: &discordgo.Member{
+					User: testUser,
+				},
+				SelfStream: false,
+				SelfVideo:  false,
+				SelfMute:   false,
+				SelfDeaf:   false,
+			},
+		}
+		messages, err := onVoiceStateUpdateFunc(
+			ctx,
+			&repository.RepositoryFuncMock{
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
+					return []*repository.VcSignalNgUserAllColumn{}, nil
+				},
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
+					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				},
+				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
+					return &repository.VcSignalChannelAllColumn{
+						VcChannelID:     vcChannelID,
+						GuildID:         afterGuildId,
+						SendSignal:      true,
+						SendChannelID:   afterSendChannelId,
+						JoinBot:         false,
+						EveryoneMention: false,
+					}, nil
+				},
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
+					return []*repository.VcSignalMentionUser{}, nil
+				},
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
+					return []*repository.VcSignalMentionRole{}, nil
+				},
+			},
+			&mock.SessionMock{
+				ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{
+						Content: content,
+					}, nil
+				},
+				ChannelMessageSendEmbedFunc: func(channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{
+						Embeds: []*discordgo.MessageEmbed{embed},
+					}, nil
+				},
+			},
+			discordState,
+			&discordgo.VoiceStateUpdate{
+				VoiceState: &discordgo.VoiceState{
+					GuildID:   afterGuildId,
+					ChannelID: afterChannelId,
+					Member: &discordgo.Member{
+						User: testUser,
+					},
+					SelfStream: true,
+					SelfVideo:  false,
+					SelfMute:   false,
+					SelfDeaf:   false,
+				},
+				BeforeUpdate: &discordgo.VoiceState{
+					GuildID:   afterGuildId,
+					ChannelID: afterChannelId,
+					Member: &discordgo.Member{
+						User: testUser,
+					},
+					SelfStream: false,
+					SelfVideo:  false,
+					SelfMute:   false,
+					SelfDeaf:   false,
+				},
+			},
+		)
+		assert.NoError(t, err)
+		assert.Len(t, messages, 2)
+		assert.Equal(t, messages[0].Content, "<@11> がafter_test_vcで画面共有を開始しました。")
+		assert.Equal(t, messages[1].Embeds[0].Title, "画面共有")
+	})
+
 }

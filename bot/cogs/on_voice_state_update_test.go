@@ -1243,4 +1243,41 @@ func TestVcSignal(t *testing.T) {
 		assert.Len(t, messages, 1)
 		assert.Equal(t, messages[0].Content, "<@11> が画面共有を終了しました。")
 	})
+
+	t.Run("正常系(ミュートの場合何もしない)", func(t *testing.T) {
+		messages, err := onVoiceStateUpdateFunc(
+			ctx,
+			&repository.RepositoryFuncMock{},
+			&mock.SessionMock{},
+			discordState,
+			&discordgo.VoiceStateUpdate{
+				VoiceState: &discordgo.VoiceState{
+					GuildID:   afterGuildId,
+					ChannelID: afterChannelId,
+					UserID: testUser.ID,
+					Member: &discordgo.Member{
+						User: testUser,
+					},
+					SelfStream: false,
+					SelfVideo:  false,
+					SelfMute:   true,
+					SelfDeaf:   false,
+				},
+				BeforeUpdate: &discordgo.VoiceState{
+					GuildID:   afterGuildId,
+					ChannelID: afterChannelId,
+					UserID: testUser.ID,
+					Member: &discordgo.Member{
+						User: testUser,
+					},
+					SelfStream: false,
+					SelfVideo:  false,
+					SelfMute:   false,
+					SelfDeaf:   false,
+				},
+			},
+		)
+		assert.NoError(t, err)
+		assert.Len(t, messages, 0)
+	})
 }

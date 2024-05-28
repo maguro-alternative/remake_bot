@@ -253,14 +253,14 @@ func onVoiceStateUpdateFunc(
 	}
 	if (vs.BeforeUpdate != nil && !vs.BeforeUpdate.SelfStream) && vs.SelfStream {
 		presence, err := state.Presence(vs.GuildID, vs.UserID)
-		if err != nil {
+		if err != nil && err != discordgo.ErrStateNotFound {
 			return nil, err
 		}
 		vcChannel, err := state.Channel(vs.BeforeUpdate.ChannelID)
 		if err != nil {
 			return nil, err
 		}
-		if len(presence.Activities) == 0 {
+		if presence == nil {
 			embed = &discordgo.MessageEmbed{
 				Title:       "画面共有",
 				Description: vs.Member.User.Username + "\n" + "<#" + vs.ChannelID + ">",

@@ -5,5 +5,9 @@ import (
 )
 
 type VcSignalJson struct {
-	GuildID string `json:"guildId"`
+	VcChannelID string `json:"vcChannelId"`
+	SendSignal    bool `json:"sendSignal"`
+	SendChannelId string `json:"sendChannelId"`
+	JoinBot 	 bool `json:"joinBot"`
+	EveryoneMention bool `json:"everyoneMention"`
 }

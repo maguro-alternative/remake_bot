@@ -12,11 +12,11 @@ import (
 )
 
 type VcSignalHandler struct {
-	repo repository.Repository
+	repo repository.RepositoryFunc
 }
 
 func NewVcSignalHandler(
-	repo repository.Repository,
+	repo repository.RepositoryFunc,
 ) *VcSignalHandler {
 	return &VcSignalHandler{
 		repo: repo,

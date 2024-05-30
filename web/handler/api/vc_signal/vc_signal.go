@@ -35,7 +35,6 @@ func (h *VcSignalHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	var vcSignalJson internal.VcSignalJson
 	var vcSignalChannelNotGuildId repository.VcSignalChannelNotGuildID
-	//var vcSignalNgUserIds, vcSignalNgRoleIds, vcSignalMentionUserIds, vcSignalMentionRoleIds []string
 
 	err := json.NewDecoder(r.Body).Decode(&vcSignalJson)
 	if err != nil {

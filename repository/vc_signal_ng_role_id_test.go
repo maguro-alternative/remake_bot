@@ -190,7 +190,7 @@ func TestDeleteVcSignalNgRoleByGuildID(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgRoleByGuildID(ctx, "1111")
+		err = repo.DeleteVcSignalNgRoleByGuildID(ctx, "1111")
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -210,7 +210,7 @@ func TestDeleteVcSignalNgRoleByGuildID(t *testing.T) {
 
 		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_role_id")
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgRoleByGuildID(ctx, "1111")
+		err = repo.DeleteVcSignalNgRoleByGuildID(ctx, "1111")
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -242,7 +242,7 @@ func TestDeleteVcSignalNgRoleByRoleID(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgRoleByRoleID(ctx, "11111")
+		err = repo.DeleteVcSignalNgRoleByRoleID(ctx, "11111")
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -262,7 +262,7 @@ func TestDeleteVcSignalNgRoleByRoleID(t *testing.T) {
 
 		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_role_id")
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgRoleByRoleID(ctx, "11111")
+		err = repo.DeleteVcSignalNgRoleByRoleID(ctx, "11111")
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -299,7 +299,7 @@ func TestDeleteRolesNotInProvidedList(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcRolesNotInProvidedList(ctx, "111", []string{"11111"})
+		err = repo.DeleteVcSignalRolesNotInProvidedList(ctx, "111", []string{"11111"})
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -333,7 +333,7 @@ func TestDeleteRolesNotInProvidedList(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcRolesNotInProvidedList(ctx, "111", []string{"11111","11112"})
+		err = repo.DeleteVcSignalRolesNotInProvidedList(ctx, "111", []string{"11111","11112"})
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -367,7 +367,7 @@ func TestDeleteRolesNotInProvidedList(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcRolesNotInProvidedList(ctx, "111", []string{"11111","11112","11113"})
+		err = repo.DeleteVcSignalRolesNotInProvidedList(ctx, "111", []string{"11111","11112","11113"})
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -401,7 +401,7 @@ func TestDeleteRolesNotInProvidedList(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcRolesNotInProvidedList(ctx, "111", []string{})
+		err = repo.DeleteVcSignalRolesNotInProvidedList(ctx, "111", []string{})
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn

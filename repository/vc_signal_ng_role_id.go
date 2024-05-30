@@ -53,7 +53,7 @@ func (r *Repository) DeleteVcSignalNgRoleByVcChannelID(ctx context.Context, vcCh
 	return err
 }
 
-func (r *Repository) DeleteVcNgRoleByGuildID(ctx context.Context, guildID string) error {
+func (r *Repository) DeleteVcSignalNgRoleByGuildID(ctx context.Context, guildID string) error {
 	_, err := r.db.ExecContext(ctx, `
 		DELETE FROM
 			vc_signal_ng_role_id
@@ -63,7 +63,7 @@ func (r *Repository) DeleteVcNgRoleByGuildID(ctx context.Context, guildID string
 	return err
 }
 
-func (r *Repository) DeleteVcNgRoleByRoleID(ctx context.Context, roleID string) error {
+func (r *Repository) DeleteVcSignalNgRoleByRoleID(ctx context.Context, roleID string) error {
 	_, err := r.db.ExecContext(ctx, `
 		DELETE FROM
 			vc_signal_ng_role_id
@@ -73,7 +73,7 @@ func (r *Repository) DeleteVcNgRoleByRoleID(ctx context.Context, roleID string) 
 	return err
 }
 
-func (r *Repository) DeleteVcRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error {
+func (r *Repository) DeleteVcSignalRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error {
 	query := `
 		DELETE FROM
 			vc_signal_ng_role_id

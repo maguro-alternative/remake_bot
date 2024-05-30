@@ -5,11 +5,12 @@ import (
 )
 
 type VcSignalJson struct {
-	VcChannelID string      `json:"vcChannelId"`
-	VcSignals   []vcSignals `json:"vcSignals"`
+	GuildID   string      `json:"guildId"`
+	VcSignals []vcSignals `json:"vcSignals"`
 }
 
 type vcSignals struct {
+	VcChannelID            string   `json:"vcChannelId"`
 	SendSignal             bool     `json:"sendSignal"`
 	SendChannelId          string   `json:"sendChannelId"`
 	JoinBot                bool     `json:"joinBot"`
@@ -22,6 +23,6 @@ type vcSignals struct {
 
 func (g VcSignalJson) Validate() error {
 	return validation.ValidateStruct(&g,
-		validation.Field(&g.VcChannelID, validation.Required),
+		validation.Field(&g.GuildID, validation.Required),
 	)
 }

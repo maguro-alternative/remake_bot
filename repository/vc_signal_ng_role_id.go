@@ -73,7 +73,7 @@ func (r *Repository) DeleteVcNgRoleByRoleID(ctx context.Context, roleID string) 
 	return err
 }
 
-func (r *Repository) DeleteRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error {
+func (r *Repository) DeleteVcRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error {
 	query := `
 		DELETE FROM
 			vc_signal_ng_role_id

@@ -5,7 +5,11 @@ import (
 )
 
 type VcSignalJson struct {
-	VcChannelID            string   `json:"vcChannelId"`
+	VcChannelID string      `json:"vcChannelId"`
+	VcSignals   []vcSignals `json:"vcSignals"`
+}
+
+type vcSignals struct {
 	SendSignal             bool     `json:"sendSignal"`
 	SendChannelId          string   `json:"sendChannelId"`
 	JoinBot                bool     `json:"joinBot"`

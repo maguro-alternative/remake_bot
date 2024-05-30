@@ -73,7 +73,7 @@ func (r *Repository) DeleteVcNgUserByUserID(ctx context.Context, userID string) 
 	return err
 }
 
-func (r *Repository) DeleteVcNgUsersNotInProvidedList(ctx context.Context, vcChannelID string, userIDs []string) error {
+func (r *Repository) DeleteVcSignalNgUsersNotInProvidedList(ctx context.Context, vcChannelID string, userIDs []string) error {
 	query := `
 	DELETE FROM
 		vc_signal_ng_user_id

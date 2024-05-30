@@ -301,7 +301,7 @@ func TestDeleteNgUsersNotInProvidedList(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgUsersNotInProvidedList(ctx, "111", []string{"11111", "33333"})
+		err = repo.DeleteVcSignalNgUsersNotInProvidedList(ctx, "111", []string{"11111", "33333"})
 		assert.NoError(t, err)
 
 		var ngUsers []VcSignalNgUserAllColumn
@@ -339,7 +339,7 @@ func TestDeleteNgUsersNotInProvidedList(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgUsersNotInProvidedList(ctx, "111", []string{"11111", "22222"})
+		err = repo.DeleteVcSignalNgUsersNotInProvidedList(ctx, "111", []string{"11111", "22222"})
 		assert.NoError(t, err)
 
 		var ngUsers []VcSignalNgUserAllColumn
@@ -374,7 +374,7 @@ func TestDeleteNgUsersNotInProvidedList(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgUsersNotInProvidedList(ctx, "111", []string{})
+		err = repo.DeleteVcSignalNgUsersNotInProvidedList(ctx, "111", []string{})
 		assert.NoError(t, err)
 
 		var ngUsers []VcSignalNgUserAllColumn

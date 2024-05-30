@@ -138,7 +138,7 @@ func TestDeleteVcSignalNgRoleID(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgRoleByVcChannelID(ctx, "111")
+		err = repo.DeleteVcSignalNgRoleByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -158,7 +158,7 @@ func TestDeleteVcSignalNgRoleID(t *testing.T) {
 
 		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_role_id")
 		repo := NewRepository(tx)
-		err = repo.DeleteVcNgRoleByVcChannelID(ctx, "111")
+		err = repo.DeleteVcSignalNgRoleByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn

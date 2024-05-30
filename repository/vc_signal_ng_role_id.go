@@ -43,7 +43,7 @@ func (r *Repository) GetVcSignalNgRolesByVcChannelIDAllColumn(ctx context.Contex
 	return ngRoleIDs, nil
 }
 
-func (r *Repository) DeleteVcNgRoleByVcChannelID(ctx context.Context, vcChannelID string) error {
+func (r *Repository) DeleteVcSignalNgRoleByVcChannelID(ctx context.Context, vcChannelID string) error {
 	_, err := r.db.ExecContext(ctx, `
 		DELETE FROM
 			vc_signal_ng_role_id

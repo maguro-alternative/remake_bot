@@ -6,10 +6,10 @@ import (
 
 type VcSignalJson struct {
 	GuildID   string      `json:"guildId"`
-	VcSignals []vcSignals `json:"vcSignals"`
+	VcSignals []VcSignal `json:"vcSignal"`
 }
 
-type vcSignals struct {
+type VcSignal struct {
 	VcChannelID            string   `json:"vcChannelId"`
 	SendSignal             bool     `json:"sendSignal"`
 	SendChannelId          string   `json:"sendChannelId"`

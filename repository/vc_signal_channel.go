@@ -15,7 +15,6 @@ type VcSignalChannelAllColumn struct {
 
 type VcSignalChannelNotGuildID struct {
 	VcChannelID     string `db:"vc_channel_id"`
-	GuildID         string `db:"guild_id"`
 	SendSignal      bool   `db:"send_signal"`
 	SendChannelID   string `db:"send_channel_id"`
 	JoinBot         bool   `db:"join_bot"`

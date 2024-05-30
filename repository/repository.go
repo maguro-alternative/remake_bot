@@ -55,6 +55,15 @@ type RepositoryFuncMock struct {
 	GetVcSignalChannelAllColumnByVcChannelIDFunc          func(ctx context.Context, vcChannelID string) (*VcSignalChannelAllColumn, error)
 	GetVcSignalMentionUsersByVcChannelIDFunc              func(ctx context.Context, vcChannelID string) ([]*VcSignalMentionUser, error)
 	GetVcSignalMentionRolesByVcChannelIDFunc              func(ctx context.Context, vcChannelID string) ([]*VcSignalMentionRole, error)
+	UpdateVcSignalChannelFunc                             func(ctx context.Context, vcSignalChannelNotGuildID VcSignalChannelNotGuildID) error
+	InsertVcSignalNgUserFunc                              func(ctx context.Context, vcChannelID string, guildID string, userID string) error
+	InsertVcSignalNgRoleFunc                              func(ctx context.Context, vcChannelID string, guildID string, roleID string) error
+	InsertVcSignalMentionUserFunc                         func(ctx context.Context, vcChannelID string, guildID string, userID string) error
+	InsertVcSignalMentionRoleFunc                         func(ctx context.Context, vcChannelID string, guildID string, roleID string) error
+	DeleteVcSignalNgUsersNotInProvidedListFunc            func(ctx context.Context, vcChannelID string, userIDs []string) error
+	DeleteVcSignalNgRolesNotInProvidedListFunc            func(ctx context.Context, vcChannelID string, roleIDs []string) error
+	DeleteVcSignalMentionUsersNotInProvidedListFunc       func(ctx context.Context, vcChannelID string, userIDs []string) error
+	DeleteVcSignalMentionRolesNotInProvidedListFunc       func(ctx context.Context, vcChannelID string, roleIDs []string) error
 }
 
 func (r *RepositoryFuncMock) InsertLineBotIvByGuildID(ctx context.Context, guildId string) error {
@@ -209,6 +218,42 @@ func (r *RepositoryFuncMock) GetVcSignalMentionRolesByVcChannelID(ctx context.Co
 	return r.GetVcSignalMentionRolesByVcChannelIDFunc(ctx, vcChannelID)
 }
 
+func (r *RepositoryFuncMock) UpdateVcSignalChannel(ctx context.Context, vcSignalChannelNotGuildID VcSignalChannelNotGuildID) error {
+	return r.UpdateVcSignalChannelFunc(ctx, vcSignalChannelNotGuildID)
+}
+
+func (r *RepositoryFuncMock) InsertVcSignalNgUser(ctx context.Context, vcChannelID string, guildID string, userID string) error {
+	return r.InsertVcSignalNgUserFunc(ctx, vcChannelID, guildID, userID)
+}
+
+func (r *RepositoryFuncMock) InsertVcSignalNgRole(ctx context.Context, vcChannelID string, guildID string, roleID string) error {
+	return r.InsertVcSignalNgRoleFunc(ctx, vcChannelID, guildID, roleID)
+}
+
+func (r *RepositoryFuncMock) InsertVcSignalMentionUser(ctx context.Context, vcChannelID string, guildID string, userID string) error {
+	return r.InsertVcSignalMentionUserFunc(ctx, vcChannelID, guildID, userID)
+}
+
+func (r *RepositoryFuncMock) InsertVcSignalMentionRole(ctx context.Context, vcChannelID string, guildID string, roleID string) error {
+	return r.InsertVcSignalMentionRoleFunc(ctx, vcChannelID, guildID, roleID)
+}
+
+func (r *RepositoryFuncMock) DeleteVcSignalNgUsersNotInProvidedList(ctx context.Context, vcChannelID string, userIDs []string) error {
+	return r.DeleteVcSignalNgUsersNotInProvidedListFunc(ctx, vcChannelID, userIDs)
+}
+
+func (r *RepositoryFuncMock) DeleteVcSignalNgRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error {
+	return r.DeleteVcSignalNgRolesNotInProvidedListFunc(ctx, vcChannelID, roleIDs)
+}
+
+func (r *RepositoryFuncMock) DeleteVcSignalMentionUsersNotInProvidedList(ctx context.Context, vcChannelID string, userIDs []string) error {
+	return r.DeleteVcSignalMentionUsersNotInProvidedListFunc(ctx, vcChannelID, userIDs)
+}
+
+func (r *RepositoryFuncMock) DeleteVcSignalMentionRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error {
+	return r.DeleteVcSignalMentionRolesNotInProvidedListFunc(ctx, vcChannelID, roleIDs)
+}
+
 // Repository is an interface for repository.
 type RepositoryFunc interface {
 	InsertLineBotIvByGuildID(ctx context.Context, guildId string) error
@@ -249,6 +294,15 @@ type RepositoryFunc interface {
 	GetVcSignalChannelAllColumnByVcChannelID(ctx context.Context, vcChannelID string) (*VcSignalChannelAllColumn, error)
 	GetVcSignalMentionUsersByVcChannelID(ctx context.Context, vcChannelID string) ([]*VcSignalMentionUser, error)
 	GetVcSignalMentionRolesByVcChannelID(ctx context.Context, vcChannelID string) ([]*VcSignalMentionRole, error)
+	UpdateVcSignalChannel(ctx context.Context, vcChannel VcSignalChannelNotGuildID) error
+	InsertVcSignalNgUser(ctx context.Context, vcChannelID string, guildID string, userID string) error
+	InsertVcSignalNgRole(ctx context.Context, vcChannelID string, guildID string, roleID string) error
+	InsertVcSignalMentionUser(ctx context.Context, vcChannelID string, guildID string, userID string) error
+	InsertVcSignalMentionRole(ctx context.Context, vcChannelID string, guildID string, roleID string) error
+	DeleteVcSignalNgUsersNotInProvidedList(ctx context.Context, vcChannelID string, userIDs []string) error
+	DeleteVcSignalNgRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error
+	DeleteVcSignalMentionUsersNotInProvidedList(ctx context.Context, vcChannelID string, userIDs []string) error
+	DeleteVcSignalMentionRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error
 }
 
 var (

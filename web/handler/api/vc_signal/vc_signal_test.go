@@ -16,7 +16,7 @@ import (
 )
 
 func TestVcSignalHandler_ServeHTTP(t *testing.T) {
-	bodyJson, err := json.Marshal(internal.VcSignalJson{
+	vcSignal := internal.VcSignalJson{
 		GuildID: "987654321",
 		VcSignals: []internal.VcSignal{
 			{
@@ -27,8 +27,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 				EveryoneMention: true,
 			},
 		},
-	})
-	assert.NoError(t, err)
+	}
 
 	t.Run("MethodがPOST以外の場合、Method Not Allowedが返ること", func(t *testing.T) {
 		h := &VcSignalHandler{}
@@ -39,6 +38,8 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("VCシグナルの更新が成功すること", func(t *testing.T) {
+		bodyJson, err := json.Marshal(vcSignal)
+		assert.NoError(t, err)
 		h := &VcSignalHandler{
 			repo: &repository.RepositoryFuncMock{
 				UpdateVcSignalChannelFunc: func(ctx context.Context, vcSignalChannelNotGuildID repository.VcSignalChannelNotGuildID) error {
@@ -93,6 +94,8 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("VcSignalChannelの更新に失敗した場合、Internal Server Errorが返ること", func(t *testing.T) {
+		bodyJson, err := json.Marshal(vcSignal)
+		assert.NoError(t, err)
 		h := &VcSignalHandler{
 			repo: &repository.RepositoryFuncMock{
 				UpdateVcSignalChannelFunc: func(ctx context.Context, vcSignalChannelNotGuildID repository.VcSignalChannelNotGuildID) error {
@@ -107,6 +110,8 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("VcSignalChannelの更新に失敗した場合、Internal Server Errorが返ること", func(t *testing.T) {
+		bodyJson, err := json.Marshal(vcSignal)
+		assert.NoError(t, err)
 		h := &VcSignalHandler{
 			repo: &repository.RepositoryFuncMock{
 				UpdateVcSignalChannelFunc: func(ctx context.Context, vcSignalChannelNotGuildID repository.VcSignalChannelNotGuildID) error {
@@ -124,6 +129,8 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("NgUserIDの追加に失敗した場合、Internal Server Errorが返ること", func(t *testing.T) {
+		bodyJson, err := json.Marshal(vcSignal)
+		assert.NoError(t, err)
 		h := &VcSignalHandler{
 			repo: &repository.RepositoryFuncMock{
 				UpdateVcSignalChannelFunc: func(ctx context.Context, vcSignalChannelNotGuildID repository.VcSignalChannelNotGuildID) error {
@@ -162,6 +169,8 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("NgUserIDの追加が成功すること", func(t *testing.T) {
+		bodyJson, err := json.Marshal(vcSignal)
+		assert.NoError(t, err)
 		h := &VcSignalHandler{
 			repo: &repository.RepositoryFuncMock{
 				UpdateVcSignalChannelFunc: func(ctx context.Context, vcSignalChannelNotGuildID repository.VcSignalChannelNotGuildID) error {

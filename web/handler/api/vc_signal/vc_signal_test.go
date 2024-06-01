@@ -109,26 +109,8 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
 
-	t.Run("VcSignalChannelの更新に失敗した場合、Internal Server Errorが返ること", func(t *testing.T) {
-		bodyJson, err := json.Marshal(vcSignal)
-		assert.NoError(t, err)
-		h := &VcSignalHandler{
-			repo: &repository.RepositoryFuncMock{
-				UpdateVcSignalChannelFunc: func(ctx context.Context, vcSignalChannelNotGuildID repository.VcSignalChannelNotGuildID) error {
-					return nil
-				},
-				InsertVcSignalNgUserFunc: func(ctx context.Context, vcChannelID, guildID, userID string) error {
-					return assert.AnError
-				},
-			},
-		}
-		w := httptest.NewRecorder()
-		r := httptest.NewRequest(http.MethodPost, "/api/987654321/vc-signal", bytes.NewReader(bodyJson))
-		h.ServeHTTP(w, r)
-		assert.Equal(t, http.StatusInternalServerError, w.Code)
-	})
-
 	t.Run("NgUserIDの追加に失敗した場合、Internal Server Errorが返ること", func(t *testing.T) {
+		vcSignal.VcSignals[0].VcSignalNgUserIDs = []string{"123456789"}
 		bodyJson, err := json.Marshal(vcSignal)
 		assert.NoError(t, err)
 		h := &VcSignalHandler{
@@ -169,6 +151,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("NgUserIDの追加が成功すること", func(t *testing.T) {
+		vcSignal.VcSignals[0].VcSignalNgUserIDs = []string{"123456789"}
 		bodyJson, err := json.Marshal(vcSignal)
 		assert.NoError(t, err)
 		h := &VcSignalHandler{

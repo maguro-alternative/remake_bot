@@ -92,9 +92,7 @@ func TestGetVcSignalNgUsersByChannelIDAllColumn(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.Len(t, ngUsers, 1)
-		assert.Equal(t, "111", ngUsers[0].VcChannelID)
-		assert.Equal(t, "1111", ngUsers[0].GuildID)
-		assert.Equal(t, "11111", ngUsers[0].UserID)
+		assert.Equal(t, "11111", ngUsers[0])
 	})
 
 	t.Run("存在しない場合は空のスライスを返す", func(t *testing.T) {

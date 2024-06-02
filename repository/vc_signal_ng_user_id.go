@@ -27,11 +27,11 @@ func (r *Repository) InsertVcSignalNgUser(ctx context.Context, vcChannelID, guil
 	return err
 }
 
-func (r *Repository) GetVcSignalNgUsersByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]*VcSignalNgUserAllColumn, error) {
-	var ngUserIDs []*VcSignalNgUserAllColumn
+func (r *Repository) GetVcSignalNgUsersByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]string, error) {
+	var ngUserIDs []string
 	err := r.db.SelectContext(ctx, &ngUserIDs, `
 		SELECT
-			*
+			user_id
 		FROM
 			vc_signal_ng_user_id
 		WHERE

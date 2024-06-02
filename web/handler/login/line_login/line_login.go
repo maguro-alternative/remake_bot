@@ -25,8 +25,8 @@ import (
 )
 
 type LineLoginHandler struct {
-	IndexService *service.IndexService
-	Repo         repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 	aesCrypto    crypto.AESInterface
 }
 
@@ -36,8 +36,8 @@ func NewLineLoginHandler(
 	aesCrypto crypto.AESInterface,
 ) *LineLoginHandler {
 	return &LineLoginHandler{
-		IndexService: indexService,
-		Repo:         repo,
+		indexService: indexService,
+		repo:         repo,
 		aesCrypto:    aesCrypto,
 	}
 }
@@ -54,14 +54,14 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		ctx = context.Background()
 	}
 
-	lineBots, err := h.Repo.GetAllColumnsLineBots(ctx)
+	lineBots, err := h.repo.GetAllColumnsLineBots(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	for _, lineBot := range lineBots {
-		lineBotIv, err = h.Repo.GetAllColumnsLineBotIvByGuildID(ctx, lineBot.GuildID)
+		lineBotIv, err = h.repo.GetAllColumnsLineBotIvByGuildID(ctx, lineBot.GuildID)
 		if err != nil {
 			slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。")
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -87,7 +87,7 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 		}
 
 		lineRequ := line.NewLineRequest(
-			*h.IndexService.Client,
+			*h.indexService.Client,
 			string(lineNotifyTokenByte),
 			string(lineBotTokenByte),
 			string(lineGroupByte),
@@ -144,7 +144,7 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 	guildID := r.PathValue("guildId")
 	state := uuid.New().String()
 	nonce := uuid.New().String()
-	sessionStore, err := session.NewSessionStore(r, h.IndexService.CookieStore, config.SessionSecret())
+	sessionStore, err := session.NewSessionStore(r, h.indexService.CookieStore, config.SessionSecret())
 	if err != nil {
 		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -155,13 +155,13 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 		ctx = context.Background()
 	}
 
-	lineBot, err := h.Repo.GetAllColumnsLineBotByGuildID(ctx, guildID)
+	lineBot, err := h.repo.GetAllColumnsLineBotByGuildID(ctx, guildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	lineBotIv, err := h.Repo.GetAllColumnsLineBotIvByGuildID(ctx, lineBot.GuildID)
+	lineBotIv, err := h.repo.GetAllColumnsLineBotIvByGuildID(ctx, lineBot.GuildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_bot_ivの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -183,7 +183,7 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	err = sessionStore.StoreSave(r, w, h.IndexService.CookieStore)
+	err = sessionStore.StoreSave(r, w, h.indexService.CookieStore)
 	if err != nil {
 		slog.ErrorContext(ctx, "セッションの保存に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

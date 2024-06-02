@@ -15,12 +15,12 @@ import (
 )
 
 type IndexViewHandler struct {
-	IndexService *service.IndexService
+	indexService *service.IndexService
 }
 
 func NewIndexViewHandler(indexService *service.IndexService) *IndexViewHandler {
 	return &IndexViewHandler{
-		IndexService: indexService,
+		indexService: indexService,
 	}
 }
 
@@ -57,7 +57,7 @@ func (g *IndexViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}{
 		Title:      "トップページ",
 		AccountVer: template.HTML(accountVer.String()),
-		BotName:    g.IndexService.DiscordBotState.User.Username,
+		BotName:    g.indexService.DiscordBotState.User.Username,
 		GuildId:    lineSession.DiscordGuildID,
 	})
 	if err != nil {

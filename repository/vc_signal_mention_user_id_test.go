@@ -105,9 +105,7 @@ func TestGetVcSignalMentionUsersByChannelID(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.Len(t, mentionUserIDs, 1)
-		assert.Equal(t, "111", mentionUserIDs[0].VcChannelID)
-		assert.Equal(t, "1111", mentionUserIDs[0].GuildID)
-		assert.Equal(t, "11111", mentionUserIDs[0].UserID)
+		assert.Equal(t, "11111", mentionUserIDs[0])
 	})
 
 	t.Run("指定したchannelIDのMentionUserがない場合は空の配列を返すこと", func(t *testing.T) {

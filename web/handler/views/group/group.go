@@ -20,8 +20,8 @@ import (
 )
 
 type LineGroupViewHandler struct {
-	IndexService *service.IndexService
-	Repo         repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 }
 
 func NewLineGroupViewHandler(
@@ -29,8 +29,8 @@ func NewLineGroupViewHandler(
 	repo repository.RepositoryFunc,
 ) *LineGroupViewHandler {
 	return &LineGroupViewHandler{
-		IndexService: indexService,
-		Repo:         repo,
+		indexService: indexService,
+		repo:         repo,
 	}
 }
 
@@ -41,7 +41,7 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	guildId := r.PathValue("guildId")
 	categoryPositions := make(map[string]components.DiscordChannel)
-	guild, err := g.IndexService.DiscordBotState.Guild(guildId)
+	guild, err := g.indexService.DiscordBotState.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: ", "エラーメッセージ:", err.Error())
@@ -49,7 +49,7 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if guild.Channels == nil {
-		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId)
+		guild.Channels, err = g.indexService.DiscordSession.GuildChannels(guildId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
@@ -97,7 +97,7 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	lineBot, err := g.Repo.GetAllColumnsLineBotByGuildID(ctx, guildId)
+	lineBot, err := g.repo.GetAllColumnsLineBotByGuildID(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "line_botの取得に失敗しました:"+err.Error())

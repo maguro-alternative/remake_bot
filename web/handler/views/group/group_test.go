@@ -68,7 +68,7 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		}
 		handler := NewLineGroupViewHandler(indexService, repo)
 
-		_, err = handler.IndexService.DiscordBotState.Guild("123")
+		_, err = handler.indexService.DiscordBotState.Guild("123")
 		assert.NoError(t, err)
 
 		w := httptest.NewRecorder()
@@ -131,7 +131,7 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		}
 		handler := NewLineGroupViewHandler(indexService, repo)
 
-		_, err = handler.IndexService.DiscordBotState.Guild("123")
+		_, err = handler.indexService.DiscordBotState.Guild("123")
 		assert.NoError(t, err)
 
 		w := httptest.NewRecorder()
@@ -167,7 +167,7 @@ func TestNewLineGroupViewHandler(t *testing.T) {
 		}
 		handler := NewLineGroupViewHandler(indexService, repo)
 
-		_, err = handler.IndexService.DiscordBotState.Guild("123")
+		_, err = handler.indexService.DiscordBotState.Guild("123")
 		assert.NoError(t, err)
 
 		w := httptest.NewRecorder()

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/maguro-alternative/remake_bot/web/components"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -17,16 +19,10 @@ type DiscordChannelSet struct {
 	NgRoles    []string
 }
 
-type DiscordChannel struct {
-	ID       string
-	Name     string
-	Position int
-}
-
 func CreateLinePostDiscordChannelForm(
 	categoryIDTmps []string,
 	channelsInCategory map[string][]DiscordChannelSet,
-	categoryPositions map[string]DiscordChannel,
+	categoryPositions map[string]components.DiscordChannel,
 	guild *discordgo.Guild,
 	messageTypes []string,
 ) string {

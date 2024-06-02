@@ -61,7 +61,7 @@ func NewLinePostDiscordChannelViewHandler(
 }
 
 func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http.Request) {
-	categoryPositions := make(map[string]internal.DiscordChannel)
+	categoryPositions := make(map[string]components.DiscordChannel)
 	var categoryIDTmps []string
 	guildId := r.PathValue("guildId")
 	ctx := r.Context()
@@ -113,7 +113,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 			continue
 		}
 		categoryIDTmps = append(categoryIDTmps, channel.ID)
-		categoryPositions[channel.ID] = internal.DiscordChannel{
+		categoryPositions[channel.ID] = components.DiscordChannel{
 			ID:       channel.ID,
 			Name:     channel.Name,
 			Position: channel.Position,
@@ -185,7 +185,7 @@ func createCategoryInChannels(
 	repo repository.RepositoryFunc,
 	guild *discordgo.Guild,
 	channel *discordgo.Channel,
-	categoryPositions map[string]internal.DiscordChannel,
+	categoryPositions map[string]components.DiscordChannel,
 	channelsInCategory map[string][]internal.DiscordChannelSet,
 ) error {
 	if channel.Type == discordgo.ChannelTypeGuildForum {

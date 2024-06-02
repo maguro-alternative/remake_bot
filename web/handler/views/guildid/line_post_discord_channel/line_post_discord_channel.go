@@ -46,8 +46,8 @@ var (
 )
 
 type LinePostDiscordChannelViewHandler struct {
-	IndexService *service.IndexService
-	Repo         repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 }
 
 func NewLinePostDiscordChannelViewHandler(
@@ -55,8 +55,8 @@ func NewLinePostDiscordChannelViewHandler(
 	repo repository.RepositoryFunc,
 ) *LinePostDiscordChannelViewHandler {
 	return &LinePostDiscordChannelViewHandler{
-		IndexService: indexService,
-		Repo:         repo,
+		indexService: indexService,
+		repo:         repo,
 	}
 }
 
@@ -69,7 +69,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 		ctx = context.Background()
 	}
 
-	guild, err := g.IndexService.DiscordBotState.Guild(guildId)
+	guild, err := g.indexService.DiscordBotState.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました:"+err.Error())
@@ -77,7 +77,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	}
 
 	if guild.Members == nil {
-		guild.Members, err = g.IndexService.DiscordSession.GuildMembers(guildId, "", 1000)
+		guild.Members, err = g.indexService.DiscordSession.GuildMembers(guildId, "", 1000)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild members: "+err.Error())
@@ -86,7 +86,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	}
 
 	if guild.Channels == nil {
-		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId)
+		guild.Channels, err = g.indexService.DiscordSession.GuildChannels(guildId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
@@ -124,7 +124,7 @@ func (g *LinePostDiscordChannelViewHandler) Index(w http.ResponseWriter, r *http
 	for _, channel := range guild.Channels {
 		err = createCategoryInChannels(
 			ctx,
-			g.Repo,
+			g.repo,
 			guild,
 			channel,
 			categoryPositions,

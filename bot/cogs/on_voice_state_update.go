@@ -32,11 +32,9 @@ func onVoiceStateUpdateFunc(
 	var sendText, beforeMentionText, afterMentionText strings.Builder
 	var embed *discordgo.MessageEmbed
 	var sendMessages []*discordgo.Message
-	var beforeNgUserIDs, afterNgUserIDs []*repository.VcSignalNgUserAllColumn
-	var beforeNgRoleIDs, afterNgRoleIDs[]*repository.VcSignalNgRoleAllColumn
+	var beforeNgUserIDs, afterNgUserIDs, beforeNgRoleIDs, afterNgRoleIDs []string
 	var beforeVcSignalChannel, afterVcSignalChannel *repository.VcSignalChannelAllColumn
-	var beforeMentionUserIDs, afterMentionUserIDs []*repository.VcSignalMentionUser
-	var beforeMentionRoleIDs, afterMentionRoleIDs []*repository.VcSignalMentionRole
+	var beforeMentionUserIDs, afterMentionUserIDs, beforeMentionRoleIDs, afterMentionRoleIDs []string
 	embed = nil
 	if vs.BeforeUpdate != nil && (vs.BeforeUpdate.SelfDeaf != vs.SelfDeaf || vs.BeforeUpdate.SelfMute != vs.SelfMute) {
 		return nil, nil
@@ -45,8 +43,8 @@ func onVoiceStateUpdateFunc(
 	if err != nil {
 		return nil, err
 	}
-	for _, afterNgUser := range afterNgUserIDs {
-		if afterNgUser.UserID == vs.UserID {
+	for _, afterNgUserID := range afterNgUserIDs {
+		if afterNgUserID == vs.UserID {
 			return nil, nil
 		}
 	}
@@ -54,9 +52,9 @@ func onVoiceStateUpdateFunc(
 	if err != nil {
 		return nil, err
 	}
-	for _, afterNgRole := range afterNgRoleIDs {
+	for _, afterNgRoleID := range afterNgRoleIDs {
 		for _, roleID := range vs.Member.Roles {
-			if afterNgRole.RoleID == roleID {
+			if afterNgRoleID == roleID {
 				return nil, nil
 			}
 		}
@@ -81,8 +79,8 @@ func onVoiceStateUpdateFunc(
 	if err != nil {
 		return nil, err
 	}
-	for _, afterMentionUser := range afterMentionUserIDs {
-		if afterMentionUser.UserID == vs.UserID {
+	for _, afterMentionUserID := range afterMentionUserIDs {
+		if afterMentionUserID == vs.UserID {
 			afterMentionText.WriteString("<@")
 			afterMentionText.WriteString(vs.UserID)
 			afterMentionText.WriteString("> ")
@@ -92,9 +90,9 @@ func onVoiceStateUpdateFunc(
 	if err != nil {
 		return nil, err
 	}
-	for _, afterMentionRole := range afterMentionRoleIDs {
+	for _, afterMentionRoleID := range afterMentionRoleIDs {
 		for _, roleID := range vs.Member.Roles {
-			if afterMentionRole.RoleID == roleID {
+			if afterMentionRoleID == roleID {
 				afterMentionText.WriteString("<@&")
 				afterMentionText.WriteString(roleID)
 				afterMentionText.WriteString("> ")
@@ -111,8 +109,8 @@ func onVoiceStateUpdateFunc(
 			if err != nil {
 				return nil, err
 			}
-			for _, beforeMentionUser := range beforeMentionUserIDs {
-				if beforeMentionUser.UserID == vs.UserID {
+			for _, beforeMentionUserID := range beforeMentionUserIDs {
+				if beforeMentionUserID == vs.UserID {
 					beforeMentionText.WriteString("<@")
 					beforeMentionText.WriteString(vs.UserID)
 					beforeMentionText.WriteString("> ")
@@ -122,9 +120,9 @@ func onVoiceStateUpdateFunc(
 			if err != nil {
 				return nil, err
 			}
-			for _, beforeMentionRole := range beforeMentionRoleIDs {
+			for _, beforeMentionRoleID := range beforeMentionRoleIDs {
 				for _, roleID := range vs.Member.Roles {
-					if beforeMentionRole.RoleID == roleID {
+					if beforeMentionRoleID == roleID {
 						beforeMentionText.WriteString("<@&")
 						beforeMentionText.WriteString(roleID)
 						beforeMentionText.WriteString("> ")
@@ -136,8 +134,8 @@ func onVoiceStateUpdateFunc(
 			if err != nil {
 				return nil, err
 			}
-			for _, beforeNgUser := range beforeNgUserIDs {
-				if beforeNgUser.UserID == vs.UserID {
+			for _, beforeNgUserID := range beforeNgUserIDs {
+				if beforeNgUserID == vs.UserID {
 					return nil, nil
 				}
 			}
@@ -145,9 +143,9 @@ func onVoiceStateUpdateFunc(
 			if err != nil {
 				return nil, err
 			}
-			for _, beforeNgRole := range beforeNgRoleIDs {
+			for _, beforeNgRoleID := range beforeNgRoleIDs {
 				for _, roleID := range vs.Member.Roles {
-					if beforeNgRole.RoleID == roleID {
+					if beforeNgRoleID == roleID {
 						return nil, nil
 					}
 				}

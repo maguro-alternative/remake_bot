@@ -107,11 +107,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					return &repository.VcSignalChannelAllColumn{
@@ -123,11 +123,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -168,11 +168,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					return &repository.VcSignalChannelAllColumn{
@@ -184,11 +184,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -248,11 +248,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					if vcChannelID == afterChannelId {
@@ -274,11 +274,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -342,11 +342,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					if vcChannelID == afterChannelId {
@@ -368,11 +368,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -440,11 +440,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					if vcChannelID == afterChannelId {
@@ -466,11 +466,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -518,11 +518,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					if vcChannelID == afterChannelId {
@@ -544,11 +544,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -623,11 +623,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					if vcChannelID == afterChannelId {
@@ -649,11 +649,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -711,11 +711,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					return &repository.VcSignalChannelAllColumn{
@@ -727,11 +727,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -793,11 +793,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					return &repository.VcSignalChannelAllColumn{
@@ -809,11 +809,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -872,11 +872,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					return &repository.VcSignalChannelAllColumn{
@@ -888,11 +888,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -978,11 +978,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					return &repository.VcSignalChannelAllColumn{
@@ -994,11 +994,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -1086,11 +1086,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					return &repository.VcSignalChannelAllColumn{
@@ -1102,11 +1102,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{
@@ -1176,11 +1176,11 @@ func TestVcSignal(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,
 			&repository.RepositoryFuncMock{
-				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgUserAllColumn, error) {
-					return []*repository.VcSignalNgUserAllColumn{}, nil
+				GetVcSignalNgUsersByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalNgRoleAllColumn, error) {
-					return []*repository.VcSignalNgRoleAllColumn{}, nil
+				GetVcSignalNgRolesByVcChannelIDAllColumnFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
 					return &repository.VcSignalChannelAllColumn{
@@ -1192,11 +1192,11 @@ func TestVcSignal(t *testing.T) {
 						EveryoneMention: false,
 					}, nil
 				},
-				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionUser, error) {
-					return []*repository.VcSignalMentionUser{}, nil
+				GetVcSignalMentionUsersByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
-				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]*repository.VcSignalMentionRole, error) {
-					return []*repository.VcSignalMentionRole{}, nil
+				GetVcSignalMentionRolesByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
 				},
 			},
 			&mock.SessionMock{

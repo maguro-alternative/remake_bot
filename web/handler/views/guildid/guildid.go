@@ -15,12 +15,12 @@ import (
 )
 
 type GuildIDViewHandler struct {
-	IndexService *service.IndexService
+	indexService *service.IndexService
 }
 
 func NewGuildIDViewHandler(indexService *service.IndexService) *GuildIDViewHandler {
 	return &GuildIDViewHandler{
-		IndexService: indexService,
+		indexService: indexService,
 	}
 }
 
@@ -31,7 +31,7 @@ func (g *GuildIDViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		ctx = context.Background()
 	}
 	guildId := r.PathValue("guildId")
-	guild, err := g.IndexService.DiscordBotState.Guild(guildId)
+	guild, err := g.indexService.DiscordBotState.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Discordサーバーの読み取りに失敗しました: ", "エラーメッセージ:", err.Error())

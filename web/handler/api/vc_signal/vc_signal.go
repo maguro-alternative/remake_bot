@@ -28,6 +28,7 @@ func (h *VcSignalHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
+	guildId := r.PathValue("guildId")
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		slog.ErrorContext(ctx, "/api/vc-signal Method Not Allowed")
@@ -62,7 +63,7 @@ func (h *VcSignalHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, userId := range vcSignal.VcSignalNgUserIDs {
-			err = h.repo.InsertVcSignalNgUser(ctx, vcSignal.VcChannelID, vcSignalJson.GuildID, userId)
+			err = h.repo.InsertVcSignalNgUser(ctx, vcSignal.VcChannelID, guildId, userId)
 			if err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				slog.ErrorContext(ctx, "NgUserIDの追加に失敗しました。", "エラー:", err.Error())
@@ -76,7 +77,7 @@ func (h *VcSignalHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, roleId := range vcSignal.VcSignalNgRoleIDs {
-			err = h.repo.InsertVcSignalNgRole(ctx, vcSignal.VcChannelID, vcSignalJson.GuildID, roleId)
+			err = h.repo.InsertVcSignalNgRole(ctx, vcSignal.VcChannelID, guildId, roleId)
 			if err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				slog.ErrorContext(ctx, "NgRoleIDの追加に失敗しました。", "エラー:", err.Error())
@@ -90,7 +91,7 @@ func (h *VcSignalHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, userId := range vcSignal.VcSignalMentionUserIDs {
-			err = h.repo.InsertVcSignalMentionUser(ctx, vcSignal.VcChannelID, vcSignalJson.GuildID, userId)
+			err = h.repo.InsertVcSignalMentionUser(ctx, vcSignal.VcChannelID, guildId, userId)
 			if err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				slog.ErrorContext(ctx, "MentionUserIDの追加に失敗しました。", "エラー:", err.Error())
@@ -104,7 +105,7 @@ func (h *VcSignalHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, roleId := range vcSignal.VcSignalMentionRoleIDs {
-			err = h.repo.InsertVcSignalMentionRole(ctx, vcSignal.VcChannelID, vcSignalJson.GuildID, roleId)
+			err = h.repo.InsertVcSignalMentionRole(ctx, vcSignal.VcChannelID, guildId, roleId)
 			if err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				slog.ErrorContext(ctx, "MentionRoleIDの追加に失敗しました。", "エラー:", err.Error())

@@ -17,7 +17,6 @@ import (
 
 func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 	vcSignal := internal.VcSignalJson{
-		GuildID: "987654321",
 		VcSignals: []internal.VcSignal{
 			{
 				VcChannelID:     "987654321",

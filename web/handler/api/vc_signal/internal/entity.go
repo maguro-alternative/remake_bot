@@ -5,7 +5,6 @@ import (
 )
 
 type VcSignalJson struct {
-	GuildID   string      `json:"guildId"`
 	VcSignals []VcSignal `json:"vcSignal"`
 }
 
@@ -23,6 +22,6 @@ type VcSignal struct {
 
 func (g VcSignalJson) Validate() error {
 	return validation.ValidateStruct(&g,
-		validation.Field(&g.GuildID, validation.Required),
+		validation.Field(&g.VcSignals, validation.Required),
 	)
 }

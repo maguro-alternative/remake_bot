@@ -20,8 +20,8 @@ import (
 )
 
 type LineTokenViewHandler struct {
-	IndexService *service.IndexService
-	Repo         repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 }
 
 func NewLineTokenViewHandler(
@@ -29,8 +29,8 @@ func NewLineTokenViewHandler(
 	repo repository.RepositoryFunc,
 ) *LineTokenViewHandler {
 	return &LineTokenViewHandler{
-		IndexService: indexService,
-		Repo:         repo,
+		indexService: indexService,
+		repo:         repo,
 	}
 }
 
@@ -42,7 +42,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		ctx = context.Background()
 	}
 
-	guild, err := g.IndexService.DiscordBotState.Guild(guildId)
+	guild, err := g.indexService.DiscordBotState.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Not get guild id: "+err.Error())
@@ -50,7 +50,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if guild.Channels == nil {
-		guild.Channels, err = g.IndexService.DiscordSession.GuildChannels(guildId)
+		guild.Channels, err = g.indexService.DiscordSession.GuildChannels(guildId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
@@ -96,10 +96,10 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			channelsInCategory,
 		)
 	}
-	lineBot, err := g.Repo.GetAllColumnsLineBotByGuildID(ctx, guildId)
+	lineBot, err := g.repo.GetAllColumnsLineBotByGuildID(ctx, guildId)
 	if err != nil && err.Error() == "sql: no rows in result set" {
 		slog.InfoContext(ctx, "line_botが存在しないため新規作成します")
-		err = g.Repo.InsertLineBot(ctx, &repository.LineBot{
+		err = g.repo.InsertLineBot(ctx, &repository.LineBot{
 			GuildID:          guildId,
 			DefaultChannelID: guild.SystemChannelID,
 			DebugMode:        false,
@@ -109,7 +109,7 @@ func (g *LineTokenViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			slog.ErrorContext(ctx, "line_botの作成に失敗しました:"+err.Error())
 			return
 		}
-		err = g.Repo.InsertLineBotIvByGuildID(ctx, guildId)
+		err = g.repo.InsertLineBotIvByGuildID(ctx, guildId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "line_bot_ivの作成に失敗しました:"+err.Error())

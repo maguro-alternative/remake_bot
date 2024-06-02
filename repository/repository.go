@@ -56,6 +56,7 @@ type RepositoryFuncMock struct {
 	GetVcSignalMentionUsersByVcChannelIDFunc              func(ctx context.Context, vcChannelID string) ([]*VcSignalMentionUser, error)
 	GetVcSignalMentionRolesByVcChannelIDFunc              func(ctx context.Context, vcChannelID string) ([]*VcSignalMentionRole, error)
 	UpdateVcSignalChannelFunc                             func(ctx context.Context, vcSignalChannelNotGuildID VcSignalChannelNotGuildID) error
+	InsertVcSignalChannelFunc                             func(ctx context.Context, vcChannelID string, guildID, sendChannelID string) error
 	InsertVcSignalNgUserFunc                              func(ctx context.Context, vcChannelID string, guildID string, userID string) error
 	InsertVcSignalNgRoleFunc                              func(ctx context.Context, vcChannelID string, guildID string, roleID string) error
 	InsertVcSignalMentionUserFunc                         func(ctx context.Context, vcChannelID string, guildID string, userID string) error
@@ -222,6 +223,10 @@ func (r *RepositoryFuncMock) UpdateVcSignalChannel(ctx context.Context, vcSignal
 	return r.UpdateVcSignalChannelFunc(ctx, vcSignalChannelNotGuildID)
 }
 
+func (r *RepositoryFuncMock) InsertVcSignalChannel(ctx context.Context, vcChannelID string, guildID, sendChannelID string) error {
+	return r.InsertVcSignalChannelFunc(ctx, vcChannelID, guildID, sendChannelID)
+}
+
 func (r *RepositoryFuncMock) InsertVcSignalNgUser(ctx context.Context, vcChannelID string, guildID string, userID string) error {
 	return r.InsertVcSignalNgUserFunc(ctx, vcChannelID, guildID, userID)
 }
@@ -295,6 +300,7 @@ type RepositoryFunc interface {
 	GetVcSignalMentionUsersByVcChannelID(ctx context.Context, vcChannelID string) ([]*VcSignalMentionUser, error)
 	GetVcSignalMentionRolesByVcChannelID(ctx context.Context, vcChannelID string) ([]*VcSignalMentionRole, error)
 	UpdateVcSignalChannel(ctx context.Context, vcChannel VcSignalChannelNotGuildID) error
+	InsertVcSignalChannel(ctx context.Context, vcChannelID string, guildID, sendChannelID string) error
 	InsertVcSignalNgUser(ctx context.Context, vcChannelID string, guildID string, userID string) error
 	InsertVcSignalNgRole(ctx context.Context, vcChannelID string, guildID string, roleID string) error
 	InsertVcSignalMentionUser(ctx context.Context, vcChannelID string, guildID string, userID string) error

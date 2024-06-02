@@ -52,7 +52,7 @@ func (g *LineGroupViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		guild.Channels, err = g.indexService.DiscordSession.GuildChannels(guildId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "Not get guild channels: "+err.Error())
+			slog.ErrorContext(ctx, "サーバー内のチャンネルの取得に失敗しました。 ", "エラー", err.Error())
 			return
 		}
 	}

@@ -27,11 +27,11 @@ func (r *Repository) InsertVcSignalNgRole(ctx context.Context, vcChannelID, guil
 	return err
 }
 
-func (r *Repository) GetVcSignalNgRolesByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]*VcSignalNgRoleAllColumn, error) {
-	var ngRoleIDs []*VcSignalNgRoleAllColumn
+func (r *Repository) GetVcSignalNgRolesByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]string, error) {
+	var ngRoleIDs []string
 	err := r.db.SelectContext(ctx, &ngRoleIDs, `
 		SELECT
-			*
+			role_id
 		FROM
 			vc_signal_ng_role_id
 		WHERE

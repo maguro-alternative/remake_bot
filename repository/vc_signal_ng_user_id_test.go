@@ -88,7 +88,7 @@ func TestGetVcSignalNgUsersByChannelIDAllColumn(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		ngUsers, err := repo.GetVcSignalNgUsersByVcChannelIDAllColumn(ctx, "111")
+		ngUsers, err := repo.GetVcSignalNgUserIDsByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Len(t, ngUsers, 1)
@@ -106,7 +106,7 @@ func TestGetVcSignalNgUsersByChannelIDAllColumn(t *testing.T) {
 
 		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 		repo := NewRepository(tx)
-		ngUsers, err := repo.GetVcSignalNgUsersByVcChannelIDAllColumn(ctx, "111")
+		ngUsers, err := repo.GetVcSignalNgUserIDsByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Len(t, ngUsers, 0)

@@ -101,7 +101,7 @@ func TestGetVcSignalMentionUsersByChannelID(t *testing.T) {
 			}),
 		)
 
-		mentionUserIDs, err := repo.GetVcSignalMentionUsersByVcChannelID(ctx, "111")
+		mentionUserIDs, err := repo.GetVcSignalMentionUserIDsByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Len(t, mentionUserIDs, 1)
@@ -120,7 +120,7 @@ func TestGetVcSignalMentionUsersByChannelID(t *testing.T) {
 		tx.ExecContext(ctx, "DELETE FROM vc_signal_mention_user_id")
 		repo := NewRepository(tx)
 
-		mentionUserIDs, err := repo.GetVcSignalMentionUsersByVcChannelID(ctx, "111")
+		mentionUserIDs, err := repo.GetVcSignalMentionUserIDsByVcChannelID(ctx, "111")
 		assert.NoError(t, err)
 
 		assert.Len(t, mentionUserIDs, 0)

@@ -27,7 +27,7 @@ func (r *Repository) InsertVcSignalMentionRole(ctx context.Context, vcChannelID,
 	return err
 }
 
-func (r *Repository) GetVcSignalMentionRolesByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
+func (r *Repository) GetVcSignalMentionRoleIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
 	var mentionRoleIDs []string
 	err := r.db.SelectContext(ctx, &mentionRoleIDs, `
 		SELECT

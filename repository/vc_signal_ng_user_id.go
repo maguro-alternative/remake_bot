@@ -27,7 +27,7 @@ func (r *Repository) InsertVcSignalNgUser(ctx context.Context, vcChannelID, guil
 	return err
 }
 
-func (r *Repository) GetVcSignalNgUsersByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]string, error) {
+func (r *Repository) GetVcSignalNgUserIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
 	var ngUserIDs []string
 	err := r.db.SelectContext(ctx, &ngUserIDs, `
 		SELECT

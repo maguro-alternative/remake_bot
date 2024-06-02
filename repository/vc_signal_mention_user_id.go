@@ -27,7 +27,7 @@ func (r *Repository) InsertVcSignalMentionUser(ctx context.Context, vcChannelID,
 	return err
 }
 
-func (r *Repository) GetVcSignalMentionUsersByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
+func (r *Repository) GetVcSignalMentionUserIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
 	var mentionUserIDs []string
 	err := r.db.SelectContext(ctx, &mentionUserIDs, `
 		SELECT

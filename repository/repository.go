@@ -50,11 +50,11 @@ type RepositoryFuncMock struct {
 	GetPermissionRoleIDsByGuildIDAndTypeFunc              func(ctx context.Context, guildID, permissionType string) ([]PermissionRoleID, error)
 	DeletePermissionUserIDsByGuildIDFunc                  func(ctx context.Context, guildId string) error
 	DeletePermissionRoleIDsByGuildIDFunc                  func(ctx context.Context, guildId string) error
-	GetVcSignalNgUsersByVcChannelIDAllColumnFunc          func(ctx context.Context, vcChannelID string) ([]string, error)
-	GetVcSignalNgRolesByVcChannelIDAllColumnFunc          func(ctx context.Context, vcChannelID string) ([]string, error)
+	GetVcSignalNgUserIDsByVcChannelIDFunc                 func(ctx context.Context, vcChannelID string) ([]string, error)
+	GetVcSignalNgRoleIDsByVcChannelIDFunc                 func(ctx context.Context, vcChannelID string) ([]string, error)
 	GetVcSignalChannelAllColumnByVcChannelIDFunc          func(ctx context.Context, vcChannelID string) (*VcSignalChannelAllColumn, error)
-	GetVcSignalMentionUsersByVcChannelIDFunc              func(ctx context.Context, vcChannelID string) ([]string, error)
-	GetVcSignalMentionRolesByVcChannelIDFunc              func(ctx context.Context, vcChannelID string) ([]string, error)
+	GetVcSignalMentionUserIDsByVcChannelIDFunc            func(ctx context.Context, vcChannelID string) ([]string, error)
+	GetVcSignalMentionRoleIDsByVcChannelIDFunc            func(ctx context.Context, vcChannelID string) ([]string, error)
 	UpdateVcSignalChannelFunc                             func(ctx context.Context, vcSignalChannelNotGuildID VcSignalChannelNotGuildID) error
 	InsertVcSignalChannelFunc                             func(ctx context.Context, vcChannelID string, guildID, sendChannelID string) error
 	InsertVcSignalNgUserFunc                              func(ctx context.Context, vcChannelID string, guildID string, userID string) error
@@ -199,24 +199,24 @@ func (r *RepositoryFuncMock) DeletePermissionRoleIDsByGuildID(ctx context.Contex
 	return r.DeletePermissionRoleIDsByGuildIDFunc(ctx, guildId)
 }
 
-func (r *RepositoryFuncMock) GetVcSignalNgUsersByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]string, error) {
-	return r.GetVcSignalNgUsersByVcChannelIDAllColumnFunc(ctx, vcChannelID)
+func (r *RepositoryFuncMock) GetVcSignalNgUserIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
+	return r.GetVcSignalNgUserIDsByVcChannelIDFunc(ctx, vcChannelID)
 }
 
-func (r *RepositoryFuncMock) GetVcSignalNgRolesByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]string, error) {
-	return r.GetVcSignalNgRolesByVcChannelIDAllColumnFunc(ctx, vcChannelID)
+func (r *RepositoryFuncMock) GetVcSignalNgRoleIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
+	return r.GetVcSignalNgRoleIDsByVcChannelIDFunc(ctx, vcChannelID)
 }
 
 func (r *RepositoryFuncMock) GetVcSignalChannelAllColumnByVcChannelID(ctx context.Context, vcChannelID string) (*VcSignalChannelAllColumn, error) {
 	return r.GetVcSignalChannelAllColumnByVcChannelIDFunc(ctx, vcChannelID)
 }
 
-func (r *RepositoryFuncMock) GetVcSignalMentionUsersByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
-	return r.GetVcSignalMentionUsersByVcChannelIDFunc(ctx, vcChannelID)
+func (r *RepositoryFuncMock) GetVcSignalMentionUserIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
+	return r.GetVcSignalMentionUserIDsByVcChannelIDFunc(ctx, vcChannelID)
 }
 
-func (r *RepositoryFuncMock) GetVcSignalMentionRolesByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
-	return r.GetVcSignalMentionRolesByVcChannelIDFunc(ctx, vcChannelID)
+func (r *RepositoryFuncMock) GetVcSignalMentionRoleIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error) {
+	return r.GetVcSignalMentionRoleIDsByVcChannelIDFunc(ctx, vcChannelID)
 }
 
 func (r *RepositoryFuncMock) UpdateVcSignalChannel(ctx context.Context, vcSignalChannelNotGuildID VcSignalChannelNotGuildID) error {
@@ -294,11 +294,11 @@ type RepositoryFunc interface {
 	GetPermissionRoleIDsByGuildIDAndType(ctx context.Context, guildID, permissionType string) ([]PermissionRoleID, error)
 	DeletePermissionUserIDsByGuildID(ctx context.Context, guildId string) error
 	DeletePermissionRoleIDsByGuildID(ctx context.Context, guildId string) error
-	GetVcSignalNgUsersByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]string, error)
-	GetVcSignalNgRolesByVcChannelIDAllColumn(ctx context.Context, vcChannelID string) ([]string, error)
+	GetVcSignalNgUserIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error)
+	GetVcSignalNgRoleIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error)
 	GetVcSignalChannelAllColumnByVcChannelID(ctx context.Context, vcChannelID string) (*VcSignalChannelAllColumn, error)
-	GetVcSignalMentionUsersByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error)
-	GetVcSignalMentionRolesByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error)
+	GetVcSignalMentionUserIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error)
+	GetVcSignalMentionRoleIDsByVcChannelID(ctx context.Context, vcChannelID string) ([]string, error)
 	UpdateVcSignalChannel(ctx context.Context, vcChannel VcSignalChannelNotGuildID) error
 	InsertVcSignalChannel(ctx context.Context, vcChannelID string, guildID, sendChannelID string) error
 	InsertVcSignalNgUser(ctx context.Context, vcChannelID string, guildID string, userID string) error

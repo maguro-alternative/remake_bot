@@ -39,7 +39,7 @@ func onVoiceStateUpdateFunc(
 	if vs.BeforeUpdate != nil && (vs.BeforeUpdate.SelfDeaf != vs.SelfDeaf || vs.BeforeUpdate.SelfMute != vs.SelfMute) {
 		return nil, nil
 	}
-	afterNgUserIDs, err := repo.GetVcSignalNgUsersByVcChannelIDAllColumn(ctx, vs.ChannelID)
+	afterNgUserIDs, err := repo.GetVcSignalNgUserIDsByVcChannelID(ctx, vs.ChannelID)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func onVoiceStateUpdateFunc(
 			return nil, nil
 		}
 	}
-	afterNgRoleIDs, err = repo.GetVcSignalNgRolesByVcChannelIDAllColumn(ctx, vs.ChannelID)
+	afterNgRoleIDs, err = repo.GetVcSignalNgRoleIDsByVcChannelID(ctx, vs.ChannelID)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func onVoiceStateUpdateFunc(
 	if afterVcSignalChannel.EveryoneMention {
 		afterMentionText.WriteString("@everyone ")
 	}
-	afterMentionUserIDs, err = repo.GetVcSignalMentionUsersByVcChannelID(ctx, vs.ChannelID)
+	afterMentionUserIDs, err = repo.GetVcSignalMentionUserIDsByVcChannelID(ctx, vs.ChannelID)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func onVoiceStateUpdateFunc(
 			afterMentionText.WriteString("> ")
 		}
 	}
-	afterMentionRoleIDs, err = repo.GetVcSignalMentionRolesByVcChannelID(ctx, vs.ChannelID)
+	afterMentionRoleIDs, err = repo.GetVcSignalMentionRoleIDsByVcChannelID(ctx, vs.ChannelID)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func onVoiceStateUpdateFunc(
 			return nil, err
 		}
 		if beforeVcSignalChannel.SendSignal {
-			beforeMentionUserIDs, err = repo.GetVcSignalMentionUsersByVcChannelID(ctx, vs.BeforeUpdate.ChannelID)
+			beforeMentionUserIDs, err = repo.GetVcSignalMentionUserIDsByVcChannelID(ctx, vs.BeforeUpdate.ChannelID)
 			if err != nil {
 				return nil, err
 			}
@@ -116,7 +116,7 @@ func onVoiceStateUpdateFunc(
 					beforeMentionText.WriteString("> ")
 				}
 			}
-			beforeMentionRoleIDs, err = repo.GetVcSignalMentionRolesByVcChannelID(ctx, vs.BeforeUpdate.ChannelID)
+			beforeMentionRoleIDs, err = repo.GetVcSignalMentionRoleIDsByVcChannelID(ctx, vs.BeforeUpdate.ChannelID)
 			if err != nil {
 				return nil, err
 			}
@@ -130,7 +130,7 @@ func onVoiceStateUpdateFunc(
 				}
 			}
 
-			beforeNgUserIDs, err = repo.GetVcSignalNgUsersByVcChannelIDAllColumn(ctx, vs.BeforeUpdate.ChannelID)
+			beforeNgUserIDs, err = repo.GetVcSignalNgUserIDsByVcChannelID(ctx, vs.BeforeUpdate.ChannelID)
 			if err != nil {
 				return nil, err
 			}
@@ -139,7 +139,7 @@ func onVoiceStateUpdateFunc(
 					return nil, nil
 				}
 			}
-			beforeNgRoleIDs, err = repo.GetVcSignalNgRolesByVcChannelIDAllColumn(ctx, vs.BeforeUpdate.ChannelID)
+			beforeNgRoleIDs, err = repo.GetVcSignalNgRoleIDsByVcChannelID(ctx, vs.BeforeUpdate.ChannelID)
 			if err != nil {
 				return nil, err
 			}

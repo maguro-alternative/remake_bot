@@ -18,8 +18,8 @@ import (
 )
 
 type PermissionViewHandler struct {
-	IndexService *service.IndexService
-	Repo         repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 }
 
 func NewPermissionViewHandler(
@@ -27,8 +27,8 @@ func NewPermissionViewHandler(
 	repo repository.RepositoryFunc,
 ) *PermissionViewHandler {
 	return &PermissionViewHandler{
-		IndexService: indexService,
-		Repo:         repo,
+		indexService: indexService,
+		repo:         repo,
 	}
 }
 
@@ -46,7 +46,7 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	var componentPermissionUserIDs []internal.PermissionUserID
 	var componentPermissionRoleIDs []internal.PermissionRoleID
 
-	guild, err := h.IndexService.DiscordBotState.Guild(guildId)
+	guild, err := h.indexService.DiscordBotState.Guild(guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "Not get guild id: "+err.Error())
@@ -54,7 +54,7 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if guild.Members == nil {
-		guild.Members, err = h.IndexService.DiscordSession.GuildMembers(guildId, "", 1000)
+		guild.Members, err = h.indexService.DiscordSession.GuildMembers(guildId, "", 1000)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get guild members: "+err.Error())
@@ -74,21 +74,21 @@ func (h *PermissionViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		lineSession = &model.LineOAuthSession{}
 	}
 
-	permissionCodes, err := h.Repo.GetPermissionCodesByGuildID(ctx, guildId)
+	permissionCodes, err := h.repo.GetPermissionCodesByGuildID(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "permissions_codeの取得に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	permissionUserIDs, err := h.Repo.GetGuildPermissionUserIDsAllColumnsByGuildID(ctx, guildId)
+	permissionUserIDs, err := h.repo.GetGuildPermissionUserIDsAllColumnsByGuildID(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "permissions_idの取得に失敗しました。", "エラー:", err.Error())
 		return
 	}
 
-	permissionRoleIDs, err := h.Repo.GetGuildPermissionRoleIDsAllColumnsByGuildID(ctx, guildId)
+	permissionRoleIDs, err := h.repo.GetGuildPermissionRoleIDsAllColumnsByGuildID(ctx, guildId)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		slog.ErrorContext(ctx, "permissions_idの取得に失敗しました。", "エラー:", err.Error())

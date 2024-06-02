@@ -27,12 +27,12 @@ type userGuild struct {
 }
 
 type GuildsViewHandler struct {
-	IndexService *service.IndexService
+	indexService *service.IndexService
 }
 
 func NewGuildsViewHandler(indexService *service.IndexService) *GuildsViewHandler {
 	return &GuildsViewHandler{
-		IndexService: indexService,
+		indexService: indexService,
 	}
 }
 
@@ -54,8 +54,8 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var matchGuilds []discordgo.UserGuild
-	var client = *g.IndexService.Client
-	botGuilds, err := g.IndexService.DiscordSession.UserGuilds(100, "", "", discordgo.WithClient(&client))
+	var client = *g.indexService.Client
+	botGuilds, err := g.indexService.DiscordSession.UserGuilds(100, "", "", discordgo.WithClient(&client))
 	if err != nil {
 		slog.ErrorContext(ctx, "Botサーバー取得に失敗しました。", "エラー: ", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

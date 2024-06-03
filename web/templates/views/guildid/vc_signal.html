@@ -1,0 +1,23 @@
+{{ define "content" }}
+    <main>
+        <ul>
+            <li>
+                <a href="/guild/{{ .GuildID }}">
+                    <img src="{{ .GuildIconUrl }}" alt="{{ .GuildName }}">
+                </a>
+            </li>
+            <li>
+                <a href="/guild/{{ .GuildID }}">
+                    {{ .GuildName }}
+                </a>
+            </li>
+        </ul>
+        <h1>ボイスチャンネルの入退出通知</h1>
+        <!-- 入力フォーム -->
+        <form action="#" id="form">
+            {{ .HTMLForm }}
+
+            {{ .SubmitTag }}
+        </form>
+    </main>
+{{ end }}

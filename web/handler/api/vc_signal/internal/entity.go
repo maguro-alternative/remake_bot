@@ -5,7 +5,7 @@ import (
 )
 
 type VcSignalJson struct {
-	VcSignals []VcSignal `json:"vcSignal"`
+	VcSignals []VcSignal `json:"vcSignals"`
 }
 
 type VcSignal struct {

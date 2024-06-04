@@ -32,7 +32,6 @@ func CreateVcSignalForm(
 	htmlFormBuilder := strings.Builder{}
 	categoryComponentBuilders := make([]strings.Builder, len(categoryIDTmps)+1)
 	var categoryIndex int
-	var sendSignalFlag, joinBotFlag, everyoneMentionFlag string
 	for categoryID, vcChannels := range vcChannelSets {
 		for i, categoryIDTmp := range categoryIDTmps {
 			if categoryID == "" {
@@ -53,6 +52,7 @@ func CreateVcSignalForm(
             <summary>%s</summary>
 		`, categoryChannelName))
 		for _, channel := range vcChannels {
+			var sendSignalFlag, joinBotFlag, everyoneMentionFlag string
 			if channel.ID == "" {
 				continue
 			}
@@ -82,7 +82,7 @@ func CreateVcSignalForm(
 					<label for="sendSignal` + channel.ID + `">通知を送信する</label>
 					<input type="checkbox" id="sendSignal` + channel.ID + `" name="sendSignal` + channel.ID + `" ` + sendSignalFlag + ` />
 					<br/>
-					<label for="joinBot` + channel.ID + `">Botの入退出は通知しない</label>
+					<label for="joinBot` + channel.ID + `">Botの入退出を通知する</label>
 					<input type="checkbox" id="joinBot` + channel.ID + `" name="joinBot` + channel.ID + `"` + joinBotFlag + ` />
 					<br/>
 					<label for="everyoneMention` + channel.ID + `">通知に@everyoneメンションをつける</label>

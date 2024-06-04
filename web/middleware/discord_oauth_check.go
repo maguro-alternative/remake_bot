@@ -133,6 +133,8 @@ func DiscordOAuthCheckMiddleware(
 				permissionType = "lineBot"
 			case "line-post-discord-channel":
 				permissionType = "linePostDiscordChannel"
+			case "vc-signal":
+				permissionType = "vcSignal"
 			default:
 				slog.InfoContext(ctx, "権限チャンネル以外", "permissionType", permissionType)
 				h.ServeHTTP(w, r.WithContext(ctx))

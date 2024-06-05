@@ -104,12 +104,12 @@ func CreateVcSignalForm(
 					</select>
 					<br/>
 					<label for="vcSignalMentionUserIds` + channel.ID + `[]">メンションユーザー</label><br/>
-					<select id="mention_users` + channel.ID + `[]" name="vcSignalMentionUsers` + channel.ID + `[]" multiple>
+					<select id="mention_users` + channel.ID + `[]" name="vcSignalMentionUserIds` + channel.ID + `[]" multiple>
 						` + selectMentionMemberForm + `
 					</select>
 					<br/>
-					<label for="vcSignalMentionRoles` + channel.ID + `[]">メンションロール</label><br/>
-					<select id="mention_roles` + channel.ID + `[]" name="vcSignalMentionRoles` + channel.ID + `[]" multiple>
+					<label for="vcSignalMentionRoleIds` + channel.ID + `[]">メンションロール</label><br/>
+					<select id="mention_roles` + channel.ID + `[]" name="vcSignalMentionRoleIds` + channel.ID + `[]" multiple>
 						` + selectMentionRoleForm + `
 					</select>
 					<br/>
@@ -163,38 +163,3 @@ func createRoleSelectForm(guild *discordgo.Guild, roles []string) (string) {
 	}
 	return selectRoleFormBuilder.String()
 }
-
-func createChannelsInCategory(
-	guild *discordgo.Guild,
-	channel *discordgo.Channel,
-	categoryPositions map[string]components.DiscordChannel,
-	channelsInCategory map[string][]components.DiscordChannelSelect,
-) {
-	// カテゴリー、フォーラムチャンネルはスキップ
-	if channel.Type == discordgo.ChannelTypeGuildForum {
-		return
-	}
-	if channel.Type == discordgo.ChannelTypeGuildCategory {
-		return
-	}
-	typeIcon := "🔊"
-	if channel.Type == discordgo.ChannelTypeGuildText {
-		typeIcon = "📝"
-	}
-	categoryPosition := categoryPositions[channel.ParentID]
-	// まだチャンネルがない場合は初期化
-	if len(channelsInCategory[categoryPosition.ID]) == 0 {
-		channelsInCategory[categoryPosition.ID] = make([]components.DiscordChannelSelect, len(guild.Channels)+1)
-	}
-	channelsInCategory[categoryPosition.ID][channel.Position] = components.DiscordChannelSelect{
-		ID:   channel.ID,
-		Name: fmt.Sprintf("%s:%s:%s", categoryPosition.Name, typeIcon, channel.Name),
-	}
-	if categoryPosition.ID == "" {
-		channelsInCategory[categoryPosition.ID][channel.Position] = components.DiscordChannelSelect{
-			ID:   channel.ID,
-			Name: fmt.Sprintf("カテゴリーなし:%s:%s", typeIcon, channel.Name),
-		}
-	}
-}
-

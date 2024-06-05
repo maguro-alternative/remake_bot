@@ -206,7 +206,7 @@ func onVoiceStateUpdateFunc(
 				embed = &discordgo.MessageEmbed{
 					Title: "通話終了",
 				}
-				sendText.WriteString(beforeMentionText.String())
+				sendText.WriteString(afterMentionText.String())
 				sendText.WriteString("通話が終了しました。")
 				sendMessage, err := s.ChannelMessageSend(afterVcSignalChannel.SendChannelID, sendText.String())
 				if err != nil {

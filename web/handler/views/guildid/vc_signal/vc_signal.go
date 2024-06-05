@@ -166,22 +166,24 @@ func createCategoryInChannels(
 	vcChannelSets map[string][]internal.VcChannelSet,
 	channelsInCategory map[string][]components.DiscordChannelSelect,
 ) error {
-	typeIcon := "🔊"
+	typeIcon := "📝"
 	if channel.Type == discordgo.ChannelTypeGuildForum {
 		return nil
 	}
 	if channel.Type == discordgo.ChannelTypeGuildCategory {
 		return nil
 	}
+	if channel.Type == discordgo.ChannelTypeGuildVoice {
+		typeIcon = "🔊"
+	}
+	if len(channelsInCategory[channel.ParentID]) == 0 {
+		channelsInCategory[channel.ParentID] = make([]components.DiscordChannelSelect, len(guild.Channels)+1)
+	}
+	channelsInCategory[channel.ParentID][channel.Position] = components.DiscordChannelSelect{
+		ID:   channel.ID,
+		Name: fmt.Sprintf("%s:%s:%s", categoryPositions[channel.ParentID].Name, typeIcon, channel.Name),
+	}
 	if channel.Type == discordgo.ChannelTypeGuildText {
-		typeIcon = "📝"
-		if len(channelsInCategory[channel.ParentID]) == 0 {
-			channelsInCategory[channel.ParentID] = make([]components.DiscordChannelSelect, len(guild.Channels)+1)
-		}
-		channelsInCategory[channel.ParentID][channel.Position] = components.DiscordChannelSelect{
-			ID:   channel.ID,
-			Name: fmt.Sprintf("%s:%s:%s", categoryPositions[channel.ParentID].Name, typeIcon, channel.Name),
-		}
 		return nil
 	}
 	categoryPosition := categoryPositions[channel.ParentID]

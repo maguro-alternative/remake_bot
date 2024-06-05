@@ -59,17 +59,17 @@ const createJsonData = async function(formElements, formData) {
                 "vcSignalNgRoles": ngRoleArray
             }
         }
-        if ((formKey.includes('vcSignalMentionUsers')) && (formKey.includes('[]'))) {
-            jsonTmp[channelId]['vcSignalMentionUsers'] = formData.getAll(formKey);
+        if ((formKey.includes('vcSignalMentionUserIds')) && (formKey.includes('[]'))) {
+            jsonTmp[channelId]['vcSignalMentionUserIds'] = formData.getAll(formKey);
         }
-        if ((formKey.includes('vcSignalMentionRoles')) && (formKey.includes('[]'))) {
-            jsonTmp[channelId]['vcSignalMentionRoles'] = formData.getAll(formKey);
+        if ((formKey.includes('vcSignalMentionRoleIds')) && (formKey.includes('[]'))) {
+            jsonTmp[channelId]['vcSignalMentionRoleIds'] = formData.getAll(formKey);
         }
-        if ((formKey.includes('vcSignalNgUsers')) && (formKey.includes('[]'))) {
-            jsonTmp[channelId]['vcSignalNgUsers'] = formData.getAll(formKey);
+        if ((formKey.includes('vcSignalNgUserIds')) && (formKey.includes('[]'))) {
+            jsonTmp[channelId]['vcSignalNgUserIds'] = formData.getAll(formKey);
         }
-        if ((formKey.includes('vcSignalNgRoles')) && (formKey.includes('[]'))) {
-            jsonTmp[channelId]['vcSignalNgRoles'] = formData.getAll(formKey);
+        if ((formKey.includes('vcSignalNgRoleIds')) && (formKey.includes('[]'))) {
+            jsonTmp[channelId]['vcSignalNgRoleIds'] = formData.getAll(formKey);
         }
         if (formKey.includes('sendSignal')) {
             document.getElementById(formKey).checked ? jsonTmp[channelId]["sendSignal"] = true : jsonTmp[channelId]["sendSignal"] = false;

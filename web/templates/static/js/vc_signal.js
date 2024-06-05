@@ -13,8 +13,6 @@ document.getElementById('form').onsubmit = async function (event) {
 
     const jsonData = await createJsonData(formElements, formData);
 
-    console.log(jsonData);
-
     // データを送信
     await fetch(`/api/${guildId}/vc-signal`, {
         method: 'POST',

@@ -87,7 +87,29 @@ describe('fetchLineTokenData', () => {
 
         const jsonData = await createJsonData(formData)
 
-        expect(jsonData).toEqual('{"guildId":"111","lineNotifyToken":"line_notify_token","lineBotToken":"line_bot_token","lineBotSecret":"line_bot_secret","lineGroupId":"line_group_id","lineClientId":"line_client_id","lineClientSecret":"line_client_secret","debugMode":true,"lineNotifyTokenDelete":false,"lineBotTokenDelete":false,"lineBotSecretDelete":false,"lineGroupIdDelete":false,"lineClientIdDelete":false,"lineClientSecretDelete":false}');
+        // jsonDataをオブジェクトにパース
+        const parsedJsonData = JSON.parse(jsonData);
+
+        // 期待値のオブジェクトを定義
+        const expectedObject = {
+            guildId: "111",
+            lineNotifyToken: "line_notify_token",
+            lineBotToken: "line_bot_token",
+            lineBotSecret: "line_bot_secret",
+            lineGroupId: "line_group_id",
+            lineClientId: "line_client_id",
+            lineClientSecret: "line_client_secret",
+            debugMode: true,
+            lineNotifyTokenDelete: false,
+            lineBotTokenDelete: false,
+            lineBotSecretDelete: false,
+            lineGroupIdDelete: false,
+            lineClientIdDelete: false,
+            lineClientSecretDelete: false
+        };
+
+        // パースしたオブジェクトと期待値のオブジェクトを比較
+        expect(parsedJsonData).toEqual(expectedObject);
     })
 });
 
@@ -116,6 +138,22 @@ describe('fetchLineTokenData', () => {
 
         const jsonData = await createJsonData(formData)
 
-        expect(jsonData).toEqual('{"guildId":"111","lineBotTokenDelete":true,"debugMode":false,"lineNotifyTokenDelete":false,"lineBotSecretDelete":false,"lineGroupIdDelete":false,"lineClientIdDelete":false,"lineClientSecretDelete":false}')
+        // jsonDataをオブジェクトにパース
+        const parsedJsonData = JSON.parse(jsonData);
+
+        // 期待値のオブジェクトを定義
+        const expectedObject = {
+            guildId: "111",
+            lineBotTokenDelete: true,
+            debugMode: false,
+            lineNotifyTokenDelete: false,
+            lineBotSecretDelete: false,
+            lineGroupIdDelete: false,
+            lineClientIdDelete: false,
+            lineClientSecretDelete: false
+        };
+
+        // パースしたオブジェクトと期待値のオブジェクトを比較
+        expect(parsedJsonData).toEqual(expectedObject);
     })
 });

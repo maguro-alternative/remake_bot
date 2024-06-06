@@ -352,6 +352,9 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 				return nil
 			},
 			GetVcSignalNgUserIDsByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+				if (vcChannelID == "123456") {
+					return []string{"123"}, nil
+				}
 				return []string{}, nil
 			},
 			GetVcSignalNgRoleIDsByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
@@ -396,10 +399,11 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 
 		assert.Contains(t, rec.Body.String(), `<label for="vcSignalNgUserIds123456[]">NGユーザー</label>`)
 		assert.Contains(t, rec.Body.String(), `<select id="ng_users123456[]" name="vcSignalNgUserIds123456[]" multiple>`)
-		assert.Contains(t, rec.Body.String(), `<option value="123">test</option>`)
+		assert.Contains(t, rec.Body.String(), `<option value="123" selected>test</option>`)
 		assert.Contains(t, rec.Body.String(), `</select>`)
 		assert.Contains(t, rec.Body.String(), `<label for="vcSignalNgRoleIds123456[]">NGロール</label>`)
 		assert.Contains(t, rec.Body.String(), `<select id="ng_roles123456[]" name="vcSignalNgRoleIds123456[]" multiple>`)
+		assert.Contains(t, rec.Body.String(), `<option value="1235">test</option>`)
 		assert.Contains(t, rec.Body.String(), `</select>`)
 		assert.Contains(t, rec.Body.String(), `<label for="vcSignalMentionUserIds123456[]">メンションユーザー</label>`)
 		assert.Contains(t, rec.Body.String(), `<select id="mention_users123456[]" name="vcSignalMentionUserIds123456[]" multiple>`)
@@ -407,6 +411,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `</select>`)
 		assert.Contains(t, rec.Body.String(), `<label for="vcSignalMentionRoleIds123456[]">メンションロール</label>`)
 		assert.Contains(t, rec.Body.String(), `<select id="mention_roles123456[]" name="vcSignalMentionRoleIds123456[]" multiple>`)
+		assert.Contains(t, rec.Body.String(), `<option value="1235">test</option>`)
 		assert.Contains(t, rec.Body.String(), `</select>`)
 		assert.Contains(t, rec.Body.String(), `<button type="submit" class="btn btn-primary">送信</button>`)
 	})

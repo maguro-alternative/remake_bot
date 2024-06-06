@@ -190,6 +190,40 @@ describe('fetchPermissionData', () => {
 
         const jsonData = await createJsonData(111, formData, document.forms['form'].elements);
 
-        expect(jsonData).toBe('{"permissionCodes":[{"guildId":111,"type":"lineBot","code":8},{"guildId":111,"type":"linePostDiscordChannel","code":8},{"guildId":111,"type":"vcSignal","code":8},{"guildId":111,"type":"webhook","code":8}],"permissionUserIds":[{"guildId":111,"type":"lineBot","userId":"111","permission":"all"},{"guildId":111,"type":"lineBot","userId":"222","permission":"all"},{"guildId":111,"type":"linePostDiscordChannel","userId":"111","permission":"all"},{"guildId":111,"type":"linePostDiscordChannel","userId":"222","permission":"all"},{"guildId":111,"type":"vcSignal","userId":"111","permission":"all"},{"guildId":111,"type":"vcSignal","userId":"222","permission":"all"},{"guildId":111,"type":"webhook","userId":"111","permission":"all"},{"guildId":111,"type":"webhook","userId":"222","permission":"all"}],"permissionRoleIds":[{"guildId":111,"type":"lineBot","roleId":"111","permission":"all"},{"guildId":111,"type":"lineBot","roleId":"222","permission":"all"},{"guildId":111,"type":"linePostDiscordChannel","roleId":"111","permission":"all"},{"guildId":111,"type":"linePostDiscordChannel","roleId":"222","permission":"all"},{"guildId":111,"type":"vcSignal","roleId":"111","permission":"all"},{"guildId":111,"type":"vcSignal","roleId":"222","permission":"all"},{"guildId":111,"type":"webhook","roleId":"111","permission":"all"},{"guildId":111,"type":"webhook","roleId":"222","permission":"all"}]}');
+        // jsonDataをオブジェクトにパース
+        const parsedJsonData = JSON.parse(jsonData);
+
+        // 期待値のオブジェクトを定義
+        const expectedObject = {
+            permissionCodes: [
+                { guildId: 111, type: "lineBot", code: 8 },
+                { guildId: 111, type: "linePostDiscordChannel", code: 8 },
+                { guildId: 111, type: "vcSignal", code: 8 },
+                { guildId: 111, type: "webhook", code: 8 }
+            ],
+            permissionUserIds: [
+                { guildId: 111, type: "lineBot", userId: "111", permission: "all" },
+                { guildId: 111, type: "lineBot", userId: "222", permission: "all" },
+                { guildId: 111, type: "linePostDiscordChannel", userId: "111", permission: "all" },
+                { guildId: 111, type: "linePostDiscordChannel", userId: "222", permission: "all" },
+                { guildId: 111, type: "vcSignal", userId: "111", permission: "all" },
+                { guildId: 111, type: "vcSignal", userId: "222", permission: "all" },
+                { guildId: 111, type: "webhook", userId: "111", permission: "all" },
+                { guildId: 111, type: "webhook", userId: "222", permission: "all" }
+            ],
+            permissionRoleIds: [
+                { guildId: 111, type: "lineBot", roleId: "111", permission: "all" },
+                { guildId: 111, type: "lineBot", roleId: "222", permission: "all" },
+                { guildId: 111, type: "linePostDiscordChannel", roleId: "111", permission: "all" },
+                { guildId: 111, type: "linePostDiscordChannel", roleId: "222", permission: "all" },
+                { guildId: 111, type: "vcSignal", roleId: "111", permission: "all" },
+                { guildId: 111, type: "vcSignal", roleId: "222", permission: "all" },
+                { guildId: 111, type: "webhook", roleId: "111", permission: "all" },
+                { guildId: 111, type: "webhook", roleId: "222", permission: "all" }
+            ]
+        };
+
+        // パースしたオブジェクトと期待値のオブジェクトを比較
+        expect(parsedJsonData).toEqual(expectedObject);
     });
 });

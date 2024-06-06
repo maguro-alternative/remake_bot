@@ -94,6 +94,24 @@ describe('fetchLinePostDiscordChannelData', () => {
 
         const jsonData = await createJsonData(document.forms['form'].elements, formData)
 
-        expect(jsonData).toEqual('{"channels":[{"channelId":"111","ng":false,"botMessage":false,"ngTypes":[1,2],"ngUsers":["1111","2222"],"ngRoles":["3333","4444"]}]}');
+        // jsonDataをオブジェクトにパース
+        const parsedJsonData = JSON.parse(jsonData);
+
+        // 期待値のオブジェクトを定義
+        const expectedObject = {
+            channels: [
+                {
+                    channelId: "111",
+                    ng: false,
+                    botMessage: false,
+                    ngTypes: [1, 2],
+                    ngUsers: ["1111", "2222"],
+                    ngRoles: ["3333", "4444"]
+                }
+            ]
+        };
+
+        // パースしたオブジェクトと期待値のオブジェクトを比較
+        expect(parsedJsonData).toEqual(expectedObject);
     });
 });

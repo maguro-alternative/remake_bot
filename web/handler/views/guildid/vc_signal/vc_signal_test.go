@@ -61,7 +61,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 			Members: []*discordgo.Member{
 				{
 					User: &discordgo.User{
-						ID: "123",
+						ID:       "123",
 						Username: "test",
 					},
 				},
@@ -74,13 +74,13 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 
 		repo := &repository.RepositoryFuncMock{
 			GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
-				if (vcChannelID == "123456") {
+				if vcChannelID == "123456" {
 					return &repository.VcSignalChannelAllColumn{
-						VcChannelID: "123456",
-						GuildID:"123",
-						SendSignal: false,
-						SendChannelID: "123456",
-						JoinBot: false,
+						VcChannelID:     "123456",
+						GuildID:         "123",
+						SendSignal:      false,
+						SendChannelID:   "123456",
+						JoinBot:         false,
 						EveryoneMention: false,
 					}, nil
 				}
@@ -185,14 +185,14 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 			Members: []*discordgo.Member{
 				{
 					User: &discordgo.User{
-						ID: "123",
+						ID:       "123",
 						Username: "test",
 					},
 				},
 			},
 			Roles: []*discordgo.Role{
 				{
-					ID: "1235",
+					ID:   "1235",
 					Name: "test",
 				},
 			},
@@ -204,13 +204,13 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 
 		repo := &repository.RepositoryFuncMock{
 			GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
-				if (vcChannelID == "123456") {
+				if vcChannelID == "123456" {
 					return &repository.VcSignalChannelAllColumn{
-						VcChannelID: "123456",
-						GuildID:"123",
-						SendSignal: false,
-						SendChannelID: "123456",
-						JoinBot: false,
+						VcChannelID:     "123456",
+						GuildID:         "123",
+						SendSignal:      false,
+						SendChannelID:   "123456",
+						JoinBot:         false,
 						EveryoneMention: false,
 					}, nil
 				}
@@ -317,14 +317,14 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 			Members: []*discordgo.Member{
 				{
 					User: &discordgo.User{
-						ID: "123",
+						ID:       "123",
 						Username: "test",
 					},
 				},
 			},
 			Roles: []*discordgo.Role{
 				{
-					ID: "1235",
+					ID:   "1235",
 					Name: "test",
 				},
 			},
@@ -336,13 +336,13 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 
 		repo := &repository.RepositoryFuncMock{
 			GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
-				if (vcChannelID == "123456") {
+				if vcChannelID == "123456" {
 					return &repository.VcSignalChannelAllColumn{
-						VcChannelID: "123456",
-						GuildID:"123",
-						SendSignal: false,
-						SendChannelID: "123456",
-						JoinBot: false,
+						VcChannelID:     "123456",
+						GuildID:         "123",
+						SendSignal:      false,
+						SendChannelID:   "123456",
+						JoinBot:         false,
 						EveryoneMention: false,
 					}, nil
 				}
@@ -352,7 +352,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 				return nil
 			},
 			GetVcSignalNgUserIDsByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
-				if (vcChannelID == "123456") {
+				if vcChannelID == "123456" {
 					return []string{"123"}, nil
 				}
 				return []string{}, nil
@@ -452,14 +452,14 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 			Members: []*discordgo.Member{
 				{
 					User: &discordgo.User{
-						ID: "123",
+						ID:       "123",
 						Username: "test",
 					},
 				},
 			},
 			Roles: []*discordgo.Role{
 				{
-					ID: "1235",
+					ID:   "1235",
 					Name: "test",
 				},
 			},
@@ -471,13 +471,13 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 
 		repo := &repository.RepositoryFuncMock{
 			GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
-				if (vcChannelID == "123456") {
+				if vcChannelID == "123456" {
 					return &repository.VcSignalChannelAllColumn{
-						VcChannelID: "123456",
-						GuildID:"123",
-						SendSignal: false,
-						SendChannelID: "123456",
-						JoinBot: false,
+						VcChannelID:     "123456",
+						GuildID:         "123",
+						SendSignal:      false,
+						SendChannelID:   "123456",
+						JoinBot:         false,
 						EveryoneMention: false,
 					}, nil
 				}
@@ -490,7 +490,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 				return []string{}, nil
 			},
 			GetVcSignalNgRoleIDsByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
-				if (vcChannelID == "123456") {
+				if vcChannelID == "123456" {
 					return []string{"1235"}, nil
 				}
 				return []string{}, nil
@@ -587,14 +587,14 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 			Members: []*discordgo.Member{
 				{
 					User: &discordgo.User{
-						ID: "123",
+						ID:       "123",
 						Username: "test",
 					},
 				},
 			},
 			Roles: []*discordgo.Role{
 				{
-					ID: "1235",
+					ID:   "1235",
 					Name: "test",
 				},
 			},
@@ -606,13 +606,13 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 
 		repo := &repository.RepositoryFuncMock{
 			GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
-				if (vcChannelID == "123456") {
+				if vcChannelID == "123456" {
 					return &repository.VcSignalChannelAllColumn{
-						VcChannelID: "123456",
-						GuildID:"123",
-						SendSignal: false,
-						SendChannelID: "123456",
-						JoinBot: false,
+						VcChannelID:     "123456",
+						GuildID:         "123",
+						SendSignal:      false,
+						SendChannelID:   "123456",
+						JoinBot:         false,
 						EveryoneMention: false,
 					}, nil
 				}
@@ -628,7 +628,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 				return []string{}, nil
 			},
 			GetVcSignalMentionUserIDsByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
-				if (vcChannelID == "123456") {
+				if vcChannelID == "123456" {
 					return []string{"123"}, nil
 				}
 				return []string{}, nil
@@ -722,14 +722,14 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 			Members: []*discordgo.Member{
 				{
 					User: &discordgo.User{
-						ID: "123",
+						ID:       "123",
 						Username: "test",
 					},
 				},
 			},
 			Roles: []*discordgo.Role{
 				{
-					ID: "1235",
+					ID:   "1235",
 					Name: "test",
 				},
 			},
@@ -741,13 +741,13 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 
 		repo := &repository.RepositoryFuncMock{
 			GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
-				if (vcChannelID == "123456") {
+				if vcChannelID == "123456" {
 					return &repository.VcSignalChannelAllColumn{
-						VcChannelID: "123456",
-						GuildID:"123",
-						SendSignal: false,
-						SendChannelID: "123456",
-						JoinBot: false,
+						VcChannelID:     "123456",
+						GuildID:         "123",
+						SendSignal:      false,
+						SendChannelID:   "123456",
+						JoinBot:         false,
 						EveryoneMention: false,
 					}, nil
 				}
@@ -766,7 +766,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 				return []string{}, nil
 			},
 			GetVcSignalMentionRoleIDsByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
-				if (vcChannelID == "123456") {
+				if vcChannelID == "123456" {
 					return []string{"1235"}, nil
 				}
 				return []string{}, nil

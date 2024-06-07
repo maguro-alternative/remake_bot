@@ -1,4 +1,4 @@
-package on_message_create
+package internal
 
 type LineBotDecrypt struct {
 	LineNotifyToken  string

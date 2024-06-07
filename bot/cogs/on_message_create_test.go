@@ -13,7 +13,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 
-	onMessageCreate "github.com/maguro-alternative/remake_bot/bot/cogs/on_message_create"
+	"github.com/maguro-alternative/remake_bot/bot/ffmpeg"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/stretchr/testify/assert"
@@ -73,7 +73,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					return lineBotIv, nil
 				},
 			},
-			&onMessageCreate.FfmpegMock{
+			&ffmpeg.FfmpegMock{
 				ConversionAudioFileFunc: func(tmpFile, tmpFileNotExt string) error {
 					return nil
 				},
@@ -146,7 +146,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					return lineBotIv, nil
 				},
 			},
-			&onMessageCreate.FfmpegMock{
+			&ffmpeg.FfmpegMock{
 				ConversionAudioFileFunc: func(tmpFile, tmpFileNotExt string) error {
 					return nil
 				},
@@ -225,7 +225,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					return lineBotIv, nil
 				},
 			},
-			&onMessageCreate.FfmpegMock{
+			&ffmpeg.FfmpegMock{
 				ConversionAudioFileFunc: func(tmpFile, tmpFileNotExt string) error {
 					return nil
 				},
@@ -336,7 +336,7 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 					return lineBotIv, nil
 				},
 			},
-			&onMessageCreate.FfmpegMock{
+			&ffmpeg.FfmpegMock{
 				ConversionAudioFileFunc: func(tmpFile, tmpFileNotExt string) error {
 					return nil
 				},

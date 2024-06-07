@@ -1,4 +1,4 @@
-package on_message_create
+package ffmpeg
 
 import (
 	"context"

@@ -17,7 +17,7 @@ func PingCommand(repo repository.RepositoryFunc) *command {
 		説明: Pong!
 		オプション: なし
 	*/
-	exec := newCogHandler(repo)
+	exec := newCogHandler(repo, nil)
 	return &command{
 		Name:        "ping",
 		Description: "Pong!",
@@ -26,7 +26,7 @@ func PingCommand(repo repository.RepositoryFunc) *command {
 	}
 }
 
-func (h *commandHandler) handlePing(s mock.Session, i *discordgo.InteractionCreate) error {
+func (h *commandHandler) handlePing(s mock.Session, state *discordgo.State, i *discordgo.InteractionCreate) error {
 	/*
 		pingコマンドの実行
 

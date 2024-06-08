@@ -3,6 +3,8 @@ package commands
 import (
 	"fmt"
 
+	"github.com/maguro-alternative/remake_bot/bot/ffmpeg"
+
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
@@ -13,11 +15,13 @@ import (
 // スラッシュコマンド内でもデータベースを使用できるようにする
 type commandHandler struct {
 	repo repository.RepositoryFunc
+	ff   *ffmpeg.FfmpegInterface
 }
 
-func newCogHandler(repo repository.RepositoryFunc) *commandHandler {
+func newCogHandler(repo repository.RepositoryFunc, ff *ffmpeg.FfmpegInterface) *commandHandler {
 	return &commandHandler{
 		repo: repo,
+		ff:   ff,
 	}
 }
 
@@ -27,7 +31,7 @@ type command struct {
 	Description string
 	Options     []*discordgo.ApplicationCommandOption
 	AppCommand  *discordgo.ApplicationCommand
-	Executor    func(s mock.Session, i *discordgo.InteractionCreate) error
+	Executor    func(s mock.Session, state *discordgo.State, i *discordgo.InteractionCreate) error
 }
 
 func (c *command) addApplicationCommand(appCmd *discordgo.ApplicationCommand) {
@@ -88,7 +92,7 @@ func (h *handler) commandRegister(command *command) error {
 	// スラッシュコマンドのハンドラを登録
 	h.session.AddHandler(
 		func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			command.Executor(s, i)
+			command.Executor(s, s.State, i)
 		},
 	)
 

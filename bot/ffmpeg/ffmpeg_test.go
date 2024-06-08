@@ -16,7 +16,7 @@ func TestFfmpeg_ConversionAudioFile(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, os.Chdir(cwd))
 	})
-	require.NoError(t, os.Chdir("../../../"))
+	require.NoError(t, os.Chdir("../../"))
 
 	testFilesPath, err := os.Getwd()
 	require.NoError(t, err)
@@ -45,7 +45,7 @@ func TestFfmpeg_GetAudioFileSecond(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, os.Chdir(cwd))
 	})
-	require.NoError(t, os.Chdir("../../../"))
+	require.NoError(t, os.Chdir("../../"))
 
 	testFilesPath, err := os.Getwd()
 	require.NoError(t, err)
@@ -68,7 +68,7 @@ func TestPlayFfmpeg_Start(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, os.Chdir(cwd))
 	})
-	require.NoError(t, os.Chdir("../../../"))
+	require.NoError(t, os.Chdir("../../"))
 
 	testFilesPath, err := os.Getwd()
 	require.NoError(t, err)
@@ -89,7 +89,7 @@ func TestPlayFfmpeg_Kill(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, os.Chdir(cwd))
 	})
-	require.NoError(t, os.Chdir("../../../"))
+	require.NoError(t, os.Chdir("../../"))
 
 	testFilesPath, err := os.Getwd()
 	require.NoError(t, err)
@@ -112,7 +112,7 @@ func TestPlayFfmpeg_StdoutPipe(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, os.Chdir(cwd))
 	})
-	require.NoError(t, os.Chdir("../../../"))
+	require.NoError(t, os.Chdir("../../"))
 
 	testFilesPath, err := os.Getwd()
 	require.NoError(t, err)

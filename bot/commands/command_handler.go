@@ -14,14 +14,14 @@ import (
 
 // スラッシュコマンド内でもデータベースを使用できるようにする
 type commandHandler struct {
-	repo repository.RepositoryFunc
-	ff   *ffmpeg.FfmpegInterface
+	repo   repository.RepositoryFunc
+	playFf *ffmpeg.PlayFfmpegInterface
 }
 
-func newCogHandler(repo repository.RepositoryFunc, ff *ffmpeg.FfmpegInterface) *commandHandler {
+func newCogHandler(repo repository.RepositoryFunc, playFf *ffmpeg.PlayFfmpegInterface) *commandHandler {
 	return &commandHandler{
-		repo: repo,
-		ff:   ff,
+		repo:   repo,
+		playFf: playFf,
 	}
 }
 
@@ -31,7 +31,7 @@ type command struct {
 	Description string
 	Options     []*discordgo.ApplicationCommandOption
 	AppCommand  *discordgo.ApplicationCommand
-	Executor    func(s mock.Session, state *discordgo.State, i *discordgo.InteractionCreate) error
+	Executor    func(s mock.Session, state *discordgo.State, voice map[string]*discordgo.VoiceConnection, i *discordgo.InteractionCreate) error
 }
 
 func (c *command) addApplicationCommand(appCmd *discordgo.ApplicationCommand) {
@@ -41,6 +41,7 @@ func (c *command) addApplicationCommand(appCmd *discordgo.ApplicationCommand) {
 type handler struct {
 	session  mock.Session
 	state    *discordgo.State
+	voice    map[string]*discordgo.VoiceConnection
 	commands map[string]*command
 	guild    string
 }
@@ -49,11 +50,13 @@ type handler struct {
 func newCommandHandler(
 	session mock.Session,
 	state *discordgo.State,
+	voice map[string]*discordgo.VoiceConnection,
 	guildID string,
 ) *handler {
 	return &handler{
 		session:  session,
 		state:    state,
+		voice:    voice,
 		commands: make(map[string]*command),
 		guild:    guildID,
 	}
@@ -92,7 +95,7 @@ func (h *handler) commandRegister(command *command) error {
 	// スラッシュコマンドのハンドラを登録
 	h.session.AddHandler(
 		func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			command.Executor(s, s.State, i)
+			command.Executor(s, h.state, h.voice, i)
 		},
 	)
 
@@ -126,10 +129,15 @@ func RegisterCommands(discordSession *discordgo.Session, db db.Driver) (func(), 
 	var commandHandlers []*handler
 	// 所属しているサーバすべてにスラッシュコマンドを追加する
 	// NewCommandHandlerの第二引数を空にすることで、グローバルでの使用を許可する
-	commandHandler := newCommandHandler(discordSession, discordSession.State, "")
+	commandHandler := newCommandHandler(discordSession, discordSession.State, discordSession.VoiceConnections, "")
 	repo := repository.NewRepository(db)
 	// 追加したいコマンドをここに追加
 	err := commandHandler.commandRegister(PingCommand(repo))
+	if err != nil {
+		fmt.Printf("error while registering command: %v\n", err)
+		return nil, err
+	}
+	err = commandHandler.commandRegister(VoiceVoxCommand(repo, nil))
 	if err != nil {
 		fmt.Printf("error while registering command: %v\n", err)
 		return nil, err

@@ -13,7 +13,8 @@ type SessionMock struct {
 	ChannelFunc                    func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error)
 	ChannelMessageSendFunc         func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error)
 	ChannelFileSendWithMessageFunc func(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error)
-	ChannelMessageSendEmbedFunc func(channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error)
+	ChannelMessageSendEmbedFunc    func(channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error)
+	ChannelVoiceJoinFunc           func(gID string, cID string, mute bool, deaf bool) (voice *discordgo.VoiceConnection, err error)
 	GuildFunc                      func(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error)
 	GuildChannelsFunc              func(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Channel, err error)
 	GuildMemberFunc                func(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error)
@@ -50,6 +51,10 @@ func (s *SessionMock) ChannelFileSendWithMessage(channelID string, content strin
 
 func (s *SessionMock) ChannelMessageSendEmbed(channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error) {
 	return s.ChannelMessageSendEmbedFunc(channelID, embed, options...)
+}
+
+func (s *SessionMock) ChannelVoiceJoin(gID string, cID string, mute bool, deaf bool) (voice *discordgo.VoiceConnection, err error) {
+	return s.ChannelVoiceJoinFunc(gID, cID, mute, deaf)
 }
 
 func (s *SessionMock) Guild(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error) {
@@ -93,6 +98,7 @@ type Session interface {
 	ChannelMessageSend(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error)
 	ChannelFileSendWithMessage(channelID string, content string, name string, r io.Reader, options ...discordgo.RequestOption) (*discordgo.Message, error)
 	ChannelMessageSendEmbed(channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error)
+	ChannelVoiceJoin(gID string, cID string, mute bool, deaf bool) (voice *discordgo.VoiceConnection, err error)
 	Guild(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error)
 	GuildChannels(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Channel, err error)
 	GuildMember(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error)

@@ -25,7 +25,7 @@ func Test_PingCommandRegister(t *testing.T) {
 		state.User = &discordgo.User{
 			ID: "1234567890",
 		}
-		h := newCommandHandler(&session, state, "")
+		h := newCommandHandler(&session, state, nil, "")
 		err := h.commandRegister(PingCommand(repo))
 		assert.NoError(t, err)
 		c := h.getCommands()
@@ -50,7 +50,7 @@ func Test_PingCommandRemove(t *testing.T) {
 		state.User = &discordgo.User{
 			ID: "1234567890",
 		}
-		h := newCommandHandler(&session, state, "")
+		h := newCommandHandler(&session, state, nil, "")
 		err := h.commandRegister(PingCommand(repo))
 		assert.NoError(t, err)
 		c := h.getCommands()

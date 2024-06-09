@@ -13,8 +13,9 @@ import (
 func Test_PingCommand(t *testing.T) {
 	repo := &repository.RepositoryFuncMock{}
 	session := mock.SessionMock{}
+	state := discordgo.NewState()
 	t.Run("ping成功", func(t *testing.T){
-		err := PingCommand(repo).Executor(&session, &discordgo.InteractionCreate{
+		err := PingCommand(repo).Executor(&session, state, nil, &discordgo.InteractionCreate{
 			Interaction: &discordgo.Interaction{
 				Data: discordgo.ApplicationCommandInteractionData{
 					Name: "ping",

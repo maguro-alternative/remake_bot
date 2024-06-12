@@ -41,6 +41,8 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 	if i.Interaction.GuildID != i.GuildID {
 		return nil
 	}
+
+	playCh := make(chan bool)
 	userVoiceState, err := state.VoiceState(i.GuildID, i.Member.User.ID)
 	if err != nil {
 		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -81,12 +83,10 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 		return err
 	}
 
-	dgvoice.PlayAudioFile(voice[i.GuildID], "testutil/files/yumi_dannasama.mp3", make(chan bool))
+	dgvoice.PlayAudioFile(voice[i.GuildID], "testutil/files/yumi_dannasama.mp3", playCh)
 
-	defer func() error {
-		err = voice[i.GuildID].Speaking(false)
-		return err
-	}()
-	return err
+	<-playCh
+
+	return voice[i.GuildID].Speaking(false)
 }
 

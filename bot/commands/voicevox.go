@@ -24,7 +24,114 @@ func VoiceVoxCommand(repo repository.RepositoryFunc, playFf *ffmpeg.PlayFfmpegIn
 	return &command{
 		Name:        "voicevox",
 		Description: "ずんだもんたちが喋るよ！",
-		Options:     []*discordgo.ApplicationCommandOption{},
+		Options:     []*discordgo.ApplicationCommandOption{
+			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "text",
+				Description: "しゃべらせたいテキスト",
+				Required:    true,
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "speaker",
+				Description: "しゃべる人",
+				Autocomplete: true,
+				Choices: []*discordgo.ApplicationCommandOptionChoice{
+					{
+						Name:  "四国めたん",
+						Value: "2",
+					},
+					{
+						Name:  "四国めたんあまあま",
+						Value: "0",
+					},
+					{
+						Name:  "四国めたんツンツン",
+						Value: "6",
+					},
+					{
+						Name:  "四国めたんセクシー",
+						Value: "4",
+					},
+					{
+						Name:  "ずんだもん",
+						Value: "3",
+					},
+					{
+						Name:  "ずんだもんあまあま",
+						Value: "1",
+					},
+					{
+						Name:  "ずんだもんツンツン",
+						Value: "7",
+					},
+					{
+						Name:  "ずんだもんセクシー",
+						Value: "5",
+					},
+					{
+						Name:  "ずんだもんささやき",
+						Value: "22",
+					},
+					{
+						Name:  "春日部つむぎ",
+						Value: "8",
+					},
+					{
+						Name:  "雨晴はう",
+						Value: "10",
+					},
+					{
+						Name:  "波音リツ",
+						Value: "9",
+					},
+					{
+						Name:  "玄野武宏",
+						Value: "11",
+					},
+					{
+						Name:  "白上虎太郎",
+						Value: "12",
+					},
+					{
+						Name:  "青山龍星",
+						Value: "13",
+					},
+					{
+						Name:  "冥鳴ひまり",
+						Value: "14",
+					},
+					{
+						Name:  "九州そら",
+						Value: "16",
+					},
+					{
+						Name:  "九州そらあまあま",
+						Value: "15",
+					},
+					{
+						Name:  "九州そらツンツン",
+						Value: "18",
+					},
+					{
+						Name:  "九州そらセクシー",
+						Value: "17",
+					},
+					{
+						Name:  "九州そらささやき",
+						Value: "19",
+					},
+					{
+						Name:  "もち子さん",
+						Value: "20",
+					},
+					{
+						Name:  "剣崎雌雄",
+						Value: "21",
+					},
+				},
+			},
+		},
 		Executor:    exec.handleVoiceVox,
 	}
 }
@@ -82,6 +189,7 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 		fmt.Printf("error speaking: %v\n", err)
 		return err
 	}
+	i.ApplicationCommandData()
 
 	dgvoice.PlayAudioFile(voice[i.GuildID], "testutil/files/yumi_dannasama.mp3", playCh)
 
@@ -89,4 +197,3 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 
 	return voice[i.GuildID].Speaking(false)
 }
-

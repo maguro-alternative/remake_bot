@@ -131,6 +131,24 @@ func VoiceVoxCommand(repo repository.RepositoryFunc, playFf *ffmpeg.PlayFfmpegIn
 					},
 				},
 			},
+			{
+				Type:        discordgo.ApplicationCommandOptionInteger,
+				Name:        "pitch",
+				Description: "声の高さ",
+				Required:    false,
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionInteger,
+				Name:        "intonation",
+				Description: "声の抑揚",
+				Required:    false,
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionInteger,
+				Name:        "speed",
+				Description: "しゃべる速さ",
+				Required:    false,
+			},
 		},
 		Executor:    exec.handleVoiceVox,
 	}
@@ -197,3 +215,4 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 
 	return voice[i.GuildID].Speaking(false)
 }
+

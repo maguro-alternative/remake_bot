@@ -2,8 +2,7 @@ package commands
 
 import (
 	"fmt"
-
-	"github.com/maguro-alternative/remake_bot/bot/ffmpeg"
+	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/repository"
@@ -15,13 +14,13 @@ import (
 // スラッシュコマンド内でもデータベースを使用できるようにする
 type commandHandler struct {
 	repo   repository.RepositoryFunc
-	playFf *ffmpeg.PlayFfmpegInterface
+	client *http.Client
 }
 
-func newCogHandler(repo repository.RepositoryFunc, playFf *ffmpeg.PlayFfmpegInterface) *commandHandler {
+func newCogHandler(repo repository.RepositoryFunc, client *http.Client) *commandHandler {
 	return &commandHandler{
 		repo:   repo,
-		playFf: playFf,
+		client: client,
 	}
 }
 

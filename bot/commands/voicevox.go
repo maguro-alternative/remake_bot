@@ -2,8 +2,7 @@ package commands
 
 import (
 	"fmt"
-
-	"github.com/maguro-alternative/remake_bot/bot/ffmpeg"
+	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
@@ -12,7 +11,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func VoiceVoxCommand(repo repository.RepositoryFunc, playFf *ffmpeg.PlayFfmpegInterface) *command {
+func VoiceVoxCommand(repo repository.RepositoryFunc, client *http.Client) *command {
 	/*
 		pingコマンドの定義
 
@@ -20,7 +19,7 @@ func VoiceVoxCommand(repo repository.RepositoryFunc, playFf *ffmpeg.PlayFfmpegIn
 		説明: Pong!
 		オプション: なし
 	*/
-	exec := newCogHandler(repo, playFf)
+	exec := newCogHandler(repo, client)
 	return &command{
 		Name:        "voicevox",
 		Description: "ずんだもんたちが喋るよ！",
@@ -35,101 +34,8 @@ func VoiceVoxCommand(repo repository.RepositoryFunc, playFf *ffmpeg.PlayFfmpegIn
 				Type:        discordgo.ApplicationCommandOptionString,
 				Name:        "speaker",
 				Description: "しゃべる人",
+				Required: true,
 				Autocomplete: true,
-				Choices: []*discordgo.ApplicationCommandOptionChoice{
-					{
-						Name:  "四国めたん",
-						Value: "2",
-					},
-					{
-						Name:  "四国めたんあまあま",
-						Value: "0",
-					},
-					{
-						Name:  "四国めたんツンツン",
-						Value: "6",
-					},
-					{
-						Name:  "四国めたんセクシー",
-						Value: "4",
-					},
-					{
-						Name:  "ずんだもん",
-						Value: "3",
-					},
-					{
-						Name:  "ずんだもんあまあま",
-						Value: "1",
-					},
-					{
-						Name:  "ずんだもんツンツン",
-						Value: "7",
-					},
-					{
-						Name:  "ずんだもんセクシー",
-						Value: "5",
-					},
-					{
-						Name:  "ずんだもんささやき",
-						Value: "22",
-					},
-					{
-						Name:  "春日部つむぎ",
-						Value: "8",
-					},
-					{
-						Name:  "雨晴はう",
-						Value: "10",
-					},
-					{
-						Name:  "波音リツ",
-						Value: "9",
-					},
-					{
-						Name:  "玄野武宏",
-						Value: "11",
-					},
-					{
-						Name:  "白上虎太郎",
-						Value: "12",
-					},
-					{
-						Name:  "青山龍星",
-						Value: "13",
-					},
-					{
-						Name:  "冥鳴ひまり",
-						Value: "14",
-					},
-					{
-						Name:  "九州そら",
-						Value: "16",
-					},
-					{
-						Name:  "九州そらあまあま",
-						Value: "15",
-					},
-					{
-						Name:  "九州そらツンツン",
-						Value: "18",
-					},
-					{
-						Name:  "九州そらセクシー",
-						Value: "17",
-					},
-					{
-						Name:  "九州そらささやき",
-						Value: "19",
-					},
-					{
-						Name:  "もち子さん",
-						Value: "20",
-					},
-					{
-						Name:  "剣崎雌雄",
-						Value: "21",
-					},
-				},
 			},
 			{
 				Type:        discordgo.ApplicationCommandOptionInteger,
@@ -165,6 +71,134 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 	}
 	if i.Interaction.GuildID != i.GuildID {
 		return nil
+	}
+
+	data := i.ApplicationCommandData()
+
+	text := ""
+	speaker := "3"
+	pitch := int64(0)
+	intonation := int64(1)
+	speed := int64(1)
+
+	choices := []*discordgo.ApplicationCommandOptionChoice{
+		{
+			Name:  "四国めたん",
+			Value: "2",
+		},
+		{
+			Name:  "四国めたんあまあま",
+			Value: "0",
+		},
+		{
+			Name:  "四国めたんツンツン",
+			Value: "6",
+		},
+		{
+			Name:  "四国めたんセクシー",
+			Value: "4",
+		},
+		{
+			Name:  "ずんだもん",
+			Value: "3",
+		},
+		{
+			Name:  "ずんだもんあまあま",
+			Value: "1",
+		},
+		{
+			Name:  "ずんだもんツンツン",
+			Value: "7",
+		},
+		{
+			Name:  "ずんだもんセクシー",
+			Value: "5",
+		},
+		{
+			Name:  "ずんだもんささやき",
+			Value: "22",
+		},
+		{
+			Name:  "春日部つむぎ",
+			Value: "8",
+		},
+		{
+			Name:  "雨晴はう",
+			Value: "10",
+		},
+		{
+			Name:  "波音リツ",
+			Value: "9",
+		},
+		{
+			Name:  "玄野武宏",
+			Value: "11",
+		},
+		{
+			Name:  "白上虎太郎",
+			Value: "12",
+		},
+		{
+			Name:  "青山龍星",
+			Value: "13",
+		},
+		{
+			Name:  "冥鳴ひまり",
+			Value: "14",
+		},
+		{
+			Name:  "九州そら",
+			Value: "16",
+		},
+		{
+			Name:  "九州そらあまあま",
+			Value: "15",
+		},
+		{
+			Name:  "九州そらツンツン",
+			Value: "18",
+		},
+		{
+			Name:  "九州そらセクシー",
+			Value: "17",
+		},
+		{
+			Name:  "九州そらささやき",
+			Value: "19",
+		},
+		{
+			Name:  "もち子さん",
+			Value: "20",
+		},
+		{
+			Name:  "剣崎雌雄",
+			Value: "21",
+		},
+	}
+
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionApplicationCommandAutocompleteResult,
+		Data: &discordgo.InteractionResponseData{
+			Choices: choices, // This is basically the whole purpose of autocomplete interaction - return custom options to the user.
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, option := range data.Options {
+		switch option.Name {
+		case "text":
+			text = option.StringValue()
+		case "speaker":
+			speaker = option.StringValue()
+		case "pitch":
+			pitch = option.IntValue()
+		case "intonation":
+			intonation = option.IntValue()
+		case "speed":
+			speed = option.IntValue()
+		}
 	}
 
 	playCh := make(chan bool)
@@ -207,7 +241,12 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 		fmt.Printf("error speaking: %v\n", err)
 		return err
 	}
-	i.ApplicationCommandData()
+
+	err = getVoiceVoxFile(h.client, "", text, speaker, pitch, intonation, speed)
+	if err != nil {
+		fmt.Printf("error getting voicevox file: %v\n", err)
+		return err
+	}
 
 	dgvoice.PlayAudioFile(voice[i.GuildID], "testutil/files/yumi_dannasama.mp3", playCh)
 
@@ -216,3 +255,29 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 	return voice[i.GuildID].Speaking(false)
 }
 
+func getVoiceVoxFile(
+	client *http.Client,
+	key string,
+	text string,
+	speaker string,
+	pitch int64,
+	intonation int64,
+	speed int64,
+) error {
+	//"https://api.su-shiki.com/v2/voicevox/audio/?key={key}&speaker={id}&pitch={pitch}&intonationScale={intonation}&speed={speed}&text={text}"
+	url := fmt.Sprintf("https://api.su-shiki.com/v2/voicevox/audio/?key=%s&speaker=%s&pitch=%d&intonationScale=%d&speed=%d&text=%s", key, speaker, pitch, intonation, speed, text)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("error while getting voicevox file: %v", resp.Status)
+	}
+
+	return nil
+}

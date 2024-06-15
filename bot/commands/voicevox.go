@@ -11,77 +11,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func VoiceVoxCommand(repo repository.RepositoryFunc, client *http.Client) *command {
-	/*
-		pingコマンドの定義
-
-		コマンド名: ping
-		説明: Pong!
-		オプション: なし
-	*/
-	exec := newCogHandler(repo, client)
-	return &command{
-		Name:        "voicevox",
-		Description: "ずんだもんたちが喋るよ！",
-		Options:     []*discordgo.ApplicationCommandOption{
-			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "text",
-				Description: "しゃべらせたいテキスト",
-				Required:    true,
-			},
-			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "speaker",
-				Description: "しゃべる人",
-				Required: true,
-				Autocomplete: true,
-			},
-			{
-				Type:        discordgo.ApplicationCommandOptionInteger,
-				Name:        "pitch",
-				Description: "声の高さ",
-				Required:    false,
-			},
-			{
-				Type:        discordgo.ApplicationCommandOptionInteger,
-				Name:        "intonation",
-				Description: "声の抑揚",
-				Required:    false,
-			},
-			{
-				Type:        discordgo.ApplicationCommandOptionInteger,
-				Name:        "speed",
-				Description: "しゃべる速さ",
-				Required:    false,
-			},
-		},
-		Executor:    exec.handleVoiceVox,
-	}
-}
-
-func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, voice map[string]*discordgo.VoiceConnection, i *discordgo.InteractionCreate) error {
-	/*
-		pingコマンドの実行
-
-		コマンドの実行結果を返す
-	*/
-	if i.Interaction.Data.(discordgo.ApplicationCommandInteractionData).Name != "voicevox" {
-		return nil
-	}
-	if i.Interaction.GuildID != i.GuildID {
-		return nil
-	}
-
-	data := i.ApplicationCommandData()
-
-	text := ""
-	speaker := "3"
-	pitch := int64(0)
-	intonation := int64(1)
-	speed := int64(1)
-
-	choices := []*discordgo.ApplicationCommandOptionChoice{
+var (
+	choices = []*discordgo.ApplicationCommandOptionChoice{
 		{
 			Name:  "四国めたん",
 			Value: "2",
@@ -175,18 +106,87 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 			Value: "21",
 		},
 	}
+)
+
+func VoiceVoxCommand(repo repository.RepositoryFunc, client *http.Client) *command {
+	/*
+		pingコマンドの定義
+
+		コマンド名: ping
+		説明: Pong!
+		オプション: なし
+	*/
+	exec := newCogHandler(repo, client)
+	return &command{
+		Name:        "voicevox",
+		Description: "ずんだもんたちが喋るよ！",
+		Options: []*discordgo.ApplicationCommandOption{
+			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "text",
+				Description: "しゃべらせたいテキスト",
+				Required:    true,
+			},
+			{
+				Type:         discordgo.ApplicationCommandOptionString,
+				Name:         "speaker",
+				Description:  "しゃべる人",
+				Required:     true,
+				Autocomplete: true,
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionInteger,
+				Name:        "pitch",
+				Description: "声の高さ",
+				Required:    false,
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionInteger,
+				Name:        "intonation",
+				Description: "声の抑揚",
+				Required:    false,
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionInteger,
+				Name:        "speed",
+				Description: "しゃべる速さ",
+				Required:    false,
+			},
+		},
+		Executor: exec.handleVoiceVox,
+	}
+}
+
+func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, voice map[string]*discordgo.VoiceConnection, i *discordgo.InteractionCreate) error {
+	/*
+		pingコマンドの実行
+
+		コマンドの実行結果を返す
+	*/
+	if i.Interaction.Data.(discordgo.ApplicationCommandInteractionData).Name != "voicevox" {
+		return nil
+	}
+	if i.Interaction.GuildID != i.GuildID {
+		return nil
+	}
+
+	text := ""
+	speaker := "3"
+	pitch := int64(0)
+	intonation := int64(1)
+	speed := int64(1)
 
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionApplicationCommandAutocompleteResult,
 		Data: &discordgo.InteractionResponseData{
-			Choices: choices, // This is basically the whole purpose of autocomplete interaction - return custom options to the user.
+			Choices: choices, // オートコンプリート用の選択肢
 		},
 	})
 	if err != nil {
 		return err
 	}
 
-	for _, option := range data.Options {
+	for _, option := range i.ApplicationCommandData().Options {
 		switch option.Name {
 		case "text":
 			text = option.StringValue()
@@ -211,7 +211,7 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 			},
 		})
 		if err != nil {
-			fmt.Printf("error responding to ping command: %v\n", err)
+			fmt.Printf("error responding to voicevox command: %v\n", err)
 			return err
 		}
 		return nil

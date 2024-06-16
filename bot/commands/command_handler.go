@@ -124,7 +124,7 @@ func (h *handler) getCommands() []*command {
 	return commands
 }
 
-func RegisterCommands(discordSession *discordgo.Session, db db.Driver) (func(), error) {
+func RegisterCommands(discordSession *discordgo.Session, db db.Driver, client *http.Client) (func(), error) {
 	var commandHandlers []*handler
 	// 所属しているサーバすべてにスラッシュコマンドを追加する
 	// NewCommandHandlerの第二引数を空にすることで、グローバルでの使用を許可する
@@ -136,7 +136,7 @@ func RegisterCommands(discordSession *discordgo.Session, db db.Driver) (func(), 
 		fmt.Printf("error while registering command: %v\n", err)
 		return nil, err
 	}
-	err = commandHandler.commandRegister(VoiceVoxCommand(repo, nil))
+	err = commandHandler.commandRegister(VoiceVoxCommand(repo, client))
 	if err != nil {
 		fmt.Printf("error while registering command: %v\n", err)
 		return nil, err

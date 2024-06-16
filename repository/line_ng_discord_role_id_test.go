@@ -13,7 +13,7 @@ import (
 
 func TestGetLineNgDiscordRoleID(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -40,7 +40,7 @@ func TestGetLineNgDiscordRoleID(t *testing.T) {
 func TestRepository_InsertLineNgDiscordRoleIDs(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NGなIDが正しく追加されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -82,7 +82,7 @@ func TestRepository_InsertLineNgDiscordRoleIDs(t *testing.T) {
 func TestRepository_DeleteLineNgDiscordRoleIDs(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NGなIDが正しく削除されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)

@@ -14,7 +14,7 @@ import (
 func TestInsertVcSignalNgRoleID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NgRoleIDを追加できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -24,7 +24,7 @@ func TestInsertVcSignalNgRoleID(t *testing.T) {
 
 		tx.ExecContext(ctx, "DELETE FROM vc_signal_ng_user_id")
 		repo := NewRepository(tx)
-		err = repo.InsertVcSignalNgRole(ctx, "111","1111","11111")
+		err = repo.InsertVcSignalNgRole(ctx, "111", "1111", "11111")
 		assert.NoError(t, err)
 
 		var ngRole VcSignalNgRoleAllColumn
@@ -37,7 +37,7 @@ func TestInsertVcSignalNgRoleID(t *testing.T) {
 	})
 
 	t.Run("既にある場合はエラーを返さずそのまま", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -56,7 +56,7 @@ func TestInsertVcSignalNgRoleID(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.InsertVcSignalNgRole(ctx, "111","1111","11111")
+		err = repo.InsertVcSignalNgRole(ctx, "111", "1111", "11111")
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -69,7 +69,7 @@ func TestInsertVcSignalNgRoleID(t *testing.T) {
 func TestGetVcSignalNgRolesByChannelIDAllColumn(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NgRoleIDを取得できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -99,7 +99,7 @@ func TestGetVcSignalNgRolesByChannelIDAllColumn(t *testing.T) {
 	})
 
 	t.Run("存在しない場合は空のスライスを返す", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -119,7 +119,7 @@ func TestGetVcSignalNgRolesByChannelIDAllColumn(t *testing.T) {
 func TestDeleteVcSignalNgRoleID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NgRoleIDを削除できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -148,7 +148,7 @@ func TestDeleteVcSignalNgRoleID(t *testing.T) {
 	})
 
 	t.Run("存在しない場合はエラーを返さずそのまま", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -171,7 +171,7 @@ func TestDeleteVcSignalNgRoleID(t *testing.T) {
 func TestDeleteVcSignalNgRoleByGuildID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NgRoleIDを削除できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -200,7 +200,7 @@ func TestDeleteVcSignalNgRoleByGuildID(t *testing.T) {
 	})
 
 	t.Run("存在しない場合はエラーを返さずそのまま", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -223,7 +223,7 @@ func TestDeleteVcSignalNgRoleByGuildID(t *testing.T) {
 func TestDeleteVcSignalNgRoleByRoleID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NgRoleIDを削除できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -252,7 +252,7 @@ func TestDeleteVcSignalNgRoleByRoleID(t *testing.T) {
 	})
 
 	t.Run("存在しない場合はエラーを返さずそのまま", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -275,7 +275,7 @@ func TestDeleteVcSignalNgRoleByRoleID(t *testing.T) {
 func TestDeleteRolesNotInProvidedList(t *testing.T) {
 	ctx := context.Background()
 	t.Run("指定されたNgRoleID以外を削除できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -309,7 +309,7 @@ func TestDeleteRolesNotInProvidedList(t *testing.T) {
 	})
 
 	t.Run("指定されたNgRoleID以外を削除できること(すべて削除)", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -333,7 +333,7 @@ func TestDeleteRolesNotInProvidedList(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcSignalNgRolesNotInProvidedList(ctx, "111", []string{"11111","11112"})
+		err = repo.DeleteVcSignalNgRolesNotInProvidedList(ctx, "111", []string{"11111", "11112"})
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -343,7 +343,7 @@ func TestDeleteRolesNotInProvidedList(t *testing.T) {
 	})
 
 	t.Run("指定されたNgRoleID以外を削除できること(存在しないものがあっても無視)", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -367,7 +367,7 @@ func TestDeleteRolesNotInProvidedList(t *testing.T) {
 		)
 
 		repo := NewRepository(tx)
-		err = repo.DeleteVcSignalNgRolesNotInProvidedList(ctx, "111", []string{"11111","11112","11113"})
+		err = repo.DeleteVcSignalNgRolesNotInProvidedList(ctx, "111", []string{"11111", "11112", "11113"})
 		assert.NoError(t, err)
 
 		var ngRoles []VcSignalNgRoleAllColumn
@@ -377,7 +377,7 @@ func TestDeleteRolesNotInProvidedList(t *testing.T) {
 	})
 
 	t.Run("指定されたNgRoleID以外を削除できること(チャンネルidの指定のみの場合すべて削除)", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)

@@ -13,7 +13,7 @@ import (
 
 func TestGetLinePostDiscordChannel(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -43,7 +43,7 @@ func TestGetLinePostDiscordChannel(t *testing.T) {
 
 func TestInsertLinePostDiscordChannel(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -80,7 +80,7 @@ func TestInsertLinePostDiscordChannel(t *testing.T) {
 func TestRepository_UpdateLinePostDiscordChannel(t *testing.T) {
 	ctx := context.Background()
 	t.Run("Channelが正しく更新されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)

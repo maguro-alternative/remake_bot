@@ -53,10 +53,9 @@ func DatabasePort() string {
 	return cfg.DBPort
 }
 
-func DatabaseURL() string {
+func DatabaseURLWithSslmode() string {
 	return fmt.Sprintf("%s://%s:%s/%s?user=%s&password=%s&sslmode=disable", cfg.DBName, cfg.DBHost, cfg.DBPort, cfg.DBName, cfg.DBUser, cfg.DBPassword)
 }
-
 
 func DiscordClientID() string {
 	return cfg.DiscordClientID

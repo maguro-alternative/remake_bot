@@ -14,7 +14,7 @@ import (
 func TestInsertVcSignalMentionUser(t *testing.T) {
 	ctx := context.Background()
 	t.Run("MentionUserを追加できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -39,7 +39,7 @@ func TestInsertVcSignalMentionUser(t *testing.T) {
 	})
 
 	t.Run("既にある場合はエラーを返さずそのまま", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -76,7 +76,7 @@ func TestInsertVcSignalMentionUser(t *testing.T) {
 func TestGetVcSignalMentionUsersByChannelID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("指定したchannelIDのMentionUserを取得できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -109,7 +109,7 @@ func TestGetVcSignalMentionUsersByChannelID(t *testing.T) {
 	})
 
 	t.Run("指定したchannelIDのMentionUserがない場合は空の配列を返すこと", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -130,7 +130,7 @@ func TestGetVcSignalMentionUsersByChannelID(t *testing.T) {
 func TestDeleteVcSignalMentionUser(t *testing.T) {
 	ctx := context.Background()
 	t.Run("指定したchannelID, guildID, userIDのMentionUserを削除できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -169,7 +169,7 @@ func TestDeleteVcSignalMentionUser(t *testing.T) {
 	})
 
 	t.Run("指定したchannelID, guildID, userIDのMentionUserがない場合はエラーを返さずそのまま", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -208,7 +208,7 @@ func TestDeleteVcSignalMentionUser(t *testing.T) {
 func TestDeleteVcSignalMentionUserByChannelID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("指定したchannelIDのMentionUserを削除できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -247,7 +247,7 @@ func TestDeleteVcSignalMentionUserByChannelID(t *testing.T) {
 	})
 
 	t.Run("指定したchannelIDのMentionUserがない場合はエラーを返さずそのまま", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -273,7 +273,7 @@ func TestDeleteVcSignalMentionUserByChannelID(t *testing.T) {
 func TestDeleteVcSignalMentionUserByGuildID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("指定したguildIDのMentionUserを削除できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -312,7 +312,7 @@ func TestDeleteVcSignalMentionUserByGuildID(t *testing.T) {
 	})
 
 	t.Run("指定したguildIDのMentionUserがない場合はエラーを返さずそのまま", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -338,7 +338,7 @@ func TestDeleteVcSignalMentionUserByGuildID(t *testing.T) {
 func TestDeleteVcSignalMentionUserByUserID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("指定したuserIDのMentionUserを削除できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -377,7 +377,7 @@ func TestDeleteVcSignalMentionUserByUserID(t *testing.T) {
 	})
 
 	t.Run("指定したuserIDのMentionUserがない場合はエラーを返さずそのまま", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -403,7 +403,7 @@ func TestDeleteVcSignalMentionUserByUserID(t *testing.T) {
 func TestDeleteVcSignalMentionUsersNotInProvidedList(t *testing.T) {
 	ctx := context.Background()
 	t.Run("指定したchannelIDのMentionUserのうち、指定したguildID, userIDのMentionUser以外を削除できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -442,7 +442,7 @@ func TestDeleteVcSignalMentionUsersNotInProvidedList(t *testing.T) {
 	})
 
 	t.Run("指定したchannelIDのMentionUserのうち、指定したguildID, userIDのMentionUser以外がない場合は全て削除されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)

@@ -15,7 +15,7 @@ import (
 func TestInsertVcSignalChannel(t *testing.T) {
 	ctx := context.Background()
 	t.Run("ChannelIDを追加できること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -39,7 +39,7 @@ func TestInsertVcSignalChannel(t *testing.T) {
 	})
 
 	t.Run("ChannelIDが重複している場合はエラーは返さず挿入しないこと", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -68,7 +68,7 @@ func TestInsertVcSignalChannel(t *testing.T) {
 
 func TestGetVcSignalChannel(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	require.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -116,7 +116,7 @@ func TestGetVcSignalChannel(t *testing.T) {
 
 func TestUpdateVcSignalChannel(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	require.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -182,7 +182,7 @@ func TestUpdateVcSignalChannel(t *testing.T) {
 
 func TestDeleteVcSignalChannel(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	require.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)

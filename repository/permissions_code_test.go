@@ -13,7 +13,7 @@ import (
 
 func TestGetPermissionsCode(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -39,7 +39,7 @@ func TestGetPermissionsCode(t *testing.T) {
 
 func TestGetPermissionsCodes(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -73,7 +73,7 @@ func TestGetPermissionsCodes(t *testing.T) {
 func TestRepository_UpdatePermissionsCode(t *testing.T) {
 	ctx := context.Background()
 	t.Run("Permissions_codeが正しく更新されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)

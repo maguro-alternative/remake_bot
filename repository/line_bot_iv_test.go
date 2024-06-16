@@ -14,7 +14,7 @@ import (
 
 func TestInsertLineBotIv(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -51,7 +51,7 @@ func TestInsertLineBotIv(t *testing.T) {
 
 func TestGetLineBotIvNotClient(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -84,7 +84,7 @@ func TestGetLineBotIvNotClient(t *testing.T) {
 
 func TestRepository_GetAllColumnsLineBotIv(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -122,7 +122,7 @@ func TestRepository_GetAllColumnsLineBotIv(t *testing.T) {
 func TestRepository_UpdateLineBotIv(t *testing.T) {
 	ctx := context.Background()
 	t.Run("LineBotのIVが正しく更新されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -172,7 +172,7 @@ func TestRepository_UpdateLineBotIv(t *testing.T) {
 	})
 
 	t.Run("LineBotのIVの1部分(notifyとbottoken)が正しく更新されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)

@@ -14,7 +14,7 @@ import (
 func TestRepository_InsertPermissionsID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("Permissions_idが正しく挿入されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -46,7 +46,7 @@ func TestRepository_InsertPermissionsID(t *testing.T) {
 
 func TestGetGuildPermissionIDsAllColumns(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -96,7 +96,7 @@ func TestGetGuildPermissionIDsAllColumns(t *testing.T) {
 
 func TestGetPermissionIDs(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -141,7 +141,7 @@ func TestGetPermissionIDs(t *testing.T) {
 func TestRepository_DeletePermissionsID(t *testing.T) {
 	ctx := context.Background()
 	t.Run("Permissions_idが正しく削除されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)

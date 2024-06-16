@@ -13,7 +13,7 @@ import (
 
 func TestGetLineNgDiscordMessageType(t *testing.T) {
 	ctx := context.Background()
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	assert.NoError(t, err)
 	defer cleanup()
 	tx, err := dbV1.BeginTxx(ctx, nil)
@@ -39,7 +39,7 @@ func TestGetLineNgDiscordMessageType(t *testing.T) {
 func TestRepository_InsertLineNgDiscordMessageTypes(t *testing.T) {
 	ctx := context.Background()
 	t.Run("Channelが正しく追加されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -82,7 +82,7 @@ func TestRepository_InsertLineNgDiscordMessageTypes(t *testing.T) {
 func TestRepository_DeleteLineNgDiscordMessageTypes(t *testing.T) {
 	ctx := context.Background()
 	t.Run("NGなメッセージタイプが正しく削除されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)
@@ -135,7 +135,7 @@ func TestRepository_DeleteLineNgDiscordMessageTypes(t *testing.T) {
 	})
 
 	t.Run("指定されたサーバーのNGなメッセージタイプがすべて削除されること", func(t *testing.T) {
-		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
 		tx, err := dbV1.BeginTxx(ctx, nil)

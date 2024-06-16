@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"time"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/maguro-alternative/remake_bot/bot"
 	"github.com/maguro-alternative/remake_bot/core/config"
@@ -24,7 +24,7 @@ var schema string // schema.sqlの内容をschemaに代入
 func main() {
 	ctx := context.Background()
 	// データベースの接続を開始
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 	if err != nil {
 		panic(err)
 	}

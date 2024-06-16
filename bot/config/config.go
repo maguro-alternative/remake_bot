@@ -87,3 +87,11 @@ func DatabaseURLForMigration() string {
 	}
 	return DatabaseURLWithUserAndPasswordForMigration()
 }
+
+func SessionSecret() string {
+	return cfg.SessionSecret
+}
+
+func VoiceVoxKey() string {
+	return cfg.VoiceVoxKey
+}

@@ -212,7 +212,7 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "ボイスチャンネルに参加してからコマンドを実行してね！",
+				Content: "ボイスチャンネルに参加してからコマンドを実行して下さい",
 			},
 		})
 		if err != nil {

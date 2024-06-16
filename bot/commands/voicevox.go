@@ -3,7 +3,11 @@ package commands
 import (
 	"fmt"
 	"net/http"
+	"io"
+	"os"
+	"time"
 
+	"github.com/maguro-alternative/remake_bot/bot/config"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
@@ -243,13 +247,14 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 		return err
 	}
 
-	err = getVoiceVoxFile(h.client, "", text, speaker, pitch, intonation, speed)
+	filepath, err := getVoiceVoxFile(h.client, config.VoiceVoxKey(), text, speaker, pitch, intonation, speed)
 	if err != nil {
 		fmt.Printf("error getting voicevox file: %v\n", err)
 		return err
 	}
+	defer os.Remove(filepath)
 
-	dgvoice.PlayAudioFile(voice[i.GuildID], "testutil/files/yumi_dannasama.mp3", playCh)
+	dgvoice.PlayAudioFile(voice[i.GuildID], filepath, playCh)
 
 	<-playCh
 
@@ -264,21 +269,31 @@ func getVoiceVoxFile(
 	pitch int64,
 	intonation int64,
 	speed int64,
-) error {
+) (string, error) {
+	filepath := fmt.Sprintf("%s/%s.wav", os.TempDir(), time.Now().Format("20060102150405"))
+	file, err := os.Create(filepath)
+	if err != nil {
+		fmt.Printf("error creating file: %v\n", err)
+		return "", err
+	}
+	defer file.Close()
+
 	//"https://api.su-shiki.com/v2/voicevox/audio/?key={key}&speaker={id}&pitch={pitch}&intonationScale={intonation}&speed={speed}&text={text}"
 	url := fmt.Sprintf("https://api.su-shiki.com/v2/voicevox/audio/?key=%s&speaker=%s&pitch=%d&intonationScale=%d&speed=%d&text=%s", key, speaker, pitch, intonation, speed, text)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error while getting voicevox file: %v", resp.Status)
+		return "", fmt.Errorf("error while getting voicevox file: %v", resp.Status)
 	}
+	defer resp.Body.Close()
 
-	return nil
+	_, err = io.Copy(file, resp.Body)
+	return filepath, err
 }

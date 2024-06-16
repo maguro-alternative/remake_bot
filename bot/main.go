@@ -38,6 +38,6 @@ func BotOnReady(indexDB db.Driver, client *http.Client) (*discordgo.Session, fun
 		return nil, func(){}, errors.WithStack(err)
 	}
 	cogs.RegisterHandlers(discordSession, indexDB, client)
-	cleanupCommandHandlers, err := commands.RegisterCommands(discordSession, indexDB)
+	cleanupCommandHandlers, err := commands.RegisterCommands(discordSession, indexDB, client)
 	return discordSession, cleanupCommandHandlers, err
 }

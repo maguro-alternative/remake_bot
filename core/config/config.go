@@ -57,6 +57,10 @@ func DatabasePort() string {
 	return cfg.DBPort
 }
 
+func DatabaseURL() string {
+	return cfg.DBURL
+}
+
 func DatabaseURLWithSslmode() string {
 	return fmt.Sprintf("%s://%s:%s/%s?user=%s&password=%s&sslmode=disable", cfg.DBName, cfg.DBHost, cfg.DBPort, cfg.DBName, cfg.DBUser, cfg.DBPassword)
 }

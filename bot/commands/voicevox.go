@@ -175,7 +175,7 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 	}
 
 	text := ""
-	speaker := "3"
+	speakerId := "3"
 	pitch := int64(0)
 	intonation := int64(1)
 	speed := int64(1)
@@ -196,7 +196,7 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 		case "text":
 			text = option.StringValue()
 		case "speaker":
-			speaker = option.StringValue()
+			speakerId = option.StringValue()
 		case "pitch":
 			pitch = option.IntValue()
 		case "intonation":
@@ -233,7 +233,7 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Pong",
+			Content: fmt.Sprintf("%s「 %s 」", text),
 		},
 	})
 	if err != nil {
@@ -247,7 +247,7 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 		return err
 	}
 
-	filepath, err := getVoiceVoxFile(h.client, config.VoiceVoxKey(), text, speaker, pitch, intonation, speed)
+	filepath, err := getVoiceVoxFile(h.client, config.VoiceVoxKey(), text, speakerId, pitch, intonation, speed)
 	if err != nil {
 		fmt.Printf("error getting voicevox file: %v\n", err)
 		return err
@@ -265,7 +265,7 @@ func getVoiceVoxFile(
 	client *http.Client,
 	key string,
 	text string,
-	speaker string,
+	speakerId string,
 	pitch int64,
 	intonation int64,
 	speed int64,
@@ -279,7 +279,7 @@ func getVoiceVoxFile(
 	defer file.Close()
 
 	//"https://api.su-shiki.com/v2/voicevox/audio/?key={key}&speaker={id}&pitch={pitch}&intonationScale={intonation}&speed={speed}&text={text}"
-	url := fmt.Sprintf("https://api.su-shiki.com/v2/voicevox/audio/?key=%s&speaker=%s&pitch=%d&intonationScale=%d&speed=%d&text=%s", key, speaker, pitch, intonation, speed, text)
+	url := fmt.Sprintf("https://api.su-shiki.com/v2/voicevox/audio/?key=%s&speaker=%s&pitch=%d&intonationScale=%d&speed=%d&text=%s", key, speakerId, pitch, intonation, speed, text)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", err

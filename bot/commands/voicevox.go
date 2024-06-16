@@ -182,8 +182,9 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 			Choices: choices, // オートコンプリート用の選択肢
 		},
 	})
-	if err != nil {
-		return err
+	// オートコンプリートのレスポンスはエラーを無視する
+	if err == nil {
+		return nil
 	}
 
 	for _, option := range i.ApplicationCommandData().Options {

@@ -175,6 +175,7 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 	}
 
 	text := ""
+	speacker := "ずんだもん"
 	speakerId := "3"
 	pitch := int64(0)
 	intonation := int64(1)
@@ -197,6 +198,12 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 			text = option.StringValue()
 		case "speaker":
 			speakerId = option.StringValue()
+			for _, choice := range choices {
+				if choice.Value == speakerId {
+					speacker = choice.Name
+					break
+				}
+			}
 		case "pitch":
 			pitch = option.IntValue()
 		case "intonation":
@@ -233,7 +240,7 @@ func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, 
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("%s「 %s 」", text),
+			Content: fmt.Sprintf("%s「 %s 」", speacker, text),
 		},
 	})
 	if err != nil {

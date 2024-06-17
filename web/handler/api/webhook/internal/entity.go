@@ -21,7 +21,6 @@ type NewWebhook struct {
 	SearchAndWords   []string `json:"searchAndWords"`
 	MentionOrWords   []string `json:"mentionOrWords"`
 	MentionAndWords  []string `json:"mentionAndWords"`
-	DeleteFlag       bool     `json:"deleteFlag"`
 }
 
 type UpdateWebhook struct {

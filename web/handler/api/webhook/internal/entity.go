@@ -9,13 +9,15 @@ type WebhookJson struct {
 }
 
 type Webhook struct {
-	WebhookID        string `json:"webhookId"`
-	ChannelID        string `json:"channelId"`
-	WebhookURL       string `json:"webhookUrl"`
-	SubscriptionType string `json:"subscriptionType"`
-	SubscriptionId   string `json:"subscriptionId"`
-	MentionRoles     []int  `json:"mentionRoles"`
-	MentionUsers     []int  `json:"mentionUsers"`
+	WebhookID        string   `json:"webhookId"`
+	ChannelID        string   `json:"channelId"`
+	WebhookURL       string   `json:"webhookUrl"`
+	SubscriptionType string   `json:"subscriptionType"`
+	SubscriptionId   string   `json:"subscriptionId"`
+	MentionRoles     []int    `json:"mentionRoles"`
+	MentionUsers     []int    `json:"mentionUsers"`
+	NgOrWords        []string `json:"ngOrWords"`
+	NgAndWords       []string `json:"ngAndWords"`
 }
 
 func (g WebhookJson) Validate() error {

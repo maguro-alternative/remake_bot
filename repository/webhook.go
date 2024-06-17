@@ -32,7 +32,14 @@ func NewWebhook(
 	}
 }
 
-func (r *Repository) InsertWebhook(ctx context.Context, webhook *Webhook) error {
+func (r *Repository) InsertWebhook(
+	ctx context.Context,
+	guildID string,
+	webhookID string,
+	subscriptionType string,
+	subscriptionID string,
+	lastPostedAt time.Time,
+) error {
 	query := `
 		INSERT INTO webhook (
 			guild_id,
@@ -51,11 +58,11 @@ func (r *Repository) InsertWebhook(ctx context.Context, webhook *Webhook) error 
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
-		webhook.GuildID,
-		webhook.WebhookID,
-		webhook.SubscriptionType,
-		webhook.SubscriptionID,
-		webhook.LastPostedAt,
+		guildID,
+		webhookID,
+		subscriptionType,
+		subscriptionID,
+		lastPostedAt,
 	)
 	return err
 }

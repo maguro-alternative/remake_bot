@@ -22,6 +22,7 @@ type Webhook struct {
 	SearchAndWords   []string `json:"searchAndWords"`
 	MentionOrWords   []string `json:"mentionOrWords"`
 	MentionAndWords  []string `json:"mentionAndWords"`
+	DeleteFlag       bool     `json:"deleteFlag"`
 }
 
 func (g WebhookJson) Validate() error {

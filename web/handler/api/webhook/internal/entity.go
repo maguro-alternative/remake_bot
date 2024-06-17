@@ -5,7 +5,8 @@ import (
 )
 
 type WebhookJson struct {
-	Webhooks []Webhook `json:"webhooks"`
+	NewWebhooks    []Webhook `json:"webhooks"`
+	UpdateWebhooks []Webhook `json:"updateWebhooks"`
 }
 
 type Webhook struct {
@@ -27,6 +28,6 @@ type Webhook struct {
 
 func (g WebhookJson) Validate() error {
 	return validation.ValidateStruct(&g,
-		validation.Field(&g.Webhooks, validation.Required),
+		validation.Field(&g.NewWebhooks, validation.Required),
 	)
 }

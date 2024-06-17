@@ -73,9 +73,12 @@ func (r *Repository) UpdateWebhookWithLastPostedAt(
 	lastPostedAt time.Time,
 ) error {
 	query := `
-		UPDATE webhook
-		SET last_posted_at = $1
-		WHERE id = $2
+		UPDATE
+			webhook
+		SET
+			last_posted_at = $1
+		WHERE
+			id = $2
 	`
 	_, err := r.db.ExecContext(
 		ctx,

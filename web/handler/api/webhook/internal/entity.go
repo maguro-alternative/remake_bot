@@ -15,7 +15,7 @@ type Webhook struct {
 	SubscriptionType string   `json:"subscriptionType"`
 	SubscriptionId   string   `json:"subscriptionId"`
 	MentionRoles     []string    `json:"mentionRoles"`
-	MentionUsers     []int    `json:"mentionUsers"`
+	MentionUsers     []string    `json:"mentionUsers"`
 	NgOrWords        []string `json:"ngOrWords"`
 	NgAndWords       []string `json:"ngAndWords"`
 	SearchOrWords    []string `json:"searchOrWords"`

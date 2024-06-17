@@ -5,7 +5,7 @@ import (
 )
 
 type WebhookJson struct {
-	NewWebhooks    []NewWebhook `json:"newWebhooks"`
+	NewWebhooks    []NewWebhook    `json:"newWebhooks"`
 	UpdateWebhooks []UpdateWebhook `json:"updateWebhooks"`
 }
 

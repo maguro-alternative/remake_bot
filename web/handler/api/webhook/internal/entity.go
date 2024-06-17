@@ -11,7 +11,6 @@ type WebhookJson struct {
 
 type Webhook struct {
 	WebhookID        string   `json:"webhookId"`
-	WebhookURL       string   `json:"webhookUrl"`
 	SubscriptionType string   `json:"subscriptionType"`
 	SubscriptionId   string   `json:"subscriptionId"`
 	MentionRoles     []string `json:"mentionRoles"`

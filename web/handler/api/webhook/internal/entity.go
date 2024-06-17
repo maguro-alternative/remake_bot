@@ -20,6 +20,8 @@ type Webhook struct {
 	NgAndWords       []string `json:"ngAndWords"`
 	SearchOrWords    []string `json:"searchOrWords"`
 	SearchAndWords   []string `json:"searchAndWords"`
+	MentionOrWords   []string `json:"mentionOrWords"`
+	MentionAndWords  []string `json:"mentionAndWords"`
 }
 
 func (g WebhookJson) Validate() error {

@@ -66,3 +66,22 @@ func (r *Repository) InsertWebhook(
 	)
 	return err
 }
+
+func (r *Repository) UpdateWebhookWithLastPostedAt(
+	ctx context.Context,
+	id int64,
+	lastPostedAt time.Time,
+) error {
+	query := `
+		UPDATE webhook
+		SET last_posted_at = $1
+		WHERE id = $2
+	`
+	_, err := r.db.ExecContext(
+		ctx,
+		query,
+		lastPostedAt,
+		id,
+	)
+	return err
+}

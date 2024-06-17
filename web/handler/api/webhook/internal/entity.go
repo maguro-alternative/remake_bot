@@ -18,6 +18,8 @@ type Webhook struct {
 	MentionUsers     []int    `json:"mentionUsers"`
 	NgOrWords        []string `json:"ngOrWords"`
 	NgAndWords       []string `json:"ngAndWords"`
+	SearchOrWords    []string `json:"searchOrWords"`
+	SearchAndWords   []string `json:"searchAndWords"`
 }
 
 func (g WebhookJson) Validate() error {

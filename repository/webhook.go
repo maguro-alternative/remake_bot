@@ -111,6 +111,33 @@ func (r *Repository) UpdateWebhookWithLastPostedAt(
 	return err
 }
 
+func (r *Repository) UpdateWebhookWithWebhookIDAndSubscription(
+	ctx context.Context,
+	id int64,
+	webhookID string,
+	subscriptionID string,
+	subscriptionType string,
+) error {
+	query := `
+		UPDATE
+			webhook
+		SET
+			webhook_id = $1,
+			subscription_id = $2,
+			subscription_type = $3
+		WHERE
+			id = $4
+	`
+	_, err := r.db.ExecContext(
+		ctx,
+		query,
+		subscriptionID,
+		subscriptionType,
+		id,
+	)
+	return err
+}
+
 func (r *Repository) DeleteWebhook(
 	ctx context.Context,
 	id int64,

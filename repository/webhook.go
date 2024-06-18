@@ -67,6 +67,28 @@ func (r *Repository) InsertWebhook(
 	return err
 }
 
+func (r *Repository) GetAllColumnsWebhooksByGuildID(
+	ctx context.Context,
+	guildID string,
+) ([]*Webhook, error) {
+	query := `
+		SELECT
+			*
+		FROM
+			webhook
+		WHERE
+			guild_id = $1
+	`
+	var webhooks []*Webhook
+	err := r.db.SelectContext(
+		ctx,
+		&webhooks,
+		query,
+		guildID,
+	)
+	return webhooks, err
+}
+
 func (r *Repository) UpdateWebhookWithLastPostedAt(
 	ctx context.Context,
 	id int64,

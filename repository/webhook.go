@@ -14,24 +14,6 @@ type Webhook struct {
 	LastPostedAt     time.Time `db:"last_posted_at"`
 }
 
-func NewWebhook(
-	id *int64,
-	guildID string,
-	webhookID string,
-	subscriptionType string,
-	subscriptionID string,
-	lastPostedAt time.Time,
-) *Webhook {
-	return &Webhook{
-		ID:               id,
-		GuildID:          guildID,
-		WebhookID:        webhookID,
-		SubscriptionType: subscriptionType,
-		SubscriptionID:   subscriptionID,
-		LastPostedAt:     lastPostedAt,
-	}
-}
-
 func (r *Repository) InsertWebhook(
 	ctx context.Context,
 	guildID string,

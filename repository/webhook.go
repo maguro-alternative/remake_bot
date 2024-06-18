@@ -110,3 +110,21 @@ func (r *Repository) UpdateWebhookWithLastPostedAt(
 	)
 	return err
 }
+
+func (r *Repository) DeleteWebhook(
+	ctx context.Context,
+	id int64,
+) error {
+	query := `
+		DELETE FROM
+			webhook
+		WHERE
+			id = $1
+	`
+	_, err := r.db.ExecContext(
+		ctx,
+		query,
+		id,
+	)
+	return err
+}

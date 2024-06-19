@@ -101,4 +101,51 @@ func TestWebhook(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, webhooks, 0)
 	})
+
+	t.Run("Webhook取得_複数", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
+		assert.NoError(t, err)
+		defer cleanup()
+
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM webhook")
+
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewWebhook(ctx, func(b *fixtures.Webhook) {
+				b.GuildID = "1111"
+				b.WebhookID = "22222"
+				b.SubscriptionType = "youtube"
+				b.SubscriptionID = "test"
+				b.LastPostedAt = lastPostedAt
+			}),
+			fixtures.NewWebhook(ctx, func(b *fixtures.Webhook) {
+				b.GuildID = "1111"
+				b.WebhookID = "33333"
+				b.SubscriptionType = "niconico"
+				b.SubscriptionID = "test"
+				b.LastPostedAt = lastPostedAt
+			}),
+		)
+
+		repo := NewRepository(tx)
+
+		webhooks, err := repo.GetAllColumnsWebhooksByGuildID(ctx, "1111")
+		assert.NoError(t, err)
+		assert.Len(t, webhooks, 2)
+		assert.Equal(t, "1111", webhooks[0].GuildID)
+		assert.Equal(t, "22222", webhooks[0].WebhookID)
+		assert.Equal(t, "youtube", webhooks[0].SubscriptionType)
+		assert.Equal(t, "test", webhooks[0].SubscriptionID)
+		assert.Equal(t, lastPostedAt, webhooks[0].LastPostedAt.UTC())
+		assert.Equal(t, "1111", webhooks[1].GuildID)
+		assert.Equal(t, "33333", webhooks[1].WebhookID)
+		assert.Equal(t, "niconico", webhooks[1].SubscriptionType)
+		assert.Equal(t, "test", webhooks[1].SubscriptionID)
+		assert.Equal(t, lastPostedAt, webhooks[1].LastPostedAt.UTC())
+	})
 }

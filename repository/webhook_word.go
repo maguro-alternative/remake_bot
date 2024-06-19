@@ -7,9 +7,9 @@ import (
 )
 
 type WebhookWord struct {
-	ID        int64  `db:"id"`
-	Condition string `db:"condition"`
-	Word      string `db:"word"`
+	WebhookSerialID int64  `db:"webhook_serial_id"`
+	Condition       string `db:"condition"`
+	Word            string `db:"word"`
 }
 
 func (r *Repository) InsertWebhookWord(

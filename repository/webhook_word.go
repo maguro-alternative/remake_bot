@@ -32,3 +32,22 @@ func (r *Repository) InsertWebhookWord(
 	)
 	return err
 }
+
+func (r *Repository) GetWebhookWordWithWebhookSerialIDAndCondition(
+	ctx context.Context,
+	webhookSerialID int64,
+	condition string,
+) ([]*WebhookWord, error) {
+	query := `
+		SELECT
+			*
+		FROM
+			webhook_word
+		WHERE
+			webhook_serial_id = $1
+			condition = $2
+	`
+	var webhookWord []*WebhookWord
+	err := r.db.SelectContext(ctx, &webhookWord, query, webhookSerialID, condition)
+	return webhookWord, err
+}

@@ -50,23 +50,26 @@ func NewWebhook(ctx context.Context, setter ...func(b *Webhook)) *ModelConnector
 			}
 		},
 		insertTable: func(t *testing.T, f *Fixture) {
-			_, err := f.DBv1.NamedExecContext(ctx, `
+			err := f.DBv1.QueryRowxContext(ctx, `
 				INSERT INTO webhook (
-					webhook_serial_id,
 					guild_id,
 					webhook_id,
 					subscription_type,
 					subscription_id,
 					last_posted_at
 				) VALUES (
-					:webhook_serial_id,
-					:guild_id,
-					:webhook_id,
-					:subscription_type,
-					:subscription_id,
-					:last_posted_at
-				)
-			`, webhook)
+					$1,
+					$2,
+					$3,
+					$4,
+					$5
+				) RETURNING webhook_serial_id`,
+				webhook.GuildID,
+				webhook.WebhookID,
+				webhook.SubscriptionType,
+				webhook.SubscriptionID,
+				webhook.LastPostedAt,
+			).Scan(&webhook.WebhookSerialID)
 			if err != nil {
 				t.Fatalf("insert error: %v", err)
 			}

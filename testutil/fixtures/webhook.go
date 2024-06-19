@@ -7,7 +7,7 @@ import (
 )
 
 type Webhook struct {
-	ID               *int64    `db:"id"`
+	WebhookSerialID  *int64    `db:"webhook_serial_id"`
 	GuildID          string    `db:"guild_id"`
 	WebhookID        string    `db:"webhook_id"`
 	SubscriptionType string    `db:"subscription_type"`
@@ -38,13 +38,13 @@ func NewWebhook(ctx context.Context, setter ...func(b *Webhook)) *ModelConnector
 			switch connectingModel := connectingModel.(type) {
 			case *WebhookWord:
 				webhookWord := connectingModel
-				webhookWord.ID = *webhook.ID
+				webhookWord.ID = *webhook.WebhookSerialID
 			case *WebhookUserMention:
 				webhookUserMention := connectingModel
-				webhookUserMention.WebhookID = *webhook.ID
+				webhookUserMention.WebhookID = *webhook.WebhookSerialID
 			case *WebhookRoleMention:
 				webhookRoleMention := connectingModel
-				webhookRoleMention.WebhookID = *webhook.ID
+				webhookRoleMention.WebhookID = *webhook.WebhookSerialID
 			default:
 				t.Fatalf("%T cannot be connected to %T", connectingModel, webhook)
 			}

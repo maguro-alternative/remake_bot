@@ -321,4 +321,31 @@ func TestWebhook(t *testing.T) {
 		assert.Equal(t, "test", webhook.SubscriptionID)
 		assert.Equal(t, time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC), webhook.LastPostedAt.UTC())
 	})
+
+	t.Run("Webhook更新(最終更新日)_存在しないWebhookSerialID", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
+		assert.NoError(t, err)
+		defer cleanup()
+
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM webhook")
+
+		repo := NewRepository(tx)
+
+		err = repo.UpdateWebhookWithLastPostedAt(
+			ctx,
+			1,
+			time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+		)
+		assert.NoError(t, err)
+
+		var webhookCount int
+		err = tx.GetContext(ctx, &webhookCount, "SELECT COUNT(*) FROM webhook")
+		assert.NoError(t, err)
+		assert.Equal(t, 0, webhookCount)
+	})
 }

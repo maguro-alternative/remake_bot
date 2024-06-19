@@ -24,7 +24,7 @@ func (r *Repository) InsertWebhookWord(
 		) VALUES (
 			$1,
 			$2
-		)
+		) ON CONFLICT (condition, word) DO NOTHING
 	`
 	_, err := r.db.ExecContext(
 		ctx,

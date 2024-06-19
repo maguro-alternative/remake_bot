@@ -54,22 +54,6 @@ func (r *Repository) GetWebhookWordWithWebhookSerialIDAndCondition(
 	return webhookWord, err
 }
 
-func (r *Repository) DeleteWebhookWordWithWebhookSerialIDAndCondition(
-	ctx context.Context,
-	webhookSerialID int64,
-	condition string,
-) error {
-	query := `
-		DELETE FROM
-			webhook_word
-		WHERE
-			webhook_serial_id = $1
-			condition = $2
-	`
-	_, err := r.db.ExecContext(ctx, query, webhookSerialID, condition)
-	return err
-}
-
 func (r *Repository) DeleteWebhookWordsNotInProvidedList(
 	ctx context.Context,
 	webhookSerialID int64,

@@ -122,18 +122,18 @@ func (r *Repository) UpdateWebhookWithWebhookIDAndSubscription(
 
 func (r *Repository) DeleteWebhook(
 	ctx context.Context,
-	id int64,
+	webhookSerialID int64,
 ) error {
 	query := `
 		DELETE FROM
 			webhook
 		WHERE
-			id = $1
+			webhook_serial_id = $1
 	`
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
-		id,
+		webhookSerialID,
 	)
 	return err
 }

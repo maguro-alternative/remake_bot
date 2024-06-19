@@ -120,7 +120,7 @@ func (r *Repository) UpdateWebhookWithWebhookIDAndSubscription(
 	return err
 }
 
-func (r *Repository) DeleteWebhook(
+func (r *Repository) DeleteWebhookByWebhookSerialID(
 	ctx context.Context,
 	webhookSerialID int64,
 ) error {

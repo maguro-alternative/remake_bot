@@ -6,7 +6,7 @@ import (
 )
 
 type Webhook struct {
-	ID               *int64    `db:"id"`
+	WebhookSerialID  *int64    `db:"webhook_serial_id"`
 	GuildID          string    `db:"guild_id"`
 	WebhookID        string    `db:"webhook_id"`
 	SubscriptionType string    `db:"subscription_type"`

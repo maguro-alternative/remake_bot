@@ -148,4 +148,78 @@ func TestWebhook(t *testing.T) {
 		assert.Equal(t, "test", webhooks[1].SubscriptionID)
 		assert.Equal(t, lastPostedAt, webhooks[1].LastPostedAt.UTC())
 	})
+
+	t.Run("Webhook取得_複数_存在しない", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
+		assert.NoError(t, err)
+		defer cleanup()
+
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM webhook")
+
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewWebhook(ctx, func(b *fixtures.Webhook) {
+				b.GuildID = "1111"
+				b.WebhookID = "22222"
+				b.SubscriptionType = "youtube"
+				b.SubscriptionID = "test"
+				b.LastPostedAt = lastPostedAt
+			}),
+			fixtures.NewWebhook(ctx, func(b *fixtures.Webhook) {
+				b.GuildID = "1111"
+				b.WebhookID = "33333"
+				b.SubscriptionType = "niconico"
+				b.SubscriptionID = "test"
+				b.LastPostedAt = lastPostedAt
+			}),
+		)
+
+		repo := NewRepository(tx)
+
+		webhooks, err := repo.GetAllColumnsWebhooksByGuildID(ctx, "2222")
+		assert.NoError(t, err)
+		assert.Len(t, webhooks, 0)
+	})
+
+	t.Run("Webhook取得_複数_異なるguildID", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
+		assert.NoError(t, err)
+		defer cleanup()
+
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM webhook")
+
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewWebhook(ctx, func(b *fixtures.Webhook) {
+				b.GuildID = "1111"
+				b.WebhookID = "22222"
+				b.SubscriptionType = "youtube"
+				b.SubscriptionID = "test"
+				b.LastPostedAt = lastPostedAt
+			}),
+			fixtures.NewWebhook(ctx, func(b *fixtures.Webhook) {
+				b.GuildID = "1111"
+				b.WebhookID = "33333"
+				b.SubscriptionType = "niconico"
+				b.SubscriptionID = "test"
+				b.LastPostedAt = lastPostedAt
+			}),
+		)
+
+		repo := NewRepository(tx)
+
+		webhooks, err := repo.GetAllColumnsWebhooksByGuildID(ctx, "2222")
+		assert.NoError(t, err)
+		assert.Len(t, webhooks, 0)
+	})
 }

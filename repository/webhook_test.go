@@ -82,4 +82,23 @@ func TestWebhook(t *testing.T) {
 		assert.Equal(t, "test", webhooks[0].SubscriptionID)
 		assert.Equal(t, lastPostedAt, webhooks[0].LastPostedAt.UTC())
 	})
+
+	t.Run("Webhook取得_存在しない", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
+		assert.NoError(t, err)
+		defer cleanup()
+
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM webhook")
+
+		repo := NewRepository(tx)
+
+		webhooks, err := repo.GetAllColumnsWebhooksByGuildID(ctx, "1111")
+		assert.NoError(t, err)
+		assert.Len(t, webhooks, 0)
+	})
 }

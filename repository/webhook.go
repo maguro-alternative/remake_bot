@@ -95,7 +95,7 @@ func (r *Repository) UpdateWebhookWithLastPostedAt(
 
 func (r *Repository) UpdateWebhookWithWebhookIDAndSubscription(
 	ctx context.Context,
-	id int64,
+	webhookSerialID int64,
 	webhookID string,
 	subscriptionID string,
 	subscriptionType string,
@@ -108,14 +108,14 @@ func (r *Repository) UpdateWebhookWithWebhookIDAndSubscription(
 			subscription_id = $2,
 			subscription_type = $3
 		WHERE
-			id = $4
+			webhook_serial_id = $4
 	`
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
 		subscriptionID,
 		subscriptionType,
-		id,
+		webhookSerialID,
 	)
 	return err
 }

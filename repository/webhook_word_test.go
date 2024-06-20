@@ -42,6 +42,50 @@ func TestWebhookWord(t *testing.T) {
 
 		err = repo.InsertWebhookWord(ctx, *f.Webhooks[0].WebhookSerialID, "ng_or", "word")
 		assert.NoError(t, err)
+
+		var webhookWords []*WebhookWord
+		err = tx.SelectContext(ctx, &webhookWords, "SELECT * FROM webhook_word")
+		assert.NoError(t, err)
+		assert.Len(t, webhookWords, 1)
+	})
+
+	t.Run("WebhookWord挿入(既存のものはスルー)", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
+		assert.NoError(t, err)
+		defer cleanup()
+
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM webhook_word")
+
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewWebhook(ctx, func(b *fixtures.Webhook) {
+				b.GuildID = "1111"
+				b.WebhookID = "22222"
+				b.SubscriptionType = "youtube"
+				b.SubscriptionID = "test"
+				b.LastPostedAt = lastPostedAt
+			}).Connect(
+				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
+					b.Condition = "ng_or"
+					b.Word = "word"
+				}),
+			),
+		)
+
+		repo := NewRepository(tx)
+
+		err = repo.InsertWebhookWord(ctx, *f.Webhooks[0].WebhookSerialID, "ng_or", "word")
+		assert.NoError(t, err)
+
+		var webhookWords []*WebhookWord
+		err = tx.SelectContext(ctx, &webhookWords, "SELECT * FROM webhook_word")
+		assert.NoError(t, err)
+		assert.Len(t, webhookWords, 1)
 	})
 
 	t.Run("WebhookWord取得", func(t *testing.T) {
@@ -70,8 +114,8 @@ func TestWebhookWord(t *testing.T) {
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
 					b.Condition = "ng_or"
 					b.Word = "word"
-				},
-			)),
+				}),
+			),
 		)
 
 		webhookWords, err := repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *f.Webhooks[0].WebhookSerialID, "ng_or")

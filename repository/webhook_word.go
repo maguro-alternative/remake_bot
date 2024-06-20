@@ -8,27 +8,31 @@ import (
 
 type WebhookWord struct {
 	WebhookSerialID int64  `db:"webhook_serial_id"`
-	Condition       string `db:"condition"`
+	Condition       string `db:"conditions"`
 	Word            string `db:"word"`
 }
 
 func (r *Repository) InsertWebhookWord(
 	ctx context.Context,
+	webhookSerialID int64,
 	condition string,
 	word string,
 ) error {
 	query := `
 		INSERT INTO webhook_word (
-			condition,
+			webhook_serial_id,
+			conditions,
 			word
 		) VALUES (
 			$1,
-			$2
-		) ON CONFLICT (condition, word) DO NOTHING
+			$2,
+			$3
+		) ON CONFLICT (webhook_serial_id, word) DO NOTHING
 	`
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
+		webhookSerialID,
 		condition,
 		word,
 	)
@@ -47,7 +51,7 @@ func (r *Repository) GetWebhookWordWithWebhookSerialIDAndCondition(
 			webhook_word
 		WHERE
 			webhook_serial_id = $1
-			condition = $2
+			conditions = $2
 	`
 	var webhookWord []*WebhookWord
 	err := r.db.SelectContext(ctx, &webhookWord, query, webhookSerialID, condition)
@@ -65,7 +69,7 @@ func (r *Repository) DeleteWebhookWordsNotInProvidedList(
 			webhook_word
 		WHERE
 			webhook_serial_id = ? AND
-			condition = ? AND
+			conditions = ? AND
 			word NOT IN (?)
 	`
 	if len(words) == 0 {

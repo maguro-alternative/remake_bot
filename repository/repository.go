@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 )
@@ -65,6 +66,11 @@ type RepositoryFuncMock struct {
 	DeleteVcSignalNgRolesNotInProvidedListFunc            func(ctx context.Context, vcChannelID string, roleIDs []string) error
 	DeleteVcSignalMentionUsersNotInProvidedListFunc       func(ctx context.Context, vcChannelID string, userIDs []string) error
 	DeleteVcSignalMentionRolesNotInProvidedListFunc       func(ctx context.Context, vcChannelID string, roleIDs []string) error
+	InsertWebhookFunc                                     func(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) error
+	GetAllColumnsWebhooksByGuildIDFunc                    func(ctx context.Context, guildID string) ([]*Webhook, error)
+	UpdateWebhookWithLastPostedAtFunc                     func(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error
+	UpdateWebhookWithWebhookIDAndSubscriptionFunc          func(ctx context.Context,webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error
+	DeleteWebhookByWebhookSerialIDFunc                    func(ctx context.Context, webhookSerialID int64) error
 }
 
 func (r *RepositoryFuncMock) InsertLineBotIvByGuildID(ctx context.Context, guildId string) error {
@@ -259,6 +265,26 @@ func (r *RepositoryFuncMock) DeleteVcSignalMentionRolesNotInProvidedList(ctx con
 	return r.DeleteVcSignalMentionRolesNotInProvidedListFunc(ctx, vcChannelID, roleIDs)
 }
 
+func (r *RepositoryFuncMock) InsertWebhook(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) error {
+	return r.InsertWebhookFunc(ctx, guildID, webhookID, subscriptionType, subscriptionID, lastPostedAt)
+}
+
+func (r *RepositoryFuncMock) GetAllColumnsWebhooksByGuildID(ctx context.Context, guildID string) ([]*Webhook, error) {
+	return r.GetAllColumnsWebhooksByGuildIDFunc(ctx, guildID)
+}
+
+func (r *RepositoryFuncMock) UpdateWebhookWithLastPostedAt(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error {
+	return r.UpdateWebhookWithLastPostedAtFunc(ctx, webhookSerialID, lastPostedAt)
+}
+
+func (r *RepositoryFuncMock) UpdateWebhookWithWebhookIDAndSubscription(ctx context.Context, webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error {
+	return r.UpdateWebhookWithWebhookIDAndSubscriptionFunc(ctx, webhookSerialID, webhookID, subscriptionID, subscriptionType)
+}
+
+func (r *RepositoryFuncMock) DeleteWebhookByWebhookSerialID(ctx context.Context, webhookSerialID int64) error {
+	return r.DeleteWebhookByWebhookSerialIDFunc(ctx, webhookSerialID)
+}
+
 // Repository is an interface for repository.
 type RepositoryFunc interface {
 	InsertLineBotIvByGuildID(ctx context.Context, guildId string) error
@@ -309,6 +335,12 @@ type RepositoryFunc interface {
 	DeleteVcSignalNgRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error
 	DeleteVcSignalMentionUsersNotInProvidedList(ctx context.Context, vcChannelID string, userIDs []string) error
 	DeleteVcSignalMentionRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error
+	InsertWebhook(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) error
+	GetAllColumnsWebhooksByGuildID(ctx context.Context, guildID string) ([]*Webhook, error)
+	UpdateWebhookWithLastPostedAt(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error
+	UpdateWebhookWithWebhookIDAndSubscription(ctx context.Context, webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error
+	DeleteWebhookByWebhookSerialID(ctx context.Context, webhookSerialID int64) error
+	//InsertWebhookWord(ctx context.Context, webhookSerialID string, condition string, word string) error
 }
 
 var (

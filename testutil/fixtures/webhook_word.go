@@ -6,16 +6,16 @@ import (
 )
 
 type WebhookWord struct {
-	ID        int64  `db:"id"`
-	Condition string `db:"condition"`
-	Word      string `db:"word"`
+	WebhookSerialID int64  `db:"webhook_serial_id"`
+	Condition       string `db:"conditions"`
+	Word            string `db:"word"`
 }
 
 func NewWebhookWord(ctx context.Context, setter ...func(b *WebhookWord)) *ModelConnector {
 	webhookWord := &WebhookWord{
-		ID:        1,
-		Condition: "ng_or",
-		Word:      "word",
+		WebhookSerialID: 1,
+		Condition:       "ng_or",
+		Word:            "word",
 	}
 
 	return &ModelConnector{
@@ -37,12 +37,12 @@ func NewWebhookWord(ctx context.Context, setter ...func(b *WebhookWord)) *ModelC
 		insertTable: func(t *testing.T, f *Fixture) {
 			_, err := f.DBv1.NamedExecContext(ctx, `
 				INSERT INTO webhook_word (
-					id,
-					condition,
+					webhook_serial_id,
+					conditions,
 					word
 				) VALUES (
-					:id,
-					:condition,
+					:webhook_serial_id,
+					:conditions,
 					:word
 				)
 			`, webhookWord)

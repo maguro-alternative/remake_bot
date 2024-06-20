@@ -71,6 +71,9 @@ type RepositoryFuncMock struct {
 	UpdateWebhookWithLastPostedAtFunc                     func(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error
 	UpdateWebhookWithWebhookIDAndSubscriptionFunc          func(ctx context.Context,webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error
 	DeleteWebhookByWebhookSerialIDFunc                    func(ctx context.Context, webhookSerialID int64) error
+	InsertWebhookWordFunc                                 func(ctx context.Context, webhookSerialID int64, condition string, word string) error
+	GetWebhookWordWithWebhookSerialIDAndConditionFunc      func(ctx context.Context, webhookSerialID int64, condition string) ([]*WebhookWord, error)
+	DeleteWebhookWordsNotInProvidedListFunc               func(ctx context.Context, webhookSerialID int64, conditions string, words []string) error
 }
 
 func (r *RepositoryFuncMock) InsertLineBotIvByGuildID(ctx context.Context, guildId string) error {
@@ -285,6 +288,18 @@ func (r *RepositoryFuncMock) DeleteWebhookByWebhookSerialID(ctx context.Context,
 	return r.DeleteWebhookByWebhookSerialIDFunc(ctx, webhookSerialID)
 }
 
+func (r *RepositoryFuncMock) InsertWebhookWord(ctx context.Context, webhookSerialID int64, condition string, word string) error {
+	return r.InsertWebhookWordFunc(ctx, webhookSerialID, condition, word)
+}
+
+func (r *RepositoryFuncMock) GetWebhookWordWithWebhookSerialIDAndCondition(ctx context.Context, webhookSerialID int64, condition string) ([]*WebhookWord, error) {
+	return r.GetWebhookWordWithWebhookSerialIDAndConditionFunc(ctx, webhookSerialID, condition)
+}
+
+func (r *RepositoryFuncMock) DeleteWebhookWordsNotInProvidedList(ctx context.Context, webhookSerialID int64, conditions string, words []string) error {
+	return r.DeleteWebhookWordsNotInProvidedListFunc(ctx, webhookSerialID, conditions, words)
+}
+
 // Repository is an interface for repository.
 type RepositoryFunc interface {
 	InsertLineBotIvByGuildID(ctx context.Context, guildId string) error
@@ -340,7 +355,9 @@ type RepositoryFunc interface {
 	UpdateWebhookWithLastPostedAt(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error
 	UpdateWebhookWithWebhookIDAndSubscription(ctx context.Context, webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error
 	DeleteWebhookByWebhookSerialID(ctx context.Context, webhookSerialID int64) error
-	//InsertWebhookWord(ctx context.Context, webhookSerialID string, condition string, word string) error
+	InsertWebhookWord(ctx context.Context, webhookSerialID int64, condition string, word string) error
+	GetWebhookWordWithWebhookSerialIDAndCondition(ctx context.Context, webhookSerialID int64, condition string) ([]*WebhookWord, error)
+	DeleteWebhookWordsNotInProvidedList(ctx context.Context, webhookSerialID int64, conditions string, words []string) error
 }
 
 var (

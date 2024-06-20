@@ -50,7 +50,7 @@ func (r *Repository) GetWebhookWordWithWebhookSerialIDAndCondition(
 		FROM
 			webhook_word
 		WHERE
-			webhook_serial_id = $1
+			webhook_serial_id = $1 AND
 			conditions = $2
 	`
 	var webhookWord []*WebhookWord

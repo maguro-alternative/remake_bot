@@ -74,6 +74,9 @@ type RepositoryFuncMock struct {
 	InsertWebhookWordFunc                                 func(ctx context.Context, webhookSerialID int64, condition string, word string) error
 	GetWebhookWordWithWebhookSerialIDAndConditionFunc      func(ctx context.Context, webhookSerialID int64, condition string) ([]*WebhookWord, error)
 	DeleteWebhookWordsNotInProvidedListFunc               func(ctx context.Context, webhookSerialID int64, conditions string, words []string) error
+	InsertWebhookUserMentionFunc                          func(ctx context.Context, webhookSerialID int64, userID string) error
+	GetWebhookUserMentionWithWebhookSerialIDFunc          func(ctx context.Context, webhookSerialID int64) ([]*WebhookUserMention, error)
+	DeleteWebhookUserMentionsNotInProvidedListFunc        func(ctx context.Context, webhookSerialID int64, userIDs []string) error
 }
 
 func (r *RepositoryFuncMock) InsertLineBotIvByGuildID(ctx context.Context, guildId string) error {
@@ -300,6 +303,18 @@ func (r *RepositoryFuncMock) DeleteWebhookWordsNotInProvidedList(ctx context.Con
 	return r.DeleteWebhookWordsNotInProvidedListFunc(ctx, webhookSerialID, conditions, words)
 }
 
+func (r *RepositoryFuncMock) InsertWebhookUserMention(ctx context.Context, webhookSerialID int64, userID string) error {
+	return r.InsertWebhookUserMentionFunc(ctx, webhookSerialID, userID)
+}
+
+func (r *RepositoryFuncMock) GetWebhookUserMentionWithWebhookSerialID(ctx context.Context, webhookSerialID int64) ([]*WebhookUserMention, error) {
+	return r.GetWebhookUserMentionWithWebhookSerialIDFunc(ctx, webhookSerialID)
+}
+
+func (r *RepositoryFuncMock) DeleteWebhookUserMentionsNotInProvidedList(ctx context.Context, webhookSerialID int64, userIDs []string) error {
+	return r.DeleteWebhookUserMentionsNotInProvidedListFunc(ctx, webhookSerialID, userIDs)
+}
+
 // Repository is an interface for repository.
 type RepositoryFunc interface {
 	InsertLineBotIvByGuildID(ctx context.Context, guildId string) error
@@ -358,6 +373,9 @@ type RepositoryFunc interface {
 	InsertWebhookWord(ctx context.Context, webhookSerialID int64, condition string, word string) error
 	GetWebhookWordWithWebhookSerialIDAndCondition(ctx context.Context, webhookSerialID int64, condition string) ([]*WebhookWord, error)
 	DeleteWebhookWordsNotInProvidedList(ctx context.Context, webhookSerialID int64, conditions string, words []string) error
+	InsertWebhookUserMention(ctx context.Context, webhookSerialID int64, userID string) error
+	GetWebhookUserMentionWithWebhookSerialID(ctx context.Context, webhookSerialID int64) ([]*WebhookUserMention, error)
+	DeleteWebhookUserMentionsNotInProvidedList(ctx context.Context, webhookSerialID int64, userIDs []string) error
 }
 
 var (

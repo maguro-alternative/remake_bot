@@ -6,14 +6,14 @@ import (
 )
 
 type WebhookUserMention struct {
-	WebhookID int64  `db:"webhook_id"`
-	UserID    string `db:"user_id"`
+	WebhookSerialID int64  `db:"webhook_serial_id"`
+	UserID          string `db:"user_id"`
 }
 
 func NewWebhookUserMention(ctx context.Context, setter ...func(b *WebhookUserMention)) *ModelConnector {
 	webhookUserMention := &WebhookUserMention{
-		WebhookID: 1,
-		UserID:    "1111111111111",
+		WebhookSerialID: 1,
+		UserID:          "1111111111111",
 	}
 
 	return &ModelConnector{
@@ -35,10 +35,10 @@ func NewWebhookUserMention(ctx context.Context, setter ...func(b *WebhookUserMen
 		insertTable: func(t *testing.T, f *Fixture) {
 			_, err := f.DBv1.NamedExecContext(ctx, `
 				INSERT INTO webhook_user_mention (
-					webhook_id,
+					webhook_serial_id,
 					user_id
 				) VALUES (
-					:webhook_id,
+					:webhook_serial_id,
 					:user_id
 				)
 			`, webhookUserMention)

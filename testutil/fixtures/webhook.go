@@ -38,13 +38,13 @@ func NewWebhook(ctx context.Context, setter ...func(b *Webhook)) *ModelConnector
 			switch connectingModel := connectingModel.(type) {
 			case *WebhookWord:
 				webhookWord := connectingModel
-				webhookWord.ID = *webhook.WebhookSerialID
+				webhookWord.WebhookSerialID = *webhook.WebhookSerialID
 			case *WebhookUserMention:
 				webhookUserMention := connectingModel
-				webhookUserMention.WebhookID = *webhook.WebhookSerialID
+				webhookUserMention.WebhookSerialID = *webhook.WebhookSerialID
 			case *WebhookRoleMention:
 				webhookRoleMention := connectingModel
-				webhookRoleMention.WebhookID = *webhook.WebhookSerialID
+				webhookRoleMention.WebhookSerialID = *webhook.WebhookSerialID
 			default:
 				t.Fatalf("%T cannot be connected to %T", connectingModel, webhook)
 			}

@@ -10,7 +10,7 @@ type WebhookRoleMention struct {
 	RoleID          string `db:"role_id"`
 }
 
-func NewWebhookMention(ctx context.Context, setter ...func(b *WebhookRoleMention)) *ModelConnector {
+func NewWebhookRoleMention(ctx context.Context, setter ...func(b *WebhookRoleMention)) *ModelConnector {
 	webhookRoleMention := &WebhookRoleMention{
 		WebhookSerialID: 1,
 		RoleID:          "1111111111111",

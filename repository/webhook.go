@@ -21,7 +21,8 @@ func (r *Repository) InsertWebhook(
 	subscriptionType string,
 	subscriptionID string,
 	lastPostedAt time.Time,
-) error {
+) (int64, error) {
+	var webhookSerialID int64
 	query := `
 		INSERT INTO webhook (
 			guild_id,
@@ -35,9 +36,9 @@ func (r *Repository) InsertWebhook(
 			$3,
 			$4,
 			$5
-		)
+		) RETURNING webhook_serial_id
 	`
-	_, err := r.db.ExecContext(
+	err := r.db.QueryRowxContext(
 		ctx,
 		query,
 		guildID,
@@ -45,8 +46,8 @@ func (r *Repository) InsertWebhook(
 		subscriptionType,
 		subscriptionID,
 		lastPostedAt,
-	)
-	return err
+	).Scan(&webhookSerialID)
+	return webhookSerialID, err
 }
 
 func (r *Repository) GetAllColumnsWebhooksByGuildID(

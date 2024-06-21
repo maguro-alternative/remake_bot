@@ -66,7 +66,7 @@ type RepositoryFuncMock struct {
 	DeleteVcSignalNgRolesNotInProvidedListFunc            func(ctx context.Context, vcChannelID string, roleIDs []string) error
 	DeleteVcSignalMentionUsersNotInProvidedListFunc       func(ctx context.Context, vcChannelID string, userIDs []string) error
 	DeleteVcSignalMentionRolesNotInProvidedListFunc       func(ctx context.Context, vcChannelID string, roleIDs []string) error
-	InsertWebhookFunc                                     func(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) error
+	InsertWebhookFunc                                     func(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) (int64, error)
 	GetAllColumnsWebhooksByGuildIDFunc                    func(ctx context.Context, guildID string) ([]*Webhook, error)
 	UpdateWebhookWithLastPostedAtFunc                     func(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error
 	UpdateWebhookWithWebhookIDAndSubscriptionFunc          func(ctx context.Context,webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error
@@ -274,7 +274,7 @@ func (r *RepositoryFuncMock) DeleteVcSignalMentionRolesNotInProvidedList(ctx con
 	return r.DeleteVcSignalMentionRolesNotInProvidedListFunc(ctx, vcChannelID, roleIDs)
 }
 
-func (r *RepositoryFuncMock) InsertWebhook(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) error {
+func (r *RepositoryFuncMock) InsertWebhook(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) (int64, error) {
 	return r.InsertWebhookFunc(ctx, guildID, webhookID, subscriptionType, subscriptionID, lastPostedAt)
 }
 
@@ -380,7 +380,7 @@ type RepositoryFunc interface {
 	DeleteVcSignalNgRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error
 	DeleteVcSignalMentionUsersNotInProvidedList(ctx context.Context, vcChannelID string, userIDs []string) error
 	DeleteVcSignalMentionRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error
-	InsertWebhook(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) error
+	InsertWebhook(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) (int64, error)
 	GetAllColumnsWebhooksByGuildID(ctx context.Context, guildID string) ([]*Webhook, error)
 	UpdateWebhookWithLastPostedAt(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error
 	UpdateWebhookWithWebhookIDAndSubscription(ctx context.Context, webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error

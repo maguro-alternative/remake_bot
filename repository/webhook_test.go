@@ -28,7 +28,7 @@ func TestWebhook(t *testing.T) {
 		tx.ExecContext(ctx, "DELETE FROM webhook")
 
 		repo := NewRepository(tx)
-		err = repo.InsertWebhook(
+		webhookSerialID, err := repo.InsertWebhook(
 			ctx,
 			"1111",
 			"22222",
@@ -41,6 +41,7 @@ func TestWebhook(t *testing.T) {
 		var webhook Webhook
 		err = tx.GetContext(ctx, &webhook, "SELECT * FROM webhook WHERE webhook_id = '22222'")
 		assert.NoError(t, err)
+		assert.Equal(t, webhookSerialID, *webhook.WebhookSerialID)
 		assert.Equal(t, "1111", webhook.GuildID)
 		assert.Equal(t, "22222", webhook.WebhookID)
 		assert.Equal(t, "youtube", webhook.SubscriptionType)

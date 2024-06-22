@@ -41,6 +41,7 @@ type UpdateWebhook struct {
 
 func (g WebhookJson) Validate() error {
 	return validation.ValidateStruct(&g,
-		validation.Field(&g.NewWebhooks, validation.Required),
+		validation.Field(&g.NewWebhooks, validation.Length(0, 1000)),
+		validation.Field(&g.UpdateWebhooks, validation.Length(0, 1000)),
 	)
 }

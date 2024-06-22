@@ -89,4 +89,12 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
+
+	t.Run("Webhookの更新が失敗すること(リクエストのパース失敗)", func(t *testing.T) {
+		h := &WebhookHandler{}
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/webhook", bytes.NewReader([]byte("invalid json")))
+		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
 }

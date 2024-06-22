@@ -70,4 +70,23 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
+
+	t.Run("Webhookの更新が失敗すること(mentionAndWordのinsert失敗)", func(t *testing.T) {
+		bodyJson, err := json.Marshal(webhook)
+		assert.NoError(t, err)
+		h := &WebhookHandler{
+			repo: &repository.RepositoryFuncMock{
+				InsertWebhookFunc: func(ctx context.Context, guildID, webhookID, subscriptionType, subscriptionID string, lastPostedAt time.Time) (int64, error) {
+					return 1, nil
+				},
+				InsertWebhookWordFunc: func(ctx context.Context, webhookSerialID int64, mentionAndWordType, word string) error {
+					return assert.AnError
+				},
+			},
+		}
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/webhook", bytes.NewReader(bodyJson))
+		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
 }

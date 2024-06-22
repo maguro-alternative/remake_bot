@@ -69,10 +69,10 @@ type RepositoryFuncMock struct {
 	InsertWebhookFunc                                     func(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) (int64, error)
 	GetAllColumnsWebhooksByGuildIDFunc                    func(ctx context.Context, guildID string) ([]*Webhook, error)
 	UpdateWebhookWithLastPostedAtFunc                     func(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error
-	UpdateWebhookWithWebhookIDAndSubscriptionFunc          func(ctx context.Context,webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error
+	UpdateWebhookWithWebhookIDAndSubscriptionFunc         func(ctx context.Context, webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error
 	DeleteWebhookByWebhookSerialIDFunc                    func(ctx context.Context, webhookSerialID int64) error
 	InsertWebhookWordFunc                                 func(ctx context.Context, webhookSerialID int64, condition string, word string) error
-	GetWebhookWordWithWebhookSerialIDAndConditionFunc      func(ctx context.Context, webhookSerialID int64, condition string) ([]*WebhookWord, error)
+	GetWebhookWordWithWebhookSerialIDAndConditionFunc     func(ctx context.Context, webhookSerialID int64, condition string) ([]*WebhookWord, error)
 	DeleteWebhookWordsNotInProvidedListFunc               func(ctx context.Context, webhookSerialID int64, conditions string, words []string) error
 	InsertWebhookUserMentionFunc                          func(ctx context.Context, webhookSerialID int64, userID string) error
 	GetWebhookUserMentionWithWebhookSerialIDFunc          func(ctx context.Context, webhookSerialID int64) ([]*WebhookUserMention, error)

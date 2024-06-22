@@ -47,12 +47,75 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, webhook := range webhookJson.NewWebhooks {
-		err = h.repo.InsertWebhook(ctx, guildId, webhook.WebhookID, webhook.SubscriptionType, webhook.SubscriptionId, now)
+		webhookSerialID, err := h.repo.InsertWebhook(ctx, guildId, webhook.WebhookID, webhook.SubscriptionType, webhook.SubscriptionId, now)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Webhookの更新に失敗しました:", "エラー:", err.Error())
 			return
 		}
-		
+		for _, word := range webhook.MentionAndWords {
+			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "mention_and", word)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())
+				return
+			}
+		}
+		for _, word := range webhook.MentionOrWords {
+			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "mention_or", word)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())
+				return
+			}
+		}
+		for _, word := range webhook.SearchAndWords {
+			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "search_and", word)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())
+				return
+			}
+		}
+		for _, word := range webhook.SearchOrWords {
+			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "search_or", word)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())
+				return
+			}
+		}
+		for _, word := range webhook.NgAndWords {
+			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "ng_and", word)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())
+				return
+			}
+		}
+		for _, word := range webhook.NgOrWords {
+			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "ng_or", word)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())
+				return
+			}
+		}
+		for _, roleId := range webhook.MentionRoles {
+			err = h.repo.InsertWebhookRoleMention(ctx, webhookSerialID, roleId)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "Roleの更新に失敗しました:", "エラー:", err.Error())
+				return
+			}
+		}
+		for _, userId := range webhook.MentionUsers {
+			err = h.repo.InsertWebhookUserMention(ctx, webhookSerialID, userId)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "Userの更新に失敗しました:", "エラー:", err.Error())
+				return
+			}
+		}
 	}
 }

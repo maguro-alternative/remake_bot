@@ -24,7 +24,7 @@ type NewWebhook struct {
 }
 
 type UpdateWebhook struct {
-	WebhookSerialID  int64      `json:"webhookSerialId"`
+	WebhookSerialID  int64    `json:"webhookSerialId"`
 	WebhookID        string   `json:"webhookId"`
 	SubscriptionType string   `json:"subscriptionType"`
 	SubscriptionId   string   `json:"subscriptionId"`

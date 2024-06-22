@@ -45,6 +45,12 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.ErrorContext(ctx, "jsonの読み取りに失敗しました:", "エラー:", err.Error())
 		return
 	}
+	err = webhookJson.Validate()
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		slog.ErrorContext(ctx, "jsonのバリデーションに失敗しました:", "エラー:", err.Error())
+		return
+	}
 
 	for _, webhook := range webhookJson.NewWebhooks {
 		webhookSerialID, err := h.repo.InsertWebhook(ctx, guildId, webhook.WebhookID, webhook.SubscriptionType, webhook.SubscriptionId, now)

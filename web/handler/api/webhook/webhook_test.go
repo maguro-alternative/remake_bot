@@ -20,10 +20,10 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 	webhook := internal.WebhookJson{
 		NewWebhooks: []internal.NewWebhook{
 			{
-				WebhookID:       "987654321",
+				WebhookID:        "987654321",
 				SubscriptionType: "youtube",
 				SubscriptionId:   "987654321",
-				MentionAndWords: []string{"word1", "word2"},
+				MentionAndWords:  []string{"word1", "word2"},
 			},
 		},
 	}

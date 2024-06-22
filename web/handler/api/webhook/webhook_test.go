@@ -36,6 +36,14 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		assert.Equal(t, http.StatusMethodNotAllowed, w.Code)
 	})
 
+	t.Run("バリデーションチェックに失敗した場合、BadRequestが返ること", func(t *testing.T) {
+		h := &WebhookHandler{}
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/webhook", nil)
+		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
 	t.Run("Webhookの更新が成功すること", func(t *testing.T) {
 		bodyJson, err := json.Marshal(webhook)
 		assert.NoError(t, err)

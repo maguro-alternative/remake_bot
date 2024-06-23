@@ -135,6 +135,8 @@ func DiscordOAuthCheckMiddleware(
 				permissionType = "linePostDiscordChannel"
 			case "vc-signal":
 				permissionType = "vcSignal"
+			case "webhook":
+				permissionType = "webhook"
 			default:
 				slog.InfoContext(ctx, "権限チャンネル以外", "permissionType", permissionType)
 				h.ServeHTTP(w, r.WithContext(ctx))

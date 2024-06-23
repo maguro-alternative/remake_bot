@@ -73,15 +73,15 @@ type RepositoryFuncMock struct {
 	DeleteWebhookByWebhookSerialIDFunc                    func(ctx context.Context, webhookSerialID int64) error
 	InsertWebhookWordFunc                                 func(ctx context.Context, webhookSerialID int64, condition string, word string) error
 	GetWebhookWordWithWebhookSerialIDAndConditionFunc     func(ctx context.Context, webhookSerialID int64, condition string) ([]*WebhookWord, error)
-	GetWebhookWordWithWebhookSerialIDsFunc func(ctx context.Context, webhookSerialIDs []int64) ([]*WebhookWord, error)
+	GetWebhookWordWithWebhookSerialIDsFunc                func(ctx context.Context, webhookSerialIDs []int64) ([]*WebhookWord, error)
 	DeleteWebhookWordsNotInProvidedListFunc               func(ctx context.Context, webhookSerialID int64, conditions string, words []string) error
 	InsertWebhookUserMentionFunc                          func(ctx context.Context, webhookSerialID int64, userID string) error
 	GetWebhookUserMentionWithWebhookSerialIDFunc          func(ctx context.Context, webhookSerialID int64) ([]*WebhookUserMention, error)
-	GetWebhookUserMentionWithWebhookSerialIDsFunc func(ctx context.Context, webhookSerialIDs []int64) ([]*WebhookUserMention, error)
+	GetWebhookUserMentionWithWebhookSerialIDsFunc         func(ctx context.Context, webhookSerialIDs []int64) ([]*WebhookUserMention, error)
 	DeleteWebhookUserMentionsNotInProvidedListFunc        func(ctx context.Context, webhookSerialID int64, userIDs []string) error
 	InsertWebhookRoleMentionFunc                          func(ctx context.Context, webhookSerialID int64, roleID string) error
 	GetWebhookRoleMentionWithWebhookSerialIDFunc          func(ctx context.Context, webhookSerialID int64) ([]*WebhookRoleMention, error)
-	GetWebhookRoleMentionWithWebhookSerialIDsFunc func(ctx context.Context, webhookSerialIDs []int64) ([]*WebhookRoleMention, error)
+	GetWebhookRoleMentionWithWebhookSerialIDsFunc         func(ctx context.Context, webhookSerialIDs []int64) ([]*WebhookRoleMention, error)
 	DeleteWebhookRoleMentionsNotInProvidedListFunc        func(ctx context.Context, webhookSerialID int64, roleIDs []string) error
 }
 

@@ -174,24 +174,39 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			<select name="webhook_type`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="webhook_type`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" style="display: none;">
 				`+ webhookForm +`
 			</select>
+			<br/>
 			<select name="member_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="member_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" style="display: none;">
 				`+ memberSelectForm +`
 			</select>
+			<br/>
 			<select name="role_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="role_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" style="display: none;">
 				`+ roleSelectForm +`
 			</select>
+			<br/>
 			`+ ngOrWordForm +`
+			<br/>
 			<button type="button" onclick="addWord('ng_or', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">NGワードOR検索追加</button>
+			<br/>
 			`+ ngAndWordForm +`
+			<br/>
 			<button type="button" onclick="addWord('ng_and', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">NGワードAND検索追加</button>
+			<br/>
 			`+ searchOrWordForm +`
+			<br/>
 			<button type="button" onclick="addWord('search_or', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">キーワードOR検索追加</button>
+			<br/>
 			`+ searchAndWordForm +`
+			<br/>
 			<button type="button" onclick="addWord('search_and', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">キーワードAND検索追加</button>
+			<br/>
 			`+ mentionOrWordForm +`
+			<br/>
 			<button type="button" onclick="addWord('mention_or', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">メンションOR検索追加</button>
+			<br/>
 			`+ mentionAndWordForm +`
+			<br/>
 			<button type="button" onclick="addWord('mention_and', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">メンションAND検索追加</button>
+			<br/>
 			<button type="button" onclick="deleteWebhook(`+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">削除</button>
 		</details>
 		`)
@@ -203,24 +218,39 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			<select name="webhook_type" id="webhook_type" style="display: none;">
 				`+ internal.CreateWebhookSelectForm(guildWebhooks, "") +`
 			</select>
+			<br/>
 			<select name="member_mention" id="member_mention" style="display: none;">
 				`+ internal.CreateMemberSelectForm(guild, nil) +`
 			</select>
+			<br/>
 			<select name="role_mention" id="role_mention" style="display: none;">
 				`+ internal.CreateRoleSelectForm(guild, nil) +`
 			</select>
+			<br/>
 			`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)") +`
+			<br/>
 			<button type="button" onclick="addWord('ng_or', 0)">NGワードOR検索追加</button>
+			<br/>
 			`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)") +`
+			<br/>
 			<button type="button" onclick="addWord('ng_and', 0)">NGワードAND検索追加</button>
+			<br/>
 			`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)") +`
+			<br/>
 			<button type="button" onclick="addWord('search_or', 0)">キーワードOR検索追加</button>
+			<br/>
 			`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードAND検索(すべての単語が含まれている場合、送信)") +`
+			<br/>
 			<button type="button" onclick="addWord('search_and', 0)">キーワードAND検索追加</button>
+			<br/>
 			`+ internal.CreateWordWebhookForm(nil, guildId, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)") +`
+			<br/>
 			<button type="button" onclick="addWord('mention_or', 0)">メンションOR検索追加</button>
+			<br/>
 			`+ internal.CreateWordWebhookForm(nil, guildId, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)") +`
+			<br/>
 			<button type="button" onclick="addWord('mention_and', 0)">メンションAND検索追加</button>
+			<br/>
 			<button type="button" onclick="addWebhook()">追加</button>
 		</details>
 	`)

@@ -125,6 +125,69 @@ func TestWebhookWord(t *testing.T) {
 		assert.Equal(t, "word", webhookWords[0].Word)
 	})
 
+	t.Run("WebhookWord取得(指定されたidのみ取得)", func(t *testing.T) {
+		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
+		assert.NoError(t, err)
+		defer cleanup()
+
+		tx, err := dbV1.BeginTxx(ctx, nil)
+		assert.NoError(t, err)
+
+		defer tx.RollbackCtx(ctx)
+
+		tx.ExecContext(ctx, "DELETE FROM webhook_word")
+
+		repo := NewRepository(tx)
+
+		f := &fixtures.Fixture{DBv1: tx}
+		f.Build(t,
+			fixtures.NewWebhook(ctx, func(b *fixtures.Webhook) {
+				b.GuildID = "1111"
+				b.WebhookID = "22222"
+				b.SubscriptionType = "youtube"
+				b.SubscriptionID = "test"
+				b.LastPostedAt = lastPostedAt
+			}).Connect(
+				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
+					b.Condition = "ng_or"
+					b.Word = "word"
+				}),
+				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
+					b.Condition = "ng_and"
+					b.Word = "word2"
+				}),
+				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
+					b.Condition = "search_or"
+					b.Word = "word3"
+				}),
+			),
+			fixtures.NewWebhook(ctx, func(b *fixtures.Webhook) {
+				b.GuildID = "1111"
+				b.WebhookID = "22223"
+				b.SubscriptionType = "youtube"
+				b.SubscriptionID = "test2"
+				b.LastPostedAt = lastPostedAt
+			}).Connect(
+				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
+					b.Condition = "ng_or"
+					b.Word = "word"
+				}),
+				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
+					b.Condition = "ng_and"
+					b.Word = "word2"
+				}),
+				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
+					b.Condition = "search_or"
+					b.Word = "word3"
+				}),
+			),
+		)
+
+		webhookWords, err := repo.GetWebhookWordWithWebhookSerialIDs(ctx, []int64{*f.Webhooks[0].WebhookSerialID, *f.Webhooks[1].WebhookSerialID})
+		assert.NoError(t, err)
+		assert.Len(t, webhookWords, 6)
+	})
+
 	t.Run("WebhookWord削除", func(t *testing.T) {
 		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)

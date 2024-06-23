@@ -171,6 +171,12 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		webhookFormBuilder.WriteString(`
 		<details style="margin: 0 0 0 1em;">
             <summary>` + webhook.SubscriptionType + `:` + webhook.SubscriptionID + `</summary>
+			<label for="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービス名</label>
+			<select name="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionType+`" />
+			<br/>
+			<label for="subscription_id`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービスID</label>
+			<input type="text" name="subscription_id`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscription_id`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionID+`" />
+			<br/>
 			<select name="webhook_type`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="webhook_type`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" style="display: none;">
 				`+ webhookForm +`
 			</select>
@@ -218,6 +224,12 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			<select name="webhook_type" id="webhook_type" style="display: none;">
 				`+ internal.CreateWebhookSelectForm(guildWebhooks, "") +`
 			</select>
+			<br/>
+			<label for="subscription_name">サービス名</label>
+			<input type="text" name="subscription_name" id="subscription_name" value="" />
+			<br/>
+			<label for="subscription_id">サービスID</label>
+			<input type="text" name="subscription_id" id="subscription_id" value="" />
 			<br/>
 			<select name="member_mention" id="member_mention" style="display: none;">
 				`+ internal.CreateMemberSelectForm(guild, nil) +`

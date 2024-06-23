@@ -51,6 +51,28 @@ func (r *Repository) GetWebhookUserMentionWithWebhookSerialID(
 	return webhookUserMention, err
 }
 
+func (r *Repository) GetWebhookUserMentionWithWebhookSerialIDs(
+	ctx context.Context,
+	webhookSerialIDs []int64,
+) ([]*WebhookUserMention, error) {
+	query := `
+		SELECT
+			*
+		FROM
+			webhook_user_mention
+		WHERE
+			webhook_serial_id IN (?)
+	`
+	var webhookUserMention []*WebhookUserMention
+	query, args, err := db.In(query, webhookSerialIDs)
+	if err != nil {
+		return nil, err
+	}
+	query = db.Rebind(2, query)
+	err = r.db.SelectContext(ctx, &webhookUserMention, query, args...)
+	return webhookUserMention, err
+}
+
 func (r *Repository) DeleteWebhookUserMentionsNotInProvidedList(
 	ctx context.Context,
 	webhookSerialID int64,

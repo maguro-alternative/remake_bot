@@ -5,13 +5,28 @@ import (
 	"strings"
 
 	//"github.com/maguro-alternative/remake_bot/web/components"
+	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/bwmarrin/discordgo"
 )
 
+func CreateWordWebhookForm(
+	words []*repository.WebhookWord,
+	guildId string,
+	label string,
+) string {
+	wordFormBuilder := strings.Builder{}
+	for i, word := range words {
+		wordId := fmt.Sprintf("%sword%s_%d", word.Condition, guildId, i)
+		wordFormBuilder.WriteString(fmt.Sprintf(`
+			<label for="%s">%s</label>
+			<input type="text" id="%s" name="%s" value="%s">
+		`, wordId, label, wordId, wordId, word.Word))
+	}
+	return wordFormBuilder.String()
+}
 
-
-func createNewWebhookSelectForm(
+func CreateNewWebhookSelectForm(
 	guildWebhooks []*discordgo.Webhook,
 ) (string) {
 	selectWebhookFormBuilder := strings.Builder{}
@@ -23,7 +38,7 @@ func createNewWebhookSelectForm(
 	return selectWebhookFormBuilder.String()
 }
 
-func createWebhookSelectForm(
+func CreateWebhookSelectForm(
 	guildWebhooks []*discordgo.Webhook,
 	selectedWebhookID string,
 ) (string) {
@@ -42,7 +57,7 @@ func createWebhookSelectForm(
 	return selectWebhookFormBuilder.String()
 }
 
-func createMemberSelectForm(guild *discordgo.Guild, users []string) (string) {
+func CreateMemberSelectForm(guild *discordgo.Guild, users []string) (string) {
 	selectMemberFormBuilder := strings.Builder{}
 	for _, member := range guild.Members {
 		selectedFlag := false
@@ -61,7 +76,7 @@ func createMemberSelectForm(guild *discordgo.Guild, users []string) (string) {
 	return selectMemberFormBuilder.String()
 }
 
-func createRoleSelectForm(guild *discordgo.Guild, roles []string) (string) {
+func CreateRoleSelectForm(guild *discordgo.Guild, roles []string) (string) {
 	selectRoleFormBuilder := strings.Builder{}
 	for _, role := range guild.Roles {
 		selectedFlag := false

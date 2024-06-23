@@ -11,9 +11,35 @@ import (
 
 
 
-func createWebhookSelectForm(guild *discordgo.Guild) (string) {
-	return fmt.Sprintf(`
-	`)
+func createNewWebhookSelectForm(
+	guildWebhooks []*discordgo.Webhook,
+) (string) {
+	selectWebhookFormBuilder := strings.Builder{}
+	for _, guildWebhook := range guildWebhooks {
+		selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
+		<option value="%s">%s</option>`,
+		guildWebhook.ID, guildWebhook.Name))
+	}
+	return selectWebhookFormBuilder.String()
+}
+
+func createWebhookSelectForm(
+	guildWebhooks []*discordgo.Webhook,
+	selectedWebhookID string,
+) (string) {
+	selectWebhookFormBuilder := strings.Builder{}
+	for _, guildWebhook := range guildWebhooks {
+		if guildWebhook.ID == selectedWebhookID {
+			selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
+			<option value="%s" selected>%s</option>`,
+			guildWebhook.ID, guildWebhook.Name))
+			continue
+		}
+		selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
+		<option value="%s">%s</option>`,
+		guildWebhook.ID, guildWebhook.Name))
+	}
+	return selectWebhookFormBuilder.String()
 }
 
 func createMemberSelectForm(guild *discordgo.Guild, users []string) (string) {

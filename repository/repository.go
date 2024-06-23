@@ -81,6 +81,7 @@ type RepositoryFuncMock struct {
 	DeleteWebhookUserMentionsNotInProvidedListFunc        func(ctx context.Context, webhookSerialID int64, userIDs []string) error
 	InsertWebhookRoleMentionFunc                          func(ctx context.Context, webhookSerialID int64, roleID string) error
 	GetWebhookRoleMentionWithWebhookSerialIDFunc          func(ctx context.Context, webhookSerialID int64) ([]*WebhookRoleMention, error)
+	GetWebhookRoleMentionWithWebhookSerialIDsFunc func(ctx context.Context, webhookSerialIDs []int64) ([]*WebhookRoleMention, error)
 	DeleteWebhookRoleMentionsNotInProvidedListFunc        func(ctx context.Context, webhookSerialID int64, roleIDs []string) error
 }
 
@@ -336,6 +337,10 @@ func (r *RepositoryFuncMock) GetWebhookRoleMentionWithWebhookSerialID(ctx contex
 	return r.GetWebhookRoleMentionWithWebhookSerialIDFunc(ctx, webhookSerialID)
 }
 
+func (r *RepositoryFuncMock) GetWebhookRoleMentionWithWebhookSerialIDs(ctx context.Context, webhookSerialIDs []int64) ([]*WebhookRoleMention, error) {
+	return r.GetWebhookRoleMentionWithWebhookSerialIDsFunc(ctx, webhookSerialIDs)
+}
+
 func (r *RepositoryFuncMock) DeleteWebhookRoleMentionsNotInProvidedList(ctx context.Context, webhookSerialID int64, roleIDs []string) error {
 	return r.DeleteWebhookRoleMentionsNotInProvidedListFunc(ctx, webhookSerialID, roleIDs)
 }
@@ -405,6 +410,7 @@ type RepositoryFunc interface {
 	DeleteWebhookUserMentionsNotInProvidedList(ctx context.Context, webhookSerialID int64, userIDs []string) error
 	InsertWebhookRoleMention(ctx context.Context, webhookSerialID int64, roleID string) error
 	GetWebhookRoleMentionWithWebhookSerialID(ctx context.Context, webhookSerialID int64) ([]*WebhookRoleMention, error)
+	GetWebhookRoleMentionWithWebhookSerialIDs(ctx context.Context, webhookSerialIDs []int64) ([]*WebhookRoleMention, error)
 	DeleteWebhookRoleMentionsNotInProvidedList(ctx context.Context, webhookSerialID int64, roleIDs []string) error
 }
 

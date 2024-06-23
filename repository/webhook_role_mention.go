@@ -51,6 +51,28 @@ func (r *Repository) GetWebhookRoleMentionWithWebhookSerialID(
 	return webhookRoleMention, err
 }
 
+func (r *Repository) GetWebhookRoleMentionWithWebhookSerialIDs(
+	ctx context.Context,
+	webhookSerialIDs []int64,
+) ([]*WebhookRoleMention, error) {
+	query := `
+		SELECT
+			*
+		FROM
+			webhook_role_mention
+		WHERE
+			webhook_serial_id IN (?)
+	`
+	var webhookRoleMention []*WebhookRoleMention
+	query, args, err := db.In(query, webhookSerialIDs)
+	if err != nil {
+		return nil, err
+	}
+	query = db.Rebind(2, query)
+	err = r.db.SelectContext(ctx, &webhookRoleMention, query, args...)
+	return webhookRoleMention, err
+}
+
 func (r *Repository) DeleteWebhookRoleMentionsNotInProvidedList(
 	ctx context.Context,
 	webhookSerialID int64,

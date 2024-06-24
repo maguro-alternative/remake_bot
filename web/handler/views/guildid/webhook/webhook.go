@@ -253,27 +253,39 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)") +`
 				<br/>
-				<button type="button" onclick="addWord('ng_or', 0)">NGワードOR検索追加</button>
+				<div id="ng_or_words">
+					<button type="button" onclick="addWord('ng_or', 0)">NGワードOR検索追加</button>
+				</div>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)") +`
 				<br/>
-				<button type="button" onclick="addWord('ng_and', 0)">NGワードAND検索追加</button>
+				<div id="ng_and_words">
+					<button type="button" onclick="addWord('ng_and', 0)">NGワードAND検索追加</button>
+				</div>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)") +`
 				<br/>
-				<button type="button" onclick="addWord('search_or', 0)">キーワードOR検索追加</button>
+				<div id="search_or_words">
+					<button type="button" onclick="addWord('search_or', 0)">キーワードOR検索追加</button>
+				</div>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードAND検索(すべての単語が含まれている場合、送信)") +`
 				<br/>
-				<button type="button" onclick="addWord('search_and', 0)">キーワードAND検索追加</button>
+				<div id="search_and_words">
+					<button type="button" onclick="addWord('search_and', 0)">キーワードAND検索追加</button>
+				</div>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)") +`
 				<br/>
-				<button type="button" onclick="addWord('mention_or', 0)">メンションOR検索追加</button>
+				<div id="mention_or_words">
+					<button type="button" onclick="addWord('mention_or', 0)">メンションOR検索追加</button>
+				</div>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)") +`
 				<br/>
-				<button type="button" onclick="addWord('mention_and', 0)">メンションAND検索追加</button>
+				<div id="mention_and_words">
+					<button type="button" onclick="addWord('mention_and', 0)">メンションAND検索追加</button>
+				</div>
 				<br/>
 				<button type="button" onclick="addWebhook()">追加</button>
 			</div>

@@ -228,52 +228,55 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	webhookFormBuilder.WriteString(`
 		<details style="margin: 0 0 0 1em;">
-			<summary>新規Webhook追加</summary>
-			<select name="webhook_type" id="webhook_type" style="display: none;">
-				`+ internal.CreateWebhookSelectForm(guildWebhooks, "") +`
-			</select>
-			<br/>
-			<label for="subscription_name">サービス名</label>
-			<select name="subscription_name" id="subscription_name" />
-				`+ internal.CreateSubscriptionsSelectForm(subscriptionNames, "") +`
-			</select>
-			<br/>
-			<label for="subscription_id">サービスID</label>
-			<input type="text" name="subscription_id" id="subscription_id" value="" />
-			<br/>
-			<select name="member_mention" id="member_mention" style="display: none;">
-				`+ internal.CreateMemberSelectForm(guild, nil) +`
-			</select>
-			<br/>
-			<select name="role_mention" id="role_mention" style="display: none;">
-				`+ internal.CreateRoleSelectForm(guild, nil) +`
-			</select>
-			<br/>
-			`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)") +`
-			<br/>
-			<button type="button" onclick="addWord('ng_or', 0)">NGワードOR検索追加</button>
-			<br/>
-			`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)") +`
-			<br/>
-			<button type="button" onclick="addWord('ng_and', 0)">NGワードAND検索追加</button>
-			<br/>
-			`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)") +`
-			<br/>
-			<button type="button" onclick="addWord('search_or', 0)">キーワードOR検索追加</button>
-			<br/>
-			`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードAND検索(すべての単語が含まれている場合、送信)") +`
-			<br/>
-			<button type="button" onclick="addWord('search_and', 0)">キーワードAND検索追加</button>
-			<br/>
-			`+ internal.CreateWordWebhookForm(nil, guildId, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)") +`
-			<br/>
-			<button type="button" onclick="addWord('mention_or', 0)">メンションOR検索追加</button>
-			<br/>
-			`+ internal.CreateWordWebhookForm(nil, guildId, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)") +`
-			<br/>
-			<button type="button" onclick="addWord('mention_and', 0)">メンションAND検索追加</button>
-			<br/>
-			<button type="button" onclick="addWebhook()">追加</button>
+			<div id="new_webhook">
+				<summary>新規Webhook追加</summary>
+				<label for="webhook_type">Webhook</label>
+				<select name="webhook_type" id="webhook_type" style="display: none;">
+					`+ internal.CreateWebhookSelectForm(guildWebhooks, "") +`
+				</select>
+				<br/>
+				<label for="subscription_name">サービス名</label>
+				<select name="subscription_name" id="subscription_name" />
+					`+ internal.CreateSubscriptionsSelectForm(subscriptionNames, "") +`
+				</select>
+				<br/>
+				<label for="subscription_id">サービスID</label>
+				<input type="text" name="subscription_id" id="subscription_id" value="" />
+				<br/>
+				<select name="member_mention" id="member_mention" style="display: none;">
+					`+ internal.CreateMemberSelectForm(guild, nil) +`
+				</select>
+				<br/>
+				<select name="role_mention" id="role_mention" style="display: none;">
+					`+ internal.CreateRoleSelectForm(guild, nil) +`
+				</select>
+				<br/>
+				`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)") +`
+				<br/>
+				<button type="button" onclick="addWord('ng_or', 0)">NGワードOR検索追加</button>
+				<br/>
+				`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)") +`
+				<br/>
+				<button type="button" onclick="addWord('ng_and', 0)">NGワードAND検索追加</button>
+				<br/>
+				`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)") +`
+				<br/>
+				<button type="button" onclick="addWord('search_or', 0)">キーワードOR検索追加</button>
+				<br/>
+				`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードAND検索(すべての単語が含まれている場合、送信)") +`
+				<br/>
+				<button type="button" onclick="addWord('search_and', 0)">キーワードAND検索追加</button>
+				<br/>
+				`+ internal.CreateWordWebhookForm(nil, guildId, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)") +`
+				<br/>
+				<button type="button" onclick="addWord('mention_or', 0)">メンションOR検索追加</button>
+				<br/>
+				`+ internal.CreateWordWebhookForm(nil, guildId, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)") +`
+				<br/>
+				<button type="button" onclick="addWord('mention_and', 0)">メンションAND検索追加</button>
+				<br/>
+				<button type="button" onclick="addWebhook()">追加</button>
+			</div>
 		</details>
 	`)
 

@@ -20,6 +20,10 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
+var (
+	subscriptionNames = []string{"youtube", "niconico"}
+)
+
 type WebhookViewHandler struct {
 	indexService *service.IndexService
 	repo         repository.RepositoryFunc
@@ -99,6 +103,8 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	for _, webhook := range webhooks {
 		webhookForm := internal.CreateWebhookSelectForm(guildWebhooks, webhook.WebhookID)
 
+		subscriptionSelectForm := internal.CreateSubscriptionsSelectForm(subscriptionNames, webhook.SubscriptionType)
+
 		userMentions, err := h.repo.GetWebhookUserMentionWithWebhookSerialID(ctx, *webhook.WebhookSerialID)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -172,7 +178,9 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		<details style="margin: 0 0 0 1em;">
             <summary>` + webhook.SubscriptionType + `:` + webhook.SubscriptionID + `</summary>
 			<label for="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービス名</label>
-			<select name="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionType+`" />
+			<select name="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" />
+				`+ subscriptionSelectForm +`
+			</select>
 			<br/>
 			<label for="subscription_id`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービスID</label>
 			<input type="text" name="subscription_id`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscription_id`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionID+`" />
@@ -226,7 +234,9 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			</select>
 			<br/>
 			<label for="subscription_name">サービス名</label>
-			<input type="text" name="subscription_name" id="subscription_name" value="" />
+			<select name="subscription_name" id="subscription_name" />
+				`+ internal.CreateSubscriptionsSelectForm(subscriptionNames, "") +`
+			</select>
 			<br/>
 			<label for="subscription_id">サービスID</label>
 			<input type="text" name="subscription_id" id="subscription_id" value="" />

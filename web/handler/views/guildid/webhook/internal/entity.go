@@ -10,6 +10,18 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+func CreateSubscriptionsSelectForm(subscriptionNames []string, selectedSucscriptionName string) string {
+	selectSubscriptionsFormBuilder := strings.Builder{}
+	for _, subscriptionName := range subscriptionNames {
+		if subscriptionName == selectedSucscriptionName {
+			selectSubscriptionsFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, subscriptionName, subscriptionName))
+			continue
+		}
+		selectSubscriptionsFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, subscriptionName, subscriptionName))
+	}
+	return selectSubscriptionsFormBuilder.String()
+}
+
 func CreateWordWebhookForm(
 	words []*repository.WebhookWord,
 	guildId string,

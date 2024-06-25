@@ -29,11 +29,11 @@ func CreateWordWebhookForm(
 ) string {
 	wordFormBuilder := strings.Builder{}
 	for i, word := range words {
-		wordId := fmt.Sprintf("%sword%s_%d", word.Condition, guildId, i)
+		wordId := fmt.Sprintf("%sword%s_%d[]", word.Condition, guildId, i)
 		wordFormBuilder.WriteString(fmt.Sprintf(`
 			<label for="%s">%s</label>
-			<input type="text" id="%s" name="%s" value="%s">
-		`, wordId, label, wordId, wordId, word.Word))
+			<input type="text" name="%s" value="%s">
+		`, wordId, label, wordId, word.Word))
 	}
 	return wordFormBuilder.String()
 }

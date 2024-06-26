@@ -68,7 +68,7 @@ function addWebhook() {
 
     // 新しいWebhook要素を作成
     const newWebhookLabel = document.createElement('label');
-    newWebhookLabel.textContent = `Webhook${newIdNumber}`;
+    newWebhookLabel.htmlFor = `new_webhook_type${newIdNumber}[]`;
     const newWebhookType = document.createElement('select');
     newWebhookType.name = `new_webhook_type${newIdNumber}[]`;
     newWebhookType.id = `new_webhook_type${newIdNumber}[]`;

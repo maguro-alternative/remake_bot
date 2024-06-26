@@ -51,6 +51,10 @@ function addWebhook() {
     // 新しいIDの番号を設定
     const newIdNumber = currentWebhooks + 1;
 
+    while (document.getElementById(`new_webhook_type${newIdNumber}`) !== null) {
+        newIdNumber++;
+    }
+
     // 新しいWebhook要素を作成
     const newWebhookType = document.createElement('select');
     newWebhookType.name = `new_webhook_type${newIdNumber}`;

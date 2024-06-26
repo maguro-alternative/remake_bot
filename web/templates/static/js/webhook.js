@@ -57,7 +57,6 @@ const createJsonData = async function(formData) {
 // 追加ボタンがクリックされたときに実行される関数
 function addWebhook() {
     const webhook = document.getElementById('new_webhook');
-    const br = document.createElement('br');
     // 現在のWebhook要素の数を取得
     const currentWebhooks = document.querySelectorAll('[id^="new_webhook_type"]').length;
     // 新しいIDの番号を設定
@@ -153,27 +152,38 @@ function addWebhook() {
     newMentionAndWordsDiv.appendChild(newMentionAndWords);
 
     // 新しいWebhook要素を追加
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newWebhookType);
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newSubscriptionName);
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newSubscriptionId);
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newMenberMention);
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newRoleMention);
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newNgOrWordsDiv);
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newNgAndWordsDiv);
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newSearchOrWordsDiv);
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newSearchAndWordsDiv);
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newMentionOrWordsDiv);
-    webhook.appendChild(br);
+    webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(document.createElement('br'));
     webhook.appendChild(newMentionAndWordsDiv);
 }
 

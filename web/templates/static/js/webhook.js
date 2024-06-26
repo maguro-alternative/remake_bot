@@ -70,6 +70,7 @@ function addWebhook() {
     // 新しいWebhook要素を作成
     const newWebhookLabel = document.createElement('label');
     newWebhookLabel.htmlFor = `new_webhook_type${newIdNumber}[]`;
+    newWebhookLabel.textContent = 'Webhook';
     const newWebhookType = document.createElement('select');
     newWebhookType.name = `new_webhook_type${newIdNumber}[]`;
     newWebhookType.id = `new_webhook_type${newIdNumber}[]`;
@@ -78,18 +79,21 @@ function addWebhook() {
 
     const newSubscriptionNameLabel = document.createElement('label');
     newSubscriptionNameLabel.htmlFor = `new_subscription_name${newIdNumber}`;
+    newSubscriptionNameLabel.textContent = 'サービス名';
     const newSubscriptionName = document.createElement('input');
     newSubscriptionName.type = 'text';
     newSubscriptionName.name = `new_subscription_name${newIdNumber}`;
 
     const newSubscriptionIdLabel = document.createElement('label');
     newSubscriptionIdLabel.htmlFor = `new_subscription_id${newIdNumber}`;
+    newSubscriptionIdLabel.textContent = 'サービスID';
     const newSubscriptionId = document.createElement('input');
     newSubscriptionId.type = 'text';
     newSubscriptionId.name = `new_subscription_id${newIdNumber}`;
 
     const newMenberMentionLabel = document.createElement('label');
     newMenberMentionLabel.htmlFor = `new_member_mention${newIdNumber}[]`;
+    newMenberMentionLabel.textContent = 'メンションするユーザー';
     const newMenberMention = document.createElement('select');
     newMenberMention.name = `new_member_mention${newIdNumber}[]`;
     const memberMentionOptions = sessionStorage.getItem('memberMentionOptions');
@@ -97,6 +101,7 @@ function addWebhook() {
 
     const newRoleMentionLabel = document.createElement('label');
     newRoleMentionLabel.htmlFor = `new_role_mention${newIdNumber}[]`;
+    newRoleMentionLabel.textContent = 'メンションするロール';
     const newRoleMention = document.createElement('select');
     newRoleMention.name = `new_role_mention${newIdNumber}[]`;
     const roleMentionOptions = sessionStorage.getItem('roleMentionOptions');

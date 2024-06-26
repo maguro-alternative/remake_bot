@@ -87,6 +87,8 @@ function addWebhook() {
     newSubscriptionId.type = 'text';
     newSubscriptionId.name = `new_subscription_id${newIdNumber}`;
 
+    const newMenberMentionLabel = document.createElement('label');
+    newMenberMentionLabel.htmlFor = `new_member_mention${newIdNumber}[]`;
     const newMenberMention = document.createElement('select');
     newMenberMention.name = `new_member_mention${newIdNumber}[]`;
     const memberMentionOptions = sessionStorage.getItem('memberMentionOptions');
@@ -168,10 +170,11 @@ function addWebhook() {
     webhook.appendChild(newSubscriptionName);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));
-    webhook.appendChild(newSubscriptionIdLabel)
+    webhook.appendChild(newSubscriptionIdLabel);
     webhook.appendChild(newSubscriptionId);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(newMenberMentionLabel);
     webhook.appendChild(newMenberMention);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));

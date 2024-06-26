@@ -70,8 +70,8 @@ function addWebhook() {
     const newWebhookLabel = document.createElement('label');
     newWebhookLabel.textContent = `Webhook${newIdNumber}`;
     const newWebhookType = document.createElement('select');
-    newWebhookType.name = `new_webhook_type${newIdNumber}`;
-    newWebhookType.id = `new_webhook_type${newIdNumber}`;
+    newWebhookType.name = `new_webhook_type${newIdNumber}[]`;
+    newWebhookType.id = `new_webhook_type${newIdNumber}[]`;
     const webhookOptions = sessionStorage.getItem('webhookOptions');
     newWebhookType.innerHTML = webhookOptions;
 
@@ -84,12 +84,12 @@ function addWebhook() {
     newSubscriptionId.name = `new_subscription_id${newIdNumber}`;
 
     const newMenberMention = document.createElement('select');
-    newMenberMention.name = `new_member_mention${newIdNumber}`;
+    newMenberMention.name = `new_member_mention${newIdNumber}[]`;
     const memberMentionOptions = sessionStorage.getItem('memberMentionOptions');
     newMenberMention.innerHTML = memberMentionOptions;
 
     const newRoleMention = document.createElement('select');
-    newRoleMention.name = `new_role_mention${newIdNumber}`;
+    newRoleMention.name = `new_role_mention${newIdNumber}[]`;
     const roleMentionOptions = sessionStorage.getItem('roleMentionOptions');
     newRoleMention.innerHTML = roleMentionOptions;
 

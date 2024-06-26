@@ -189,11 +189,13 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 				`+ webhookForm +`
 			</select>
 			<br/>
-			<select name="member_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="member_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+` multiple>
+			<label for="member_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするユーザー</label>
+			<select name="member_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="member_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
 				`+ memberSelectForm +`
 			</select>
 			<br/>
-			<select name="role_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="role_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+` multiple>
+			<label for="role_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするロール</label>
+			<select name="role_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="role_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
 				`+ roleSelectForm +`
 			</select>
 			<br/>

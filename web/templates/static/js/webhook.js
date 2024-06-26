@@ -75,6 +75,8 @@ function addWebhook() {
     const webhookOptions = sessionStorage.getItem('webhookOptions');
     newWebhookType.innerHTML = webhookOptions;
 
+    const newSubscriptionNameLabel = document.createElement('label');
+    newSubscriptionNameLabel.htmlFor = `new_subscription_name${newIdNumber}`;
     const newSubscriptionName = document.createElement('input');
     newSubscriptionName.type = 'text';
     newSubscriptionName.name = `new_subscription_name${newIdNumber}`;
@@ -160,6 +162,7 @@ function addWebhook() {
     webhook.appendChild(newWebhookType);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(newSubscriptionNameLabel)
     webhook.appendChild(newSubscriptionName);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));

@@ -67,6 +67,8 @@ function addWebhook() {
     }
 
     // 新しいWebhook要素を作成
+    const newWebhookLabel = document.createElement('label');
+    newWebhookLabel.textContent = `Webhook${newIdNumber}`;
     const newWebhookType = document.createElement('select');
     newWebhookType.name = `new_webhook_type${newIdNumber}`;
     newWebhookType.id = `new_webhook_type${newIdNumber}`;
@@ -154,6 +156,7 @@ function addWebhook() {
     // 新しいWebhook要素を追加
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(newWebhookLabel);
     webhook.appendChild(newWebhookType);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));

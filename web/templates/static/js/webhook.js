@@ -34,10 +34,11 @@ window.onload = function() {
     const webhookOptions = document.querySelector('#new_webhook_type1').innerHTML;
     sessionStorage.setItem('webhookOptions', webhookOptions);
 
-    const memberMentionOptions = document.querySelector('#new_member_mention1[]').innerHTML;
+    // IDに[]が含まれる場合、\\[と\\]でエスケープする
+    const memberMentionOptions = document.querySelector('#new_member_mention1\\[\\]').innerHTML;
     sessionStorage.setItem('memberMentionOptions', memberMentionOptions);
 
-    const roleMentionOptions = document.querySelector('#new_role_mention1[]').innerHTML;
+    const roleMentionOptions = document.querySelector('#new_role_mention1\\[\\]').innerHTML;
     sessionStorage.setItem('roleMentionOptions', roleMentionOptions);
 }
 

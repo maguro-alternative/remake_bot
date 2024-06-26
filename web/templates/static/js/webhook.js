@@ -98,6 +98,7 @@ function addWebhook() {
     newMenberMention.name = `new_member_mention${newIdNumber}[]`;
     const memberMentionOptions = sessionStorage.getItem('memberMentionOptions');
     newMenberMention.innerHTML = memberMentionOptions;
+    newMenberMention.multiple = true;
 
     const newRoleMentionLabel = document.createElement('label');
     newRoleMentionLabel.htmlFor = `new_role_mention${newIdNumber}[]`;
@@ -106,6 +107,7 @@ function addWebhook() {
     newRoleMention.name = `new_role_mention${newIdNumber}[]`;
     const roleMentionOptions = sessionStorage.getItem('roleMentionOptions');
     newRoleMention.innerHTML = roleMentionOptions;
+    newRoleMention.multiple = true;
 
     const newNgOrWordsDiv = document.createElement('div');
     newNgOrWordsDiv.id = `new_ng_or_words${newIdNumber}`;

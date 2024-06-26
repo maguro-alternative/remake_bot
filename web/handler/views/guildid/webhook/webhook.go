@@ -231,7 +231,7 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			<div id="new_webhook">
 				<summary>新規Webhook追加</summary>
 				<label for="new_webhook_type1">Webhook</label>
-				<select name="new_webhook_type1" id="new_webhook_type1" style="display: none;">
+				<select name="new_webhook_type1" id="new_webhook_type1">
 					`+ internal.CreateWebhookSelectForm(guildWebhooks, "") +`
 				</select>
 				<br/>

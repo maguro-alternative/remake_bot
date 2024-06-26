@@ -29,6 +29,18 @@ document.getElementById('form').onsubmit = async function (event) {
     });
 }
 
+// JavaScriptでsessionStorageにoptionを保存
+window.onload = function() {
+    const webhookOptions = document.querySelector('#new_webhook_type1').innerHTML;
+    sessionStorage.setItem('webhookOptions', webhookOptions);
+
+    const memberMentionOptions = document.querySelector('#new_member_mention1').innerHTML;
+    sessionStorage.setItem('memberMentionOptions', memberMentionOptions);
+
+    const roleMentionOptions = document.querySelector('#new_role_mention1').innerHTML;
+    sessionStorage.setItem('roleMentionOptions', roleMentionOptions);
+}
+
 const createJsonData = async function(formData) {
     const data = Object.fromEntries(formData.entries());
     return JSON.stringify(data);
@@ -59,6 +71,8 @@ function addWebhook() {
     const newWebhookType = document.createElement('select');
     newWebhookType.name = `new_webhook_type${newIdNumber}`;
     newWebhookType.id = `new_webhook_type${newIdNumber}`;
+    const webhookOptions = sessionStorage.getItem('webhookOptions');
+    newWebhookType.innerHTML = webhookOptions;
 
     const newSubscriptionName = document.createElement('input');
     newSubscriptionName.type = 'text';
@@ -70,6 +84,13 @@ function addWebhook() {
 
     const newMenberMention = document.createElement('select');
     newMenberMention.name = `new_member_mention${newIdNumber}`;
+    const memberMentionOptions = sessionStorage.getItem('memberMentionOptions');
+    newMenberMention.innerHTML = memberMentionOptions;
+
+    const newRoleMention = document.createElement('select');
+    newRoleMention.name = `new_role_mention${newIdNumber}`;
+    const roleMentionOptions = sessionStorage.getItem('roleMentionOptions');
+    newRoleMention.innerHTML = roleMentionOptions;
 
     const newNgOrWordsDiv = document.createElement('div');
     newNgOrWordsDiv.id = `new_ng_or_words${newIdNumber}`;
@@ -140,6 +161,8 @@ function addWebhook() {
     webhook.appendChild(newSubscriptionId);
     webhook.appendChild(br);
     webhook.appendChild(newMenberMention);
+    webhook.appendChild(br);
+    webhook.appendChild(newRoleMention);
     webhook.appendChild(br);
     webhook.appendChild(newNgOrWordsDiv);
     webhook.appendChild(br);

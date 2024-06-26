@@ -94,6 +94,8 @@ function addWebhook() {
     const memberMentionOptions = sessionStorage.getItem('memberMentionOptions');
     newMenberMention.innerHTML = memberMentionOptions;
 
+    const newRoleMentionLabel = document.createElement('label');
+    newRoleMentionLabel.htmlFor = `new_role_mention${newIdNumber}[]`;
     const newRoleMention = document.createElement('select');
     newRoleMention.name = `new_role_mention${newIdNumber}[]`;
     const roleMentionOptions = sessionStorage.getItem('roleMentionOptions');
@@ -178,6 +180,7 @@ function addWebhook() {
     webhook.appendChild(newMenberMention);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(newRoleMentionLabel);
     webhook.appendChild(newRoleMention);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));

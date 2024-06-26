@@ -81,6 +81,8 @@ function addWebhook() {
     newSubscriptionName.type = 'text';
     newSubscriptionName.name = `new_subscription_name${newIdNumber}`;
 
+    const newSubscriptionIdLabel = document.createElement('label');
+    newSubscriptionIdLabel.htmlFor = `new_subscription_id${newIdNumber}`;
     const newSubscriptionId = document.createElement('input');
     newSubscriptionId.type = 'text';
     newSubscriptionId.name = `new_subscription_id${newIdNumber}`;
@@ -162,10 +164,11 @@ function addWebhook() {
     webhook.appendChild(newWebhookType);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));
-    webhook.appendChild(newSubscriptionNameLabel)
+    webhook.appendChild(newSubscriptionNameLabel);
     webhook.appendChild(newSubscriptionName);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));
+    webhook.appendChild(newSubscriptionIdLabel)
     webhook.appendChild(newSubscriptionId);
     webhook.appendChild(document.createElement('br'));
     webhook.appendChild(document.createElement('br'));

@@ -243,11 +243,11 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 				<label for="new_subscription_id">サービスID</label>
 				<input type="text" name="new_subscription_id" id="new_subscription_id1" value="" />
 				<br/>
-				<select name="new_member_mention1" id="new_member_mention1" multiple>
+				<select name="new_member_mention1[]" id="new_member_mention1[]" multiple>
 					`+ internal.CreateMemberSelectForm(guild, nil) +`
 				</select>
 				<br/>
-				<select name="new_role_mention1" id="new_role_mention1" multiple>
+				<select name="new_role_mention1[]" id="new_role_mention1[]" multiple>
 					`+ internal.CreateRoleSelectForm(guild, nil) +`
 				</select>
 				<br/>

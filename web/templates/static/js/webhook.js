@@ -109,8 +109,7 @@ function addWebhook() {
     newRoleMentionLabel.textContent = 'メンションするロール';
     const newRoleMention = document.createElement('select');
     newRoleMention.name = `newRoleMention${newIdNumber}[]`;
-    const roleMentionOptions = sessionStorage.getItem('roleMentionOptions');
-    newRoleMention.innerHTML = roleMentionOptions;
+    newRoleMention.innerHTML = sessionStorage.getItem('roleMentionOptions');
     newRoleMention.multiple = true;
 
     const newNgOrWordsDiv = document.createElement('div');

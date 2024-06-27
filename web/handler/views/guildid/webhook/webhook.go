@@ -177,25 +177,25 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		webhookFormBuilder.WriteString(`
 		<details style="margin: 0 0 0 1em;">
             <summary>` + webhook.SubscriptionType + `:` + webhook.SubscriptionID + `</summary>
-			<label for="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービス名</label>
-			<select name="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscription_name`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" />
+			<label for="subscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービス名</label>
+			<select name="subscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" />
 				`+ subscriptionSelectForm +`
 			</select>
 			<br/>
 			<label for="subscription_id`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービスID</label>
-			<input type="text" name="subscription_id`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscription_id`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionID+`" />
+			<input type="text" name="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionID+`" />
 			<br/>
-			<select name="webhook_type`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="webhook_type`+strconv.Itoa(int(*webhook.WebhookSerialID))+`>
+			<select name="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`>
 				`+ webhookForm +`
 			</select>
 			<br/>
-			<label for="member_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするユーザー</label>
-			<select name="member_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="member_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
+			<label for="memberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするユーザー</label>
+			<select name="memberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="memberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
 				`+ memberSelectForm +`
 			</select>
 			<br/>
-			<label for="role_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするロール</label>
-			<select name="role_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="role_mention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
+			<label for="roleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするロール</label>
+			<select name="roleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="roleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
 				`+ roleSelectForm +`
 			</select>
 			<br/>
@@ -230,65 +230,65 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	webhookFormBuilder.WriteString(`
 		<details style="margin: 0 0 0 1em;">
-			<div id="new_webhook">
+			<div id="newWebhook">
 				<summary>新規Webhook追加</summary>
-				<label for="new_webhook_type1">Webhook</label>
-				<select name="new_webhook_type1" id="new_webhook_type1">
+				<label for="newWebhookType1">Webhook</label>
+				<select name="newWebhookType1" id="newWebhookType1">
 					`+ internal.CreateWebhookSelectForm(guildWebhooks, "") +`
 				</select>
 				<br/>
-				<label for="new_subscription_name1">サービス名</label>
-				<select name="new_subscription_name1" id="new_subscription_name1" />
+				<label for="newSubscriptionName1">サービス名</label>
+				<select name="newSubscriptionName1" id="newSubscriptionName1" />
 					`+ internal.CreateSubscriptionsSelectForm(subscriptionNames, "") +`
 				</select>
 				<br/>
-				<label for="new_subscription_id">サービスID</label>
-				<input type="text" name="new_subscription_id" id="new_subscription_id1" value="" />
+				<label for="newSubscriptionId">サービスID</label>
+				<input type="text" name="newSubscriptionId" id="newSubscriptionId1" value="" />
 				<br/>
-				<label for="new_member_mention1[]">メンションするユーザー</label>
-				<select name="new_member_mention1[]" id="new_member_mention1[]" multiple>
+				<label for="newMemberMention1[]">メンションするユーザー</label>
+				<select name="newMemberMention1[]" id="newMemberMention1[]" multiple>
 					`+ internal.CreateMemberSelectForm(guild, nil) +`
 				</select>
 				<br/>
-				<label for="new_role_mention1[]">メンションするロール</label>
-				<select name="new_role_mention1[]" id="new_role_mention1[]" multiple>
+				<label for="newRoleMention1[]">メンションするロール</label>
+				<select name="newRoleMention1[]" id="newRoleMention1[]" multiple>
 					`+ internal.CreateRoleSelectForm(guild, nil) +`
 				</select>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)") +`
 				<br/>
-				<div id="new_ng_or_words1">
-					<button type="button" onclick="addWord('new_ng_or', 1)">NGワードOR検索追加</button>
+				<div id="newNgOrWords1">
+					<button type="button" onclick="addWord('newNgOr', 1)">NGワードOR検索追加</button>
 				</div>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)") +`
 				<br/>
-				<div id="new_ng_and_words1">
-					<button type="button" onclick="addWord('new_ng_and', 1)">NGワードAND検索追加</button>
+				<div id="newNgAndWords1">
+					<button type="button" onclick="addWord('newNgAnd', 1)">NGワードAND検索追加</button>
 				</div>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)") +`
 				<br/>
-				<div id="new_search_or_words1">
-					<button type="button" onclick="addWord('new_search_or', 1)">キーワードOR検索追加</button>
+				<div id="newSearchOrWords1">
+					<button type="button" onclick="addWord('newSearchOr', 1)">キーワードOR検索追加</button>
 				</div>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードAND検索(すべての単語が含まれている場合、送信)") +`
 				<br/>
-				<div id="new_search_and_words1">
-					<button type="button" onclick="addWord('new_search_and', 1)">キーワードAND検索追加</button>
+				<div id="newSearchAndWords1">
+					<button type="button" onclick="addWord('newSearchAnd', 1)">キーワードAND検索追加</button>
 				</div>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)") +`
 				<br/>
-				<div id="new_mention_or_words1">
-					<button type="button" onclick="addWord('new_mention_or', 1)">メンションOR検索追加</button>
+				<div id="newMentionOrWords1">
+					<button type="button" onclick="addWord('newMentionOr', 1)">メンションOR検索追加</button>
 				</div>
 				<br/>
 				`+ internal.CreateWordWebhookForm(nil, guildId, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)") +`
 				<br/>
-				<div id="new_mention_and_words1">
-					<button type="button" onclick="addWord('new_mention_and', 1)">メンションAND検索追加</button>
+				<div id="newMentionAndWords1">
+					<button type="button" onclick="addWord('newMentionAnd', 1)">メンションAND検索追加</button>
 				</div>
 				<br/>
 				<button type="button" onclick="addWebhook()">追加</button>

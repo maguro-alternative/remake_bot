@@ -31,17 +31,17 @@ document.getElementById('form').onsubmit = async function (event) {
 
 // JavaScriptでsessionStorageにoptionを保存
 window.onload = function() {
-    const webhookOptions = document.querySelector('#new_webhook_type1').innerHTML;
+    const webhookOptions = document.querySelector('#newWebhookType1').innerHTML;
     sessionStorage.setItem('webhookOptions', webhookOptions);
 
-    const subscriptionNameOptions = document.querySelector('#new_sunscription_name1').innerHTML;
+    const subscriptionNameOptions = document.querySelector('#newSunscriptionName1').innerHTML;
     sessionStorage.setItem("subscriptionNameOptions", subscriptionNameOptions);
 
     // IDに[]が含まれる場合、\\[と\\]でエスケープする
-    const memberMentionOptions = document.querySelector('#new_member_mention1\\[\\]').innerHTML;
+    const memberMentionOptions = document.querySelector('#newMemberMention1\\[\\]').innerHTML;
     sessionStorage.setItem('memberMentionOptions', memberMentionOptions);
 
-    const roleMentionOptions = document.querySelector('#new_role_mention1\\[\\]').innerHTML;
+    const roleMentionOptions = document.querySelector('#newRoleMention1\\[\\]').innerHTML;
     sessionStorage.setItem('roleMentionOptions', roleMentionOptions);
 }
 
@@ -63,115 +63,115 @@ const createJsonData = async function(formElements, formData) {
 
 // 追加ボタンがクリックされたときに実行される関数
 function addWebhook() {
-    const webhook = document.getElementById('new_webhook');
+    const webhook = document.getElementById('newWebhook');
     // 現在のWebhook要素の数を取得
-    const currentWebhooks = document.querySelectorAll('[id^="new_webhook_type"]').length;
+    const currentWebhooks = document.querySelectorAll('[id^="newWebhookType"]').length;
     // 新しいIDの番号を設定
     const newIdNumber = currentWebhooks + 1;
 
-    while (document.getElementById(`new_webhook_type${newIdNumber}`) !== null) {
+    while (document.getElementById(`newWebhookType${newIdNumber}`) !== null) {
         newIdNumber++;
     }
 
     // 新しいWebhook要素を作成
     const newWebhookLabel = document.createElement('label');
-    newWebhookLabel.htmlFor = `new_webhook_type${newIdNumber}[]`;
+    newWebhookLabel.htmlFor = `newWebhookType${newIdNumber}[]`;
     newWebhookLabel.textContent = 'Webhook';
     const newWebhookType = document.createElement('select');
-    newWebhookType.name = `new_webhook_type${newIdNumber}[]`;
-    newWebhookType.id = `new_webhook_type${newIdNumber}[]`;
+    newWebhookType.name = `newWebhookType${newIdNumber}[]`;
+    newWebhookType.id = `newWebhookType${newIdNumber}[]`;
     const webhookOptions = sessionStorage.getItem('webhookOptions');
     newWebhookType.innerHTML = webhookOptions;
 
     const newSubscriptionNameLabel = document.createElement('label');
-    newSubscriptionNameLabel.htmlFor = `new_subscription_name${newIdNumber}`;
+    newSubscriptionNameLabel.htmlFor = `newSubscriptionName${newIdNumber}`;
     newSubscriptionNameLabel.textContent = 'サービス名';
     const newSubscriptionName = document.createElement('select');
-    newSubscriptionName.name = `new_subscription_name${newIdNumber}`;
+    newSubscriptionName.name = `newSubscriptionName${newIdNumber}`;
     newSubscriptionName.innerHTML = sessionStorage.getItem("subscriptionNameOptions")
 
     const newSubscriptionIdLabel = document.createElement('label');
-    newSubscriptionIdLabel.htmlFor = `new_subscription_id${newIdNumber}`;
+    newSubscriptionIdLabel.htmlFor = `newSubscriptionId${newIdNumber}`;
     newSubscriptionIdLabel.textContent = 'サービスID';
     const newSubscriptionId = document.createElement('input');
     newSubscriptionId.type = 'text';
-    newSubscriptionId.name = `new_subscription_id${newIdNumber}`;
+    newSubscriptionId.name = `newSubscriptionId${newIdNumber}`;
 
     const newMenberMentionLabel = document.createElement('label');
-    newMenberMentionLabel.htmlFor = `new_member_mention${newIdNumber}[]`;
+    newMenberMentionLabel.htmlFor = `newMemberMention${newIdNumber}[]`;
     newMenberMentionLabel.textContent = 'メンションするユーザー';
     const newMenberMention = document.createElement('select');
-    newMenberMention.name = `new_member_mention${newIdNumber}[]`;
+    newMenberMention.name = `newMemberMention${newIdNumber}[]`;
     const memberMentionOptions = sessionStorage.getItem('memberMentionOptions');
     newMenberMention.innerHTML = memberMentionOptions;
     newMenberMention.multiple = true;
 
     const newRoleMentionLabel = document.createElement('label');
-    newRoleMentionLabel.htmlFor = `new_role_mention${newIdNumber}[]`;
+    newRoleMentionLabel.htmlFor = `newRoleMention${newIdNumber}[]`;
     newRoleMentionLabel.textContent = 'メンションするロール';
     const newRoleMention = document.createElement('select');
-    newRoleMention.name = `new_role_mention${newIdNumber}[]`;
+    newRoleMention.name = `newRoleMention${newIdNumber}[]`;
     const roleMentionOptions = sessionStorage.getItem('roleMentionOptions');
     newRoleMention.innerHTML = roleMentionOptions;
     newRoleMention.multiple = true;
 
     const newNgOrWordsDiv = document.createElement('div');
-    newNgOrWordsDiv.id = `new_ng_or_words${newIdNumber}`;
+    newNgOrWordsDiv.id = `newNgOrWords${newIdNumber}`;
     const newNgOrWords = document.createElement('button');
     newNgOrWords.type = 'button';
     newNgOrWords.textContent = 'NGワードOR追加';
     newNgOrWords.onclick = function () {
-        addWord('new_ng_or', newIdNumber);
+        addWord('newNgOr', newIdNumber);
     };
     newNgOrWordsDiv.appendChild(newNgOrWords);
 
     const newNgAndWordsDiv = document.createElement('div');
-    newNgAndWordsDiv.id = `new_ng_and_words${newIdNumber}`;
+    newNgAndWordsDiv.id = `newNgAndWords${newIdNumber}`;
     const newNgAndWords = document.createElement('button');
     newNgAndWords.type = 'button';
     newNgAndWords.textContent = 'NGワードAND追加';
     newNgAndWords.onclick = function () {
-        addWord('new_ng_and', newIdNumber);
+        addWord('newNgAnd', newIdNumber);
     };
     newNgAndWordsDiv.appendChild(newNgAndWords);
 
     const newSearchOrWordsDiv = document.createElement('div');
-    newSearchOrWordsDiv.id = `new_search_or_words${newIdNumber}`;
+    newSearchOrWordsDiv.id = `newSearchOrWords${newIdNumber}`;
     const newSearchOrWords = document.createElement('button');
     newSearchOrWords.type = 'button';
     newSearchOrWords.textContent = '検索ワードOR追加';
     newSearchOrWords.onclick = function () {
-        addWord('new_search_or', newIdNumber);
+        addWord('newSearchOr', newIdNumber);
     };
     newSearchOrWordsDiv.appendChild(newSearchOrWords);
 
     const newSearchAndWordsDiv = document.createElement('div');
-    newSearchAndWordsDiv.id = `new_search_and_words${newIdNumber}`;
+    newSearchAndWordsDiv.id = `newSearchAndWords${newIdNumber}`;
     const newSearchAndWords = document.createElement('button');
     newSearchAndWords.type = 'button';
     newSearchAndWords.textContent = '検索ワードAND追加';
     newSearchAndWords.onclick = function () {
-        addWord('new_search_and', newIdNumber);
+        addWord('newSearchAnd', newIdNumber);
     };
     newSearchAndWordsDiv.appendChild(newSearchAndWords);
 
     const newMentionOrWordsDiv = document.createElement('div');
-    newMentionOrWordsDiv.id = `new_mention_or_words${newIdNumber}`;
+    newMentionOrWordsDiv.id = `newMentionOrWords${newIdNumber}`;
     const newMentionOrWords = document.createElement('button');
     newMentionOrWords.type = 'button';
     newMentionOrWords.textContent = 'メンションOR追加';
     newMentionOrWords.onclick = function () {
-        addWord('new_mention_or', newIdNumber);
+        addWord('newMentionOr', newIdNumber);
     };
     newMentionOrWordsDiv.appendChild(newMentionOrWords);
 
     const newMentionAndWordsDiv = document.createElement('div');
-    newMentionAndWordsDiv.id = `new_mention_and_words${newIdNumber}`;
+    newMentionAndWordsDiv.id = `newMentionAndWords${newIdNumber}`;
     const newMentionAndWords = document.createElement('button');
     newMentionAndWords.type = 'button';
     newMentionAndWords.textContent = 'メンションAND追加';
     newMentionAndWords.onclick = function () {
-        addWord('new_mention_and', newIdNumber);
+        addWord('newMentionAnd', newIdNumber);
     };
     newMentionAndWordsDiv.appendChild(newMentionAndWords);
 

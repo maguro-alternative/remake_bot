@@ -46,6 +46,15 @@ window.onload = function() {
 }
 
 const createJsonData = async function(formElements, formData) {
+    let newWebhooks, updateWebhooks;
+    let memberMentions, roleMentions, ngOrWords, ngAndWords, searchOrWords, searchAndWords, mentionOrWords, mentionAndWords;
+    for (let i = 0; i < formElements.length; i++) {
+        formKey = formElements[i].name;
+        webhookFormId = formKey.match(/[0-9]/g).join('');
+        if (formKey.includes('newWebhookType')) {
+            newWebhooks[webhookFormId]['']
+        }
+    }
     const data = Object.fromEntries(formData.entries());
     return JSON.stringify({
         newWebhooks:[],

@@ -32,17 +32,17 @@ document.getElementById('form').onsubmit = async function (event) {
 // JavaScriptでsessionStorageにoptionを保存
 window.onload = function() {
     const webhookOptions = document.querySelector('#newWebhookType1').innerHTML;
-    sessionStorage.setItem('webhookOptions', webhookOptions);
+    window.sessionStorage.setItem('webhookOptions', webhookOptions);
 
     const subscriptionNameOptions = document.querySelector('#newSunscriptionName1').innerHTML;
-    sessionStorage.setItem("subscriptionNameOptions", subscriptionNameOptions);
+    window.sessionStorage.setItem("subscriptionNameOptions", subscriptionNameOptions);
 
     // IDに[]が含まれる場合、\\[と\\]でエスケープする
     const memberMentionOptions = document.querySelector('#newMemberMention1\\[\\]').innerHTML;
-    sessionStorage.setItem('memberMentionOptions', memberMentionOptions);
+    window.sessionStorage.setItem('memberMentionOptions', memberMentionOptions);
 
     const roleMentionOptions = document.querySelector('#newRoleMention1\\[\\]').innerHTML;
-    sessionStorage.setItem('roleMentionOptions', roleMentionOptions);
+    window.sessionStorage.setItem('roleMentionOptions', roleMentionOptions);
 }
 
 const createJsonData = async function(formElements, formData) {

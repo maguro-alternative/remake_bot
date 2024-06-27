@@ -230,6 +230,7 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	webhookFormBuilder.WriteString(`
 		<details style="margin: 0 0 0 1em;">
+			<button type="button" onclick="addWebhook()">追加</button>
 			<div id="newWebhook">
 				<summary>新規Webhook追加</summary>
 				<label for="newWebhookType1">Webhook</label>
@@ -291,7 +292,6 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 					<button type="button" onclick="addWord('newMentionAnd', 1)">メンションAND検索追加</button>
 				</div>
 				<br/>
-				<button type="button" onclick="addWebhook()">追加</button>
 			</div>
 		</details>
 	`)

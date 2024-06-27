@@ -185,6 +185,7 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			<label for="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービスID</label>
 			<input type="text" name="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionID+`" />
 			<br/>
+			<label for="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">Webhook</label>
 			<select name="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`>
 				`+ webhookForm +`
 			</select>

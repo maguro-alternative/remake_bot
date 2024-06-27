@@ -45,9 +45,12 @@ window.onload = function() {
     sessionStorage.setItem('roleMentionOptions', roleMentionOptions);
 }
 
-const createJsonData = async function(formData) {
+const createJsonData = async function(formElements, formData) {
     const data = Object.fromEntries(formData.entries());
-    return JSON.stringify(data);
+    return JSON.stringify({
+        newWebhooks:[],
+        updateWebhooks:[]
+    });
 }
 
 /*function addWebhook() {

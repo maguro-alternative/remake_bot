@@ -217,7 +217,7 @@ function addWebhook() {
 }
 
 function addWord(condition, serialId) {
-    const word = document.getElementById(`${condition}_words${serialId}`);
+    const word = document.getElementById(`${condition}Words${serialId}`);
     const wordClone = word.cloneNode(true);
     wordClone.id = `word${serialId}`;
 
@@ -225,7 +225,7 @@ function addWord(condition, serialId) {
     const input = document.createElement('input');
     input.type = 'text';
     input.value = ''; // 初期値は空文字列
-    input.name = `${condition}_word${serialId}[]`;
+    input.name = `${condition}Word${serialId}[]`;
     word.appendChild(input);
 }
 

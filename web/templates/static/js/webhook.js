@@ -83,9 +83,9 @@ function addWebhook() {
     const newSubscriptionNameLabel = document.createElement('label');
     newSubscriptionNameLabel.htmlFor = `new_subscription_name${newIdNumber}`;
     newSubscriptionNameLabel.textContent = 'サービス名';
-    const newSubscriptionName = document.createElement('input');
-    newSubscriptionName.type = 'text';
+    const newSubscriptionName = document.createElement('select');
     newSubscriptionName.name = `new_subscription_name${newIdNumber}`;
+    newSubscriptionName.innerHTML = sessionStorage.getItem("subscriptionNameOptions")
 
     const newSubscriptionIdLabel = document.createElement('label');
     newSubscriptionIdLabel.htmlFor = `new_subscription_id${newIdNumber}`;

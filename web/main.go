@@ -31,6 +31,7 @@ import (
 	linetokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken"
 	permissionView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/permission"
 	vcSignalView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/vc_signal"
+	webhookView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/webhook"
 	guildsView "github.com/maguro-alternative/remake_bot/web/handler/views/guilds"
 	"github.com/maguro-alternative/remake_bot/web/service"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
@@ -104,6 +105,7 @@ func NewWebRouter(
 	mux.Handle("/guild/{guildId}/linetoken", discordLoginRequiredChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService, repo).Index))
 	mux.Handle("/guild/{guildId}/line-post-discord-channel", discordLoginRequiredChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService, repo).Index))
 	mux.Handle("/guild/{guildId}/vc-signal", discordLoginRequiredChain.ThenFunc(vcSignalView.NewVcSignalViewHandler(indexService, repo).Index))
+	mux.Handle("/guild/{guildId}/webhook", discordLoginRequiredChain.ThenFunc(webhookView.NewWebhookViewHandler(indexService, repo).Index))
 	mux.Handle("/group/{guildId}", lineLoginRequiredChain.ThenFunc(groupView.NewLineGroupViewHandler(indexService, repo).Index))
 
 	mux.Handle("/api/line-bot", middleChain.Then(linebot.NewLineBotHandler(indexService, repo, aesCrypto)))

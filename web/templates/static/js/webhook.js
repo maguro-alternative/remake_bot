@@ -101,8 +101,7 @@ function addWebhook() {
     newMenberMentionLabel.textContent = 'メンションするユーザー';
     const newMenberMention = document.createElement('select');
     newMenberMention.name = `newMemberMention${newIdNumber}[]`;
-    const memberMentionOptions = sessionStorage.getItem('memberMentionOptions');
-    newMenberMention.innerHTML = memberMentionOptions;
+    newMenberMention.innerHTML = sessionStorage.getItem('memberMentionOptions');
     newMenberMention.multiple = true;
 
     const newRoleMentionLabel = document.createElement('label');

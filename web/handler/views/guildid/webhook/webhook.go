@@ -177,6 +177,10 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		webhookFormBuilder.WriteString(`
 		<details style="margin: 0 0 0 1em;">
             <summary>` + webhook.SubscriptionType + `:` + webhook.SubscriptionID + `</summary>
+			<label for="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">Webhook</label>
+			<select name="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`>
+				`+ webhookForm +`
+			</select>
 			<label for="subscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービス名</label>
 			<select name="subscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" />
 				`+ subscriptionSelectForm +`
@@ -185,10 +189,6 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			<label for="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービスID</label>
 			<input type="text" name="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionID+`" />
 			<br/>
-			<label for="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">Webhook</label>
-			<select name="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`>
-				`+ webhookForm +`
-			</select>
 			<br/>
 			<label for="memberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするユーザー</label>
 			<select name="memberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="memberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>

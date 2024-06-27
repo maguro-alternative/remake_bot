@@ -17,7 +17,7 @@ type WebhookHandler struct {
 	repo repository.RepositoryFunc
 }
 
-func NewVcSignalHandler(
+func NewWebhookHandler(
 	repo repository.RepositoryFunc,
 ) *WebhookHandler {
 	return &WebhookHandler{

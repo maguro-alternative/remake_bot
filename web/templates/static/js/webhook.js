@@ -80,8 +80,7 @@ function addWebhook() {
     const newWebhookType = document.createElement('select');
     newWebhookType.name = `newWebhookType${newIdNumber}[]`;
     newWebhookType.id = `newWebhookType${newIdNumber}[]`;
-    const webhookOptions = sessionStorage.getItem('webhookOptions');
-    newWebhookType.innerHTML = webhookOptions;
+    newWebhookType.innerHTML = sessionStorage.getItem('webhookOptions');
 
     const newSubscriptionNameLabel = document.createElement('label');
     newSubscriptionNameLabel.htmlFor = `newSubscriptionName${newIdNumber}`;

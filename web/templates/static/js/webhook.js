@@ -75,11 +75,11 @@ function addWebhook() {
 
     // 新しいWebhook要素を作成
     const newWebhookLabel = document.createElement('label');
-    newWebhookLabel.htmlFor = `newWebhookType${newIdNumber}[]`;
+    newWebhookLabel.htmlFor = `newWebhookType${newIdNumber}`;
     newWebhookLabel.textContent = 'Webhook';
     const newWebhookType = document.createElement('select');
-    newWebhookType.name = `newWebhookType${newIdNumber}[]`;
-    newWebhookType.id = `newWebhookType${newIdNumber}[]`;
+    newWebhookType.name = `newWebhookType${newIdNumber}`;
+    newWebhookType.id = `newWebhookType${newIdNumber}`;
     newWebhookType.innerHTML = sessionStorage.getItem('webhookOptions');
 
     const newSubscriptionNameLabel = document.createElement('label');

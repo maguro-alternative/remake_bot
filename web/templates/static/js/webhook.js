@@ -34,6 +34,9 @@ window.onload = function() {
     const webhookOptions = document.querySelector('#new_webhook_type1').innerHTML;
     sessionStorage.setItem('webhookOptions', webhookOptions);
 
+    const subscriptionNameOptions = document.querySelector('#new_sunscription_name1').innerHTML;
+    sessionStorage.setItem("subscriptionNameOptions", subscriptionNameOptions);
+
     // IDに[]が含まれる場合、\\[と\\]でエスケープする
     const memberMentionOptions = document.querySelector('#new_member_mention1\\[\\]').innerHTML;
     sessionStorage.setItem('memberMentionOptions', memberMentionOptions);

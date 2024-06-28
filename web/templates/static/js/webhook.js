@@ -46,7 +46,7 @@ window.onload = function() {
 }
 
 const createJsonData = async function(formElements, formData) {
-    let newWebhooksTmp, updateWebhooksTmp;
+    let newWebhooksTmp = {}, updateWebhooksTmp = {};
     let memberMentions, roleMentions, ngOrWords, ngAndWords, searchOrWords, searchAndWords, mentionOrWords, mentionAndWords;
     for (let i = 0; i < formElements.length; i++) {
         formKey = formElements[i].name;

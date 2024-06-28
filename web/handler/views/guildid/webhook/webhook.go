@@ -244,8 +244,8 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 					`+ internal.CreateSubscriptionsSelectForm(subscriptionNames, "") +`
 				</select>
 				<br/>
-				<label for="newSubscriptionId">サービスID</label>
-				<input type="text" name="newSubscriptionId" id="newSubscriptionId1" value="" />
+				<label for="newSubscriptionId1">サービスID</label>
+				<input type="text" name="newSubscriptionId1" id="newSubscriptionId1" value="" />
 				<br/>
 				<label for="newMemberMention1[]">メンションするユーザー</label>
 				<select name="newMemberMention1[]" id="newMemberMention1[]" multiple>

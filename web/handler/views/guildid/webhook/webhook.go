@@ -177,52 +177,52 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		webhookFormBuilder.WriteString(`
 		<details style="margin: 0 0 0 1em;">
             <summary>` + webhook.SubscriptionType + `:` + webhook.SubscriptionID + `</summary>
-			<label for="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">Webhook</label>
-			<select name="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="webhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`>
+			<label for="updateWebhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">Webhook</label>
+			<select name="updateWebhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="updateWebhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`>
 				`+ webhookForm +`
 			</select>
-			<label for="subscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービス名</label>
-			<select name="subscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" />
+			<label for="updateSubscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービス名</label>
+			<select name="updateSubscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="updateSubscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" />
 				`+ subscriptionSelectForm +`
 			</select>
 			<br/>
-			<label for="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービスID</label>
-			<input type="text" name="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="subscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionID+`" />
+			<label for="updateSubscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービスID</label>
+			<input type="text" name="updateSubscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="updateSubscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionID+`" />
 			<br/>
 			<br/>
-			<label for="memberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするユーザー</label>
-			<select name="memberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="memberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
+			<label for="updateMemberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするユーザー</label>
+			<select name="updateMemberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="updateMemberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
 				`+ memberSelectForm +`
 			</select>
 			<br/>
-			<label for="roleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするロール</label>
-			<select name="roleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="roleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
+			<label for="updateRoleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするロール</label>
+			<select name="updateRoleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="updateRoleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
 				`+ roleSelectForm +`
 			</select>
 			<br/>
 			`+ ngOrWordForm +`
 			<br/>
-			<button type="button" onclick="addWord('ngOr', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">NGワードOR検索追加</button>
+			<button type="button" onclick="addWord('updateNgOr', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">NGワードOR検索追加</button>
 			<br/>
 			`+ ngAndWordForm +`
 			<br/>
-			<button type="button" onclick="addWord('ngAnd', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">NGワードAND検索追加</button>
+			<button type="button" onclick="addWord('updateNgAnd', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">NGワードAND検索追加</button>
 			<br/>
 			`+ searchOrWordForm +`
 			<br/>
-			<button type="button" onclick="addWord('searchOr', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">キーワードOR検索追加</button>
+			<button type="button" onclick="addWord('updateSearchOr', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">キーワードOR検索追加</button>
 			<br/>
 			`+ searchAndWordForm +`
 			<br/>
-			<button type="button" onclick="addWord('searchAnd', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">キーワードAND検索追加</button>
+			<button type="button" onclick="addWord('updateSearchAnd', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">キーワードAND検索追加</button>
 			<br/>
 			`+ mentionOrWordForm +`
 			<br/>
-			<button type="button" onclick="addWord('mentionOr', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">メンションOR検索追加</button>
+			<button type="button" onclick="addWord('updateMentionOr', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">メンションOR検索追加</button>
 			<br/>
 			`+ mentionAndWordForm +`
 			<br/>
-			<button type="button" onclick="addWord('mentionAnd', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">メンションAND検索追加</button>
+			<button type="button" onclick="addWord('updateMentionAnd', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">メンションAND検索追加</button>
 			<br/>
 			<button type="button" onclick="deleteWebhook(`+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">削除</button>
 		</details>

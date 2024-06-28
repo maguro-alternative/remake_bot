@@ -347,7 +347,19 @@ function addWord(condition, serialId) {
     input.type = 'text';
     input.value = ''; // 初期値は空文字列
     input.name = `${condition}Word${serialId}[]`;
+
+    // 削除ボタンを作成
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = '削除';
+
+    // 削除ボタンのクリックイベントリスナーを追加
+    deleteButton.addEventListener('click', function() {
+        input.remove(); // input要素を削除
+        deleteButton.remove(); // 削除ボタン自身も削除
+    });
+    // input要素と削除ボタンを親要素に追加
     word.appendChild(input);
+    word.appendChild(deleteButton);
 }
 
 try {

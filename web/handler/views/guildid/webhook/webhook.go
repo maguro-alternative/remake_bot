@@ -200,29 +200,41 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 				` + roleSelectForm + `
 			</select>
 			<br/>
-			` + ngOrWordForm + `
+			<div id="updateNgOrWords` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">
+				` + ngOrWordForm + `
+				<br/>
+				<button type="button" onclick="addWord('updateNgOr', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">NGワードOR検索追加</button>
+			</div>
 			<br/>
-			<button type="button" onclick="addWord('updateNgOr', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">NGワードOR検索追加</button>
+			<div id="updateNgAndWords` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">
+				` + ngAndWordForm + `
+				<br/>
+				<button type="button" onclick="addWord('updateNgAnd', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">NGワードAND検索追加</button>
+			</div>
 			<br/>
-			` + ngAndWordForm + `
+			<div id="updateSearchOrWords` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">
+				` + searchOrWordForm + `
+				<br/>
+				<button type="button" onclick="addWord('updateSearchOr', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">キーワードOR検索追加</button>
+			</div>
 			<br/>
-			<button type="button" onclick="addWord('updateNgAnd', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">NGワードAND検索追加</button>
+			<div id="updateSearchAndWords` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">
+				` + searchAndWordForm + `
+				<br/>
+				<button type="button" onclick="addWord('updateSearchAnd', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">キーワードAND検索追加</button>
+			</div>
 			<br/>
-			` + searchOrWordForm + `
+			<div id="updateMentionOrWords` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">
+				` + mentionOrWordForm + `
+				<br/>
+				<button type="button" onclick="addWord('updateMentionOr', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">メンションOR検索追加</button>
+			</div>
 			<br/>
-			<button type="button" onclick="addWord('updateSearchOr', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">キーワードOR検索追加</button>
-			<br/>
-			` + searchAndWordForm + `
-			<br/>
-			<button type="button" onclick="addWord('updateSearchAnd', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">キーワードAND検索追加</button>
-			<br/>
-			` + mentionOrWordForm + `
-			<br/>
-			<button type="button" onclick="addWord('updateMentionOr', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">メンションOR検索追加</button>
-			<br/>
-			` + mentionAndWordForm + `
-			<br/>
-			<button type="button" onclick="addWord('updateMentionAnd', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">メンションAND検索追加</button>
+			<div id="updateMentionAndWords` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">
+				` + mentionAndWordForm + `
+				<br/>
+				<button type="button" onclick="addWord('updateMentionAnd', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">メンションAND検索追加</button>
+			</div>
 			<br/>
 			<button type="button" onclick="deleteWebhook(` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">削除</button>
 		</details>

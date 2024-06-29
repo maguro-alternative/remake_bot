@@ -1,6 +1,5 @@
 package webhook
 
-
 import (
 	"context"
 	"encoding/json"
@@ -103,7 +102,7 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		for _, word := range webhook.NgOrWords {
-			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "ng_or", word)
+			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "NgOr", word)
 			if err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())
@@ -138,7 +137,7 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			continue
 		}
-		err = h.repo.UpdateWebhookWithWebhookIDAndSubscription(ctx, webhook.WebhookSerialID,  webhook.WebhookID, webhook.SubscriptionType, webhook.SubscriptionId)
+		err = h.repo.UpdateWebhookWithWebhookIDAndSubscription(ctx, webhook.WebhookSerialID, webhook.WebhookID, webhook.SubscriptionType, webhook.SubscriptionId)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Webhookの更新に失敗しました:", "エラー:", err.Error())
@@ -214,14 +213,14 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		err = h.repo.DeleteWebhookWordsNotInProvidedList(ctx, webhook.WebhookSerialID, "ng_or", webhook.NgOrWords)
+		err = h.repo.DeleteWebhookWordsNotInProvidedList(ctx, webhook.WebhookSerialID, "NgOr", webhook.NgOrWords)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())
 			return
 		}
 		for _, word := range webhook.NgOrWords {
-			err = h.repo.InsertWebhookWord(ctx, webhook.WebhookSerialID, "ng_or", word)
+			err = h.repo.InsertWebhookWord(ctx, webhook.WebhookSerialID, "NgOr", word)
 			if err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())

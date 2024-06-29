@@ -6,8 +6,8 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
-	"strings"
 	"strconv"
+	"strings"
 
 	//"github.com/bwmarrin/discordgo"
 
@@ -129,10 +129,10 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		roleSelectForm := internal.CreateRoleSelectForm(guild, mentionIds)
 		mentionIds = nil
 
-		ngOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "ng_or")
+		ngOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "NgOr")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "Not get ng_or words: "+err.Error())
+			slog.ErrorContext(ctx, "Not get NgOr words: "+err.Error())
 			return
 		}
 		ngOrWordForm := internal.CreateWordWebhookForm(ngOrWords, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)")
@@ -147,7 +147,7 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		searchOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "search_or")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "Not get ng_or words: "+err.Error())
+			slog.ErrorContext(ctx, "Not get NgOr words: "+err.Error())
 			return
 		}
 		searchOrWordForm := internal.CreateWordWebhookForm(searchOrWords, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)")
@@ -159,10 +159,10 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		}
 		searchAndWordForm := internal.CreateWordWebhookForm(searchAndWords, "キーワードAND検索(すべての単語が含まれている場合、送信)")
 
-		mentionOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "ng_or")
+		mentionOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "NgOr")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "Not get ng_or words: "+err.Error())
+			slog.ErrorContext(ctx, "Not get NgOr words: "+err.Error())
 			return
 		}
 		mentionOrWordForm := internal.CreateWordWebhookForm(mentionOrWords, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)")
@@ -177,54 +177,54 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		webhookFormBuilder.WriteString(`
 		<details style="margin: 0 0 0 1em;">
             <summary>` + webhook.SubscriptionType + `:` + webhook.SubscriptionID + `</summary>
-			<label for="updateWebhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">Webhook</label>
-			<select name="updateWebhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="updateWebhookType`+strconv.Itoa(int(*webhook.WebhookSerialID))+`>
-				`+ webhookForm +`
+			<label for="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">Webhook</label>
+			<select name="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" id="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `>
+				` + webhookForm + `
 			</select>
-			<label for="updateSubscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービス名</label>
-			<select name="updateSubscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="updateSubscriptionName`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" />
-				`+ subscriptionSelectForm +`
-			</select>
-			<br/>
-			<label for="updateSubscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`">サービスID</label>
-			<input type="text" name="updateSubscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" id="updateSubscriptionId`+strconv.Itoa(int(*webhook.WebhookSerialID))+`" value="`+webhook.SubscriptionID+`" />
-			<br/>
-			<br/>
-			<label for="updateMemberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするユーザー</label>
-			<select name="updateMemberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="updateMemberMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
-				`+ memberSelectForm +`
+			<label for="updateSubscriptionName` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">サービス名</label>
+			<select name="updateSubscriptionName` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" id="updateSubscriptionName` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" />
+				` + subscriptionSelectForm + `
 			</select>
 			<br/>
-			<label for="updateRoleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]">メンションするロール</label>
-			<select name="updateRoleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" id="updateRoleMention`+strconv.Itoa(int(*webhook.WebhookSerialID))+`[]" multiple>
-				`+ roleSelectForm +`
+			<label for="updateSubscriptionId` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">サービスID</label>
+			<input type="text" name="updateSubscriptionId` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" id="updateSubscriptionId` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" value="` + webhook.SubscriptionID + `" />
+			<br/>
+			<br/>
+			<label for="updateMemberMention` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `[]">メンションするユーザー</label>
+			<select name="updateMemberMention` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `[]" id="updateMemberMention` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `[]" multiple>
+				` + memberSelectForm + `
 			</select>
 			<br/>
-			`+ ngOrWordForm +`
+			<label for="updateRoleMention` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `[]">メンションするロール</label>
+			<select name="updateRoleMention` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `[]" id="updateRoleMention` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `[]" multiple>
+				` + roleSelectForm + `
+			</select>
 			<br/>
-			<button type="button" onclick="addWord('updateNgOr', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">NGワードOR検索追加</button>
+			` + ngOrWordForm + `
 			<br/>
-			`+ ngAndWordForm +`
+			<button type="button" onclick="addWord('updateNgOr', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">NGワードOR検索追加</button>
 			<br/>
-			<button type="button" onclick="addWord('updateNgAnd', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">NGワードAND検索追加</button>
+			` + ngAndWordForm + `
 			<br/>
-			`+ searchOrWordForm +`
+			<button type="button" onclick="addWord('updateNgAnd', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">NGワードAND検索追加</button>
 			<br/>
-			<button type="button" onclick="addWord('updateSearchOr', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">キーワードOR検索追加</button>
+			` + searchOrWordForm + `
 			<br/>
-			`+ searchAndWordForm +`
+			<button type="button" onclick="addWord('updateSearchOr', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">キーワードOR検索追加</button>
 			<br/>
-			<button type="button" onclick="addWord('updateSearchAnd', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">キーワードAND検索追加</button>
+			` + searchAndWordForm + `
 			<br/>
-			`+ mentionOrWordForm +`
+			<button type="button" onclick="addWord('updateSearchAnd', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">キーワードAND検索追加</button>
 			<br/>
-			<button type="button" onclick="addWord('updateMentionOr', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">メンションOR検索追加</button>
+			` + mentionOrWordForm + `
 			<br/>
-			`+ mentionAndWordForm +`
+			<button type="button" onclick="addWord('updateMentionOr', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">メンションOR検索追加</button>
 			<br/>
-			<button type="button" onclick="addWord('updateMentionAnd', `+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">メンションAND検索追加</button>
+			` + mentionAndWordForm + `
 			<br/>
-			<button type="button" onclick="deleteWebhook(`+strconv.Itoa(int(*webhook.WebhookSerialID))+`)">削除</button>
+			<button type="button" onclick="addWord('updateMentionAnd', ` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">メンションAND検索追加</button>
+			<br/>
+			<button type="button" onclick="deleteWebhook(` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `)">削除</button>
 		</details>
 		`)
 	}
@@ -236,12 +236,12 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 				<summary>新規Webhook追加</summary>
 				<label for="newWebhookType1">Webhook</label>
 				<select name="newWebhookType1" id="newWebhookType1">
-					`+ internal.CreateWebhookSelectForm(guildWebhooks, "") +`
+					` + internal.CreateWebhookSelectForm(guildWebhooks, "") + `
 				</select>
 				<br/>
 				<label for="newSubscriptionName1">サービス名</label>
 				<select name="newSubscriptionName1" id="newSubscriptionName1" />
-					`+ internal.CreateSubscriptionsSelectForm(subscriptionNames, "") +`
+					` + internal.CreateSubscriptionsSelectForm(subscriptionNames, "") + `
 				</select>
 				<br/>
 				<label for="newSubscriptionId1">サービスID</label>
@@ -249,45 +249,45 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 				<br/>
 				<label for="newMemberMention1[]">メンションするユーザー</label>
 				<select name="newMemberMention1[]" id="newMemberMention1[]" multiple>
-					`+ internal.CreateMemberSelectForm(guild, nil) +`
+					` + internal.CreateMemberSelectForm(guild, nil) + `
 				</select>
 				<br/>
 				<label for="newRoleMention1[]">メンションするロール</label>
 				<select name="newRoleMention1[]" id="newRoleMention1[]" multiple>
-					`+ internal.CreateRoleSelectForm(guild, nil) +`
+					` + internal.CreateRoleSelectForm(guild, nil) + `
 				</select>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)") +`
+				` + internal.CreateWordWebhookForm(nil, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)") + `
 				<br/>
 				<div id="newNgOrWords1">
 					<button type="button" onclick="addWord('newNgOr', 1)">NGワードOR検索追加</button>
 				</div>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)") +`
+				` + internal.CreateWordWebhookForm(nil, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)") + `
 				<br/>
 				<div id="newNgAndWords1">
 					<button type="button" onclick="addWord('newNgAnd', 1)">NGワードAND検索追加</button>
 				</div>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)") +`
+				` + internal.CreateWordWebhookForm(nil, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)") + `
 				<br/>
 				<div id="newSearchOrWords1">
 					<button type="button" onclick="addWord('newSearchOr', 1)">キーワードOR検索追加</button>
 				</div>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, "キーワードAND検索(すべての単語が含まれている場合、送信)") +`
+				` + internal.CreateWordWebhookForm(nil, "キーワードAND検索(すべての単語が含まれている場合、送信)") + `
 				<br/>
 				<div id="newSearchAndWords1">
 					<button type="button" onclick="addWord('newSearchAnd', 1)">キーワードAND検索追加</button>
 				</div>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)") +`
+				` + internal.CreateWordWebhookForm(nil, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)") + `
 				<br/>
 				<div id="newMentionOrWords1">
 					<button type="button" onclick="addWord('newMentionOr', 1)">メンションOR検索追加</button>
 				</div>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)") +`
+				` + internal.CreateWordWebhookForm(nil, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)") + `
 				<br/>
 				<div id="newMentionAndWords1">
 					<button type="button" onclick="addWord('newMentionAnd', 1)">メンションAND検索追加</button>
@@ -303,7 +303,7 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 
 	tmpl := template.Must(template.ParseFiles("web/templates/layout.html", "web/templates/views/guildid/webhook.html"))
-	if err := tmpl.Execute(w, &struct{
+	if err := tmpl.Execute(w, &struct {
 		Title        string
 		AccountVer   template.HTML
 		JsScriptTag  template.HTML

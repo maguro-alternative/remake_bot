@@ -40,7 +40,7 @@ func TestWebhookWord(t *testing.T) {
 
 		repo := NewRepository(tx)
 
-		err = repo.InsertWebhookWord(ctx, *f.Webhooks[0].WebhookSerialID, "ng_or", "word")
+		err = repo.InsertWebhookWord(ctx, *f.Webhooks[0].WebhookSerialID, "NgOr", "word")
 		assert.NoError(t, err)
 
 		var webhookWords []*WebhookWord
@@ -71,7 +71,7 @@ func TestWebhookWord(t *testing.T) {
 				b.LastPostedAt = lastPostedAt
 			}).Connect(
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word"
 				}),
 			),
@@ -79,7 +79,7 @@ func TestWebhookWord(t *testing.T) {
 
 		repo := NewRepository(tx)
 
-		err = repo.InsertWebhookWord(ctx, *f.Webhooks[0].WebhookSerialID, "ng_or", "word")
+		err = repo.InsertWebhookWord(ctx, *f.Webhooks[0].WebhookSerialID, "NgOr", "word")
 		assert.NoError(t, err)
 
 		var webhookWords []*WebhookWord
@@ -112,16 +112,16 @@ func TestWebhookWord(t *testing.T) {
 				b.LastPostedAt = lastPostedAt
 			}).Connect(
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word"
 				}),
 			),
 		)
 
-		webhookWords, err := repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *f.Webhooks[0].WebhookSerialID, "ng_or")
+		webhookWords, err := repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *f.Webhooks[0].WebhookSerialID, "NgOr")
 		assert.NoError(t, err)
 		assert.Len(t, webhookWords, 1)
-		assert.Equal(t, "ng_or", webhookWords[0].Condition)
+		assert.Equal(t, "NgOr", webhookWords[0].Condition)
 		assert.Equal(t, "word", webhookWords[0].Word)
 	})
 
@@ -149,7 +149,7 @@ func TestWebhookWord(t *testing.T) {
 				b.LastPostedAt = lastPostedAt
 			}).Connect(
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
@@ -169,7 +169,7 @@ func TestWebhookWord(t *testing.T) {
 				b.LastPostedAt = lastPostedAt
 			}).Connect(
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
@@ -212,17 +212,17 @@ func TestWebhookWord(t *testing.T) {
 				b.LastPostedAt = lastPostedAt
 			}).Connect(
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word2"
 				}),
 			),
 		)
 
-		err = repo.DeleteWebhookWordsNotInProvidedList(ctx, *f.Webhooks[0].WebhookSerialID, "ng_or", []string{"word"})
+		err = repo.DeleteWebhookWordsNotInProvidedList(ctx, *f.Webhooks[0].WebhookSerialID, "NgOr", []string{"word"})
 		assert.NoError(t, err)
 
 		var webhookWords []*WebhookWord
@@ -231,7 +231,7 @@ func TestWebhookWord(t *testing.T) {
 		assert.Len(t, webhookWords, 1)
 	})
 
-	t.Run("WebhookWord削除(ng_or以外は削除しない)", func(t *testing.T) {
+	t.Run("WebhookWord削除(NgOr以外は削除しない)", func(t *testing.T) {
 		dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
 		assert.NoError(t, err)
 		defer cleanup()
@@ -255,7 +255,7 @@ func TestWebhookWord(t *testing.T) {
 				b.LastPostedAt = lastPostedAt
 			}).Connect(
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
@@ -265,7 +265,7 @@ func TestWebhookWord(t *testing.T) {
 			),
 		)
 
-		err = repo.DeleteWebhookWordsNotInProvidedList(ctx, *f.Webhooks[0].WebhookSerialID, "ng_or", []string{"word"})
+		err = repo.DeleteWebhookWordsNotInProvidedList(ctx, *f.Webhooks[0].WebhookSerialID, "NgOr", []string{"word"})
 		assert.NoError(t, err)
 
 		var webhookWords []*WebhookWord
@@ -298,7 +298,7 @@ func TestWebhookWord(t *testing.T) {
 				b.LastPostedAt = lastPostedAt
 			}).Connect(
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
@@ -314,7 +314,7 @@ func TestWebhookWord(t *testing.T) {
 				b.LastPostedAt = lastPostedAt
 			}).Connect(
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
@@ -324,7 +324,7 @@ func TestWebhookWord(t *testing.T) {
 			),
 		)
 
-		err = repo.DeleteWebhookWordsNotInProvidedList(ctx, *f.Webhooks[0].WebhookSerialID, "ng_or", []string{"word"})
+		err = repo.DeleteWebhookWordsNotInProvidedList(ctx, *f.Webhooks[0].WebhookSerialID, "NgOr", []string{"word"})
 		assert.NoError(t, err)
 
 		var webhookWords []*WebhookWord
@@ -357,11 +357,11 @@ func TestWebhookWord(t *testing.T) {
 				b.LastPostedAt = lastPostedAt
 			}).Connect(
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word2"
 				}),
 			),
@@ -373,7 +373,7 @@ func TestWebhookWord(t *testing.T) {
 				b.LastPostedAt = lastPostedAt
 			}).Connect(
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_or"
+					b.Condition = "NgOr"
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
@@ -383,7 +383,7 @@ func TestWebhookWord(t *testing.T) {
 			),
 		)
 
-		err = repo.DeleteWebhookWordsNotInProvidedList(ctx, *f.Webhooks[0].WebhookSerialID, "ng_or", []string{"word"})
+		err = repo.DeleteWebhookWordsNotInProvidedList(ctx, *f.Webhooks[0].WebhookSerialID, "NgOr", []string{"word"})
 		assert.NoError(t, err)
 
 		var webhookWords []*WebhookWord

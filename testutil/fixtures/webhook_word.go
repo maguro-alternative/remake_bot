@@ -14,7 +14,7 @@ type WebhookWord struct {
 func NewWebhookWord(ctx context.Context, setter ...func(b *WebhookWord)) *ModelConnector {
 	webhookWord := &WebhookWord{
 		WebhookSerialID: 1,
-		Condition:       "ng_or",
+		Condition:       "NgOr",
 		Word:            "word",
 	}
 

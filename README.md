@@ -484,13 +484,13 @@ Webhookの送信時にメンションするユーザー、ロールを保存す�
 
 Webhookの送信時に特定の単語が含まれていた場合にメンションするユーザー、ロールを保存するテーブル  
 Twitter運用時使用していたが現在死に要素  
-conditionsは投稿時の条件を示す(NgOrはいずれかの単語が含まれていれば投稿しない。SearchAndは全ての単語が含まれていれば投稿する。mention_orはいずれかの単語が含まれていればメンションする。)
+conditionsは投稿時の条件を示す(NgOrはいずれかの単語が含まれていれば投稿しない。SearchAndは全ての単語が含まれていれば投稿する。MentionOrはいずれかの単語が含まれていればメンションする。)
 
 |カラム名|型|説明|
 |---|---|---|
 |***webhook_serial_id***|SERIAL|Webhookの投稿内容の識別ID|
 |***word***|TEXT|メンションする単語|
-|conditions|TEXT|投稿時の条件(NgOr NgAnd SearchOr SearchAnd mention_or mention_and)|
+|conditions|TEXT|投稿時の条件(NgOr NgAnd SearchOr SearchAnd MentionOr mention_and)|
 
 </details>
 

@@ -260,7 +260,7 @@ CREATE TABLE IF NOT EXISTS webhook_role_mention (
         NgOr       : 送信しない条件をORで結合
         NgAnd      : 送信しない条件をANDで結合
         search_or   : 検索条件をORで結合
-        search_and  : 検索条件をANDで結合
+        SearchAnd  : 検索条件をANDで結合
         mention_or  : メンション条件をORで結合
         mention_and : メンション条件をANDで結合
     word (TEXT): 単語

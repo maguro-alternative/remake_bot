@@ -153,7 +153,7 @@ func TestWebhookWord(t *testing.T) {
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_and"
+					b.Condition = "NgAnd"
 					b.Word = "word2"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
@@ -173,7 +173,7 @@ func TestWebhookWord(t *testing.T) {
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_and"
+					b.Condition = "NgAnd"
 					b.Word = "word2"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
@@ -259,7 +259,7 @@ func TestWebhookWord(t *testing.T) {
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_and"
+					b.Condition = "NgAnd"
 					b.Word = "word2"
 				}),
 			),
@@ -302,7 +302,7 @@ func TestWebhookWord(t *testing.T) {
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_and"
+					b.Condition = "NgAnd"
 					b.Word = "word2"
 				}),
 			),
@@ -318,7 +318,7 @@ func TestWebhookWord(t *testing.T) {
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_and"
+					b.Condition = "NgAnd"
 					b.Word = "word2"
 				}),
 			),
@@ -377,7 +377,7 @@ func TestWebhookWord(t *testing.T) {
 					b.Word = "word"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "ng_and"
+					b.Condition = "NgAnd"
 					b.Word = "word2"
 				}),
 			),

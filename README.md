@@ -490,7 +490,7 @@ conditionsは投稿時の条件を示す(NgOrはいずれかの単語が含ま�
 |---|---|---|
 |***webhook_serial_id***|SERIAL|Webhookの投稿内容の識別ID|
 |***word***|TEXT|メンションする単語|
-|conditions|TEXT|投稿時の条件(NgOr ng_and search_or search_and mention_or mention_and)|
+|conditions|TEXT|投稿時の条件(NgOr NgAnd search_or search_and mention_or mention_and)|
 
 </details>
 

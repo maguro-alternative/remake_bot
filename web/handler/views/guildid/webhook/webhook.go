@@ -136,10 +136,10 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		ngOrWordForm := internal.CreateWordWebhookForm(ngOrWords, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)")
-		ngAndWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "ng_and")
+		ngAndWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "NgAnd")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "Not get ng_and words: "+err.Error())
+			slog.ErrorContext(ctx, "Not get NgAnd words: "+err.Error())
 			return
 		}
 		ngAndWordForm := internal.CreateWordWebhookForm(ngAndWords, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)")
@@ -154,7 +154,7 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		searchAndWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "search_and")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "Not get ng_and words: "+err.Error())
+			slog.ErrorContext(ctx, "Not get NgAnd words: "+err.Error())
 			return
 		}
 		searchAndWordForm := internal.CreateWordWebhookForm(searchAndWords, "キーワードAND検索(すべての単語が含まれている場合、送信)")
@@ -166,10 +166,10 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		mentionOrWordForm := internal.CreateWordWebhookForm(mentionOrWords, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)")
-		mentionAndWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "ng_and")
+		mentionAndWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "NgAnd")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "Not get ng_and words: "+err.Error())
+			slog.ErrorContext(ctx, "Not get NgAnd words: "+err.Error())
 			return
 		}
 		mentionAndWordForm := internal.CreateWordWebhookForm(mentionAndWords, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)")

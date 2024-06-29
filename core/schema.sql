@@ -258,7 +258,7 @@ CREATE TABLE IF NOT EXISTS webhook_role_mention (
     webhook_serial_id (INTEGER): webhookのシリアルID
     conditions (TEXT): 条件以下のような文字列
         NgOr       : 送信しない条件をORで結合
-        ng_and      : 送信しない条件をANDで結合
+        NgAnd      : 送信しない条件をANDで結合
         search_or   : 検索条件をORで結合
         search_and  : 検索条件をANDで結合
         mention_or  : メンション条件をORで結合

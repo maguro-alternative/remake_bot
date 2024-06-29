@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS webhook_role_mention (
         SearchOr   : 検索条件をORで結合
         SearchAnd  : 検索条件をANDで結合
         MentionOr  : メンション条件をORで結合
-        mention_and : メンション条件をANDで結合
+        MentionAnd : メンション条件をANDで結合
     word (TEXT): 単語
 */
 CREATE TABLE IF NOT EXISTS webhook_word (

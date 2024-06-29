@@ -53,6 +53,9 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, webhook := range webhookJson.NewWebhooks {
+		if webhook.SubscriptionId == "" {
+			continue
+		}
 		webhookSerialID, err := h.repo.InsertWebhook(ctx, guildId, webhook.WebhookID, webhook.SubscriptionType, webhook.SubscriptionId, now)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

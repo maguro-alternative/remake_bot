@@ -135,14 +135,14 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			slog.ErrorContext(ctx, "Not get ng_or words: "+err.Error())
 			return
 		}
-		ngOrWordForm := internal.CreateWordWebhookForm(ngOrWords, guildId, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)")
+		ngOrWordForm := internal.CreateWordWebhookForm(ngOrWords, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)")
 		ngAndWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "ng_and")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get ng_and words: "+err.Error())
 			return
 		}
-		ngAndWordForm := internal.CreateWordWebhookForm(ngAndWords, guildId, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)")
+		ngAndWordForm := internal.CreateWordWebhookForm(ngAndWords, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)")
 
 		searchOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "search_or")
 		if err != nil {
@@ -150,14 +150,14 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			slog.ErrorContext(ctx, "Not get ng_or words: "+err.Error())
 			return
 		}
-		searchOrWordForm := internal.CreateWordWebhookForm(searchOrWords, guildId, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)")
+		searchOrWordForm := internal.CreateWordWebhookForm(searchOrWords, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)")
 		searchAndWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "search_and")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get ng_and words: "+err.Error())
 			return
 		}
-		searchAndWordForm := internal.CreateWordWebhookForm(searchAndWords, guildId, "キーワードAND検索(すべての単語が含まれている場合、送信)")
+		searchAndWordForm := internal.CreateWordWebhookForm(searchAndWords, "キーワードAND検索(すべての単語が含まれている場合、送信)")
 
 		mentionOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "ng_or")
 		if err != nil {
@@ -165,14 +165,14 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			slog.ErrorContext(ctx, "Not get ng_or words: "+err.Error())
 			return
 		}
-		mentionOrWordForm := internal.CreateWordWebhookForm(mentionOrWords, guildId, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)")
+		mentionOrWordForm := internal.CreateWordWebhookForm(mentionOrWords, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)")
 		mentionAndWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "ng_and")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get ng_and words: "+err.Error())
 			return
 		}
-		mentionAndWordForm := internal.CreateWordWebhookForm(mentionAndWords, guildId, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)")
+		mentionAndWordForm := internal.CreateWordWebhookForm(mentionAndWords, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)")
 
 		webhookFormBuilder.WriteString(`
 		<details style="margin: 0 0 0 1em;">
@@ -257,37 +257,37 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 					`+ internal.CreateRoleSelectForm(guild, nil) +`
 				</select>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)") +`
+				`+ internal.CreateWordWebhookForm(nil, "NGワードOR検索(いずれかの言葉が含まれている場合、送信しない)") +`
 				<br/>
 				<div id="newNgOrWords1">
 					<button type="button" onclick="addWord('newNgOr', 1)">NGワードOR検索追加</button>
 				</div>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, guildId, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)") +`
+				`+ internal.CreateWordWebhookForm(nil, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)") +`
 				<br/>
 				<div id="newNgAndWords1">
 					<button type="button" onclick="addWord('newNgAnd', 1)">NGワードAND検索追加</button>
 				</div>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)") +`
+				`+ internal.CreateWordWebhookForm(nil, "キーワードOR検索(いずれかの言葉が含まれている場合、送信)") +`
 				<br/>
 				<div id="newSearchOrWords1">
 					<button type="button" onclick="addWord('newSearchOr', 1)">キーワードOR検索追加</button>
 				</div>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, guildId, "キーワードAND検索(すべての単語が含まれている場合、送信)") +`
+				`+ internal.CreateWordWebhookForm(nil, "キーワードAND検索(すべての単語が含まれている場合、送信)") +`
 				<br/>
 				<div id="newSearchAndWords1">
 					<button type="button" onclick="addWord('newSearchAnd', 1)">キーワードAND検索追加</button>
 				</div>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, guildId, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)") +`
+				`+ internal.CreateWordWebhookForm(nil, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)") +`
 				<br/>
 				<div id="newMentionOrWords1">
 					<button type="button" onclick="addWord('newMentionOr', 1)">メンションOR検索追加</button>
 				</div>
 				<br/>
-				`+ internal.CreateWordWebhookForm(nil, guildId, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)") +`
+				`+ internal.CreateWordWebhookForm(nil, "メンションAND検索(すべての単語が含まれている場合、メンションを付けて送信)") +`
 				<br/>
 				<div id="newMentionAndWords1">
 					<button type="button" onclick="addWord('newMentionAnd', 1)">メンションAND検索追加</button>

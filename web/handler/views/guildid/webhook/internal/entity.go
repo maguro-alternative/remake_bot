@@ -24,12 +24,11 @@ func CreateSubscriptionsSelectForm(subscriptionNames []string, selectedSucscript
 
 func CreateWordWebhookForm(
 	words []*repository.WebhookWord,
-	guildId string,
 	label string,
 ) string {
 	wordFormBuilder := strings.Builder{}
 	for i, word := range words {
-		wordId := fmt.Sprintf("update%sWord%s_%d[]", word.Condition, guildId, i)
+		wordId := fmt.Sprintf("update%sWord%d[]", word.Condition, i)
 		wordFormBuilder.WriteString(fmt.Sprintf(`
 			<label for="%s">%s</label>
 			<input type="text" name="%s" value="%s">

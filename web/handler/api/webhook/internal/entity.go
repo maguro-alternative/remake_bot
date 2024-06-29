@@ -41,7 +41,13 @@ type UpdateWebhook struct {
 
 func (g WebhookJson) Validate() error {
 	return validation.ValidateStruct(&g,
-		validation.Field(&g.NewWebhooks, validation.Length(0, 1000)),
+		validation.Field(&g.NewWebhooks, validation.Length(0, 1000),
+			validation.Each(validation.By(func(value interface{}) error {
+				return validation.ValidateStruct(value, validation.Field(value.(NewWebhook).WebhookID, validation.Required),
+					validation.Field(value.(NewWebhook).SubscriptionType, validation.In("youtube", "niconico")),
+				)
+			})),
+		),
 		validation.Field(&g.UpdateWebhooks, validation.Length(0, 1000)),
 	)
 }

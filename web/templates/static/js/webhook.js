@@ -9,8 +9,9 @@ document.getElementById('form').onsubmit = async function (event) {
     event.preventDefault();
     const guildId = location.pathname.match(/[0-9]/g).join('');
     const formData = new FormData(document.getElementById('form'));
+    const formElements = document.forms['form'].elements;
 
-    const jsonData = await createJsonData(formData);
+    const jsonData = await createJsonData(formElements, formData);
 
     // データを送信
     await fetch(`/api/${guildId}/webhook`, {
@@ -50,6 +51,9 @@ const createJsonData = async function(formElements, formData) {
     let memberMentions, roleMentions, ngOrWords, ngAndWords, searchOrWords, searchAndWords, mentionOrWords, mentionAndWords;
     for (let i = 0; i < formElements.length; i++) {
         formKey = formElements[i].name;
+        if (formKey === '') {
+            continue;
+        }
         webhookFormId = formKey.match(/[0-9]/g).join('');
         if (newWebhooksTmp[webhookFormId] === undefined && formKey.includes('newWebhookType')) {
             newWebhooksTmp[webhookFormId] = {

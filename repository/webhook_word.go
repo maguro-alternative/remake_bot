@@ -100,7 +100,7 @@ func (r *Repository) DeleteWebhookWordsNotInProvidedList(
 				webhook_word
 			WHERE
 				webhook_serial_id = $1 AND
-				condition = $2
+				conditions = $2
 		`
 		_, err := r.db.ExecContext(ctx, query, webhookSerialID, conditions)
 		return err

@@ -114,6 +114,7 @@ func (r *Repository) UpdateWebhookWithWebhookIDAndSubscription(
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
+		webhookID,
 		subscriptionID,
 		subscriptionType,
 		webhookSerialID,

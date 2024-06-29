@@ -90,7 +90,7 @@ func (r *Repository) DeleteWebhookUserMentionsNotInProvidedList(
 			DELETE FROM
 				webhook_user_mention
 			WHERE
-				webhook_serial_id = ?
+				webhook_serial_id = $1
 		`
 		_, err := r.db.ExecContext(ctx, query, webhookSerialID)
 		return err

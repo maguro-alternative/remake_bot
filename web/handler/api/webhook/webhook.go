@@ -58,7 +58,7 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		webhookSerialID, err := h.repo.InsertWebhook(ctx, guildId, webhook.WebhookID, webhook.SubscriptionType, webhook.SubscriptionId, now)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "Webhookの更新に失敗しました:", "エラー:", err.Error())
+			slog.ErrorContext(ctx, "Webhookの作成に失敗しました:", "エラー:", err.Error())
 			return
 		}
 		for _, word := range webhook.MentionAndWords {
@@ -137,7 +137,7 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			continue
 		}
-		err = h.repo.UpdateWebhookWithWebhookIDAndSubscription(ctx, webhook.WebhookSerialID, webhook.WebhookID, webhook.SubscriptionType, webhook.SubscriptionId)
+		err = h.repo.UpdateWebhookWithWebhookIDAndSubscription(ctx, webhook.WebhookSerialID, webhook.WebhookID, webhook.SubscriptionId, webhook.SubscriptionType)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Webhookの更新に失敗しました:", "エラー:", err.Error())

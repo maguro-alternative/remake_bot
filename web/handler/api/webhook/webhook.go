@@ -86,7 +86,7 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		for _, word := range webhook.SearchOrWords {
-			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "search_or", word)
+			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "SearchOr", word)
 			if err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())
@@ -185,14 +185,14 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		err = h.repo.DeleteWebhookWordsNotInProvidedList(ctx, webhook.WebhookSerialID, "search_or", webhook.SearchOrWords)
+		err = h.repo.DeleteWebhookWordsNotInProvidedList(ctx, webhook.WebhookSerialID, "SearchOr", webhook.SearchOrWords)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())
 			return
 		}
 		for _, word := range webhook.SearchOrWords {
-			err = h.repo.InsertWebhookWord(ctx, webhook.WebhookSerialID, "search_or", word)
+			err = h.repo.InsertWebhookWord(ctx, webhook.WebhookSerialID, "SearchOr", word)
 			if err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				slog.ErrorContext(ctx, "Wordの更新に失敗しました:", "エラー:", err.Error())

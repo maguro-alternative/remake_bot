@@ -144,7 +144,7 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		}
 		ngAndWordForm := internal.CreateWordWebhookForm(ngAndWords, "NGワードAND検索(全ての言葉が含まれている場合、送信しない)")
 
-		searchOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "search_or")
+		searchOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "SearchOr")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get NgOr words: "+err.Error())

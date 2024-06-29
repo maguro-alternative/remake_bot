@@ -157,7 +157,7 @@ func TestWebhookWord(t *testing.T) {
 					b.Word = "word2"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "search_or"
+					b.Condition = "SearchOr"
 					b.Word = "word3"
 				}),
 			),
@@ -177,7 +177,7 @@ func TestWebhookWord(t *testing.T) {
 					b.Word = "word2"
 				}),
 				fixtures.NewWebhookWord(ctx, func(b *fixtures.WebhookWord) {
-					b.Condition = "search_or"
+					b.Condition = "SearchOr"
 					b.Word = "word3"
 				}),
 			),

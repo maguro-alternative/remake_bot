@@ -247,7 +247,6 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 			<summary>Webhook新規作成</summary>
 			<button type="button" onclick="addWebhook()">追加</button>
 			<div id="newWebhook">
-				<summary>新規Webhook追加</summary>
 				<label for="newWebhookType1">Webhook</label>
 				<select name="newWebhookType1" id="newWebhookType1">
 					` + internal.CreateWebhookSelectForm(guildWebhooks, "") + `

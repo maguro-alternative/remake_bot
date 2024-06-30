@@ -31,8 +31,9 @@ func CreateWordWebhookForm(
 		wordId := fmt.Sprintf("update%sWord%d[]", word.Condition, i)
 		wordFormBuilder.WriteString(fmt.Sprintf(`
 			<label for="%s">%s</label>
-			<input type="text" name="%s" value="%s">
-		`, wordId, label, wordId, word.Word))
+			<input type="text" id="%s" name="%s" value="%s">
+			<button type="button" onclick="document.getElementById('%s').remove(); this.remove();">削除</button>
+		`, wordId, label, wordId, wordId, word.Word, wordId))
 	}
 	return wordFormBuilder.String()
 }

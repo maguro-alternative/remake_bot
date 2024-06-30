@@ -20,6 +20,7 @@ import (
 
 //go:embed schema.sql
 var schema string // schema.sqlの内容をschemaに代入
+var permissionTypes = []string{"lineBot", "linePostDiscordChannel", "vcSignal", "webhook"}
 
 func main() {
 	ctx := context.Background()
@@ -76,7 +77,6 @@ func main() {
 }
 
 func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo.Session) error {
-	permissionTypes := []string{"lineBot", "linePostDiscordChannel", "vcSignal", "webhook"}
 	// データベースにユーザーを追加
 	// ここにユーザーを追加するコードを書く
 	// 例: dbV1.ExecContext(ctx, "INSERT INTO users (discord_id) VALUES ($1)", discordSession.State.User.ID)

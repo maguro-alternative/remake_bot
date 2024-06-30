@@ -270,7 +270,7 @@ CREATE TABLE IF NOT EXISTS webhook_word (
     conditions TEXT NOT NULL,
     word TEXT NOT NULL,
     PRIMARY KEY(webhook_serial_id, word),
-    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id)
+    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS line_bot (

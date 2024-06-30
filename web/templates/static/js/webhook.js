@@ -89,7 +89,7 @@ const createJsonData = async function(formElements, formData) {
         if (formKey.includes('newWebhookType')) {
             newWebhooksTmp[webhookFormId]['webhookId'] = formData.get(formKey);
         }
-        if (formKey.includes('newSubscriptionType')) {
+        if (formKey.includes('newSubscriptionName')) {
             newWebhooksTmp[webhookFormId]['subscriptionType'] = formData.get(formKey);
         }
         if (formKey.includes('newSubscriptionId')) {
@@ -122,7 +122,7 @@ const createJsonData = async function(formElements, formData) {
         if (formKey.includes('updateWebhookType')) {
             updateWebhooksTmp[webhookFormId]['webhookId'] = formData.get(formKey);
         }
-        if (formKey.includes('updateSubscriptionType')) {
+        if (formKey.includes('updateSubscriptionName')) {
             updateWebhooksTmp[webhookFormId]['subscriptionType'] = formData.get(formKey);
         }
         if (formKey.includes('updateSubscriptionId')) {
@@ -158,6 +158,10 @@ const createJsonData = async function(formElements, formData) {
     }
     const newWebhooks = Object.values(newWebhooksTmp);
     const updateWebhooks = Object.values(updateWebhooksTmp);
+    console.log(JSON.stringify({
+        "newWebhooks": newWebhooks,
+        "updateWebhooks": updateWebhooks
+    }));
     return JSON.stringify({
         "newWebhooks": newWebhooks,
         "updateWebhooks": updateWebhooks

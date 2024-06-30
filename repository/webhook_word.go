@@ -58,28 +58,6 @@ func (r *Repository) GetWebhookWordWithWebhookSerialIDAndCondition(
 	return webhookWord, err
 }
 
-func (r *Repository) GetWebhookWordWithWebhookSerialIDs(
-	ctx context.Context,
-	webhookSerialIDs []int64,
-) ([]*WebhookWord, error) {
-	query := `
-		SELECT
-			*
-		FROM
-			webhook_word
-		WHERE
-			webhook_serial_id IN (?)
-	`
-	var webhookWord []*WebhookWord
-	query, args, err := db.In(query, webhookSerialIDs)
-	if err != nil {
-		return nil, err
-	}
-	query = db.Rebind(2, query)
-	err = r.db.SelectContext(ctx, &webhookWord, query, args...)
-	return webhookWord, err
-}
-
 func (r *Repository) DeleteWebhookWordsNotInProvidedList(
 	ctx context.Context,
 	webhookSerialID int64,

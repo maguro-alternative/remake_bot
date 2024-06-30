@@ -48,7 +48,6 @@ window.onload = function() {
 
 const createJsonData = async function(formElements, formData) {
     let newWebhooksTmp = {}, updateWebhooksTmp = {};
-    let memberMentions, roleMentions, ngOrWords, ngAndWords, searchOrWords, searchAndWords, mentionOrWords, mentionAndWords;
     for (let i = 0; i < formElements.length; i++) {
         formKey = formElements[i].name;
         if (formKey === '') {
@@ -97,36 +96,28 @@ const createJsonData = async function(formElements, formData) {
             newWebhooksTmp[webhookFormId]['subscriptionId'] = formData.get(formKey);
         }
         if (formKey.includes('newMemberMention')) {
-            memberMentions = formData.getAll(formKey);
-            newWebhooksTmp[webhookFormId]['mentionUsers'] = memberMentions;
+            newWebhooksTmp[webhookFormId]['mentionUsers'] = formData.getAll(formKey);
         }
         if (formKey.includes('newRoleMention')) {
-            roleMentions = formData.getAll(formKey);
-            newWebhooksTmp[webhookFormId]['mentionRoles'] = roleMentions;
+            newWebhooksTmp[webhookFormId]['mentionRoles'] = formData.getAll(formKey);
         }
         if (formKey.includes('newNgOr')) {
-            ngOrWords = formData.getAll(formKey);
-            newWebhooksTmp[webhookFormId]['ngOrWords'] = ngOrWords;
+            newWebhooksTmp[webhookFormId]['ngOrWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('newNgAnd')) {
-            ngAndWords = formData.getAll(formKey);
-            newWebhooksTmp[webhookFormId]['ngAndWords'] = ngAndWords;
+            newWebhooksTmp[webhookFormId]['ngAndWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('newSearchOr')) {
-            searchOrWords = formData.getAll(formKey);
-            newWebhooksTmp[webhookFormId]['searchOrWords'] = searchOrWords;
+            newWebhooksTmp[webhookFormId]['searchOrWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('newSearchAnd')) {
-            searchAndWords = formData.getAll(formKey);
-            newWebhooksTmp[webhookFormId]['searchAndWords'] = searchAndWords;
+            newWebhooksTmp[webhookFormId]['searchAndWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('newMentionOr')) {
-            mentionOrWords = formData.getAll(formKey);
-            newWebhooksTmp[webhookFormId]['mentionOrWords'] = mentionOrWords;
+            newWebhooksTmp[webhookFormId]['mentionOrWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('newMentionAnd')) {
-            mentionAndWords = formData.getAll(formKey);
-            newWebhooksTmp[webhookFormId]['mentionAndWords'] = mentionAndWords;
+            newWebhooksTmp[webhookFormId]['mentionAndWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('updateWebhookType')) {
             updateWebhooksTmp[webhookFormId]['webhookId'] = formData.get(formKey);
@@ -138,36 +129,28 @@ const createJsonData = async function(formElements, formData) {
             updateWebhooksTmp[webhookFormId]['subscriptionId'] = formData.get(formKey);
         }
         if (formKey.includes('updateMemberMention')) {
-            memberMentions = formData.getAll(formKey);
-            updateWebhooksTmp[webhookFormId]['mentionUsers'] = memberMentions;
+            updateWebhooksTmp[webhookFormId]['mentionUsers'] = formData.getAll(formKey);
         }
         if (formKey.includes('updateRoleMention')) {
-            roleMentions = formData.getAll(formKey);
-            updateWebhooksTmp[webhookFormId]['mentionRoles'] = roleMentions;
+            updateWebhooksTmp[webhookFormId]['mentionRoles'] = formData.getAll(formKey);
         }
         if (formKey.includes('updateNgOr')) {
-            ngOrWords = formData.getAll(formKey);
-            updateWebhooksTmp[webhookFormId]['ngOrWords'] = ngOrWords;
+            updateWebhooksTmp[webhookFormId]['ngOrWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('updateNgAnd')) {
-            ngAndWords = formData.getAll(formKey);
-            updateWebhooksTmp[webhookFormId]['ngAndWords'] = ngAndWords;
+            updateWebhooksTmp[webhookFormId]['ngAndWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('updateSearchOr')) {
-            searchOrWords = formData.getAll(formKey);
-            updateWebhooksTmp[webhookFormId]['searchOrWords'] = searchOrWords;
+            updateWebhooksTmp[webhookFormId]['searchOrWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('updateSearchAnd')) {
-            searchAndWords = formData.getAll(formKey);
-            updateWebhooksTmp[webhookFormId]['searchAndWords'] = searchAndWords;
+            updateWebhooksTmp[webhookFormId]['searchAndWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('updateMentionOr')) {
-            mentionOrWords = formData.getAll(formKey);
-            updateWebhooksTmp[webhookFormId]['mentionOrWords'] = mentionOrWords;
+            updateWebhooksTmp[webhookFormId]['mentionOrWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('updateMentionAnd')) {
-            mentionAndWords = formData.getAll(formKey);
-            updateWebhooksTmp[webhookFormId]['mentionAndWords'] = mentionAndWords;
+            updateWebhooksTmp[webhookFormId]['mentionAndWords'] = formData.getAll(formKey);
         }
         if (formKey.includes('updateDeleteFlag')) {
             document.getElementById(formKey).checked ? updateWebhooksTmp[webhookFormId]["deleteFlag"] = true : updateWebhooksTmp[webhookFormId]["deleteFlag"] = false;

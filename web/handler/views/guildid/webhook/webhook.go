@@ -159,14 +159,14 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		}
 		searchAndWordForm := internal.CreateWordWebhookForm(searchAndWords, "キーワードAND検索(すべての単語が含まれている場合、送信)")
 
-		mentionOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "NgOr")
+		mentionOrWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "MentionOr")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get NgOr words: "+err.Error())
 			return
 		}
 		mentionOrWordForm := internal.CreateWordWebhookForm(mentionOrWords, "メンションOR検索(いずれかの言葉が含まれている場合、メンションを付けて送信)")
-		mentionAndWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "NgAnd")
+		mentionAndWords, err := h.repo.GetWebhookWordWithWebhookSerialIDAndCondition(ctx, *webhook.WebhookSerialID, "MentionAnd")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Not get NgAnd words: "+err.Error())

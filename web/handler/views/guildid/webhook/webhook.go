@@ -178,7 +178,7 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 		<details style="margin: 0 0 0 1em;">
             <summary>` + webhook.SubscriptionType + `:` + webhook.SubscriptionID + `</summary>
 			<label for="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">Webhook</label>
-			<select name="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" id="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `>
+			<select name="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" id="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">
 				` + webhookForm + `
 			</select>
 			<label for="updateSubscriptionName` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">サービス名</label>

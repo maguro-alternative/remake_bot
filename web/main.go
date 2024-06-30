@@ -16,6 +16,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission"
+	"github.com/maguro-alternative/remake_bot/web/handler/api/webhook"
 	vcSignal "github.com/maguro-alternative/remake_bot/web/handler/api/vc_signal"
 	discordCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/discord_callback"
 	lineCallback "github.com/maguro-alternative/remake_bot/web/handler/callback/line_callback"
@@ -120,6 +121,7 @@ func NewWebRouter(
 	mux.Handle("/api/{guildId}/linetoken", discordMiddleChain.Then(linetoken.NewLineTokenHandler(indexService, repo, aesCrypto)))
 	mux.Handle("/api/{guildId}/line-post-discord-channel", discordMiddleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(repo)))
 	mux.Handle("/api/{guildId}/vc-signal", discordMiddleChain.Then(vcSignal.NewVcSignalHandler(repo)))
+	mux.Handle("/api/{guildId}/webhook", discordMiddleChain.Then(webhook.NewWebhookHandler(repo)))
 
 	http.ListenAndServe(":"+config.Port(), mux)
 }

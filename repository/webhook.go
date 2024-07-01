@@ -72,6 +72,22 @@ func (r *Repository) GetAllColumnsWebhooksByGuildID(
 	return webhooks, err
 }
 
+func (r *Repository) GetAllColumnsWebhooks(ctx context.Context) ([]*Webhook, error) {
+	query := `
+		SELECT
+			*
+		FROM
+			webhook
+	`
+	var webhooks []*Webhook
+	err := r.db.SelectContext(
+		ctx,
+		&webhooks,
+		query,
+	)
+	return webhooks, err
+}
+
 func (r *Repository) UpdateWebhookWithLastPostedAt(
 	ctx context.Context,
 	webhookSerialID int64,

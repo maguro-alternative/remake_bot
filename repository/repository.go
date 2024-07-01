@@ -68,6 +68,7 @@ type RepositoryFuncMock struct {
 	DeleteVcSignalMentionRolesNotInProvidedListFunc       func(ctx context.Context, vcChannelID string, roleIDs []string) error
 	InsertWebhookFunc                                     func(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) (int64, error)
 	GetAllColumnsWebhooksByGuildIDFunc                    func(ctx context.Context, guildID string) ([]*Webhook, error)
+	GetAllColumnsWebhooksFunc                             func(ctx context.Context) ([]*Webhook, error)
 	UpdateWebhookWithLastPostedAtFunc                     func(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error
 	UpdateWebhookWithWebhookIDAndSubscriptionFunc         func(ctx context.Context, webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error
 	DeleteWebhookByWebhookSerialIDFunc                    func(ctx context.Context, webhookSerialID int64) error
@@ -282,6 +283,10 @@ func (r *RepositoryFuncMock) GetAllColumnsWebhooksByGuildID(ctx context.Context,
 	return r.GetAllColumnsWebhooksByGuildIDFunc(ctx, guildID)
 }
 
+func (r *RepositoryFuncMock) GetAllColumnsWebhooks(ctx context.Context) ([]*Webhook, error) {
+	return r.GetAllColumnsWebhooksFunc(ctx)
+}
+
 func (r *RepositoryFuncMock) UpdateWebhookWithLastPostedAt(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error {
 	return r.UpdateWebhookWithLastPostedAtFunc(ctx, webhookSerialID, lastPostedAt)
 }
@@ -382,6 +387,7 @@ type RepositoryFunc interface {
 	DeleteVcSignalMentionRolesNotInProvidedList(ctx context.Context, vcChannelID string, roleIDs []string) error
 	InsertWebhook(ctx context.Context, guildID string, webhookID string, subscriptionType string, subscriptionID string, lastPostedAt time.Time) (int64, error)
 	GetAllColumnsWebhooksByGuildID(ctx context.Context, guildID string) ([]*Webhook, error)
+	GetAllColumnsWebhooks(ctx context.Context) ([]*Webhook, error)
 	UpdateWebhookWithLastPostedAt(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error
 	UpdateWebhookWithWebhookIDAndSubscription(ctx context.Context, webhookSerialID int64, webhookID string, subscriptionID string, subscriptionType string) error
 	DeleteWebhookByWebhookSerialID(ctx context.Context, webhookSerialID int64) error

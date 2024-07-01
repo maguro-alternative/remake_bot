@@ -24,6 +24,7 @@ type SessionMock struct {
 	InteractionRespondFunc         func(interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error
 	UserChannelPermissionsFunc     func(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error)
 	UserGuildsFunc                 func(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
+	WebhookFunc func(webhookID string, options ...discordgo.RequestOption) (st *discordgo.Webhook, err error)
 }
 
 func (s *SessionMock) AddHandler(handler interface{}) func() {
@@ -94,6 +95,10 @@ func (s *SessionMock) UserGuilds(limit int, beforeID string, afterID string, opt
 	return s.UserGuildsFunc(limit, beforeID, afterID, options...)
 }
 
+func (s *SessionMock) Webhook(webhookID string, options ...discordgo.RequestOption) (st *discordgo.Webhook, err error) {
+	return s.WebhookFunc(webhookID, options...)
+}
+
 // Session is an interface for discordgo.Session.
 type Session interface {
 	AddHandler(handler interface{}) func()
@@ -113,6 +118,7 @@ type Session interface {
 	InteractionRespond(interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error
 	UserChannelPermissions(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error)
 	UserGuilds(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
+	Webhook(webhookID string, options ...discordgo.RequestOption) (st *discordgo.Webhook, err error)
 }
 
 var (

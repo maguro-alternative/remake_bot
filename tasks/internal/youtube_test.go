@@ -63,4 +63,29 @@ func TestYoutubeRssReader(t *testing.T) {
 		assert.Len(t, messages, 1)
 		assert.Equal(t, "test\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
 	})
+
+	t.Run("YoutubeのRss取得に失敗すること", func(t *testing.T) {
+		discordSession := &mock.SessionMock{
+			WebhookFunc: func(webhookID string, options ...discordgo.RequestOption) (*discordgo.Webhook, error) {
+				return nil, assert.AnError
+			},
+		}
+		_, err := run(ctx, discordSession, repo, webhook, feed)
+		assert.Error(t, err)
+	})
+
+	t.Run("ユーザメンションを含めること", func(t *testing.T) {
+		repo.GetWebhookUserMentionWithWebhookSerialIDFunc = func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookUserMention, error) {
+			return []*repository.WebhookUserMention{
+				{
+					WebhookSerialID:  webhookSerialId,
+					UserID: "3333",
+				},
+			}, nil
+		}
+		messages, err := run(ctx, discordSession, repo, webhook, feed)
+		assert.NoError(t, err)
+		assert.Len(t, messages, 1)
+		assert.Equal(t, "<@3333> \ntest\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
+	})
 }

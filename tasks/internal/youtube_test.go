@@ -23,7 +23,9 @@ func TestYoutubeRssReader(t *testing.T) {
 			return &discordgo.Webhook{}, nil
 		},
 		WebhookExecuteFunc: func(webhookID string, token string, wait bool, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (*discordgo.Message, error) {
-			return &discordgo.Message{}, nil
+			return &discordgo.Message{
+				Content: data.Content,
+			}, nil
 		},
 	}
 	repo := &repository.RepositoryFuncMock{
@@ -59,5 +61,6 @@ func TestYoutubeRssReader(t *testing.T) {
 		messages, err := run(ctx, discordSession, repo, webhook, feed)
 		assert.NoError(t, err)
 		assert.Len(t, messages, 1)
+		assert.Equal(t, "test\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
 	})
 }

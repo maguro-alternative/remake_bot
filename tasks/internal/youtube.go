@@ -58,8 +58,11 @@ func run(
 			for _, roleMention := range roleMentions {
 				mentionsMessage += fmt.Sprintf("<@&%s> ", roleMention.RoleID)
 			}
+			if mentionsMessage != "" {
+				mentionsMessage += "\n"
+			}
 			message, err := discordSession.WebhookExecute(w.ID, w.Token, false, &discordgo.WebhookParams{
-				Content: fmt.Sprintf("%s\n%s\n%s", mentionsMessage, item.Title, item.Link),
+				Content: fmt.Sprintf("%s%s\n%s", mentionsMessage, item.Title, item.Link),
 			})
 			if err != nil {
 				return nil, err

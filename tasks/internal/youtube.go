@@ -12,20 +12,29 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-func Run(
+func YoutubeRssReader(
 	ctx context.Context,
+	discordSession mock.Session,
 	repo repository.RepositoryFunc,
 	webhook repository.Webhook,
-	discordSession mock.Session,
 ) ([]*discordgo.Message, error) {
-	var messages []*discordgo.Message
-	var mentionsMessage string
-	var lastPostedAt time.Time
-	// ここにタスクを書く
 	feed, err := gofeed.NewParser().ParseURL(fmt.Sprintf("https://www.youtube.com/feeds/videos.xml?channel_id=%s", webhook.SubscriptionID))
     if err != nil {
 		return nil, err
 	}
+	return run(ctx, discordSession, repo, webhook, feed)
+}
+
+func run(
+	ctx context.Context,
+	discordSession mock.Session,
+	repo repository.RepositoryFunc,
+	webhook repository.Webhook,
+	feed *gofeed.Feed,
+) ([]*discordgo.Message, error) {
+	var messages []*discordgo.Message
+	var mentionsMessage string
+	var lastPostedAt time.Time
 	for _, item := range feed.Items {
         if item == nil {
             break
@@ -62,7 +71,7 @@ func Run(
 		}
 	}
 	if !lastPostedAt.IsZero() {
-		err = repo.UpdateWebhookWithLastPostedAt(ctx, *webhook.WebhookSerialID, lastPostedAt)
+		err := repo.UpdateWebhookWithLastPostedAt(ctx, *webhook.WebhookSerialID, lastPostedAt)
 		if err != nil {
 			return nil, err
 		}

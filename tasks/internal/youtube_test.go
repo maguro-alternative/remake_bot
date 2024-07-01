@@ -88,4 +88,19 @@ func TestYoutubeRssReader(t *testing.T) {
 		assert.Len(t, messages, 1)
 		assert.Equal(t, "<@3333> \ntest\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
 	})
+
+	t.Run("ロールメンションを含めること", func(t *testing.T) {
+		repo.GetWebhookRoleMentionWithWebhookSerialIDFunc = func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookRoleMention, error) {
+			return []*repository.WebhookRoleMention{
+				{
+					WebhookSerialID: webhookSerialId,
+					RoleID: "4444",
+				},
+			}, nil
+		}
+		messages, err := run(ctx, discordSession, repo, webhook, feed)
+		assert.NoError(t, err)
+		assert.Len(t, messages, 1)
+		assert.Equal(t, "<@&4444> \ntest\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
+	})
 }

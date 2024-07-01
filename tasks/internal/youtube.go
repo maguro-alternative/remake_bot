@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/mmcdole/gofeed"
@@ -13,9 +14,9 @@ import (
 
 func Run(
 	ctx context.Context,
-	repo repository.Repository,
+	repo repository.RepositoryFunc,
 	webhook repository.Webhook,
-	discordSession *discordgo.Session,
+	discordSession mock.Session,
 ) ([]*discordgo.Message, error) {
 	var messages []*discordgo.Message
 	var mentionsMessage string

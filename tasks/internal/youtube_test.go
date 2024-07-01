@@ -24,7 +24,14 @@ func TestYoutubeRssReader(t *testing.T) {
 			return &discordgo.Message{}, nil
 		},
 	}
-	repo := &repository.Repository{}
+	repo := &repository.RepositoryFuncMock{
+		GetWebhookUserMentionWithWebhookSerialIDFunc :func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookUserMention, error) {
+			return []*repository.WebhookUserMention{}, nil
+		},
+		GetWebhookRoleMentionWithWebhookSerialIDFunc:func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookRoleMention, error) {
+			return []*repository.WebhookRoleMention{}, nil
+		},
+	}
 	webhook := repository.Webhook{}
 	feed := &gofeed.Feed{
 		Items: []*gofeed.Item{
@@ -34,7 +41,8 @@ func TestYoutubeRssReader(t *testing.T) {
 		},
 	}
 	t.Run("YoutubeのRss取得に成功すること", func(t *testing.T) {
-		_, err := run(ctx, discordSession, repo, webhook, feed)
+		messages, err := run(ctx, discordSession, repo, webhook, feed)
 		assert.NoError(t, err)
+		assert.Len(t, messages, 0)
 	})
 }

@@ -33,6 +33,9 @@ func TestYoutubeRssReader(t *testing.T) {
 		GetWebhookRoleMentionWithWebhookSerialIDFunc: func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookRoleMention, error) {
 			return []*repository.WebhookRoleMention{}, nil
 		},
+		UpdateWebhookWithLastPostedAtFunc: func(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error {
+			return nil
+		},
 	}
 	webhookSerialId := int64(1)
 	webhook := repository.Webhook{
@@ -41,14 +44,14 @@ func TestYoutubeRssReader(t *testing.T) {
 		WebhookID:        "2222",
 		SubscriptionType: "youtube",
 		SubscriptionID:   "test",
-		LastPostedAt:     beforePostAt,
+		LastPostedAt:     afterPostAt,
 	}
 	feed := &gofeed.Feed{
 		Items: []*gofeed.Item{
 			{
 				Title:           "test",
 				Link:            "https://www.youtube.com/watch?v=test",
-				PublishedParsed: &afterPostAt,
+				PublishedParsed: &beforePostAt,
 			},
 		},
 	}

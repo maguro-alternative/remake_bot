@@ -32,7 +32,7 @@ func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) error 
 						return err
 					}
 				case "niconico":
-					// ここにタスクを書く
+					// Todo: ニコニコ動画のRSSリーダーを実装する
 				}
 			}
 		case <-tenMinute.C:

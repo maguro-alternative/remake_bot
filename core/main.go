@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	_ "embed"
-	"fmt"
 	"net"
 	"net/http"
+	"log/slog"
 	"os"
 	"os/signal"
 	"time"
@@ -93,7 +93,6 @@ func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo
 	}
 	for _, guild := range guilds {
 		guildSt, err := discordSession.Guild(guild.ID)
-		fmt.Println(guildSt.ID)
 		if err != nil {
 			return err
 		}
@@ -101,7 +100,7 @@ func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo
 		if err != nil {
 			return err
 		}
-		fmt.Println(guildSt.Name+"のチャンネル数", len(channels))
+		slog.InfoContext(ctx, guildSt.Name, "チャンネル数", len(channels))
 		channelsAndThreads := make([]*discordgo.Channel, 0, len(channels)+len(guildSt.Threads))
 		channelsAndThreads = append(channelsAndThreads, channels...)
 		channelsAndThreads = append(channelsAndThreads, guildSt.Threads...)
@@ -109,7 +108,7 @@ func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo
 		if err != nil {
 			return err
 		}
-		fmt.Println(guildSt.Name+"のスレッド数", len(activeThreads.Threads))
+		slog.InfoContext(ctx, guildSt.Name, "のアクティブスレッド数", len(activeThreads.Threads))
 		channelsAndThreads = append(channelsAndThreads, activeThreads.Threads...)
 		for _, channel := range channelsAndThreads {
 			if channel.Type == discordgo.ChannelTypeGuildCategory {

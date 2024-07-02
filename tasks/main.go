@@ -20,7 +20,7 @@ func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) {
 	repo := repository.NewRepository(dbv1)
 	webhooks, err := repo.GetAllColumnsWebhooks(ctx)
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
+		slog.ErrorContext(ctx, "webhookの取得に失敗しました。", "エラー", err.Error())
 	}
 	for {
 		select {
@@ -30,7 +30,7 @@ func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) {
 				case "youtube":
 					_, err := internal.YoutubeRssReader(ctx, discord, repo, *webhook)
 					if err != nil {
-						slog.ErrorContext(ctx, err.Error())
+						slog.ErrorContext(ctx, "youtubeのwebhookの投稿に失敗しました。", "エラー", err.Error())
 					}
 				case "niconico":
 					// Todo: ニコニコ動画のRSSリーダーを実装する
@@ -39,7 +39,7 @@ func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) {
 		case <-tenMinute.C:
 			webhooks, err = repo.GetAllColumnsWebhooks(ctx)
 			if err != nil {
-				slog.ErrorContext(ctx, err.Error())
+				slog.ErrorContext(ctx, "webhookの取得に失敗しました。", "エラー", err.Error())
 			}
 		}
 	}

@@ -112,4 +112,17 @@ func TestYoutubeRssReader(t *testing.T) {
 		assert.Len(t, messages, 1)
 		assert.Equal(t, "<@&4444> \ntest\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
 	})
+
+	t.Run("最新のものがない場合投稿しないこと", func(t *testing.T) {
+		feed.Items = []*gofeed.Item{
+			{
+				Title:           "test",
+				Link:            "https://www.youtube.com/watch?v=test",
+				PublishedParsed: &previousPostAt,
+			},
+		}
+		messages, err := run(ctx, discordSession, repo, webhook, feed)
+		assert.NoError(t, err)
+		assert.Len(t, messages, 0)
+	})
 }

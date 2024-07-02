@@ -16,6 +16,7 @@ import (
 
 func TestYoutubeRssReader(t *testing.T) {
 	ctx := context.Background()
+	previousPostAt := time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC)
 	beforePostAt := time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
 	afterPostAt := time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)
 	discordSession := &mock.SessionMock{
@@ -46,14 +47,19 @@ func TestYoutubeRssReader(t *testing.T) {
 		WebhookID:        "2222",
 		SubscriptionType: "youtube",
 		SubscriptionID:   "test",
-		LastPostedAt:     afterPostAt,
+		LastPostedAt:     beforePostAt,
 	}
 	feed := &gofeed.Feed{
 		Items: []*gofeed.Item{
 			{
 				Title:           "test",
 				Link:            "https://www.youtube.com/watch?v=test",
-				PublishedParsed: &beforePostAt,
+				PublishedParsed: &afterPostAt,
+			},
+			{
+				Title:           "test2",
+				Link:            "https://www.youtube.com/watch?v=test2",
+				PublishedParsed: &previousPostAt,
 			},
 		},
 	}
@@ -90,6 +96,9 @@ func TestYoutubeRssReader(t *testing.T) {
 	})
 
 	t.Run("ロールメンションを含めること", func(t *testing.T) {
+		repo.GetWebhookUserMentionWithWebhookSerialIDFunc = func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookUserMention, error) {
+			return []*repository.WebhookUserMention{}, nil
+		}
 		repo.GetWebhookRoleMentionWithWebhookSerialIDFunc = func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookRoleMention, error) {
 			return []*repository.WebhookRoleMention{
 				{

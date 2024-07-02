@@ -39,7 +39,7 @@ func run(
         if item == nil {
             break
         }
-		if webhook.LastPostedAt.After(*item.PublishedParsed) {
+		if webhook.LastPostedAt.Before(*item.PublishedParsed) {
 			w, err := discordSession.Webhook(webhook.WebhookID)
 			if err != nil {
 				return nil, err

@@ -3,6 +3,7 @@ package tasks
 import (
 	"context"
 	"time"
+	"log/slog"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 
@@ -12,14 +13,14 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) error {
+func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) {
 	// ここにタスクを書く
 	oneMinute := time.NewTicker(1 * time.Minute)
 	tenMinute := time.NewTicker(10 * time.Minute)
 	repo := repository.NewRepository(dbv1)
 	webhooks, err := repo.GetAllColumnsWebhooks(ctx)
 	if err != nil {
-		return err
+		slog.ErrorContext(ctx, err.Error())
 	}
 	for {
 		select {
@@ -29,7 +30,7 @@ func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) error 
 				case "youtube":
 					_, err := internal.YoutubeRssReader(ctx, discord, repo, *webhook)
 					if err != nil {
-						return err
+						slog.ErrorContext(ctx, err.Error())
 					}
 				case "niconico":
 					// Todo: ニコニコ動画のRSSリーダーを実装する
@@ -38,7 +39,7 @@ func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) error 
 		case <-tenMinute.C:
 			webhooks, err = repo.GetAllColumnsWebhooks(ctx)
 			if err != nil {
-				return err
+				slog.ErrorContext(ctx, err.Error())
 			}
 		}
 	}

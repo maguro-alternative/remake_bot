@@ -14,6 +14,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/core/config"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/web"
+	"github.com/maguro-alternative/remake_bot/tasks"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -69,6 +70,12 @@ func main() {
 			discord,
 		)
 	}()
+
+	// webhook投稿のタスクを開始
+	go func() {
+		tasks.Run(ctx, dbV1, discord)
+	}()
+
 	// Ctrl+Cを受け取るためのチャンネル
 	sc := make(chan os.Signal, 1)
 	// Ctrl+Cを受け取る

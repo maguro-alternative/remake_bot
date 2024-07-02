@@ -7,6 +7,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/tasks/internal"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -26,7 +27,10 @@ func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) error 
 			for _, webhook := range webhooks {
 				switch webhook.SubscriptionType {
 				case "youtube":
-					// ここにタスクを書く
+					_, err := internal.YoutubeRssReader(ctx, discord, repo, *webhook)
+					if err != nil {
+						return err
+					}
 				case "niconico":
 					// ここにタスクを書く
 				}

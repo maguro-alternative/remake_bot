@@ -26,7 +26,7 @@ var permissionTypes = []string{"lineBot", "linePostDiscordChannel", "vcSignal", 
 func main() {
 	ctx := context.Background()
 	// データベースの接続を開始
-	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURLWithSslmode())
+	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
 	if err != nil {
 		panic(err)
 	}

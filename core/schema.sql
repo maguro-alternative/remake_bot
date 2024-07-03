@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS webhook_user_mention (
     webhook_serial_id INTEGER,
     user_id TEXT NOT NULL,
     PRIMARY KEY(webhook_serial_id, user_id),
-    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id)
+    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id) ON DELETE CASCADE
 );
 
 /*
@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS webhook_role_mention (
     webhook_serial_id INTEGER,
     role_id TEXT NOT NULL,
     PRIMARY KEY(webhook_serial_id, role_id),
-    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id)
+    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id) ON DELETE CASCADE
 );
 
 /*

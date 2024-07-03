@@ -103,9 +103,9 @@ go run core/main.go
 .
 ├── bot                         // DiscordBotを動かすためのディレクトリ
 │   ├── cogs                    // DiscordBotのコグ
-│   │   └── on_message_create   // メッセージが送信されたときのデータベースの操作
 |   ├── commands                // スラッシュコマンド
 │   ├── config                  // 環境変数設定ファイル
+│   ├── ffmpeg                  // 動画、音声の変換
 │   └── main.go
 ├── core                        // サーバーとBotを動かすためのディレクトリ
 │   ├── config                  // 環境変数設定ファイル

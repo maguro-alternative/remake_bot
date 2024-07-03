@@ -16,6 +16,7 @@ DISCORD_CLIENT_ID=your_discord_client_id
 DISCORD_CLIENT_SECRET=your_discord_client_secret
 DISCORD_SCOPE=identify%20guilds.join%20guilds%20guilds.members.read%20applications.builds.read%20connections
 
+# DB_は現時点のコードでは使用されていません
 DB_NAME=your_db_name
 DB_HOST=your_db_host
 DB_PASSWORD=your_db_password

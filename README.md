@@ -21,6 +21,8 @@ DB_HOST=your_db_host
 DB_PASSWORD=your_db_password
 DB_PORT=your_db_port
 DB_USER=your_db_user
+# データベースのURL
+DATABASE_URL=
 
 PORT=5000
 # AES暗号化のためのキー(128bit,00~FFの16進数32文字)

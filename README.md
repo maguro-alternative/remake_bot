@@ -27,6 +27,7 @@ DATABASE_URL=
 PORT=5000
 # AES暗号化のためのキー(128bit,00~FFの16進数32文字)
 PRIVATE_KEY=your_private_key
+# サーバーのURL(各OAuth2のコールバック用)
 SERVER_URL=your_server_url
 
 # gorrila/sessionsのためのキー

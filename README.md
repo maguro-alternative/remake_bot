@@ -415,17 +415,30 @@ discordgo.MessageTypeで使用されている定数(0~23)と同じ値を使用�
 </details>
 
 <details>
-    <summary>line_ng_discord_id</summary>
+    <summary>line_ng_discord_user_id</summary>
 
-LINEへ送信しないDiscordユーザー、ロールを保存するテーブル  
-ここに保存されているユーザー、ロールを持つユーザーはLINEにメッセージが送信されない  
+LINEへ送信しないDiscordユーザーを保存するテーブル  
+ここに保存されているユーザーを持つユーザーはLINEにメッセージが送信されない  
 
 |カラム名|型|説明|
 |---|---|---|
 |***channel***|TEXT|DiscordのチャンネルID|
 |guild_id|TEXT|DiscordのサーバーID|
-|***id***|TEXT|ID|
-|id_type|TEXT|IDの種類 (user, role)|
+|***user_id***|TEXT|ユーザーID|
+
+</details>
+
+<details>
+    <summary>line_ng_discord_role_id</summary>
+
+LINEへ送信しないDiscordロールを保存するテーブル  
+ここに保存されているロールを持つユーザーはLINEにメッセージが送信されない  
+
+|カラム名|型|説明|
+|---|---|---|
+|***channel***|TEXT|DiscordのチャンネルID|
+|guild_id|TEXT|DiscordのサーバーID|
+|***role_id***|TEXT|ロールID|
 
 </details>
 

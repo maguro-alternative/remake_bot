@@ -3,11 +3,11 @@
 ```
 ├── web
 │   ├── components
+│   │   ├── channel_select.go
 │   │   ├── discord_account_pop.go
 │   │   ├── entity.go
 │   │   ├── line_account_pop.go
 │   │   ├── line_post_discord_chennel.go
-│   │   ├── linetoken.go
 │   │   └── submittag.go
 │   ├── config
 │   │   ├── internal

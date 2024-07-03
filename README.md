@@ -37,7 +37,6 @@ YOUTUBE_PROJECT_ID=your_youtube_project_id
 YOUTUBE_REFRESH_TOKEN=your_youtube_refresh_token
 YOUTUBE_TOKEN_EXPIRY=your_youtube_token_expiry
 
-LINE_CALLBACK_URL=your_line_callback_url
 ```
 
 以下のコマンドで依存関係を解決します。

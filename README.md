@@ -37,6 +37,8 @@ YOUTUBE_PROJECT_ID=your_youtube_project_id
 YOUTUBE_REFRESH_TOKEN=your_youtube_refresh_token
 YOUTUBE_TOKEN_EXPIRY=your_youtube_token_expiry
 
+# Web版VoiceVoxのAPIキー
+VOICEVOX_KEY=your_voicevox_key
 ```
 
 以下のコマンドで依存関係を解決します。

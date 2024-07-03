@@ -146,21 +146,28 @@ go run core/main.go
 .
 ├── bot
 │   ├── cogs
-│   │   ├── on_message_create                       // メッセージが送信されたときのデータベースの操作
-│   │   │   ├── entity.go
-│   │   │   ├── repository_test.go
-│   │   │   └── repository.go
-│   │   ├── cog_handler.go                          // ここでcogを登録
-│   │   ├── on_message_create.go                    // discord内でメッセージが送信されたときの処理
-│   │   └── vc_signal.go                            // ボイスチャンネルのステータス変化時の処理
+│   │   ├── internal
+│   │   │   └── entity.go
+│   │   ├── cog_handler.go
+│   │   ├── on_message_create.go
+│   │   ├── on_message_create_test.go
+│   │   ├── on_voice_state_update.go
+│   │   └── on_voice_state_update_test.go
 |   ├── commands
-|   |   ├── command_handler.go                      // ここでコマンドを登録
-|   |   └── ping.go                                 // pingコマンド
-│   ├── config                                      // 環境変数設定ファイル
+|   |   ├── command_handler.go
+|   |   ├── command_handler_test.go
+|   |   ├── ping_test.go
+|   |   ├── ping.go
+|   |   ├── voicevox_test.go
+|   |   └── voicevox.go
+│   ├── config
 │   │   ├── internal
 │   │   │   └── env.go
 │   │   └── config.go
-│   └── main.go                                     // Botメイン関数
+│   ├── ffmpeg
+│   │   ├── ffmpeg_test.go
+│   │   └── ffmpeg.go
+│   └── main.go
 ├── core
 │   ├── config                                      // 環境変数設定ファイル
 │   │   ├── internal

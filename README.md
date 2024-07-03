@@ -528,15 +528,26 @@ DiscordのWebhookの送信設定を保存するテーブル
 </details>
 
 <details>
-    <summary>webhook_mention</summary>
+    <summary>webhook_user_mention</summary>
 
-Webhookの送信時にメンションするユーザー、ロールを保存するテーブル
+Webhookの送信時にメンションするユーザーを保存するテーブル
 
 |カラム名|型|説明|
 |---|---|---|
 |***webhook_serial_id***|SERIAL|Webhookの投稿内容の識別ID|
-|***id***|TEXT|ID|
-|id_type|TEXT|IDの種類 (user, role)|
+|***user_id***|TEXT|ユーザーID|
+
+</details>
+
+<details>
+    <summary>webhook_role_mention</summary>
+
+Webhookの送信時にメンションするロールを保存するテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|***webhook_serial_id***|SERIAL|Webhookの投稿内容の識別ID|
+|***role_id***|TEXT|ロールID|
 
 </details>
 

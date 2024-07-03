@@ -486,16 +486,28 @@ LINEへ送信しないDiscordロールを保存するテーブル
 </details>
 
 <details>
-    <summary>vc_signal_mention_id</summary>
+    <summary>vc_signal_mention_user_id</summary>
 
-ボイスチャンネルの通知の際にメンションするユーザー、ロールを保存するテーブル
+ボイスチャンネルの通知の際にメンションするユーザーを保存するテーブル
 
 |カラム名|型|説明|
 |---|---|---|
 |***vc_channel_id***|TEXT|DiscordのボイスチャンネルID|
 |guild_id|TEXT|DiscordのサーバーID|
-|***id***|TEXT|ID|
-|id_type|TEXT|IDの種類 (user, role)|
+|***user_id***|TEXT|ユーザーID|
+
+</details>
+
+<details>
+    <summary>vc_signal_mention_role_id</summary>
+
+ボイスチャンネルの通知の際にメンションするロールを保存するテーブル
+
+|カラム名|型|説明|
+|---|---|---|
+|***vc_channel_id***|TEXT|DiscordのボイスチャンネルID|
+|guild_id|TEXT|DiscordのサーバーID|
+|***role_id***|TEXT|ロールID|
 
 </details>
 

@@ -459,16 +459,29 @@ LINEへ送信しないDiscordロールを保存するテーブル
 </details>
 
 <details>
-    <summary>vc_signal_ng_id</summary>
+    <summary>vc_signal_ng_user_id</summary>
 
-指定されたユーザー、ロールがボイスチャンネルに参加した場合通知しない
+指定されたユーザーがボイスチャンネルに参加した場合通知しない
 
 |カラム名|型|説明|
 |---|---|---|
 |***vc_channel_id***|TEXT|DiscordのボイスチャンネルID|
 |guild_id|TEXT|DiscordのサーバーID|
-|***id***|TEXT|ID|
-|id_type|TEXT|IDの種類 (user, role)|
+|***user_id***|TEXT|ユーザーID|
+
+</details>
+
+
+<details>
+    <summary>vc_signal_ng_role_id</summary>
+
+指定されたロールがボイスチャンネルに参加した場合通知しない
+
+|カラム名|型|説明|
+|---|---|---|
+|***vc_channel_id***|TEXT|DiscordのボイスチャンネルID|
+|guild_id|TEXT|DiscordのサーバーID|
+|***role_id***|TEXT|ロールID|
 
 </details>
 

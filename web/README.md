@@ -7,7 +7,6 @@
 │   │   ├── discord_account_pop.go
 │   │   ├── entity.go
 │   │   ├── line_account_pop.go
-│   │   ├── line_post_discord_chennel.go
 │   │   └── submittag.go
 │   ├── config
 │   │   ├── internal

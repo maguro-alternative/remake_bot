@@ -140,12 +140,24 @@
 │   ├── templates
 │   │   ├── static
 │   │   │   ├── img
-│   │   │   │   └── logo.png
+│   │   │   │   ├── discord-icon.png
+│   │   │   │   ├── line-icon.png
+│   │   │   │   ├── ohime.png
+│   │   │   │   └── uchuemon.png
 │   │   │   └── js
 │   │   │       ├── group.js
+│   │   │       ├── group.test.js
 │   │   │       ├── line_post_discord_chennel.js
+│   │   │       ├── line_post_discord_chennel.test.js
 │   │   │       ├── linetoken.js
-│   │   │       └── popover.js
+│   │   │       ├── linetoken.test.js
+│   │   │       ├── permission.js
+│   │   │       ├── permission.test.js
+│   │   │       ├── popover.js
+│   │   │       ├── vc_signal.js
+│   │   │       ├── vc_signal.test.js
+│   │   │       ├── webhook.js
+│   │   │       └── webhook.test.js
 │   │   ├── views
 │   │   │   ├── group
 │   │   │   │   └── group.html

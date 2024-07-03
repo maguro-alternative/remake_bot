@@ -120,6 +120,8 @@ go run core/main.go
 │   ├── db                      // データベース関連のパッケージ
 │   ├── line                    // LINEBot関連のパッケージ
 │   └── youtube                 // YouTube関連のパッケージ
+├── repository                  // データベース操作のリポジトリ
+├── tasks                       // 定期的に行うタスク(Webhookの送信など)
 ├── web                         // Webサーバーを動かすためのディレクトリ
 │   ├── components              // Webサーバーのコンポーネント
 │   ├── config                  // 環境変数設定ファイル

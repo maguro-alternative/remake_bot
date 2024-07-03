@@ -122,6 +122,7 @@ go run core/main.go
 │   └── youtube                 // YouTube関連のパッケージ
 ├── repository                  // データベース操作のリポジトリ
 ├── tasks                       // 定期的に行うタスク(Webhookの送信など)
+├── testutil                    // テスト用のユーティリティ
 ├── web                         // Webサーバーを動かすためのディレクトリ
 │   ├── components              // Webサーバーのコンポーネント
 │   ├── config                  // 環境変数設定ファイル

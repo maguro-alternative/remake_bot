@@ -357,17 +357,31 @@ go run core/main.go
 </details>
 
 <details>
-    <summary>permissions_id</summary>
+    <summary>permissions_user_id</summary>
 
-サーバーの権限設定を保存するテーブル
-ここに保存されているユーザーやロールは、```permission```と同じ権限を持っているということになる
+ユーザーのサーバー権限設定を保存するテーブル
+ここに保存されているユーザーは、```permission```と同じ権限を持っているということになる
 
 |カラム名|型|説明|
 |---|---|---|
 |***guild_id***|TEXT|DiscordサーバーのID|
 |***type***|TEXT|権限の種類 (line_post_discord_channel, line_bot, vc_signal, webhook)|
-|***target_type***|TEXT|権限の対象の種類 (role, user)|
-|***target_id***|TEXT|権限の対象ID (ユーザーID、ロールID)|
+|***user_id***|TEXT|ユーザーID|
+|permission|TEXT|権限レベル(read, write, all)|
+
+</details>
+
+<details>
+    <summary>permissions_role_id</summary>
+
+ロールのサーバー権限設定を保存するテーブル
+ここに保存されているロールは、```permission```と同じ権限を持っているということになる
+
+|カラム名|型|説明|
+|---|---|---|
+|***guild_id***|TEXT|DiscordサーバーのID|
+|***type***|TEXT|権限の種類 (line_post_discord_channel, line_bot, vc_signal, webhook)|
+|***role_id***|TEXT|ロールID|
 |permission|TEXT|権限レベル(read, write, all)|
 
 </details>

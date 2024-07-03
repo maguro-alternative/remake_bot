@@ -5,20 +5,27 @@ DiscordBotのソースコードです。
 ```
 ├── bot
 │   ├── cogs
-│   │   ├── on_message_create
-│   │   │   ├── entity.go
-│   │   │   ├── repository_test.go
-│   │   │   └── repository.go
+│   │   ├── internal
+│   │   │   └── entity.go
 │   │   ├── cog_handler.go
 │   │   ├── on_message_create.go
-│   │   └── vc_signal.go
+│   │   ├── on_message_create_test.go
+│   │   ├── on_voice_state_update.go
+│   │   └── on_voice_state_update_test.go
 |   ├── commands
 |   |   ├── command_handler.go
-|   |   └── ping.go
+|   |   ├── command_handler_test.go
+|   |   ├── ping_test.go
+|   |   ├── ping.go
+|   |   ├── voicevox_test.go
+|   |   └── voicevox.go
 │   ├── config
 │   │   ├── internal
 │   │   │   └── env.go
 │   │   └── config.go
+│   ├── ffmpeg
+│   │   ├── ffmpeg_test.go
+│   │   └── ffmpeg.go
 │   └── main.go
 ```
 

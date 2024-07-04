@@ -317,14 +317,14 @@ func TestVcSignal(t *testing.T) {
 		)
 		assert.NoError(t, err)
 		assert.Len(t, messages, 5)
-		assert.Equal(t, messages[0].Content, "現在1人 <@11> が after_test_vcに入室しました。")
-		assert.Equal(t, messages[1].Embeds[0].Title, "通話開始")
-		assert.Equal(t, messages[1].Embeds[0].Description, "<#2222>")
-		assert.Equal(t, messages[1].Embeds[0].Author.Name, "testuser")
-		assert.Equal(t, messages[1].Embeds[0].Author.IconURL, "https://cdn.discordapp.com/avatars/11/a_.gif?size=64")
-		assert.Equal(t, messages[2].Content, "現在0人 <@11> が before_test_vcから退室しました。")
-		assert.Equal(t, messages[3].Content, "通話が終了しました。")
-		assert.Equal(t, messages[4].Embeds[0].Title, "通話終了")
+		assert.Equal(t, messages[0].Content, "現在0人 <@11> が before_test_vcから退室しました。")
+		assert.Equal(t, messages[1].Content, "通話が終了しました。")
+		assert.Equal(t, messages[2].Embeds[0].Title, "通話終了")
+		assert.Equal(t, messages[3].Content, "現在1人 <@11> が after_test_vcに入室しました。")
+		assert.Equal(t, messages[4].Embeds[0].Title, "通話開始")
+		assert.Equal(t, messages[4].Embeds[0].Description, "<#2222>")
+		assert.Equal(t, messages[4].Embeds[0].Author.Name, "testuser")
+		assert.Equal(t, messages[4].Embeds[0].Author.IconURL, "https://cdn.discordapp.com/avatars/11/a_.gif?size=64")
 	})
 
 	t.Run("正常系(サーバー内でのボイスチャンネル移動)", func(t *testing.T) {
@@ -411,9 +411,9 @@ func TestVcSignal(t *testing.T) {
 		)
 		assert.NoError(t, err)
 		assert.Len(t, messages, 3)
-		assert.Equal(t, messages[0].Content, "現在1人 <@11> が after_test_vcに入室しました。")
-		assert.Equal(t, messages[1].Embeds[0].Title, "通話開始")
-		assert.Equal(t, messages[2].Content, "現在0人 <@11> が after_test_vc2から退室しました。")
+		assert.Equal(t, messages[0].Content, "現在0人 <@11> が after_test_vc2から退室しました。")
+		assert.Equal(t, messages[1].Content, "現在1人 <@11> が after_test_vcに入室しました。")
+		assert.Equal(t, messages[2].Embeds[0].Title, "通話開始")
 	})
 
 	t.Run("正常系(サーバー内での2人以降のボイスチャンネル入室)", func(t *testing.T) {
@@ -692,8 +692,8 @@ func TestVcSignal(t *testing.T) {
 		)
 		assert.NoError(t, err)
 		assert.Len(t, messages, 2)
-		assert.Equal(t, messages[0].Content, "現在2人 <@11> が after_test_vcに入室しました。")
-		assert.Equal(t, messages[1].Content, "現在1人 <@11> が after_test_vc2から退室しました。")
+		assert.Equal(t, messages[0].Content, "現在1人 <@11> が after_test_vc2から退室しました。")
+		assert.Equal(t, messages[1].Content, "現在2人 <@11> が after_test_vcに入室しました。")
 	})
 
 	t.Run("正常系(カメラ配信)", func(t *testing.T) {

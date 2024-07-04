@@ -176,20 +176,6 @@ go run core/main.go
 |   ├── main.go
 │   └── schema.sql                                  // データベースのスキーマ
 ├── fixtures
-│   ├── fixtures.go
-│   ├── line_bot_iv.go
-│   ├── line_bot.go
-|   ├── line_ng_discord_id.go
-|   ├── line_ng_discord_message_type.go
-│   ├── line_post_discord_chennel.go
-│   ├── permissions_code.go
-│   ├── permissions_id.go
-│   ├── vc_signal_channel.go
-│   ├── vc_signal_mention_id.go
-│   ├── vc_signal_ng_id.go
-│   ├── webhook_mention.go
-│   ├── webhook_word.go
-│   └── webhook.go
 ├── pkg
 │   ├── crypto
 │   │   ├── aes.go
@@ -212,6 +198,33 @@ go run core/main.go
 │       ├── create_client_secret.go
 │       ├── create_oauth2.go
 │       └── youtube.go
+├── testutil
+│   ├── files
+│   │  └── video.xml
+│   ├── fixtures
+│   │   ├── fixtures.go
+│   │   ├── line_bot_iv.go
+│   │   ├── line_bot.go
+│   |   ├── line_ng_discord_message_type.go
+│   |   ├── line_ng_discord_role_id.go
+│   |   ├── line_ng_discord_user_id.go
+│   │   ├── line_post_discord_chennel.go
+│   │   ├── permissions_code.go
+│   │   ├── permissions_role_id.go
+│   │   ├── permissions_user_id.go
+│   │   ├── vc_signal_channel.go
+│   │   ├── vc_signal_mention_role_id.go
+│   │   ├── vc_signal_mention_user_id.go
+│   │   ├── vc_signal_ng_role_id.go
+│   │   ├── vc_signal_ng_user_id.go
+│   │   ├── webhook_role_mention.go
+│   │   ├── webhook_user_mention.go
+│   │   ├── webhook_word.go
+│   │   └── webhook.go
+│   └── mock
+│       ├── client.go
+│       ├── repository.go
+│       └── session.go
 ├── web
 │   ├── components
 │   │   ├── channel_select.go

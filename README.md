@@ -4,6 +4,22 @@ https://github.com/maguro-alternative/discordfast
 
 上記のリポジトリのリプレイスです。
 
+# 機能
+## ボイスチャンネル入退室通知
+
+<details>
+    <summary>画像(折り畳み)</summary>
+
+- 入退出  
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/0b4b012d-0b24-4803-9007-6ce2e652fa02)
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/4c1f353b-b598-4684-a7e8-fe1b64c6501d)
+- 画面共有、カメラ配信  
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/b10167e6-1633-4491-95e8-48750c4c7299)
+
+</details>
+
+## LINE連携
+
 # 使い方
 以下の環境変数を設定してください。  
 PostgresSQLのデータベースを使用します。  

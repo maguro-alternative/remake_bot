@@ -44,6 +44,9 @@ func Test_PingCommandRemove(t *testing.T) {
 		ApplicationCommandCreateFunc: func(guildID string, appID string, appCmd *discordgo.ApplicationCommand, options ...discordgo.RequestOption) (ccmd *discordgo.ApplicationCommand, err error) {
 			return appCmd, nil
 		},
+		ApplicationCommandDeleteFunc: func(appID string, guildID string, cmdID string, options ...discordgo.RequestOption) error {
+			return nil
+		},
 	}
 	t.Run("ping削除成功", func(t *testing.T) {
 		state := discordgo.NewState()

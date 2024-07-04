@@ -214,11 +214,10 @@ go run core/main.go
 │       └── youtube.go
 ├── web
 │   ├── components
+│   │   ├── channel_select.go
 │   │   ├── discord_account_pop.go
 │   │   ├── entity.go
 │   │   ├── line_account_pop.go
-│   │   ├── line_post_discord_chennel.go
-│   │   ├── linetoken.go
 │   │   └── submittag.go
 │   ├── config
 │   │   ├── internal
@@ -228,107 +227,156 @@ go run core/main.go
 │   │   ├── api
 │   │   │   ├── group
 │   │   │   │   ├── internal
-│   │   │   │   │   ├── entity.go
-│   │   │   │   │   ├── repository_test.go
-│   │   │   │   │   └── repository.go
+│   │   │   │   │   └── entity.go
+│   │   │   │   ├── group_test.go
 │   │   │   │   └── group.go
 │   │   |   ├── line_post_discord_chennel
 │   │   │   │   ├── internal
-│   │   │   │   │   ├── entity.go
-│   │   │   │   │   ├── repository_test.go
-│   │   │   │   │   └── repository.go
+│   │   │   │   │   └── entity.go
+│   │   │   │   ├── line_post_discord_channel_test.go
 │   │   │   │   └── line_post_discord_chennel.go
-│   │   │   ├── line_bot
+│   │   │   ├── linebot
 │   │   │   │   ├── internal
 │   │   │   │   │   ├── entity.go
 │   │   │   │   │   ├── hmac.go
-│   │   │   │   │   ├── repository_test.go
-│   │   │   │   │   └── repository.go
-│   │   │   │   ├── entity.go
-│   │   │   │   └── line_bot.go
-│   │   │   └── linetoken
+│   │   │   │   │   └── hmac_test.go
+│   │   │   │   ├── linebot_test.go
+│   │   │   │   └── linebot.go
+│   │   │   ├── linetoken
+│   │   │   │   ├── internal
+│   │   │   │   │   └── entity.go
+│   │   │   │   ├── linetoken_test.go
+│   │   │   │   └── linetoken.go
+│   │   │   ├── permission
+│   │   │   │   ├── internal
+│   │   │   │   │   └── entity.go
+│   │   │   │   ├── permission_test.go
+│   │   │   │   └── permission.go
+│   │   │   ├── vc_signal
+│   │   │   │   ├── internal
+│   │   │   │   │   └── entity.go
+│   │   │   │   ├── permission_test.go
+│   │   │   │   └── permission.go
+│   │   │   └── webhook
 │   │   │       ├── internal
-│   │   │       │   ├── entity.go
-│   │   │       │   ├── repository_test.go
-│   │   │       │   └── repository.go
-│   │   │       └── linetoken.go
+│   │   │       │   └── entity.go
+│   │   │       ├── webhook_test.go
+│   │   │       └── webhook.go
 │   │   ├── callback
 │   │   │   ├── discord_callback
+│   │   │   |   ├── callback_test.go
 │   │   │   │   └── callback.go
 │   │   │   └── line_callback
+│   │   │       ├── callback_test.go
 │   │   │       └── callback.go
 │   │   ├── login
 │   │   │   ├── discord_login
+│   │   │   |   ├── discord_login_test.go
 │   │   │   │   └── discord_login.go
 │   │   │   └── line_login
-│   │   │       ├── internal
-│   │   │       │   ├── entity.go
-│   │   │       │   ├── repository_test.go
-│   │   │       │   └── repository.go
+│   │   │       ├── line_login_test.go
 │   │   │       └── line_login.go
 │   │   ├── logout
 │   │   │   ├── discord_logout
+│   │   │   |   ├── discord_logout_test.go
 │   │   │   │   └── discord_logout.go
 │   │   │   └── line_logout
+│   │   │       ├── line_logout_test.go
 │   │   │       └── line_logout.go
 │   │   └── views
 │   │       ├── group
-│   │       │   ├── internal
-│   │       │   │   ├── entity.go
-│   │       │   │   ├── repository_test.go
-│   │       │   │   └── repository.go
+│   │       │   ├── group_test.go
 │   │       │   └── group.go
 │   │       ├── guildid
 │   │       │   ├── line_post_discord_chennel
 │   │       │   │   ├── internal
-│   │       │   │   │   ├── entity.go
-│   │       │   │   │   ├── repository_test.go
-│   │       │   │   │   └── repository.go
+│   │       │   │   │   └── component.go
+│   │       │   │   ├── line_post_discord_channel_test.go
 │   │       │   │   └── line_post_discord_chennel.go
-│   │       │   ├── line_token
+│   │       │   ├── linetoken
 │   │       │   │   ├── internal
-│   │       │   │   │   ├── entity.go
-│   │       │   │   │   ├── repository_test.go
-│   │       │   │   │   └── repository.go
+│   │       │   │   │   └── component.go
+│   │       │   │   ├── linetoken_test.go
 │   │       │   │   └── linetoken.go
+│   │       │   ├── permission
+│   │       │   │   ├── internal
+│   │       │   │   │   └── component.go
+│   │       │   │   ├── permission_test.go
+│   │       │   │   └── permission.go
+│   │       │   ├── vc_signal
+│   │       │   │   ├── internal
+│   │       │   │   │   └── component.go
+│   │       │   │   ├── vc_signal_test.go
+│   │       │   │   └── vc_signal.go
+│   │       │   ├── webhook
+│   │       │   │   ├── internal
+│   │       │   │   │   └── component.go
+│   │       │   │   ├── webhook_test.go
+│   │       │   │   └── webhook.go
+│   │       │   ├── guildid_test.go
 │   │       │   └── guildid.go
 │   │       ├── guilds
+│   │       │   ├── guilds_test.go
 │   │       │   └── guilds.go
+│   │       ├── index_test.go
 │   │       └── index.go
 │   ├── middleware
-│   │   └── middleware.go
+│   │   ├── discord_oauth_check_test.go
+│   │   ├── discord_oauth_check.go
+│   │   ├── line_oauth_check_test.go
+│   │   ├── line_oauth_check.go
+│   │   └── log.go
 │   ├── service
-│   │   ├── discord_oauth2.go
 │   │   └── index.go
 │   ├── shared
-│   │   ├── permission
-│   │   │   ├── internal
-│   │   │   │   ├── entity.go
-│   │   │   │   ├── repository_test.go
-│   │   │   │   └── repository.go
-│   │   │   ├── check_discord_permission.go
-│   │   │   └── check_line_permission.go
+│   │   ├── ctxvalue
+│   │   │   ├── ctxvalue.go
+│   │   │   ├── discordpermissiondata.go
+│   │   │   ├── discorduser.go
+│   │   │   ├── lineprofile.go
+│   │   │   └── lineuser.go
+│   │   ├── model
+│   │   │   └── entity.go
 │   │   └── session
-│   │       ├── getoauth
-│   │       │   ├── get_discord_oauth.go
-│   │       │   └── get_line_oauth.go
-│   │       └── model
-│   │           └── entity.go
+│   │       ├── discord_oauth_token.go
+│   │       ├── discord_user.go
+│   │       ├── discordstate.go
+│   │       ├── guild_id.go
+│   │       ├── line_oauth_token.go
+│   │       ├── line_user.go
+│   │       ├── linenonce.go
+│   │       ├── linestate.go
+│   │       └── session.go
 │   ├── templates
 │   │   ├── static
 │   │   │   ├── img
-│   │   │   │   └── logo.png
+│   │   │   │   ├── discord-icon.png
+│   │   │   │   ├── line-icon.png
+│   │   │   │   ├── ohime.png
+│   │   │   │   └── uchuemon.png
 │   │   │   └── js
 │   │   │       ├── group.js
+│   │   │       ├── group.test.js
 │   │   │       ├── line_post_discord_chennel.js
+│   │   │       ├── line_post_discord_chennel.test.js
 │   │   │       ├── linetoken.js
-│   │   │       └── popover.js
+│   │   │       ├── linetoken.test.js
+│   │   │       ├── permission.js
+│   │   │       ├── permission.test.js
+│   │   │       ├── popover.js
+│   │   │       ├── vc_signal.js
+│   │   │       ├── vc_signal.test.js
+│   │   │       ├── webhook.js
+│   │   │       └── webhook.test.js
 │   │   ├── views
 │   │   │   ├── group
 │   │   │   │   └── group.html
 │   │   │   ├── guildid
 │   │   │   │   ├── line_post_discord_chennel.html
-│   │   │   │   └── linetoken.html
+│   │   │   │   ├── linetoken.html
+│   │   │   │   ├── permission.html
+│   │   │   │   ├── vc_signal.html
+│   │   │   │   └── webhook.html
 │   │   │   ├── guilds
 │   │   │   │   └── guilds.html
 |   │   │   ├── login

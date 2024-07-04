@@ -714,3 +714,11 @@ LINEBotの復号化に使用するIVを保存するテーブル
 |line_client_secret_iv|BYTEA|LINEのクライアントシークレットのIV|
 
 </details>
+
+# jest
+formからjsonに変換する際にjsを使用しているため、jestを使用してテストを行っています。
+
+```bash
+npm install
+npm run test
+```

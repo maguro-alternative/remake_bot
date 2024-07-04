@@ -183,6 +183,11 @@ func onVoiceStateUpdateFunc(
 					return nil, err
 				}
 				sendMessages = append(sendMessages, sendMessage)
+				sendMessage, err = s.ChannelMessageSendEmbed(afterVcSignalChannel.SendChannelID, embed)
+				if err != nil {
+					return sendMessages, err
+				}
+				sendMessages = append(sendMessages, sendMessage)
 				sendText.Reset()
 			}
 		}

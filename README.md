@@ -16,7 +16,7 @@ DISCORD_CLIENT_ID=your_discord_client_id
 DISCORD_CLIENT_SECRET=your_discord_client_secret
 DISCORD_SCOPE=identify%20guilds.join%20guilds%20guilds.members.read%20applications.builds.read%20connections
 
-# DB_は現時点のコードでは使用されていません
+# DB_は現時点のコードでは使用されていません(テストコードでのみ運用)
 DB_NAME=your_db_name
 DB_HOST=your_db_host
 DB_PASSWORD=your_db_password
@@ -33,6 +33,8 @@ SERVER_URL=your_server_url
 
 # gorrila/sessionsのためのキー
 SESSION_SECRET=your_session_secret
+
+# YouTubeのAPIキー
 YOUTUBE_API_KEY=your_youtube_api_key
 YOUTUBE_ACCESS_TOKEN=your_youtube_access_token
 YOUTUBE_CLIENT_ID=your_youtube_client_id

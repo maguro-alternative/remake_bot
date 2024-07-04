@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/lib/pq"
+	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
-	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 
 	"github.com/maguro-alternative/remake_bot/bot/ffmpeg"
 
@@ -31,16 +31,16 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 	})
 
 	lineBot := &repository.LineBotNotClient{
-		LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
-		LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
-		LineBotSecret:    pq.ByteaArray{[]byte("lineBotSecretStr")},
-		LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
+		LineNotifyToken: pq.ByteaArray{[]byte("lineNotifyStr")},
+		LineBotToken:    pq.ByteaArray{[]byte("lineBotStr")},
+		LineBotSecret:   pq.ByteaArray{[]byte("lineBotSecretStr")},
+		LineGroupID:     pq.ByteaArray{[]byte("lineGroupStr")},
 	}
 	lineBotIv := repository.LineBotIvNotClient{
-		LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
-		LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
-		LineBotSecretIv:    pq.ByteaArray{[]byte("decodeBotSecret")},
-		LineGroupIDIv:      pq.ByteaArray{[]byte("decodeGroupID")},
+		LineNotifyTokenIv: pq.ByteaArray{[]byte("decodeNotifyToken")},
+		LineBotTokenIv:    pq.ByteaArray{[]byte("decodeBotToken")},
+		LineBotSecretIv:   pq.ByteaArray{[]byte("decodeBotSecret")},
+		LineGroupIDIv:     pq.ByteaArray{[]byte("decodeGroupID")},
 	}
 
 	t.Run("正常系", func(t *testing.T) {

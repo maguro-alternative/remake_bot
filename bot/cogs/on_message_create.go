@@ -17,8 +17,8 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/line"
 
 	"github.com/maguro-alternative/remake_bot/bot/cogs/internal"
-	"github.com/maguro-alternative/remake_bot/bot/ffmpeg"
 	"github.com/maguro-alternative/remake_bot/bot/config"
+	"github.com/maguro-alternative/remake_bot/bot/ffmpeg"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -141,8 +141,6 @@ func onMessageCreateFunc(
 	lineBotDecrypt.LineNotifyToken = string(lineNotifyTokenByte)
 	lineBotDecrypt.LineBotToken = string(lineBotTokenByte)
 	lineBotDecrypt.LineGroupID = string(lineGroupIDByte)
-	lineBotDecrypt.DefaultChannelID = lineBotApi.DefaultChannelID
-	lineBotDecrypt.DebugMode = lineBotApi.DebugMode
 
 	lineRequ := line.NewLineRequest(
 		*client,

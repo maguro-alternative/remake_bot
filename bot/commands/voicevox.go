@@ -2,8 +2,8 @@ package commands
 
 import (
 	"fmt"
-	"net/http"
 	"io"
+	"net/http"
 	"os"
 	"time"
 

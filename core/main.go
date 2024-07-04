@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	_ "embed"
+	"log/slog"
 	"net"
 	"net/http"
-	"log/slog"
 	"os"
 	"os/signal"
 	"time"
@@ -13,8 +13,8 @@ import (
 	"github.com/maguro-alternative/remake_bot/bot"
 	"github.com/maguro-alternative/remake_bot/core/config"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
-	"github.com/maguro-alternative/remake_bot/web"
 	"github.com/maguro-alternative/remake_bot/tasks"
+	"github.com/maguro-alternative/remake_bot/web"
 
 	"github.com/bwmarrin/discordgo"
 )

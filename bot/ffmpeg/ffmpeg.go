@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type Ffmpeg struct{
+type Ffmpeg struct {
 	ctx context.Context
 }
 

@@ -20,7 +20,7 @@ func Test_PingCommandRegister(t *testing.T) {
 			return appCmd, nil
 		},
 	}
-	t.Run("ping登録成功", func(t *testing.T){
+	t.Run("ping登録成功", func(t *testing.T) {
 		state := discordgo.NewState()
 		state.User = &discordgo.User{
 			ID: "1234567890",
@@ -45,7 +45,7 @@ func Test_PingCommandRemove(t *testing.T) {
 			return appCmd, nil
 		},
 	}
-	t.Run("ping削除成功", func(t *testing.T){
+	t.Run("ping削除成功", func(t *testing.T) {
 		state := discordgo.NewState()
 		state.User = &discordgo.User{
 			ID: "1234567890",

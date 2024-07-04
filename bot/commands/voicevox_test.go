@@ -1,6 +1,5 @@
 package commands
 
-
 import (
 	"net/http"
 	"testing"
@@ -17,7 +16,7 @@ func Test_VoiceVoxCommand(t *testing.T) {
 	session := mock.SessionMock{}
 	state := discordgo.NewState()
 	client := &http.Client{}
-	t.Run("voicevox成功", func(t *testing.T){
+	t.Run("voicevox成功", func(t *testing.T) {
 		err := VoiceVoxCommand(repo, client).Executor(&session, state, nil, &discordgo.InteractionCreate{
 			Interaction: &discordgo.Interaction{
 				Data: discordgo.ApplicationCommandInteractionData{
@@ -28,4 +27,3 @@ func Test_VoiceVoxCommand(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
-

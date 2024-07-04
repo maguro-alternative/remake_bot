@@ -955,21 +955,21 @@ func TestVcSignal(t *testing.T) {
 		}
 		discordState.Guilds[0].Presences = []*discordgo.Presence{
 			{
-				User:&discordgo.User{
-					ID:testUser.ID,
+				User: &discordgo.User{
+					ID:       testUser.ID,
 					Username: testUser.Username,
-					Avatar: testUser.Avatar,
-					Bot: false,
+					Avatar:   testUser.Avatar,
+					Bot:      false,
 				},
 				Activities: []*discordgo.Activity{
 					{
-						Name:"シノビマスター 閃乱カグラ NEW LINK",
-						Type:discordgo.ActivityTypeStreaming,
-						URL:"https://dmg.hpgames.jp/shinomas/index.html",
+						Name:          "シノビマスター 閃乱カグラ NEW LINK",
+						Type:          discordgo.ActivityTypeStreaming,
+						URL:           "https://dmg.hpgames.jp/shinomas/index.html",
 						ApplicationID: "123456789012345678",
 						Assets: discordgo.Assets{
 							LargeImageID: "shinomas",
-							LargeText: "シノビマスター 閃乱カグラ NEW LINK",
+							LargeText:    "シノビマスター 閃乱カグラ NEW LINK",
 						},
 					},
 				},
@@ -1018,7 +1018,7 @@ func TestVcSignal(t *testing.T) {
 				VoiceState: &discordgo.VoiceState{
 					GuildID:   afterGuildId,
 					ChannelID: afterChannelId,
-					UserID: testUser.ID,
+					UserID:    testUser.ID,
 					Member: &discordgo.Member{
 						User: testUser,
 					},
@@ -1030,7 +1030,7 @@ func TestVcSignal(t *testing.T) {
 				BeforeUpdate: &discordgo.VoiceState{
 					GuildID:   afterGuildId,
 					ChannelID: afterChannelId,
-					UserID: testUser.ID,
+					UserID:    testUser.ID,
 					Member: &discordgo.Member{
 						User: testUser,
 					},
@@ -1068,16 +1068,16 @@ func TestVcSignal(t *testing.T) {
 		}
 		discordState.Guilds[0].Presences = []*discordgo.Presence{
 			{
-				User:&discordgo.User{
-					ID:testUser.ID,
+				User: &discordgo.User{
+					ID:       testUser.ID,
 					Username: testUser.Username,
-					Avatar: testUser.Avatar,
-					Bot: false,
+					Avatar:   testUser.Avatar,
+					Bot:      false,
 				},
 				Activities: []*discordgo.Activity{
 					{
-						Name:"Devil May Cry 5 Special Edition",
-						Type:discordgo.ActivityTypeStreaming,
+						Name:          "Devil May Cry 5 Special Edition",
+						Type:          discordgo.ActivityTypeStreaming,
 						ApplicationID: "123456789012345678",
 					},
 				},
@@ -1126,7 +1126,7 @@ func TestVcSignal(t *testing.T) {
 				VoiceState: &discordgo.VoiceState{
 					GuildID:   afterGuildId,
 					ChannelID: afterChannelId,
-					UserID: testUser.ID,
+					UserID:    testUser.ID,
 					Member: &discordgo.Member{
 						User: testUser,
 					},
@@ -1138,7 +1138,7 @@ func TestVcSignal(t *testing.T) {
 				BeforeUpdate: &discordgo.VoiceState{
 					GuildID:   afterGuildId,
 					ChannelID: afterChannelId,
-					UserID: testUser.ID,
+					UserID:    testUser.ID,
 					Member: &discordgo.Member{
 						User: testUser,
 					},
@@ -1216,7 +1216,7 @@ func TestVcSignal(t *testing.T) {
 				VoiceState: &discordgo.VoiceState{
 					GuildID:   afterGuildId,
 					ChannelID: afterChannelId,
-					UserID: testUser.ID,
+					UserID:    testUser.ID,
 					Member: &discordgo.Member{
 						User: testUser,
 					},
@@ -1228,7 +1228,7 @@ func TestVcSignal(t *testing.T) {
 				BeforeUpdate: &discordgo.VoiceState{
 					GuildID:   afterGuildId,
 					ChannelID: afterChannelId,
-					UserID: testUser.ID,
+					UserID:    testUser.ID,
 					Member: &discordgo.Member{
 						User: testUser,
 					},
@@ -1254,7 +1254,7 @@ func TestVcSignal(t *testing.T) {
 				VoiceState: &discordgo.VoiceState{
 					GuildID:   afterGuildId,
 					ChannelID: afterChannelId,
-					UserID: testUser.ID,
+					UserID:    testUser.ID,
 					Member: &discordgo.Member{
 						User: testUser,
 					},
@@ -1266,7 +1266,7 @@ func TestVcSignal(t *testing.T) {
 				BeforeUpdate: &discordgo.VoiceState{
 					GuildID:   afterGuildId,
 					ChannelID: afterChannelId,
-					UserID: testUser.ID,
+					UserID:    testUser.ID,
 					Member: &discordgo.Member{
 						User: testUser,
 					},

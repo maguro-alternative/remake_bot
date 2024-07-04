@@ -78,22 +78,6 @@ go run core/main.go
 
 ![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/4fef03cd-4a18-4691-a388-c33cf333221c)
 
-
-# 進捗
-
-- [x] LINE→Discordのメッセージの送信
-- [x] Discord→LINEのメッセージの送信
-- [x] LINE→Discordの画像の送信
-- [x] Discord→LINEの画像の送信
-- [x] LINE→Discordの動画の送信
-- [x] Discord→LINEの動画の送信
-- [x] LINE→Discordの音声の送信
-- [x] Discord→LINEの音声の送信
-- [x] LINE→Discordのスタンプの送信
-- [x] Discord→LINEのスタンプの送信
-- [] LINE→Discordのファイルの送信
-- [] Discord→LINEのファイルの送信
-
 # ディレクトリ構造
 
 <details>

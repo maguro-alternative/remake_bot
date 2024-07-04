@@ -189,6 +189,12 @@ APIのエンドポイントを管理するディレクトリです。
 
 ## middleware
 ミドルウェアを管理するディレクトリです。
+- log.go
+    ログを出力するミドルウェアです。
+- discord_oauth_check.go
+    DiscordのOAuth認証情報を確認ミドルウェアです。
+- line_oauth_check.go
+    LINEのOAuth認証情報を確認ミドルウェアです。
 
 ## service
 プロパティを管理するディレクトリです。

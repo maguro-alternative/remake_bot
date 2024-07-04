@@ -198,6 +198,11 @@ go run core/main.go
 │       ├── create_client_secret.go
 │       ├── create_oauth2.go
 │       └── youtube.go
+├── tasks
+│   ├── internal
+│   │   ├── youtube_test.go
+│   │   └── youtube.go
+│   └── main.go
 ├── testutil
 │   ├── files
 │   │  └── video.xml

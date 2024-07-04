@@ -5,8 +5,7 @@
 │   ├── internal
 │   │   ├── youtube_test.go
 │   │   └── youtube.go
-│   ├── main.go
-│   └── README.md
+│   └── main.go
 ```
 
 ## internal

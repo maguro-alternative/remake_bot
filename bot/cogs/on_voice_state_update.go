@@ -157,36 +157,6 @@ func onVoiceStateUpdateFunc(
 		}
 	}
 	//chengeVcChannelFlag := (vs.BeforeUpdate != nil) && (vs.ChannelID != "") && (vs.BeforeUpdate.ChannelID != vs.ChannelID)
-	if vs.BeforeUpdate == nil || vs.ChannelID != "" && (!vs.SelfVideo == !vs.SelfStream) && (!vs.BeforeUpdate.SelfVideo == !vs.BeforeUpdate.SelfStream) {
-		vcChannel, err := state.Channel(vs.ChannelID)
-		if err != nil {
-			return nil, err
-		}
-		membersCount := vcMembersCount(state, vs.GuildID, vs.ChannelID)
-		sendText.WriteString(afterMentionText.String())
-		sendText.WriteString("現在" + strconv.Itoa(membersCount) + "人 <@" + vs.Member.User.ID + "> が " + vcChannel.Name + "に入室しました。")
-		sendMessage, err := s.ChannelMessageSend(afterVcSignalChannel.SendChannelID, sendText.String())
-		if err != nil {
-			return nil, err
-		}
-		sendMessages = append(sendMessages, sendMessage)
-		sendText.Reset()
-		if membersCount == 1 {
-			embed = &discordgo.MessageEmbed{
-				Title:       "通話開始",
-				Description: "<#" + vs.ChannelID + ">",
-				Author: &discordgo.MessageEmbedAuthor{
-					Name:    vs.Member.User.Username,
-					IconURL: vs.Member.AvatarURL("64"),
-				},
-			}
-			sendMessage, err := s.ChannelMessageSendEmbed(afterVcSignalChannel.SendChannelID, embed)
-			if err != nil {
-				return sendMessages, err
-			}
-			sendMessages = append(sendMessages, sendMessage)
-		}
-	}
 	if vs.BeforeUpdate != nil && (!vs.BeforeUpdate.SelfVideo == !vs.BeforeUpdate.SelfStream) && (!vs.SelfVideo == !vs.SelfStream) {
 		vcChannel, err := state.Channel(vs.BeforeUpdate.ChannelID)
 		if err != nil {
@@ -215,6 +185,36 @@ func onVoiceStateUpdateFunc(
 				sendMessages = append(sendMessages, sendMessage)
 				sendText.Reset()
 			}
+		}
+	}
+	if vs.BeforeUpdate == nil || vs.ChannelID != "" && (!vs.SelfVideo == !vs.SelfStream) && (!vs.BeforeUpdate.SelfVideo == !vs.BeforeUpdate.SelfStream) {
+		vcChannel, err := state.Channel(vs.ChannelID)
+		if err != nil {
+			return nil, err
+		}
+		membersCount := vcMembersCount(state, vs.GuildID, vs.ChannelID)
+		sendText.WriteString(afterMentionText.String())
+		sendText.WriteString("現在" + strconv.Itoa(membersCount) + "人 <@" + vs.Member.User.ID + "> が " + vcChannel.Name + "に入室しました。")
+		sendMessage, err := s.ChannelMessageSend(afterVcSignalChannel.SendChannelID, sendText.String())
+		if err != nil {
+			return nil, err
+		}
+		sendMessages = append(sendMessages, sendMessage)
+		sendText.Reset()
+		if membersCount == 1 {
+			embed = &discordgo.MessageEmbed{
+				Title:       "通話開始",
+				Description: "<#" + vs.ChannelID + ">",
+				Author: &discordgo.MessageEmbedAuthor{
+					Name:    vs.Member.User.Username,
+					IconURL: vs.Member.AvatarURL("64"),
+				},
+			}
+			sendMessage, err := s.ChannelMessageSendEmbed(afterVcSignalChannel.SendChannelID, embed)
+			if err != nil {
+				return sendMessages, err
+			}
+			sendMessages = append(sendMessages, sendMessage)
 		}
 	}
 	if (vs.BeforeUpdate != nil && !vs.BeforeUpdate.SelfVideo) && vs.SelfVideo {

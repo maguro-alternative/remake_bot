@@ -19,6 +19,7 @@ https://github.com/maguro-alternative/discordfast
 </details>
 
 ## LINE連携
+利用の際は下記の画像にもあるように、WebUI上のフォームにトークンなどを入力する必要があります。
 <details>
     <summary>画像(折り畳み)</summary>
 
@@ -26,6 +27,24 @@ https://github.com/maguro-alternative/discordfast
 ![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/814b64e4-4007-42dd-aad8-0134e80801a2)
 - 動画、スタンプ  
 ![image](https://github.com/maguro-alternative/discordfast/raw/master/img/134639.png)
+
+</details>
+
+## VoiceVox読み上げ
+<details>
+    <summary>画像(折り畳み)</summary>
+
+- テキスト読み上げ  
+![image](https://github.com/maguro-alternative/discordfast/raw/master/img/zundacommand.png)
+
+</details>
+
+## Webhook
+<details>
+    <summary>画像(折り畳み)</summary>
+
+- YouTubeの新着動画  
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/de60175c-31b8-4c79-ad8c-952a2bd62191)
 
 </details>
 
@@ -104,6 +123,7 @@ go run core/main.go
 
 ![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/57ae58ec-92fc-4e63-aaec-4f7a0ec4077d)
 
+LINE連携を使用する場合は以下のフォームにトークンを入力する必要があります。
 ![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/4fef03cd-4a18-4691-a388-c33cf333221c)
 
 # ディレクトリ構造

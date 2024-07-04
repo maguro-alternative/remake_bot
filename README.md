@@ -19,6 +19,16 @@ https://github.com/maguro-alternative/discordfast
 </details>
 
 ## LINE連携
+<details>
+    <summary>画像(折り畳み)</summary>
+
+- メッセージ  
+![image](https://github.com/maguro-alternative/remake_bot/assets/71870614/814b64e4-4007-42dd-aad8-0134e80801a2)
+- 動画、スタンプ  
+![image](https://github.com/maguro-alternative/discordfast/raw/master/img/134639.png)
+
+</details>
+
 
 # 使い方
 以下の環境変数を設定してください。  

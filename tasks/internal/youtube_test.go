@@ -84,8 +84,8 @@ func TestYoutubeRssReader(t *testing.T) {
 		repo.GetWebhookUserMentionWithWebhookSerialIDFunc = func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookUserMention, error) {
 			return []*repository.WebhookUserMention{
 				{
-					WebhookSerialID:  webhookSerialId,
-					UserID: "3333",
+					WebhookSerialID: webhookSerialId,
+					UserID:          "3333",
 				},
 			}, nil
 		}
@@ -103,7 +103,7 @@ func TestYoutubeRssReader(t *testing.T) {
 			return []*repository.WebhookRoleMention{
 				{
 					WebhookSerialID: webhookSerialId,
-					RoleID: "4444",
+					RoleID:          "4444",
 				},
 			}, nil
 		}

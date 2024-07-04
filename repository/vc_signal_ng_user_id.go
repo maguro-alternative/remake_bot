@@ -99,4 +99,3 @@ func (r *Repository) DeleteVcSignalNgUsersNotInProvidedList(ctx context.Context,
 	_, err = r.db.ExecContext(ctx, query, args...)
 	return err
 }
-

@@ -19,7 +19,7 @@ func YoutubeRssReader(
 	webhook repository.Webhook,
 ) ([]*discordgo.Message, error) {
 	feed, err := gofeed.NewParser().ParseURL(fmt.Sprintf("https://www.youtube.com/feeds/videos.xml?channel_id=%s", webhook.SubscriptionID))
-    if err != nil {
+	if err != nil {
 		return nil, err
 	}
 	return run(ctx, discordSession, repo, webhook, feed)
@@ -36,9 +36,9 @@ func run(
 	var mentionsMessage string
 	var lastPostedAt time.Time
 	for _, item := range feed.Items {
-        if item == nil {
-            break
-        }
+		if item == nil {
+			break
+		}
 		if webhook.LastPostedAt.Before(*item.PublishedParsed) {
 			w, err := discordSession.Webhook(webhook.WebhookID)
 			if err != nil {

@@ -93,7 +93,6 @@ func (r *Repository) GetLineBotIvNotClientByGuildID(ctx context.Context, guildID
 	return lineBotIv, err
 }
 
-
 func (r *Repository) UpdateLineBotIv(ctx context.Context, lineBotIv *LineBotIv) error {
 	var setNameQuery string
 	var setQueryArray []string

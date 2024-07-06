@@ -18,21 +18,7 @@ RUN apt-get install -y ffmpeg && go mod download && \
     go build -o ./main ./core/main.go
 
 # ポート5000を外部に公開
-EXPOSE 5000
+#EXPOSE 5000
 
 # アプリケーションを実行
-CMD ["./main"]
-
-# Runner用の新しいステージを開始
-#FROM debian:latest AS runner
-
-#RUN apt-get update && apt-get install -y locales && \
-#    localedef -f UTF-8 -i ja_JP ja_JP.UTF-8
-#ENV LANG ja_JP.UTF-8
-#ENV LANGUAGE ja_JP:ja
-#ENV LC_ALL ja_JP.UTF-8
-#ENV TZ JST-9
-#ENV TERM xterm
-
-# ビルダーステージからバイナリをコピー
-#COPY --from=builder /app/main /app/main
+#CMD ["./main"]

@@ -128,7 +128,12 @@ func RegisterCommands(discordSession *discordgo.Session, db db.Driver, client *h
 	var commandHandlers []*handler
 	// 所属しているサーバすべてにスラッシュコマンドを追加する
 	// NewCommandHandlerの第二引数を空にすることで、グローバルでの使用を許可する
-	commandHandler := newCommandHandler(discordSession, discordSession.State, discordSession.VoiceConnections, "")
+	commandHandler := newCommandHandler(
+		discordSession,
+		discordSession.State,
+		discordSession.VoiceConnections,
+		"",
+	)
 	repo := repository.NewRepository(db)
 	// 追加したいコマンドをここに追加
 	err := commandHandler.commandRegister(PingCommand(repo))

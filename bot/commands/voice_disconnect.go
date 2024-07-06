@@ -38,7 +38,7 @@ func (h *commandHandler) handleVoiceDisconnect(
 		return nil
 	}
 
-	_, err := state.VoiceState(i.GuildID, i.User.ID)
+	_, err := state.VoiceState(i.GuildID, i.Interaction.AppID)
 	if err != nil || voice[i.GuildID] == nil {
 		err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,

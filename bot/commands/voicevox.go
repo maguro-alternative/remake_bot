@@ -135,7 +135,6 @@ func VoiceVoxCommand(repo repository.RepositoryFunc, client *http.Client) *comma
 				Type:         discordgo.ApplicationCommandOptionString,
 				Name:         "speaker",
 				Description:  "しゃべる人",
-				Required:     true,
 				Autocomplete: true,
 			},
 			{

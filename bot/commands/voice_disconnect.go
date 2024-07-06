@@ -10,7 +10,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func VoiceDisconnectComannd(repo repository.RepositoryFunc, client *http.Client) *command {
+func VoiceDisconnectCommand(repo repository.RepositoryFunc, client *http.Client) *command {
 	exec := newCogHandler(repo, client)
 	return &command{
 		Name:        "voice_disconnect",

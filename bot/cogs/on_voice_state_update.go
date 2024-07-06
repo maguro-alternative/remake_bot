@@ -95,12 +95,10 @@ func onVoiceStateUpdateFunc(
 		return nil, err
 	}
 	for _, afterMentionRoleID := range afterMentionRoleIDs {
-		for _, roleID := range vs.Member.Roles {
-			if afterMentionRoleID == roleID {
-				afterMentionText.WriteString("<@&")
-				afterMentionText.WriteString(roleID)
-				afterMentionText.WriteString("> ")
-			}
+		if afterMentionRoleID == roleID {
+			afterMentionText.WriteString("<@&")
+			afterMentionText.WriteString(roleID)
+			afterMentionText.WriteString("> ")
 		}
 	}
 	if vs.BeforeUpdate != nil && vs.ChannelID != vs.BeforeUpdate.ChannelID {

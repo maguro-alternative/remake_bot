@@ -141,6 +141,11 @@ func RegisterCommands(discordSession *discordgo.Session, db db.Driver, client *h
 		fmt.Printf("error while registering command: %v\n", err)
 		return nil, err
 	}
+	err = commandHandler.commandRegister(VoiceDisconnectCommand(nil, nil))
+	if err != nil {
+		fmt.Printf("error while registering command: %v\n", err)
+		return nil, err
+	}
 	commandHandlers = append(commandHandlers, commandHandler)
 	cleanupCommandHandlers := func() {
 		for _, handler := range commandHandlers {

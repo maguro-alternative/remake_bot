@@ -15,6 +15,7 @@ func VoiceDisconnectCommand(repo repository.RepositoryFunc, client *http.Client)
 	return &command{
 		Name:        "voice_disconnect",
 		Description: "ボイスチャンネルから切断します",
+		Options:     []*discordgo.ApplicationCommandOption{},
 		Executor:    exec.handleVoiceDisconnect,
 	}
 }

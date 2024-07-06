@@ -20,10 +20,8 @@ func Test_VoiceDisconnectCommand(t *testing.T) {
 	t.Run("voice_disconnect成功", func(t *testing.T) {
 		err := VoiceDisconnectCommand(nil, nil).Executor(&session, state, nil, &discordgo.InteractionCreate{
 			Interaction: &discordgo.Interaction{
+				AppID:   "1",
 				GuildID: "1",
-				User: &discordgo.User{
-					ID: "1",
-				},
 				Data: discordgo.ApplicationCommandInteractionData{
 					Name: "voice_disconnect",
 				},

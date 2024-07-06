@@ -161,7 +161,12 @@ func VoiceVoxCommand(repo repository.RepositoryFunc, client *http.Client) *comma
 	}
 }
 
-func (h *commandHandler) handleVoiceVox(s mock.Session, state *discordgo.State, voice map[string]*discordgo.VoiceConnection, i *discordgo.InteractionCreate) error {
+func (h *commandHandler) handleVoiceVox(
+	s mock.Session,
+	state *discordgo.State,
+	voice map[string]*discordgo.VoiceConnection,
+	i *discordgo.InteractionCreate,
+) error {
 	/*
 		pingコマンドの実行
 

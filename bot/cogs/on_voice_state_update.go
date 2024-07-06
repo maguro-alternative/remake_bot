@@ -95,11 +95,9 @@ func onVoiceStateUpdateFunc(
 		return nil, err
 	}
 	for _, afterMentionRoleID := range afterMentionRoleIDs {
-		if afterMentionRoleID == roleID {
-			afterMentionText.WriteString("<@&")
-			afterMentionText.WriteString(roleID)
-			afterMentionText.WriteString("> ")
-		}
+		afterMentionText.WriteString("<@&")
+		afterMentionText.WriteString(afterMentionRoleID)
+		afterMentionText.WriteString("> ")
 	}
 	if vs.BeforeUpdate != nil && vs.ChannelID != vs.BeforeUpdate.ChannelID {
 		beforeVcSignalChannel, err = repo.GetVcSignalChannelAllColumnByVcChannelID(ctx, vs.BeforeUpdate.ChannelID)

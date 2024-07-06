@@ -84,11 +84,9 @@ func onVoiceStateUpdateFunc(
 		return nil, err
 	}
 	for _, afterMentionUserID := range afterMentionUserIDs {
-		if afterMentionUserID == vs.UserID {
-			afterMentionText.WriteString("<@")
-			afterMentionText.WriteString(vs.UserID)
-			afterMentionText.WriteString("> ")
-		}
+		afterMentionText.WriteString("<@")
+		afterMentionText.WriteString(afterMentionUserID)
+		afterMentionText.WriteString("> ")
 	}
 	afterMentionRoleIDs, err = repo.GetVcSignalMentionRoleIDsByVcChannelID(ctx, vcChannelID)
 	if err != nil {

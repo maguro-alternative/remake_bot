@@ -67,7 +67,7 @@ func CreateLinePostDiscordChannelForm(
 					<label for="ng` + channel.ID + `">LINEへ送信しない</label>
 					<input type="checkbox" id="ng` + channel.ID + `" name="ng` + channel.ID + `" ` + messageNgFlag + ` />
 					<br/>
-					<label for="botMessage` + channel.ID + `">Botのメッセージを送信しない</label>
+					<label for="botMessage` + channel.ID + `">Botのメッセージを送信する</label>
 					<input type="checkbox" id="botMessage` + channel.ID + `" name="botMessage` + channel.ID + `"` + botNgFlag + ` />
 					<br/>
 					<label for="ngTypes` + channel.ID + `[]">NGタイプ</label><br/>

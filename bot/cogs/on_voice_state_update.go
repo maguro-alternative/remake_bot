@@ -255,7 +255,7 @@ func onVoiceStateUpdateFunc(
 		if err != nil {
 			return nil, err
 		}
-		if presence == nil {
+		if presence == nil || len(presence.Activities) == 0 {
 			embed = &discordgo.MessageEmbed{
 				Title:       "画面共有",
 				Description: vs.Member.User.Username + "\n" + "<#" + vs.ChannelID + ">",

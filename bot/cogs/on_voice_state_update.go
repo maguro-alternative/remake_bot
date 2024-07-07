@@ -73,7 +73,7 @@ func onVoiceStateUpdateFunc(
 	if afterVcSignalChannel.SendChannelID == "" {
 		return nil, nil
 	}
-	if afterVcSignalChannel.JoinBot && vs.UserID == state.User.ID {
+	if !afterVcSignalChannel.JoinBot && vs.UserID == state.User.ID {
 		return nil, nil
 	}
 	if afterVcSignalChannel.EveryoneMention {

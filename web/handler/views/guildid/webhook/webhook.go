@@ -2,14 +2,11 @@ package webhook
 
 import (
 	"context"
-	//"fmt"
 	"html/template"
 	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
-
-	//"github.com/bwmarrin/discordgo"
 
 	"github.com/maguro-alternative/remake_bot/web/shared/ctxvalue"
 
@@ -40,7 +37,6 @@ func NewWebhookViewHandler(
 }
 
 func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
-	//var webhookSerialIDs []int64
 	var webhookFormBuilder strings.Builder
 	var mentionIds []string
 	guildId := r.PathValue("guildId")

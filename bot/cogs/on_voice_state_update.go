@@ -108,24 +108,18 @@ func onVoiceStateUpdateFunc(
 				return nil, err
 			}
 			for _, beforeMentionUserID := range beforeMentionUserIDs {
-				if beforeMentionUserID == vs.UserID {
-					beforeMentionText.WriteString("<@")
-					beforeMentionText.WriteString(vs.UserID)
-					beforeMentionText.WriteString("> ")
-				}
+				beforeMentionText.WriteString("<@")
+				beforeMentionText.WriteString(beforeMentionUserID)
+				beforeMentionText.WriteString("> ")
 			}
 			beforeMentionRoleIDs, err = repo.GetVcSignalMentionRoleIDsByVcChannelID(ctx, vs.BeforeUpdate.ChannelID)
 			if err != nil {
 				return nil, err
 			}
 			for _, beforeMentionRoleID := range beforeMentionRoleIDs {
-				for _, roleID := range vs.Member.Roles {
-					if beforeMentionRoleID == roleID {
-						beforeMentionText.WriteString("<@&")
-						beforeMentionText.WriteString(roleID)
-						beforeMentionText.WriteString("> ")
-					}
-				}
+				beforeMentionText.WriteString("<@&")
+				beforeMentionText.WriteString(beforeMentionRoleID)
+				beforeMentionText.WriteString("> ")
 			}
 
 			beforeNgUserIDs, err = repo.GetVcSignalNgUserIDsByVcChannelID(ctx, vs.BeforeUpdate.ChannelID)

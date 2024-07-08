@@ -71,6 +71,8 @@ func run(
 				lastPostedAt = *item.PublishedParsed
 			}
 			messages = append(messages, message)
+			userMentions = nil
+			roleMentions = nil
 		}
 	}
 	if !lastPostedAt.IsZero() {

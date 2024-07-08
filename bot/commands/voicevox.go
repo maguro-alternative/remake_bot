@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/maguro-alternative/remake_bot/pkg/sharedtime"
 	"github.com/maguro-alternative/remake_bot/bot/config"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
@@ -252,6 +253,8 @@ func (h *commandHandler) handleVoiceVox(
 		fmt.Printf("error responding to voicevox command: %v\n", err)
 		return err
 	}
+
+	sharedtime.SetSharedTime(i.GuildID, time.Now())
 
 	err = voice[i.GuildID].Speaking(true)
 	if err != nil {

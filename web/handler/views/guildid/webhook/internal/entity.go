@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	//"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/bwmarrin/discordgo"

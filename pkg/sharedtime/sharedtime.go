@@ -2,23 +2,23 @@
 package sharedtime
 
 import (
-    "sync"
-    "time"
+	"sync"
+	"time"
 )
 
 var (
-    sharedTimes map[string]time.Time
-    lock       sync.Mutex
+	sharedTimes map[string]time.Time = make(map[string]time.Time)
+	lock        sync.Mutex
 )
 
-func SetSharedTime(t map[string]time.Time) {
-    lock.Lock()
-    defer lock.Unlock()
-    sharedTimes = t
+func SetSharedTime(guildId string, t time.Time) {
+	lock.Lock()
+	defer lock.Unlock()
+	sharedTimes[guildId] = t
 }
 
 func GetSharedTime(guildId string) time.Time {
-    lock.Lock()
-    defer lock.Unlock()
-    return sharedTimes[guildId]
+	lock.Lock()
+	defer lock.Unlock()
+	return sharedTimes[guildId]
 }

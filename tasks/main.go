@@ -15,6 +15,7 @@ import (
 )
 
 func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) {
+	var messages []*discordgo.Message
 	// ここにタスクを書く
 	oneMinute := time.NewTicker(1 * time.Minute)
 	tenMinute := time.NewTicker(10 * time.Minute)
@@ -29,14 +30,21 @@ func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) {
 			for _, webhook := range webhooks {
 				switch webhook.SubscriptionType {
 				case "youtube":
-					_, err := internal.YoutubeRssReader(ctx, discord, repo, *webhook)
+					messages, err = internal.YoutubeRssReader(ctx, discord, repo, *webhook)
 					if err != nil {
 						slog.ErrorContext(ctx, "youtubeのwebhookの投稿に失敗しました。", "エラー", err.Error())
 					}
 				case "niconico":
 					// Todo: ニコニコ動画のRSSリーダーを実装する
 				}
+				if len(messages) > 0 {
+					webhooks, err = repo.GetAllColumnsWebhooks(ctx)
+					if err != nil {
+						slog.ErrorContext(ctx, "webhookの取得に失敗しました。", "エラー", err.Error())
+					}
+				}
 			}
+			messages = nil
 			for _, connect := range discord.VoiceConnections {
 				connectTime := sharedtime.GetSharedTime(connect.GuildID)
 				if time.Since(connectTime) > 10*time.Minute {

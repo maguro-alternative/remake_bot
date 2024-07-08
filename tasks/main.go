@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
+	"github.com/maguro-alternative/remake_bot/pkg/sharedtime"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/tasks/internal"
@@ -34,6 +35,15 @@ func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) {
 					}
 				case "niconico":
 					// Todo: ニコニコ動画のRSSリーダーを実装する
+				}
+			}
+			for _, connect := range discord.VoiceConnections {
+				connectTime := sharedtime.GetSharedTime(connect.GuildID)
+				if time.Since(connectTime) > 10*time.Minute {
+					err = connect.Disconnect()
+					if err != nil {
+						slog.ErrorContext(ctx, "ボイスチャンネルからの切断に失敗しました。", "エラー", err.Error())
+					}
 				}
 			}
 		case <-tenMinute.C:

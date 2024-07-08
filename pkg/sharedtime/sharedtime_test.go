@@ -1,35 +1,34 @@
 package sharedtime
 
 import (
-    "reflect"
     "testing"
     "time"
+
+    "github.com/stretchr/testify/assert"
 )
 
 func TestSetAndGetSharedTime(t *testing.T) {
-    // テスト用の時間データを準備
-    testTime := map[string]time.Time{
-        "guild1": time.Now(),
-    }
+    t.Run("SetSharedTimeで設定した値をGetSharedTimeで取得できる", func(t *testing.T) {
+        // SetSharedTimeで設定する値
+        wantTime := time.Now()
 
-    // SetSharedTimeを呼び出して、sharedTimesに値を設定
-    SetSharedTime(testTime)
+        // SetSharedTimeで値を設定
+        SetSharedTime("key", wantTime)
 
-    // GetSharedTimeを呼び出して、設定した値を取得
-    gotTime := GetSharedTime("guild1")
+        // GetSharedTimeで値を取得
+        gotTime := GetSharedTime("key")
 
-    // 設定した時間と取得した時間が等しいか検証
-    if !reflect.DeepEqual(testTime["guild1"], gotTime) {
-        t.Errorf("GetSharedTime() = %v, want %v", gotTime, testTime["guild1"])
-    }
+        // SetSharedTimeで設定した値とGetSharedTimeで取得した値が一致することを検証
+        assert.Equal(t, wantTime, gotTime)
+    })
 }
 
 func TestGetSharedTimeNonExistentKey(t *testing.T) {
-    // 存在しないキーでGetSharedTimeを呼び出す
-    gotTime := GetSharedTime("nonexistent")
+    t.Run("存在しないキーでGetSharedTimeを実行するとゼロ値が返る", func(t *testing.T) {
+        // GetSharedTimeで存在しないキーを指定
+        gotTime := GetSharedTime("non-existent-key")
 
-    // ゼロ値のtime.Timeが返されることを検証
-    if !gotTime.IsZero() {
-        t.Errorf("GetSharedTime() with nonexistent key should return zero time, got %v", gotTime)
-    }
+        // ゼロ値が返ることを検証
+        assert.Equal(t, time.Time{}, gotTime)
+    })
 }

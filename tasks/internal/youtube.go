@@ -73,6 +73,7 @@ func run(
 			messages = append(messages, message)
 			userMentions = nil
 			roleMentions = nil
+			mentionsMessage = ""
 		}
 	}
 	if !lastPostedAt.IsZero() {

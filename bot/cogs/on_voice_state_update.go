@@ -73,7 +73,7 @@ func onVoiceStateUpdateFunc(
 	if afterVcSignalChannel.SendChannelID == "" {
 		return nil, nil
 	}
-	if !afterVcSignalChannel.JoinBot && vs.UserID == state.User.ID {
+	if !afterVcSignalChannel.JoinBot && vs.Member.User.Bot {
 		return nil, nil
 	}
 	if afterVcSignalChannel.EveryoneMention {
@@ -186,8 +186,9 @@ func onVoiceStateUpdateFunc(
 			return nil, err
 		}
 		membersCount := vcMembersCount(state, vs.GuildID, vs.ChannelID)
+		sendText.WriteString("現在" + strconv.Itoa(membersCount) + "人 ")
 		sendText.WriteString(afterMentionText.String())
-		sendText.WriteString("現在" + strconv.Itoa(membersCount) + "人 <@" + vs.Member.User.ID + "> が " + vcChannel.Name + "に入室しました。")
+		sendText.WriteString("<@" + vs.Member.User.ID + "> が " + vcChannel.Name + "に入室しました。")
 		sendMessage, err := s.ChannelMessageSend(afterVcSignalChannel.SendChannelID, sendText.String())
 		if err != nil {
 			return nil, err

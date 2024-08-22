@@ -1244,6 +1244,89 @@ func TestVcSignal(t *testing.T) {
 		assert.Equal(t, messages[0].Content, "<@11> が画面共有を終了しました。")
 	})
 
+	t.Run("正常系(画面共有時退室&通話終了)", func(t *testing.T) {
+		discordState.Guilds[0].VoiceStates = []*discordgo.VoiceState{
+			{
+				GuildID:   afterGuildId,
+				ChannelID: afterChannelId,
+				Member: &discordgo.Member{
+					User: testUser,
+				},
+				SelfStream: true,
+				SelfVideo:  false,
+				SelfMute:   false,
+				SelfDeaf:   false,
+			},
+		}
+		messages, err := onVoiceStateUpdateFunc(
+			ctx,
+			&repository.RepositoryFuncMock{
+				GetVcSignalNgUserIDsByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
+				},
+				GetVcSignalNgRoleIDsByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
+				},
+				GetVcSignalChannelAllColumnByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) (*repository.VcSignalChannelAllColumn, error) {
+					return &repository.VcSignalChannelAllColumn{
+						VcChannelID:     vcChannelID,
+						GuildID:         afterGuildId,
+						SendSignal:      true,
+						SendChannelID:   afterSendChannelId,
+						JoinBot:         false,
+						EveryoneMention: false,
+					}, nil
+				},
+				GetVcSignalMentionUserIDsByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
+				},
+				GetVcSignalMentionRoleIDsByVcChannelIDFunc: func(ctx context.Context, vcChannelID string) ([]string, error) {
+					return []string{}, nil
+				},
+			},
+			&mock.SessionMock{
+				ChannelMessageSendFunc: func(channelID string, content string, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{
+						Content: content,
+					}, nil
+				},
+				ChannelMessageSendEmbedFunc: func(channelID string, embed *discordgo.MessageEmbed, options ...discordgo.RequestOption) (*discordgo.Message, error) {
+					return &discordgo.Message{
+						Embeds: []*discordgo.MessageEmbed{embed},
+					}, nil
+				},
+			},
+			discordState,
+			&discordgo.VoiceStateUpdate{
+				VoiceState: &discordgo.VoiceState{
+					GuildID:   "",
+					ChannelID: "",
+					UserID:    testUser.ID,
+					Member: &discordgo.Member{
+						User: testUser,
+					},
+					SelfStream: true,
+					SelfVideo:  false,
+				},
+				BeforeUpdate: &discordgo.VoiceState{
+					GuildID:   beforeGuildId,
+					ChannelID: beforeChannelId,
+					UserID:    testUser.ID,
+					Member: &discordgo.Member{
+						User: testUser,
+					},
+					SelfStream: true,
+					SelfVideo:  false,
+				},
+			},
+		)
+		assert.NoError(t, err)
+		assert.Len(t, messages, 3)
+		assert.Equal(t, messages[0].Content, "現在0人 <@11> が before_test_vcから退室しました。")
+		assert.Equal(t, messages[1].Content, "通話が終了しました。")
+		assert.Equal(t, messages[2].Embeds[0].Title, "通話終了")
+	})
+
 	t.Run("正常系(ミュートの場合何もしない)", func(t *testing.T) {
 		messages, err := onVoiceStateUpdateFunc(
 			ctx,

@@ -2,6 +2,7 @@ package cogs
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"strconv"
 	"strings"
@@ -144,8 +145,9 @@ func onVoiceStateUpdateFunc(
 			}
 		}
 	}
+	fmt.Println(vs.BeforeUpdate != nil && (!vs.BeforeUpdate.SelfVideo == !vs.SelfVideo) && (!vs.BeforeUpdate.SelfStream == !vs.SelfStream))
 	//chengeVcChannelFlag := (vs.BeforeUpdate != nil) && (vs.ChannelID != "") && (vs.BeforeUpdate.ChannelID != vs.ChannelID)
-	if vs.BeforeUpdate != nil && (!vs.BeforeUpdate.SelfVideo == !vs.BeforeUpdate.SelfStream) && (!vs.SelfVideo == !vs.SelfStream) {
+	if vs.BeforeUpdate != nil && (!vs.BeforeUpdate.SelfVideo == !vs.SelfVideo) && (!vs.BeforeUpdate.SelfStream == !vs.SelfStream) {
 		vcChannel, err := state.Channel(vs.BeforeUpdate.ChannelID)
 		if err != nil {
 			return nil, err

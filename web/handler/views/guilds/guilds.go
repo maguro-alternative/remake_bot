@@ -55,7 +55,7 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	var matchGuilds []discordgo.UserGuild
 	var client = *g.indexService.Client
-	botGuilds, err := g.indexService.DiscordSession.UserGuilds(100, "", "", discordgo.WithClient(&client))
+	botGuilds, err := g.indexService.DiscordSession.UserGuilds(100, "", "", true, discordgo.WithClient(&client))
 	if err != nil {
 		slog.ErrorContext(ctx, "Botサーバー取得に失敗しました。", "エラー: ", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

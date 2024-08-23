@@ -1,4 +1,4 @@
-FROM golang:1.22.0-bullseye AS builder
+FROM golang:1.23.0-bullseye AS builder
 
 RUN apt-get -y update && apt-get -y install locales && apt-get -y upgrade && \
     localedef -f UTF-8 -i ja_JP ja_JP.UTF-8

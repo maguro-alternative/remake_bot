@@ -87,7 +87,7 @@ func autoDBInsert(ctx context.Context, dbv1 db.Driver, discordSession *discordgo
 	// データベースにユーザーを追加
 	// ここにユーザーを追加するコードを書く
 	// 例: dbV1.ExecContext(ctx, "INSERT INTO users (discord_id) VALUES ($1)", discordSession.State.User.ID)
-	guilds, err := discordSession.UserGuilds(100, "", "")
+	guilds, err := discordSession.UserGuilds(100, "", "", true)
 	if err != nil {
 		return err
 	}

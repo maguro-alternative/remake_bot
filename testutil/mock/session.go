@@ -26,6 +26,7 @@ type SessionMock struct {
 	UserGuildsFunc                 func(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
 	WebhookFunc                    func(webhookID string, options ...discordgo.RequestOption) (st *discordgo.Webhook, err error)
 	WebhookExecuteFunc             func(webhookID string, token string, wait bool, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error)
+	WebhookThreadExecuteFunc       func(webhookID, token string, wait bool, threadID string, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error)
 }
 
 func (s *SessionMock) AddHandler(handler interface{}) func() {
@@ -92,7 +93,7 @@ func (s *SessionMock) UserChannelPermissions(userID string, channelID string, fe
 	return s.UserChannelPermissionsFunc(userID, channelID, fetchOptions...)
 }
 
-func (s *SessionMock) UserGuilds(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error) {
+func (s *SessionMock) UserGuilds(limit int, beforeID string, afterID string, withCounts bool, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error) {
 	return s.UserGuildsFunc(limit, beforeID, afterID, options...)
 }
 
@@ -102,6 +103,10 @@ func (s *SessionMock) Webhook(webhookID string, options ...discordgo.RequestOpti
 
 func (s *SessionMock) WebhookExecute(webhookID string, token string, wait bool, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error) {
 	return s.WebhookExecuteFunc(webhookID, token, wait, data, options...)
+}
+
+func (s *SessionMock) WebhookThreadExecute(webhookID, token string, wait bool, threadID string, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error) {
+	return s.WebhookThreadExecuteFunc(webhookID, token, wait, threadID, data, options...)
 }
 
 // Session is an interface for discordgo.Session.
@@ -122,9 +127,10 @@ type Session interface {
 	GuildWebhooks(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Webhook, err error)
 	InteractionRespond(interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error
 	UserChannelPermissions(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error)
-	UserGuilds(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
+	UserGuilds(limit int, beforeID string, afterID string, withCounts bool, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
 	Webhook(webhookID string, options ...discordgo.RequestOption) (st *discordgo.Webhook, err error)
 	WebhookExecute(webhookID string, token string, wait bool, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error)
+	WebhookThreadExecute(webhookID, token string, wait bool, threadID string, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error)
 }
 
 var (

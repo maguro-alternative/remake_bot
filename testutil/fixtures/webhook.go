@@ -45,6 +45,9 @@ func NewWebhook(ctx context.Context, setter ...func(b *Webhook)) *ModelConnector
 			case *WebhookRoleMention:
 				webhookRoleMention := connectingModel
 				webhookRoleMention.WebhookSerialID = *webhook.WebhookSerialID
+			case *WebhookThread:
+				webhookThread := connectingModel
+				webhookThread.WebhookSerialID = *webhook.WebhookSerialID
 			default:
 				t.Fatalf("%T cannot be connected to %T", connectingModel, webhook)
 			}

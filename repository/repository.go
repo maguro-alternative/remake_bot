@@ -81,6 +81,9 @@ type RepositoryFuncMock struct {
 	InsertWebhookRoleMentionFunc                          func(ctx context.Context, webhookSerialID int64, roleID string) error
 	GetWebhookRoleMentionWithWebhookSerialIDFunc          func(ctx context.Context, webhookSerialID int64) ([]*WebhookRoleMention, error)
 	DeleteWebhookRoleMentionsNotInProvidedListFunc        func(ctx context.Context, webhookSerialID int64, roleIDs []string) error
+	InsertWebhookThreadFunc                               func(ctx context.Context, webhookSerialID int64, threadID string) error
+	GetWebhookThreadWithWebhookSerialIDFunc               func(ctx context.Context, webhookSerialID int64) ([]*WebhookThread, error)
+	DeleteWebhookThreadsNotInProvidedListFunc             func(ctx context.Context, webhookSerialID int64) error
 }
 
 func (r *RepositoryFuncMock) InsertLineBotIvByGuildID(ctx context.Context, guildId string) error {
@@ -335,6 +338,18 @@ func (r *RepositoryFuncMock) DeleteWebhookRoleMentionsNotInProvidedList(ctx cont
 	return r.DeleteWebhookRoleMentionsNotInProvidedListFunc(ctx, webhookSerialID, roleIDs)
 }
 
+func (r *RepositoryFuncMock) InsertWebhookThread(ctx context.Context, webhookSerialID int64, threadID string) error {
+	return r.InsertWebhookThreadFunc(ctx, webhookSerialID, threadID)
+}
+
+func (r *RepositoryFuncMock) GetWebhookThreadWithWebhookSerialID(ctx context.Context, webhookSerialID int64) ([]*WebhookThread, error) {
+	return r.GetWebhookThreadWithWebhookSerialIDFunc(ctx, webhookSerialID)
+}
+
+func (r *RepositoryFuncMock) DeleteWebhookThreadsNotInProvidedList(ctx context.Context, webhookSerialID int64) error {
+	return r.DeleteWebhookThreadsNotInProvidedListFunc(ctx, webhookSerialID)
+}
+
 // Repository is an interface for repository.
 type RepositoryFunc interface {
 	InsertLineBotIvByGuildID(ctx context.Context, guildId string) error
@@ -400,6 +415,9 @@ type RepositoryFunc interface {
 	InsertWebhookRoleMention(ctx context.Context, webhookSerialID int64, roleID string) error
 	GetWebhookRoleMentionWithWebhookSerialID(ctx context.Context, webhookSerialID int64) ([]*WebhookRoleMention, error)
 	DeleteWebhookRoleMentionsNotInProvidedList(ctx context.Context, webhookSerialID int64, roleIDs []string) error
+	InsertWebhookThread(ctx context.Context, webhookSerialID int64, threadID string) error
+	GetWebhookThreadWithWebhookSerialID(ctx context.Context, webhookSerialID int64) ([]*WebhookThread, error)
+	DeleteWebhookThreadsNotInProvidedList(ctx context.Context, webhookSerialID int64) error
 }
 
 var (

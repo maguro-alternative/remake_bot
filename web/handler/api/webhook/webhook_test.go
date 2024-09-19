@@ -174,4 +174,37 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
+
+	t.Run("Threadに対するWebhookの登録に成功すること", func(t *testing.T) {
+		webhook := internal.WebhookJson{
+			NewWebhooks: []*internal.NewWebhook{
+				{
+					WebhookID:        "987654321-123456789",
+					SubscriptionType: "youtube",
+					SubscriptionId:   "987654321",
+					MentionAndWords:  []string{"word1", "word2"},
+				},
+			},
+		}
+		bodyJson, err := json.Marshal(webhook)
+		assert.NoError(t, err)
+		h := WebhookHandler{
+			repo: &repository.RepositoryFuncMock{
+				InsertWebhookFunc: func(ctx context.Context, guildID, webhookID, subscriptionType, subscriptionID string, lastPostedAt time.Time) (int64, error) {
+					assert.Equal(t, webhookID, "987654321")
+					return 1, nil
+				},
+				InsertWebhookWordFunc: func(ctx context.Context, webhookSerialID int64, mentionAndWordType, word string) error {
+					return nil
+				},
+				InsertWebhookThreadFunc: func(ctx context.Context, webhookSerialID int64, threadID string) error {
+					assert.Equal(t, threadID, "123456789")
+					return nil
+				},
+			},
+		}
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/webhook", bytes.NewReader(bodyJson))
+		h.ServeHTTP(w, r)
+	})
 }

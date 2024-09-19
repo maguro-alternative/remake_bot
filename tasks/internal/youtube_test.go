@@ -28,6 +28,12 @@ func TestYoutubeRssReader(t *testing.T) {
 				Content: data.Content,
 			}, nil
 		},
+		WebhookThreadExecuteFunc: func(webhookID, token string, wait bool, threadID string, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error) {
+			return &discordgo.Message{
+				ChannelID: threadID,
+				Content:   data.Content,
+			}, nil
+		},
 	}
 	repo := &repository.RepositoryFuncMock{
 		GetWebhookUserMentionWithWebhookSerialIDFunc: func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookUserMention, error) {
@@ -127,5 +133,32 @@ func TestYoutubeRssReader(t *testing.T) {
 		messages, err := run(ctx, discordSession, repo, webhook, feed)
 		assert.NoError(t, err)
 		assert.Len(t, messages, 0)
+	})
+
+	t.Run("Threadに投稿すること", func(t *testing.T) {
+		repo := &repository.RepositoryFuncMock{
+			GetWebhookUserMentionWithWebhookSerialIDFunc: func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookUserMention, error) {
+				return []*repository.WebhookUserMention{}, nil
+			},
+			GetWebhookRoleMentionWithWebhookSerialIDFunc: func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookRoleMention, error) {
+				return []*repository.WebhookRoleMention{}, nil
+			},
+			UpdateWebhookWithLastPostedAtFunc: func(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error {
+				return nil
+			},
+			GetWebhookThreadWithWebhookSerialIDFunc: func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookThread, error) {
+				return []*repository.WebhookThread{
+					{
+						WebhookSerialID: webhookSerialID,
+						ThreadID:        "111",
+					},
+				}, nil
+			},
+		}
+		messages, err := run(ctx, discordSession, repo, webhook, feed)
+		assert.NoError(t, err)
+		assert.Len(t, messages, 1)
+		assert.Equal(t, "test\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
+		assert.Equal(t, "111", messages[0].ChannelID)
 	})
 }

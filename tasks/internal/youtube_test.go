@@ -39,6 +39,9 @@ func TestYoutubeRssReader(t *testing.T) {
 		UpdateWebhookWithLastPostedAtFunc: func(ctx context.Context, webhookSerialID int64, lastPostedAt time.Time) error {
 			return nil
 		},
+		GetWebhookThreadWithWebhookSerialIDFunc: func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookThread, error) {
+			return []*repository.WebhookThread{}, nil
+		},
 	}
 	webhookSerialId := int64(1)
 	webhook := repository.Webhook{

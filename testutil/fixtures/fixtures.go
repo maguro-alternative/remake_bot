@@ -25,6 +25,7 @@ type Fixture struct {
 	WebhookUserMentions       []*WebhookUserMention
 	WebhookRoleMentions       []*WebhookRoleMention
 	WebhookWords              []*WebhookWord
+	WebhookThreads            []*WebhookThread
 
 	DBv1 db.Driver
 }

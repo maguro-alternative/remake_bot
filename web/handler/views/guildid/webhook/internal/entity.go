@@ -5,6 +5,7 @@ import (
 	"strings"
 	"strconv"
 
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/bwmarrin/discordgo"
@@ -92,6 +93,8 @@ func CreateUpdateWebhookForm(
 }
 
 func CreateNewWebhookForm(
+	discordSession mock.Session,
+	discorsBotState *discordgo.State,
 	guildWebhooks []*discordgo.Webhook,
 	guild *discordgo.Guild,
 	subscriptionNames []string,
@@ -103,7 +106,7 @@ func CreateNewWebhookForm(
 			<div id="newWebhook">
 				<label for="newWebhookType1">Webhook</label>
 				<select name="newWebhookType1" id="newWebhookType1">
-					` + CreateWebhookSelectForm(guildWebhooks, "") + `
+					` + CreateWebhookSelectForm(discordSession, discorsBotState, guildWebhooks, "") + `
 				</select>
 				<br/>
 				<label for="newSubscriptionName1">サービス名</label>
@@ -201,20 +204,46 @@ func CreateNewWebhookSelectForm(
 }
 
 func CreateWebhookSelectForm(
+	discordSession mock.Session,
+	discorsBotState *discordgo.State,
 	guildWebhooks []*discordgo.Webhook,
 	selectedWebhookID string,
 ) (string) {
 	selectWebhookFormBuilder := strings.Builder{}
 	for _, guildWebhook := range guildWebhooks {
+		channel, err := discorsBotState.Channel(guildWebhook.ChannelID)
+		if err != nil {
+			continue
+		}
+		typeIcon := "🔊"
+		if channel.Type == discordgo.ChannelTypeGuildText {
+			typeIcon = "📝"
+		} else if channel.Type == discordgo.ChannelTypeGuildForum {
+			typeIcon = ""
+			var threads *discordgo.ThreadsList
+			if len(channel.PermissionOverwrites) == 0 {
+				threads, err = discordSession.ThreadsArchived(channel.ID, nil, 100)
+			} else {
+				threads, err = discordSession.ThreadsPrivateArchived(channel.ID, nil, 100)
+			}
+			if err != nil {
+				continue
+			}
+			for _, thread := range threads.Threads {
+				selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
+			<option value="%s-%s" selected>%s:%s:%s:%s</option>`,
+			guildWebhook.ID, thread.ID, typeIcon, channel.Name, thread.Name, guildWebhook.Name))
+			}
+		}
 		if guildWebhook.ID == selectedWebhookID {
 			selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
-			<option value="%s" selected>%s</option>`,
-			guildWebhook.ID, guildWebhook.Name))
+			<option value="%s" selected>%s:%s:%s</option>`,
+			guildWebhook.ID, typeIcon, channel.Name, guildWebhook.Name))
 			continue
 		}
 		selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
-		<option value="%s">%s</option>`,
-		guildWebhook.ID, guildWebhook.Name))
+		<option value="%s">%s:%s:%s</option>`,
+		guildWebhook.ID, typeIcon, channel.Name, guildWebhook.Name))
 	}
 	return selectWebhookFormBuilder.String()
 }

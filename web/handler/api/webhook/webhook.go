@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/maguro-alternative/remake_bot/repository"
@@ -55,11 +56,20 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if webhook.SubscriptionId == "" {
 			continue
 		}
-		webhookSerialID, err := h.repo.InsertWebhook(ctx, guildId, webhook.WebhookID, webhook.SubscriptionType, webhook.SubscriptionId, now)
+		webhookIdSplit := strings.Split(webhook.WebhookID, "-")
+		webhookSerialID, err := h.repo.InsertWebhook(ctx, guildId, webhookIdSplit[0], webhook.SubscriptionType, webhook.SubscriptionId, now)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Webhookの作成に失敗しました:", "エラー:", err.Error())
 			return
+		}
+		if len(webhookIdSplit) == 2 {
+			err = h.repo.InsertWebhookThread(ctx, webhookSerialID, webhookIdSplit[1])
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "WebhookThreadの作成に失敗しました:", "エラー:", err.Error())
+				return
+			}
 		}
 		for _, word := range webhook.MentionAndWords {
 			err = h.repo.InsertWebhookWord(ctx, webhookSerialID, "MentionAnd", word)
@@ -128,6 +138,7 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, webhook := range webhookJson.UpdateWebhooks {
+		webhookIdSplit := strings.Split(webhook.WebhookID, "-")
 		if webhook.DeleteFlag {
 			err = h.repo.DeleteWebhookByWebhookSerialID(ctx, webhook.WebhookSerialID)
 			if err != nil {
@@ -135,9 +146,15 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				slog.ErrorContext(ctx, "Webhookの削除に失敗しました:", "エラー:", err.Error())
 				return
 			}
+			err = h.repo.DeleteWebhookThreadsNotInProvidedList(ctx, webhook.WebhookSerialID)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				slog.ErrorContext(ctx, "Webhookの削除に失敗しました:", "エラー:", err.Error())
+				return
+			}
 			continue
 		}
-		err = h.repo.UpdateWebhookWithWebhookIDAndSubscription(ctx, webhook.WebhookSerialID, webhook.WebhookID, webhook.SubscriptionId, webhook.SubscriptionType)
+		err = h.repo.UpdateWebhookWithWebhookIDAndSubscription(ctx, webhook.WebhookSerialID, webhookIdSplit[0], webhook.SubscriptionId, webhook.SubscriptionType)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "Webhookの更新に失敗しました:", "エラー:", err.Error())

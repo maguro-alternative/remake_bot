@@ -61,16 +61,31 @@ func run(
 			if mentionsMessage != "" {
 				mentionsMessage += "\n"
 			}
-			message, err := discordSession.WebhookExecute(w.ID, w.Token, false, &discordgo.WebhookParams{
-				Content: fmt.Sprintf("%s%s\n%s", mentionsMessage, item.Title, item.Link),
-			})
+			threads, err := repo.GetWebhookThreadWithWebhookSerialID(ctx, *webhook.WebhookSerialID)
 			if err != nil {
 				return nil, err
+			}
+			for _, thread := range threads {
+				message, err := discordSession.WebhookThreadExecute(w.ID, w.Token, false, thread.ThreadID, &discordgo.WebhookParams{
+					Content: fmt.Sprintf("%s%s\n%s", mentionsMessage, item.Title, item.Link),
+				})
+				if err != nil {
+					return nil, err
+				}
+				messages = append(messages, message)
+			}
+			if len(threads) == 0 {
+				message, err := discordSession.WebhookExecute(w.ID, w.Token, false, &discordgo.WebhookParams{
+					Content: fmt.Sprintf("%s%s\n%s", mentionsMessage, item.Title, item.Link),
+				})
+				if err != nil {
+					return nil, err
+				}
+				messages = append(messages, message)
 			}
 			if lastPostedAt.Before(*item.PublishedParsed) {
 				lastPostedAt = *item.PublishedParsed
 			}
-			messages = append(messages, message)
 			userMentions = nil
 			roleMentions = nil
 			mentionsMessage = ""

@@ -2,6 +2,7 @@ package mock
 
 import (
 	"io"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -24,6 +25,8 @@ type SessionMock struct {
 	InteractionRespondFunc         func(interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error
 	UserChannelPermissionsFunc     func(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error)
 	UserGuildsFunc                 func(limit int, beforeID string, afterID string, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
+	ThreadsArchivedFunc				func(channelID string, before *time.Time, limit int, options ...discordgo.RequestOption) (threads *discordgo.ThreadsList, err error)
+	ThreadsPrivateArchivedFunc func(channelID string, before *time.Time, limit int, options ...discordgo.RequestOption) (threads *discordgo.ThreadsList, err error)
 	WebhookFunc                    func(webhookID string, options ...discordgo.RequestOption) (st *discordgo.Webhook, err error)
 	WebhookExecuteFunc             func(webhookID string, token string, wait bool, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error)
 	WebhookThreadExecuteFunc       func(webhookID, token string, wait bool, threadID string, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error)
@@ -89,6 +92,14 @@ func (s *SessionMock) InteractionRespond(interaction *discordgo.Interaction, res
 	return nil
 }
 
+func (s *SessionMock) ThreadsArchived(channelID string, before *time.Time, limit int, options ...discordgo.RequestOption) (threads *discordgo.ThreadsList, err error) {
+	return s.ThreadsArchivedFunc(channelID, before, limit, options...)
+}
+
+func (s *SessionMock) ThreadsPrivateArchived(channelID string, before *time.Time, limit int, options ...discordgo.RequestOption) (threads *discordgo.ThreadsList, err error) {
+	return s.ThreadsPrivateArchivedFunc(channelID, before, limit, options...)
+}
+
 func (s *SessionMock) UserChannelPermissions(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error) {
 	return s.UserChannelPermissionsFunc(userID, channelID, fetchOptions...)
 }
@@ -128,6 +139,8 @@ type Session interface {
 	InteractionRespond(interaction *discordgo.Interaction, resp *discordgo.InteractionResponse, options ...discordgo.RequestOption) error
 	UserChannelPermissions(userID string, channelID string, fetchOptions ...discordgo.RequestOption) (apermissions int64, err error)
 	UserGuilds(limit int, beforeID string, afterID string, withCounts bool, options ...discordgo.RequestOption) (st []*discordgo.UserGuild, err error)
+	ThreadsArchived(channelID string, before *time.Time, limit int, options ...discordgo.RequestOption) (threads *discordgo.ThreadsList, err error)
+	ThreadsPrivateArchived(channelID string, before *time.Time, limit int, options ...discordgo.RequestOption) (threads *discordgo.ThreadsList, err error)
 	Webhook(webhookID string, options ...discordgo.RequestOption) (st *discordgo.Webhook, err error)
 	WebhookExecute(webhookID string, token string, wait bool, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error)
 	WebhookThreadExecute(webhookID, token string, wait bool, threadID string, data *discordgo.WebhookParams, options ...discordgo.RequestOption) (st *discordgo.Message, err error)

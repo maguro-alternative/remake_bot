@@ -273,6 +273,13 @@ CREATE TABLE IF NOT EXISTS webhook_word (
     FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS webhook_thread (
+    webhook_serial_id INTEGER,
+    thread_id TEXT NOT NULL,
+    PRIMARY KEY(webhook_serial_id, thread_id),
+    FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS line_bot (
     guild_id TEXT NOT NULL,
     line_notify_token BYTEA,

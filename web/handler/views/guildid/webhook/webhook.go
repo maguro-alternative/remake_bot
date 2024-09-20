@@ -96,7 +96,7 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, webhook := range webhooks {
-		webhookForm := internal.CreateWebhookSelectForm(guildWebhooks, webhook.WebhookID)
+		webhookForm := internal.CreateWebhookSelectForm(h.indexService.DiscordSession, h.indexService.DiscordBotState, guildWebhooks, webhook.WebhookID)
 
 		subscriptionSelectForm := internal.CreateSubscriptionsSelectForm(subscriptionNames, webhook.SubscriptionType)
 
@@ -185,6 +185,8 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	webhookFormBuilder.WriteString(internal.CreateNewWebhookForm(
+		h.indexService.DiscordSession,
+		h.indexService.DiscordBotState,
 		guildWebhooks,
 		guild,
 		subscriptionNames,

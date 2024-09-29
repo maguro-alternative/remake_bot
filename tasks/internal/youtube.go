@@ -65,8 +65,8 @@ func run(
 			if err != nil {
 				return nil, err
 			}
+			fmt.Println("%#v",threads)
 			for _, thread := range threads {
-				fmt.Println(thread.ThreadID, thread.WebhookSerialID)
 				message, err := discordSession.WebhookThreadExecute(w.ID, w.Token, false, thread.ThreadID, &discordgo.WebhookParams{
 					Content: fmt.Sprintf("%s%s\n%s", mentionsMessage, item.Title, item.Link),
 				})

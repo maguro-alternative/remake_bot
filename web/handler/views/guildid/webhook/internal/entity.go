@@ -230,8 +230,14 @@ func CreateWebhookSelectForm(
 				continue
 			}
 			for _, thread := range threads.Threads {
-				selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
+				if thread.ID == selectedWebhookID {
+					selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
 			<option value="%s-%s" selected>%s:%s:%s:%s</option>`,
+			guildWebhook.ID, thread.ID, typeIcon, channel.Name, thread.Name, guildWebhook.Name))
+					continue
+				}
+				selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
+			<option value="%s-%s">%s:%s:%s:%s</option>`,
 			guildWebhook.ID, thread.ID, typeIcon, channel.Name, thread.Name, guildWebhook.Name))
 			}
 		}

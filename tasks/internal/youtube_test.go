@@ -122,19 +122,6 @@ func TestYoutubeRssReader(t *testing.T) {
 		assert.Equal(t, "<@&4444> \ntest\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
 	})
 
-	t.Run("最新のものがない場合投稿しないこと", func(t *testing.T) {
-		feed.Items = []*gofeed.Item{
-			{
-				Title:           "test",
-				Link:            "https://www.youtube.com/watch?v=test",
-				PublishedParsed: &previousPostAt,
-			},
-		}
-		messages, err := run(ctx, discordSession, repo, webhook, feed)
-		assert.NoError(t, err)
-		assert.Len(t, messages, 0)
-	})
-
 	t.Run("Threadに投稿すること", func(t *testing.T) {
 		repo := &repository.RepositoryFuncMock{
 			GetWebhookUserMentionWithWebhookSerialIDFunc: func(ctx context.Context, webhookSerialID int64) ([]*repository.WebhookUserMention, error) {
@@ -161,4 +148,18 @@ func TestYoutubeRssReader(t *testing.T) {
 		assert.Equal(t, "test\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
 		assert.Equal(t, "111", messages[0].ChannelID)
 	})
+
+	t.Run("最新のものがない場合投稿しないこと", func(t *testing.T) {
+		feed.Items = []*gofeed.Item{
+			{
+				Title:           "test",
+				Link:            "https://www.youtube.com/watch?v=test",
+				PublishedParsed: &previousPostAt,
+			},
+		}
+		messages, err := run(ctx, discordSession, repo, webhook, feed)
+		assert.NoError(t, err)
+		assert.Len(t, messages, 0)
+	})
+
 }

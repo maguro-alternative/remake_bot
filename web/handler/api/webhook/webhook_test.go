@@ -206,5 +206,6 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/webhook", bytes.NewReader(bodyJson))
 		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusOK, w.Code)
 	})
 }

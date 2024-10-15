@@ -96,6 +96,15 @@ func (h *WebhookViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, webhook := range webhooks {
+		webhookThread, err := h.repo.GetWebhookThreadWithWebhookSerialID(ctx, *webhook.WebhookSerialID)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "Not get webhook thread: "+err.Error())
+			return
+		}
+		if len(webhookThread) > 0 {
+			webhook.WebhookID = webhookThread[0].ThreadID
+		}
 		webhookForm := internal.CreateWebhookSelectForm(h.indexService.DiscordSession, h.indexService.DiscordBotState, guildWebhooks, webhook.WebhookID)
 
 		subscriptionSelectForm := internal.CreateSubscriptionsSelectForm(subscriptionNames, webhook.SubscriptionType)

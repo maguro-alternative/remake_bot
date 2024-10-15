@@ -14,7 +14,7 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-func TestYoutubeRssReader(t *testing.T) {
+func TestNiconicoRssReader(t *testing.T) {
 	ctx := context.Background()
 	previousPostAt := time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC)
 	beforePostAt := time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -54,7 +54,7 @@ func TestYoutubeRssReader(t *testing.T) {
 		WebhookSerialID:  &webhookSerialId,
 		GuildID:          "1111",
 		WebhookID:        "2222",
-		SubscriptionType: "youtube",
+		SubscriptionType: "niconico",
 		SubscriptionID:   "test",
 		LastPostedAt:     beforePostAt,
 	}
@@ -62,24 +62,24 @@ func TestYoutubeRssReader(t *testing.T) {
 		Items: []*gofeed.Item{
 			{
 				Title:           "test",
-				Link:            "https://www.youtube.com/watch?v=test",
+				Link:            "https://www.niconico.jp/smXXXX?ref=rss_myvideo_rss2.0",
 				PublishedParsed: &afterPostAt,
 			},
 			{
 				Title:           "test2",
-				Link:            "https://www.youtube.com/watch?v=test2",
+				Link:            "https://www.niconico.jp/smXXXXX?ref=rss_myvideo_rss2.0",
 				PublishedParsed: &previousPostAt,
 			},
 		},
 	}
-	t.Run("YoutubeのRss取得に成功すること", func(t *testing.T) {
+	t.Run("niconicoのRss取得に成功すること", func(t *testing.T) {
 		messages, err := run(ctx, discordSession, repo, webhook, feed)
 		assert.NoError(t, err)
 		assert.Len(t, messages, 1)
-		assert.Equal(t, "test\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
+		assert.Equal(t, "test\nhttps://www.niconico.jp/smXXXX?ref=rss_myvideo_rss2.0", messages[0].Content)
 	})
 
-	t.Run("YoutubeのRss取得に失敗すること", func(t *testing.T) {
+	t.Run("niconicoのRss取得に失敗すること", func(t *testing.T) {
 		discordSession := &mock.SessionMock{
 			WebhookFunc: func(webhookID string, options ...discordgo.RequestOption) (*discordgo.Webhook, error) {
 				return nil, assert.AnError
@@ -101,7 +101,7 @@ func TestYoutubeRssReader(t *testing.T) {
 		messages, err := run(ctx, discordSession, repo, webhook, feed)
 		assert.NoError(t, err)
 		assert.Len(t, messages, 1)
-		assert.Equal(t, "<@3333> \ntest\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
+		assert.Equal(t, "<@3333> \ntest\nhttps://www.niconico.jp/smXXXX?ref=rss_myvideo_rss2.0", messages[0].Content)
 	})
 
 	t.Run("ロールメンションを含めること", func(t *testing.T) {
@@ -119,7 +119,7 @@ func TestYoutubeRssReader(t *testing.T) {
 		messages, err := run(ctx, discordSession, repo, webhook, feed)
 		assert.NoError(t, err)
 		assert.Len(t, messages, 1)
-		assert.Equal(t, "<@&4444> \ntest\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
+		assert.Equal(t, "<@&4444> \ntest\nhttps://www.niconico.jp/smXXXX?ref=rss_myvideo_rss2.0", messages[0].Content)
 	})
 
 	t.Run("Threadに投稿すること", func(t *testing.T) {
@@ -145,7 +145,7 @@ func TestYoutubeRssReader(t *testing.T) {
 		messages, err := run(ctx, discordSession, repo, webhook, feed)
 		assert.NoError(t, err)
 		assert.Len(t, messages, 1)
-		assert.Equal(t, "test\nhttps://www.youtube.com/watch?v=test", messages[0].Content)
+		assert.Equal(t, "test\nhttps://www.niconico.jp/smXXXX?ref=rss_myvideo_rss2.0", messages[0].Content)
 		assert.Equal(t, "111", messages[0].ChannelID)
 	})
 
@@ -153,7 +153,7 @@ func TestYoutubeRssReader(t *testing.T) {
 		feed.Items = []*gofeed.Item{
 			{
 				Title:           "test",
-				Link:            "https://www.youtube.com/watch?v=test",
+				Link:            "https://www.niconico.jp/smXXXX?ref=rss_myvideo_rss2.0",
 				PublishedParsed: &previousPostAt,
 			},
 		}
@@ -161,5 +161,4 @@ func TestYoutubeRssReader(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, messages, 0)
 	})
-
 }

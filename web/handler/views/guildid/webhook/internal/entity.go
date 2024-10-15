@@ -191,25 +191,15 @@ func CreateWordWebhookForm(
 	return wordFormBuilder.String()
 }
 
-func CreateNewWebhookSelectForm(
-	guildWebhooks []*discordgo.Webhook,
-) (string) {
-	selectWebhookFormBuilder := strings.Builder{}
-	for _, guildWebhook := range guildWebhooks {
-		selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
-		<option value="%s">%s</option>`,
-		guildWebhook.ID, guildWebhook.Name))
-	}
-	return selectWebhookFormBuilder.String()
-}
-
 func CreateWebhookSelectForm(
 	discordSession mock.Session,
 	discorsBotState *discordgo.State,
 	guildWebhooks []*discordgo.Webhook,
 	selectedWebhookID string,
 ) (string) {
+	var threads, t *discordgo.ThreadsList
 	selectWebhookFormBuilder := strings.Builder{}
+	threads, _ = discordSession.GuildThreadsActive(guildWebhooks[0].GuildID)
 	for _, guildWebhook := range guildWebhooks {
 		channel, err := discorsBotState.Channel(guildWebhook.ChannelID)
 		if err != nil {
@@ -218,32 +208,45 @@ func CreateWebhookSelectForm(
 		typeIcon := "🔊"
 		if channel.Type == discordgo.ChannelTypeGuildText {
 			typeIcon = "📝"
-		} else if channel.Type == discordgo.ChannelTypeGuildForum {
-			typeIcon = ""
-			var threads *discordgo.ThreadsList
-			if len(channel.PermissionOverwrites) == 0 {
-				threads, err = discordSession.ThreadsArchived(channel.ID, nil, 100)
-			} else {
-				threads, err = discordSession.ThreadsPrivateArchived(channel.ID, nil, 100)
-			}
-			if err != nil {
+			if guildWebhook.ID == selectedWebhookID {
+				selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
+				<option value="%s" selected>%s:%s:%s</option>`,
+				guildWebhook.ID, typeIcon, channel.Name, guildWebhook.Name))
 				continue
 			}
+			selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
+			<option value="%s">%s:%s:%s</option>`,
+			guildWebhook.ID, typeIcon, channel.Name, guildWebhook.Name))
+		} else if channel.Type == discordgo.ChannelTypeGuildForum {
+			typeIcon = ""
+			if len(channel.PermissionOverwrites) != 0 {
+				t, err = discordSession.ThreadsPrivateArchived(channel.ID, nil, 100)
+				if err != nil {
+					continue
+				}
+				threads.Threads = append(threads.Threads, t.Threads...)
+			} else {
+				t, err = discordSession.ThreadsArchived(channel.ID, nil, 100)
+				if err != nil {
+					continue
+				}
+				threads.Threads = append(threads.Threads, t.Threads...)
+			}
 			for _, thread := range threads.Threads {
-				selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
+				if channel.ID != guildWebhook.ChannelID {
+					continue
+				}
+				if thread.ID == selectedWebhookID {
+					selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
 			<option value="%s-%s" selected>%s:%s:%s:%s</option>`,
+			guildWebhook.ID, thread.ID, typeIcon, channel.Name, thread.Name, guildWebhook.Name))
+					continue
+				}
+				selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
+			<option value="%s-%s">%s:%s:%s:%s</option>`,
 			guildWebhook.ID, thread.ID, typeIcon, channel.Name, thread.Name, guildWebhook.Name))
 			}
 		}
-		if guildWebhook.ID == selectedWebhookID {
-			selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
-			<option value="%s" selected>%s:%s:%s</option>`,
-			guildWebhook.ID, typeIcon, channel.Name, guildWebhook.Name))
-			continue
-		}
-		selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
-		<option value="%s">%s:%s:%s</option>`,
-		guildWebhook.ID, typeIcon, channel.Name, guildWebhook.Name))
 	}
 	return selectWebhookFormBuilder.String()
 }

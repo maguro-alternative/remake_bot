@@ -35,7 +35,10 @@ func Run(ctx context.Context, dbv1 db.Driver, discord *discordgo.Session) {
 						slog.ErrorContext(ctx, "youtubeのwebhookの投稿に失敗しました。", "エラー", err.Error())
 					}
 				case "niconico":
-					// Todo: ニコニコ動画のRSSリーダーを実装する
+					messages, err = internal.NiconicoRssReader(ctx, discord, repo, *webhook)
+					if err != nil {
+						slog.ErrorContext(ctx, "niconicoのwebhookの投稿に失敗しました。", "エラー", err.Error())
+					}
 				}
 				if len(messages) > 0 {
 					webhooks, err = repo.GetAllColumnsWebhooks(ctx)

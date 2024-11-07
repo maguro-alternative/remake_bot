@@ -306,11 +306,15 @@ CREATE TABLE IF NOT EXISTS line_bot_iv (
 
 CREATE TABLE IF NOT EXISTS line_works_bot (
     guild_id TEXT NOT NULL,
-    line_works_bot_token BYTEA,
-    line_works_bot_refresh_token BYTEA,
+    line_works_client_id BYTEA,
+    line_works_client_secret BYTEA,
     line_works_group_id BYTEA,
     line_works_bot_id BYTEA,
     line_works_bot_secret BYTEA,
+    line_works_service_account BYTEA,
+    line_works_private_key BYTEA,
+    line_works_domain_id BYTEA,
+    line_works_admin_id BYTEA,
     default_channel_id TEXT,
     debug_mode BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY(guild_id)
@@ -318,11 +322,15 @@ CREATE TABLE IF NOT EXISTS line_works_bot (
 
 CREATE TABLE IF NOT EXISTS line_works_bot_iv (
     guild_id TEXT NOT NULL,
-    line_works_bot_token_iv BYTEA,
-    line_works_bot_refresh_token_iv BYTEA,
+    line_works_client_id_iv BYTEA,
+    line_works_client_secret_iv BYTEA,
     line_works_group_id_iv BYTEA,
     line_works_bot_id_iv BYTEA,
     line_works_bot_secret_iv BYTEA,
+    line_works_service_account_iv BYTEA,
+    line_works_private_key_iv BYTEA,
+    line_works_domain_id_iv BYTEA,
+    line_works_admin_id_iv BYTEA,
     PRIMARY KEY(guild_id)
 );
 

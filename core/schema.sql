@@ -304,4 +304,49 @@ CREATE TABLE IF NOT EXISTS line_bot_iv (
     PRIMARY KEY(guild_id)
 );
 
+CREATE TABLE IF NOT EXISTS line_works_bot_info (
+    guild_id TEXT NOT NULL,
+    line_works_client_id BYTEA,
+    line_works_client_secret BYTEA,
+    line_works_service_account BYTEA,
+    line_works_private_key BYTEA,
+    line_works_domain_id BYTEA,
+    line_works_admin_id BYTEA,
+    PRIMARY KEY(guild_id)
+);
+
+CREATE TABLE IF NOT EXISTS line_works_bot_info_iv (
+    guild_id TEXT NOT NULL,
+    line_works_client_id_iv BYTEA,
+    line_works_client_secret_iv BYTEA,
+    line_works_service_account_iv BYTEA,
+    line_works_private_key_iv BYTEA,
+    line_works_domain_id_iv BYTEA,
+    line_works_admin_id_iv BYTEA,
+    PRIMARY KEY(guild_id)
+);
+
+CREATE TABLE IF NOT EXISTS line_works_bot (
+    guild_id TEXT NOT NULL,
+    line_works_bot_token BYTEA,
+    line_works_refresh_token BYTEA,
+    line_works_group_id BYTEA,
+    line_works_bot_id BYTEA,
+    line_works_bot_secret BYTEA,
+    refresh_token_expires_at TIMESTAMP, /* 有効期限は発行から90日 */
+    default_channel_id TEXT,
+    debug_mode BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY(guild_id)
+);
+
+CREATE TABLE IF NOT EXISTS line_works_bot_iv (
+    guild_id TEXT NOT NULL,
+    line_works_bot_token_iv BYTEA,
+    line_works_refresh_token_iv BYTEA,
+    line_works_group_id_iv BYTEA,
+    line_works_bot_id_iv BYTEA,
+    line_works_bot_secret_iv BYTEA,
+    PRIMARY KEY(guild_id)
+);
+
 /*DROP TABLE IF EXISTS permission_code, permission_id, line_post_discord_channel, line_ng_discord_message_type, line_ng_discord_user_id, line_ng_discord_role_id, vc_signal_channel, vc_signal_ng_id, vc_signal_mention_id, webhook, webhook_mention, webhook_word, line_bot, line_bot_iv CASCADE;*/

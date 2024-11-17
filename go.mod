@@ -53,6 +53,7 @@ require (
 	github.com/getsentry/sentry-go v0.28.1 // indirect
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/gorilla/sessions v1.4.0
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jmoiron/sqlx v1.4.0

@@ -1,6 +1,6 @@
 FROM golang:1.23.0-bullseye AS builder
 
-RUN apt-get -y update && apt-get -y install locales && apt-get -y upgrade && \
+RUN apt-get -y update && apt-get -y install locales && apt-get -y upgrade && apt-get install -y ffmpeg &&\
     localedef -f UTF-8 -i ja_JP ja_JP.UTF-8
 ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:ja
@@ -14,5 +14,5 @@ COPY . /root/src
 WORKDIR /root/src
 
 # Docker内で扱うffmpegをインストール
-RUN apt-get install -y ffmpeg && go mod download && \
+RUN go mod download && \
     go build -o ./main ./core/main.go

@@ -84,6 +84,21 @@ type RepositoryFuncMock struct {
 	InsertWebhookThreadFunc                               func(ctx context.Context, webhookSerialID int64, threadID string) error
 	GetWebhookThreadWithWebhookSerialIDFunc               func(ctx context.Context, webhookSerialID int64) ([]*WebhookThread, error)
 	DeleteWebhookThreadsNotInProvidedListFunc             func(ctx context.Context, webhookSerialID int64) error
+	GetAllLineWorksBotsFunc                               func(ctx context.Context) ([]*LineWorksBot, error)
+	InsertLineWorksBotFunc                                func(ctx context.Context, lineWorksBot *LineWorksBot) error
+	GetLineWorksBotByGuildIDFunc func(ctx context.Context, guildID string) (*LineWorksBot, error)
+	GetLineWorksBotNotClientByGuildIDFunc func(ctx context.Context, guildID string) (*LineWorksBotNotClient, error)
+	GetLineWorksBotDefaultChannelIDByGuildIDFunc func(ctx context.Context, guildID string) (*LineWorksBotDefaultChannelID, error)
+	InsertLineWorksBotIVFunc func(ctx context.Context, lineWorksBotIV *LineWorksBotIV) error
+	UpdateLineWorksBotFunc func(ctx context.Context, lineWorksBot *LineWorksBot) error
+	GetLineWorksBotIVByGuildIDFunc func(ctx context.Context, guildID string) (*LineWorksBotIV, error)
+	UpdateLineWorksBotIVFunc func(ctx context.Context, lineWorksBotIV *LineWorksBotIV) error
+	InsertLineWorksBotInfoFunc func(ctx context.Context, lineWorksBotInfo *LineWorksBotInfo) error
+	GetLineWorksBotInfoByGuildIDFunc func(ctx context.Context, guildID string) (*LineWorksBotInfo, error)
+	UpdateLineWorksBotInfoFunc func(ctx context.Context, lineWorksBotInfo *LineWorksBotInfo) error
+	InsertLineWorksBotInfoIVFunc func(ctx context.Context, lineWorksBotInfoIV *LineWorksBotInfoIV) error
+	GetLineWorksBotInfoIVByGuildIDFunc func(ctx context.Context, guildID string) (*LineWorksBotInfoIV, error)
+	UpdateLineWorksBotInfoIVFunc func(ctx context.Context, lineWorksBotInfoIV *LineWorksBotInfoIV) error
 }
 
 func (r *RepositoryFuncMock) InsertLineBotIvByGuildID(ctx context.Context, guildId string) error {
@@ -350,6 +365,66 @@ func (r *RepositoryFuncMock) DeleteWebhookThreadsNotInProvidedList(ctx context.C
 	return r.DeleteWebhookThreadsNotInProvidedListFunc(ctx, webhookSerialID)
 }
 
+func (r *RepositoryFuncMock) GetAllLineWorksBots(ctx context.Context) ([]*LineWorksBot, error) {
+	return r.GetAllLineWorksBotsFunc(ctx)
+}
+
+func (r *RepositoryFuncMock) InsertLineWorksBot(ctx context.Context, lineWorksBot *LineWorksBot) error {
+	return r.InsertLineWorksBotFunc(ctx, lineWorksBot)
+}
+
+func (r *RepositoryFuncMock) GetLineWorksBotByGuildID(ctx context.Context, guildID string) (*LineWorksBot, error) {
+	return r.GetLineWorksBotByGuildIDFunc(ctx, guildID)
+}
+
+func (r *RepositoryFuncMock) GetLineWorksBotNotClientByGuildID(ctx context.Context, guildID string) (*LineWorksBotNotClient, error) {
+	return r.GetLineWorksBotNotClientByGuildIDFunc(ctx, guildID)
+}
+
+func (r *RepositoryFuncMock) GetLineWorksBotDefaultChannelIDByGuildID(ctx context.Context, guildID string) (*LineWorksBotDefaultChannelID, error) {
+	return r.GetLineWorksBotDefaultChannelIDByGuildIDFunc(ctx, guildID)
+}
+
+func (r *RepositoryFuncMock) UpdateLineWorksBot(ctx context.Context, lineWorksBot *LineWorksBot) error {
+	return r.UpdateLineWorksBotFunc(ctx, lineWorksBot)
+}
+
+func (r *RepositoryFuncMock) InsertLineWorksBotIV(ctx context.Context, lineWorksBotIv *LineWorksBotIV) error {
+	return r.InsertLineWorksBotIVFunc(ctx, lineWorksBotIv)
+}
+
+func (r *RepositoryFuncMock) GetLineWorksBotIVByGuildID(ctx context.Context, guildID string) (*LineWorksBotIV, error) {
+	return r.GetLineWorksBotIVByGuildIDFunc(ctx, guildID)
+}
+
+func (r *RepositoryFuncMock) UpdateLineWorksBotIV(ctx context.Context, lineWorksBotIV *LineWorksBotIV) error {
+	return r.UpdateLineWorksBotIVFunc(ctx, lineWorksBotIV)
+}
+
+func (r *RepositoryFuncMock) InsertLineWorksBotInfo(ctx context.Context, lineWorksBotInfo *LineWorksBotInfo) error {
+	return r.InsertLineWorksBotInfoFunc(ctx, lineWorksBotInfo)
+}
+
+func (r *RepositoryFuncMock) GetLineWorksBotInfoByGuildID(ctx context.Context, guildID string) (*LineWorksBotInfo, error) {
+	return r.GetLineWorksBotInfoByGuildIDFunc(ctx, guildID)
+}
+
+func (r *RepositoryFuncMock) UpdateLineWorksBotInfo(ctx context.Context, lineWorksBotInfo *LineWorksBotInfo) error {
+	return r.UpdateLineWorksBotInfoFunc(ctx, lineWorksBotInfo)
+}
+
+func (r *RepositoryFuncMock) InsertLineWorksBotInfoIV(ctx context.Context, lineWorksBotInfoIV *LineWorksBotInfoIV) error {
+	return r.InsertLineWorksBotInfoIVFunc(ctx, lineWorksBotInfoIV)
+}
+
+func (r *RepositoryFuncMock) GetLineWorksBotInfoIVByGuildID(ctx context.Context, guildID string) (*LineWorksBotInfoIV, error) {
+	return r.GetLineWorksBotInfoIVByGuildIDFunc(ctx, guildID)
+}
+
+func (r *RepositoryFuncMock) UpdateLineWorksBotInfoIV(ctx context.Context, lineWorksBotInfoIV *LineWorksBotInfoIV) error {
+	return r.UpdateLineWorksBotInfoIVFunc(ctx, lineWorksBotInfoIV)
+}
+
 // Repository is an interface for repository.
 type RepositoryFunc interface {
 	InsertLineBotIvByGuildID(ctx context.Context, guildId string) error
@@ -418,6 +493,21 @@ type RepositoryFunc interface {
 	InsertWebhookThread(ctx context.Context, webhookSerialID int64, threadID string) error
 	GetWebhookThreadWithWebhookSerialID(ctx context.Context, webhookSerialID int64) ([]*WebhookThread, error)
 	DeleteWebhookThreadsNotInProvidedList(ctx context.Context, webhookSerialID int64) error
+	GetAllLineWorksBots(ctx context.Context) ([]*LineWorksBot, error)
+	InsertLineWorksBot(ctx context.Context, lineWorksBot *LineWorksBot) error
+	GetLineWorksBotByGuildID(ctx context.Context, guildID string) (*LineWorksBot, error)
+	GetLineWorksBotNotClientByGuildID(ctx context.Context, guildID string) (*LineWorksBotNotClient, error)
+	GetLineWorksBotDefaultChannelIDByGuildID(ctx context.Context, guildID string) (*LineWorksBotDefaultChannelID, error)
+	UpdateLineWorksBot(ctx context.Context, lineWorksBot *LineWorksBot) error
+	InsertLineWorksBotIV(ctx context.Context, lineWorksBotIV *LineWorksBotIV) error
+	GetLineWorksBotIVByGuildID(ctx context.Context, guildID string) (*LineWorksBotIV, error)
+	UpdateLineWorksBotIV(ctx context.Context, lineWorksBotIV *LineWorksBotIV) error
+	InsertLineWorksBotInfo(ctx context.Context, lineWorksBotInfo *LineWorksBotInfo) error
+	GetLineWorksBotInfoByGuildID(ctx context.Context, guildID string) (*LineWorksBotInfo, error)
+	UpdateLineWorksBotInfo(ctx context.Context, lineWorksBotInfo *LineWorksBotInfo) error
+	InsertLineWorksBotInfoIV(ctx context.Context, lineWorksBotInfoIV *LineWorksBotInfoIV) error
+	GetLineWorksBotInfoIVByGuildID(ctx context.Context, guildID string) (*LineWorksBotInfoIV, error)
+	UpdateLineWorksBotInfoIV(ctx context.Context, lineWorksBotInfoIV *LineWorksBotInfoIV) error
 }
 
 var (

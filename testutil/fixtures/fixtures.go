@@ -16,6 +16,10 @@ type Fixture struct {
 	LineNgDiscordRoleIDs      []*LineNgDiscordRoleID
 	LineBots                  []*LineBot
 	LineBotIvs                []*LineBotIv
+	LineWorksBots				[]*LineWorksBot
+	LineWorksBotIvs			[]*LineWorksBotIV
+	LineWorksBotInfos			[]*LineWorksBotInfo
+	LineWorksBotInfoIvs		[]*LineWorksBotInfoIV
 	VcSignalChannels          []*VcSignalChannel
 	VcSignalNgUserIDs         []*VcSignalNgUserID
 	VcSignalNgRoleIDs         []*VcSignalNgRoleID

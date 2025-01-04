@@ -20,7 +20,7 @@ func NewLineWorks(client http.Client, lineWorksToken, lineWorksRefreshToken, lin
     }
 }
 
-type lineWorksInfo struct {
+type LineWorksInfo struct {
     client http.Client
     lineWorksClientID string
     lineWorksClientSecret string
@@ -30,8 +30,8 @@ type lineWorksInfo struct {
     lineWorksAdminID string
 }
 
-func NewLineWorksInfo(client http.Client, lineWorksClientID, lineWorksClientSecret, lineWorksServiceAccount, lineWorksPrivateKey, lineWorksDomainID, lineWorksAdminID string) *lineWorksInfo {
-    return &lineWorksInfo{
+func NewLineWorksInfo(client http.Client, lineWorksClientID, lineWorksClientSecret, lineWorksServiceAccount, lineWorksPrivateKey, lineWorksDomainID, lineWorksAdminID string) *LineWorksInfo {
+    return &LineWorksInfo{
         client: client,
         lineWorksClientID: lineWorksClientID,
         lineWorksClientSecret: lineWorksClientSecret,

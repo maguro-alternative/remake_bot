@@ -18,13 +18,13 @@ type lineWorksTokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token,omitempty"`
 	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
+	ExpiresIn    string    `json:"expires_in"`
 	Scope 	  string `json:"scope"`
 }
 
-func (l lineWorksInfo) getAccessToken(ctx context.Context, clientID, clientSecret, serviceAccount, privateKey, scope string) (*lineWorksTokenResponse, error) {
+func (l LineWorksInfo) GetAccessToken(ctx context.Context, scope string) (*lineWorksTokenResponse, error) {
 	// Generate JWT
-	jwt, err := generateJWT(clientID, serviceAccount, privateKey)
+	jwt, err := generateJWT(l.lineWorksClientID, l.lineWorksServiceAccount, l.lineWorksPrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +34,8 @@ func (l lineWorksInfo) getAccessToken(ctx context.Context, clientID, clientSecre
 	formData := url.Values{
 		"assertion":     {jwt},
 		"grant_type":    {"urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer"},
-		"client_id":     {clientID},
-		"client_secret": {clientSecret},
+		"client_id":     {l.lineWorksClientID},
+		"client_secret": {l.lineWorksClientSecret},
 		"scope":         {scope},
 	}
 
@@ -57,11 +57,14 @@ func (l lineWorksInfo) getAccessToken(ctx context.Context, clientID, clientSecre
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("GetAccessToken: %v", resp.Status)
+	}
 
 	return body, nil
 }
 
-func (l lineWorksInfo) refreshAccessToken(ctx context.Context,refreshToken string) (*lineWorksTokenResponse, error) {
+func (l LineWorksInfo) RefreshAccessToken(ctx context.Context, refreshToken string) (*lineWorksTokenResponse, error) {
 	formData := url.Values{
 		"refresh_token": {refreshToken},
 		"grant_type":    {"refresh_token"},

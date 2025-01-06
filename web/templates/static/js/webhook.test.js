@@ -57,7 +57,7 @@ describe('createJsonData function', () => {
         // モックデータの準備
         const formElements = [
             { name: 'newWebhookType1', value: 'Type1' },
-            { name: 'newSubscriptionType1', value: 'Subscription1' },
+            { name: 'newSubscriptionName1', value: 'Subscription1' },
             { name: 'newSubscriptionId1', value: 'SubId1' },
             // 他のフィールドも同様に追加
         ];
@@ -101,7 +101,7 @@ describe('createJsonData function', () => {
         // モックデータの準備
         const formElements = [
             { name: 'newWebhookType1', value: 'Type1' },
-            { name: 'newSubscriptionType1', value: 'Subscription1' },
+            { name: 'newSubscriptionName1', value: 'Subscription1' },
             { name: 'newSubscriptionId1', value: 'SubId1' },
             { name: 'newMemberMention1[]', value: 'Member1' },
             { name: 'newMemberMention1[]', value: 'Member2' },
@@ -149,7 +149,7 @@ describe('createJsonData function', () => {
         // モックデータの準備
         const formElements = [
             { name: 'newWebhookType1', value: 'Type1' },
-            { name: 'newSubscriptionType1', value: 'Subscription1' },
+            { name: 'newSubscriptionName1', value: 'Subscription1' },
             { name: 'newSubscriptionId1', value: 'SubId1' },
             { name: 'newMemberMention1[]', value: 'Member1' },
             { name: 'newMemberMention1[]', value: 'Member2' },
@@ -201,7 +201,7 @@ describe('createJsonData function', () => {
         // モックデータの準備
         const formElements = [
             { name: 'newWebhookType1', value: 'Type1' },
-            { name: 'newSubscriptionType1', value: 'Subscription1' },
+            { name: 'newSubscriptionName1', value: 'Subscription1' },
             { name: 'newSubscriptionId1', value: 'SubId1' },
             { name: 'newMemberMention1[]', value: 'Member1' },
             { name: 'newMemberMention1[]', value: 'Member2' },
@@ -257,7 +257,7 @@ describe('createJsonData function', () => {
         // モックデータの準備
         const formElements = [
             { name: 'newWebhookType1', value: 'Type1' },
-            { name: 'newSubscriptionType1', value: 'Subscription1' },
+            { name: 'newSubscriptionName1', value: 'Subscription1' },
             { name: 'newSubscriptionId1', value: 'SubId1' },
             { name: 'newMemberMention1[]', value: 'Member1' },
             { name: 'newMemberMention1[]', value: 'Member2' },
@@ -317,7 +317,7 @@ describe('createJsonData function', () => {
         // モックデータの準備
         const formElements = [
             { name: 'newWebhookType1', value: 'Type1' },
-            { name: 'newSubscriptionType1', value: 'Subscription1' },
+            { name: 'newSubscriptionName1', value: 'Subscription1' },
             { name: 'newSubscriptionId1', value: 'SubId1' },
             { name: 'newMemberMention1[]', value: 'Member1' },
             { name: 'newMemberMention1[]', value: 'Member2' },
@@ -335,9 +335,9 @@ describe('createJsonData function', () => {
             { name: 'newMentionOrWord1[]', value: 'MentionWord2' },
             { name: 'newMentionAndWord1[]', value: 'MentionWord3' },
             { name: 'newMentionAndWord1[]', value: 'MentionWord4' },
-            { name: 'webhookType1', value: 'UpdateType1' },
-            { name: 'subscriptionType1', value: 'UpdateSubscription1' },
-            { name: 'subscriptionId1', value: 'UpdateSubId1' },
+            { name: 'updateWebhookType1', value: 'UpdateType1' },
+            { name: 'updateSubscriptionName1', value: 'UpdateSubscription1' },
+            { name: 'updateSubscriptionId1', value: 'UpdateSubId1' },
             { name: 'updateMemberMention1[]', value: 'UpdateMember1' },
             { name: 'updateMemberMention1[]', value: 'UpdateMember2' },
             { name: 'updateRoleMention1[]', value: 'UpdateRole1' },

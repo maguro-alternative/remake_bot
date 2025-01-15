@@ -1,0 +1,104 @@
+{{ define "content" }}
+    <main>
+        <ul>
+            <li>
+                <a href="/guild/{{ .GuildID }}">
+                    <img src="{{ .GuildIconUrl }}" alt="{{ .GuildName }}">
+                </a>
+            </li>
+            <li>
+                <a href="/guild/{{ .GuildID }}">
+                    {{ .GuildName }}
+                </a>
+            </li>
+        </ul>
+        <h1>{{ .GuildName }}のLINE Works設定</h1>
+        <h4>LINE Worksを設定できます。</h4>
+        <form action="#" id="form">
+            <label for="lineWorksClientID">LINE Works Client ID</label>
+            <input id="lineWorksClientID" type="password" name="lineWorksClientID">
+            {{ .LineWorksBotForm.LineWorksClientID }}
+            <br/>
+            <label for="lineWorksClientIdDelete">LINE Works Client ID削除</label>
+            <input id="lineWorksClientIdDelete" type="checkbox" name="lineWorksClientIdDelete">
+            <br/>
+
+            <label for="lineWorksClientSecret">LINE Works Client Secret</label>
+            <input id="lineWorksClientSecret" type="password" name="lineWorksClientSecret">
+            {{ .LineWorksBotForm.LineWorksClientSecret }}
+            <br/>
+            <label for="lineWorksClientSecretDelete">LINE Works Client Secret削除</label>
+            <input id="lineWorksClientSecretDelete" type="checkbox" name="lineWorksClientSecretDelete">
+            <br/>
+
+            <label for="lineWorksServiceAccount">LINE Works Service Account</label>
+            <input id="lineWorksServiceAccount" type="password" name="lineWorksServiceAccount">
+            {{ .LineWorksBotForm.LineWorksServiceAccount }}
+            <br/>
+            <label for="lineWorksServiceAccountDelete">LINE Works Service Account削除</label>
+            <input id="lineWorksServiceAccountDelete" type="checkbox" name="lineWorksServiceAccountDelete">
+            <br/>
+
+            <label for="lineWorksPrivateKey">LINE Works PrivateKey</label>
+            <textarea id="lineWorksPrivateKey" name="lineWorksPrivateKey" rows="5" cols="33"></textarea>
+            {{ .LineWorksBotForm.LineWorksPrivateKey }}
+            <br/>
+            <label for="lineWorksPrivateKeyDelete">LINE Works PrivateKey削除</label>
+            <input id="lineWorksPrivateKeyDelete" type="checkbox" name="lineWorksPrivateKeyDelete">
+            <br/>
+
+            <label for="lineWorksDomainID">LINE Works Domain ID</label>
+            <input id="lineWorksDomainID" type="password" name="lineWorksDomainID">
+            {{ .LineWorksBotForm.LineWorksDomainID }}
+            <br/>
+            <label for="lineWorksDomainIdDelete">LINE Works Domain ID削除</label>
+            <input id="lineWorksDomainIdDelete" type="checkbox" name="lineWorksDomainIdDelete">
+            <br/>
+
+            <label for="lineWorksAdminID">LINE Works Admin ID</label>
+            <input id="lineWorksAdminID" type="password" name="lineWorksAdminID">
+            {{ .LineWorksBotForm.LineWorksAdminID }}
+            <br/>
+            <label for="lineWorksAdminIdDelete">LINE Works Admin ID削除</label>
+            <input id="lineWorksAdminIdDelete" type="checkbox" name="lineWorksAdminIdDelete">
+            <br/>
+
+            <label for="lineWorksBotID">LINE Works Bot ID</label>
+            <input id="lineWorksBotID" type="password" name="lineWorksBotID">
+            {{ .LineWorksBotForm.LineWorksBotID }}
+            <br/>
+            <label for="lineWorksBotIdDelete">LINE Works Bot ID削除</label>
+            <input id="lineWorksBotIdDelete" type="checkbox" name="lineWorksBotIdDelete">
+            <br/>
+
+            <label for="lineWorksBotSecret">LINE Works Bot Secret</label>
+            <input id="lineWorksBotSecret" type="password" name="lineWorksBotSecret">
+            {{ .LineWorksBotForm.LineWorksBotSecret }}
+            <br/>
+
+            <label for="lineWorksBotSecretDelete">LINE Works Bot Secret削除</label>
+            <input id="lineWorksBotSecretDelete" type="checkbox" name="lineWorksBotSecretDelete">
+            <br/>
+
+            <label for="lineWorksGroupID">LINE Works Group ID</label>
+            <input id="lineWorksGroupID" type="password" name="lineWorksGroupID">
+            {{ .LineWorksBotForm.LineWorksGroupID }}
+            <br/>
+            <label for="lineWorksGroupIdDelete">LINE Works Group ID削除</label>
+            <input id="lineWorksGroupIdDelete" type="checkbox" name="lineWorksGroupIdDelete">
+            <br/>
+
+            <label for="defaultChannel">Discordに送信するデフォルトのチャンネル</label>
+            <select id="defaultChannel" name="defaultChannelId" >
+                {{ .Channels }}
+            </select>
+            <br/>
+
+            <label for="debugMode">デバッグモード</label>
+            <input id="debugMode" type="checkbox" name="debugMode" {{ if .LineWorksBotForm.DebugMode }} checked {{ end }}>
+            <br/>
+
+            {{ .SubmitTag }}
+        </form>
+    </main>
+{{ end }}

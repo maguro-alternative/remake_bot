@@ -6,6 +6,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 )
 
 func generateIV() ([]byte, error) {
@@ -67,6 +68,10 @@ func (a AES) Encrypt(data []byte) (iv []byte, encrypted []byte, err error) {
 
 // Decrypt は、dataをAES復号化します。
 func (a AES) Decrypt(data []byte, iv []byte) ([]byte, error) {
+	if len(data) % aes.BlockSize != 0 {
+		fmt.Println(len(data), aes.BlockSize)
+		return nil, fmt.Errorf("data length must be a multiple of the block size")
+	}
 	/*AES復号化*/
 	block, err := aes.NewCipher(a.key)
 	if err != nil {
@@ -93,8 +98,8 @@ func (a AESMock) Decrypt(data []byte, iv []byte) (decrypted []byte, err error) {
 }
 
 type AESInterface interface {
-	Encrypt(data []byte) (iv []byte, encrypted []byte, err error)
-	Decrypt(data []byte, iv []byte) (decrypted []byte, err error)
+	Encrypt(data []byte) (iv []byte, encrypted []byte, err error)	// Encrypt は、dataをAES暗号化します。
+	Decrypt(data []byte, iv []byte) (decrypted []byte, err error)	// Decrypt は、dataをAES復号化します。
 }
 
 var (

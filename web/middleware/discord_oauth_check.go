@@ -137,6 +137,8 @@ func DiscordOAuthCheckMiddleware(
 				permissionType = "vcSignal"
 			case "webhook":
 				permissionType = "webhook"
+			case "lineworks-token":
+				permissionType = "lineWorksToken"
 			default:
 				slog.InfoContext(ctx, "権限チャンネル以外", "permissionType", permissionType)
 				h.ServeHTTP(w, r.WithContext(ctx))

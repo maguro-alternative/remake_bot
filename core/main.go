@@ -21,7 +21,7 @@ import (
 
 //go:embed schema.sql
 var schema string // schema.sqlの内容をschemaに代入
-var permissionTypes = []string{"lineBot", "linePostDiscordChannel", "vcSignal", "webhook"}
+var permissionTypes = []string{"lineBot", "linePostDiscordChannel", "vcSignal", "webhook", "lineWorksToken"}
 
 func main() {
 	ctx := context.Background()

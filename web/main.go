@@ -15,6 +15,8 @@ import (
 	linePostDiscordChannel "github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linebot"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/linetoken"
+	lineworksBot "github.com/maguro-alternative/remake_bot/web/handler/api/lineworks_bot"
+	lineworksToken "github.com/maguro-alternative/remake_bot/web/handler/api/lineworks_token"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/permission"
 	"github.com/maguro-alternative/remake_bot/web/handler/api/webhook"
 	vcSignal "github.com/maguro-alternative/remake_bot/web/handler/api/vc_signal"
@@ -30,6 +32,7 @@ import (
 	guildIdView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid"
 	linePostDiscordChannelView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/line_post_discord_channel"
 	linetokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/linetoken"
+	lineWorksTokenView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/lineworks_token"
 	permissionView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/permission"
 	vcSignalView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/vc_signal"
 	webhookView "github.com/maguro-alternative/remake_bot/web/handler/views/guildid/webhook"
@@ -105,11 +108,13 @@ func NewWebRouter(
 	mux.Handle("/guild/{guildId}/permission", discordLoginRequiredChain.ThenFunc(permissionView.NewPermissionViewHandler(indexService, repo).Index))
 	mux.Handle("/guild/{guildId}/linetoken", discordLoginRequiredChain.ThenFunc(linetokenView.NewLineTokenViewHandler(indexService, repo).Index))
 	mux.Handle("/guild/{guildId}/line-post-discord-channel", discordLoginRequiredChain.ThenFunc(linePostDiscordChannelView.NewLinePostDiscordChannelViewHandler(indexService, repo).Index))
+	mux.Handle("/guild/{guildId}/lineworks-token", discordLoginRequiredChain.ThenFunc(lineWorksTokenView.NewLineWorksTokenViewHandler(indexService, repo).Index))
 	mux.Handle("/guild/{guildId}/vc-signal", discordLoginRequiredChain.ThenFunc(vcSignalView.NewVcSignalViewHandler(indexService, repo).Index))
 	mux.Handle("/guild/{guildId}/webhook", discordLoginRequiredChain.ThenFunc(webhookView.NewWebhookViewHandler(indexService, repo).Index))
 	mux.Handle("/group/{guildId}", lineLoginRequiredChain.ThenFunc(groupView.NewLineGroupViewHandler(indexService, repo).Index))
 
 	mux.Handle("/api/line-bot", middleChain.Then(linebot.NewLineBotHandler(indexService, repo, aesCrypto)))
+	mux.Handle("/api/lineworks-bot", middleChain.Then(lineworksBot.NewLineWorksHandler(indexService, repo, aesCrypto)))
 	mux.Handle("/login/discord", middleChain.Then(discordLogin.NewDiscordOAuth2Handler(indexService)))
 	mux.Handle("/logout/discord", middleChain.Then(discordLogout.NewDiscordOAuth2Handler(indexService)))
 	mux.Handle("/login/line/{guildId}", middleChain.ThenFunc(lineLogin.NewLineLoginHandler(indexService, repo, aesCrypto).LineLogin))
@@ -119,6 +124,7 @@ func NewWebRouter(
 	mux.Handle("/api/{guildId}/group", lineMiddleChain.Then(group.NewLineGroupHandler(repo)))
 	mux.Handle("/api/{guildId}/permission", discordMiddleChain.Then(permission.NewPermissionHandler(repo)))
 	mux.Handle("/api/{guildId}/linetoken", discordMiddleChain.Then(linetoken.NewLineTokenHandler(indexService, repo, aesCrypto)))
+	mux.Handle("/api/{guildId}/lineworks-token", discordMiddleChain.Then(lineworksToken.NewLineWorksTokenHandler(indexService, repo, aesCrypto)))
 	mux.Handle("/api/{guildId}/line-post-discord-channel", discordMiddleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(repo)))
 	mux.Handle("/api/{guildId}/vc-signal", discordMiddleChain.Then(vcSignal.NewVcSignalHandler(repo)))
 	mux.Handle("/api/{guildId}/webhook", discordMiddleChain.Then(webhook.NewWebhookHandler(repo)))

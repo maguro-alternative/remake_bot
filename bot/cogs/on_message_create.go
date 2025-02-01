@@ -39,10 +39,10 @@ func (h *cogHandler) onMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	if err != nil {
 		slog.ErrorContext(ctx, "OnMessageCreate Error", "Error:", err.Error())
 	}
-	/*err = onMessageCreateFunc2(ctx, h.client, repo, ff, aesCrypto, s, vs)
+	err = onMessageCreateFunc2(ctx, h.client, repo, ff, aesCrypto, s, vs)
 	if err != nil {
 		slog.ErrorContext(ctx, "OnMessageCreate2 Error", "Error:", err.Error())
-	}*/
+	}
 }
 
 func onMessageCreateFunc(

@@ -101,6 +101,11 @@ func NewWebRouter(
 	// 静的ファイルのハンドリング
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/templates/static/"))))
 
+	// ヘルスチェック
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
 	mux.Handle("/", loginRequiredChain.ThenFunc(indexView.NewIndexViewHandler(indexService).Index))
 	mux.Handle("/login/line", loginRequiredChain.ThenFunc(lineLogin.NewLineLoginHandler(indexService, repo, aesCrypto).Index))
 	mux.Handle("/guilds", discordLoginRequiredChain.ThenFunc(guildsView.NewGuildsViewHandler(indexService).Index))

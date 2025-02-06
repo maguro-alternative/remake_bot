@@ -83,6 +83,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/linetoken" class="btn btn-primary">LINEBOTおよびグループ設定</a>`)
 		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/vc-signal" class="btn btn-primary">ボイスチャンネルの通知設定</a>`)
 		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/webhook" class="btn btn-primary">webhookの送信設定</a>`)
+		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/lineworks-token" class="btn btn-primary">LINE WORKSの設定</a>`)
 	})
 
 	t.Run("設定ページ一覧が正常に表示される(管理者じゃない)", func(t *testing.T) {
@@ -146,7 +147,7 @@ func TestNewLinePostDiscordChannelViewHandler(t *testing.T) {
 		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/linetoken" class="btn btn-primary">LINEBOTおよびグループ設定</a>`)
 		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/vc-signal" class="btn btn-primary">ボイスチャンネルの通知設定</a>`)
 		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/webhook" class="btn btn-primary">webhookの送信設定</a>`)
-
+		assert.Contains(t, rec.Body.String(), `<a href="/guild/123/lineworks" class="btn btn-primary">LINE WORKS設定</a>`)
 	})
 
 }

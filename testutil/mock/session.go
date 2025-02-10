@@ -18,7 +18,7 @@ type SessionMock struct {
 	ChannelVoiceJoinFunc           func(gID string, cID string, mute bool, deaf bool) (voice *discordgo.VoiceConnection, err error)
 	GuildFunc                      func(guildID string, options ...discordgo.RequestOption) (st *discordgo.Guild, err error)
 	GuildChannelsFunc              func(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Channel, err error)
-	GuildThreadsActiveFunc func(guildID string, options ...discordgo.RequestOption) (threads *discordgo.ThreadsList, err error)
+	GuildThreadsActiveFunc         func(guildID string, options ...discordgo.RequestOption) (threads *discordgo.ThreadsList, err error)
 	GuildMemberFunc                func(guildID string, userID string, options ...discordgo.RequestOption) (st *discordgo.Member, err error)
 	GuildMembersFunc               func(guildID string, after string, limit int, options ...discordgo.RequestOption) (st []*discordgo.Member, err error)
 	GuildRolesFunc                 func(guildID string, options ...discordgo.RequestOption) (st []*discordgo.Role, err error)

@@ -35,10 +35,10 @@ func (h *cogHandler) onMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	if err != nil {
 		slog.ErrorContext(ctx, "暗号化キーのバイト変換に失敗しました", "エラー:", err.Error())
 	}
-	err = onMessageCreateFunc(ctx, h.client, repo, ff, aesCrypto, s, vs)
+	/*err = onMessageCreateFunc(ctx, h.client, repo, ff, aesCrypto, s, vs)
 	if err != nil {
 		slog.ErrorContext(ctx, "OnMessageCreate Error", "Error:", err.Error())
-	}
+	}*/
 	err = onMessageCreateFunc2(ctx, h.client, repo, ff, aesCrypto, s, vs)
 	if err != nil {
 		slog.ErrorContext(ctx, "OnMessageCreate2 Error", "Error:", err.Error())

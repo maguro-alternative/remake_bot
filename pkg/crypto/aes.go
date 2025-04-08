@@ -78,6 +78,11 @@ func (a AES) Decrypt(data []byte, iv []byte) ([]byte, error) {
 		return nil, err
 	}
 	decrypted := make([]byte, len(data))
+	// ブロックサイズとivの長さが一致しない場合、panicを起こす
+	if len(iv) != block.BlockSize() {
+		fmt.Println(len(iv), block.BlockSize())
+		return nil, fmt.Errorf("iv length must be equal to block size")
+	}
 	// 復号化
 	cbcDecrypter := cipher.NewCBCDecrypter(block, iv)
 	cbcDecrypter.CryptBlocks(decrypted, data)

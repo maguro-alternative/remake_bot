@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/maguro-alternative/remake_bot/bot/config"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
@@ -132,7 +133,7 @@ func RegisterCommands(discordSession *discordgo.Session, db db.Driver, client *h
 		discordSession,
 		discordSession.State,
 		discordSession.VoiceConnections,
-		"",
+		config.SlashCommandDebugGuildID(),
 	)
 	repo := repository.NewRepository(db)
 	// 追加したいコマンドをここに追加

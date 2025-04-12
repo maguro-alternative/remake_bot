@@ -20,7 +20,7 @@ func PingCommand(repo repository.RepositoryFunc) *command {
 		説明: Pong!
 		オプション: なし
 	*/
-	exec := newCogHandler(repo, nil)
+	exec := newCogHandler(repo, &http.Client{})
 	return &command{
 		Name:        "ping",
 		Description: "Pong!",

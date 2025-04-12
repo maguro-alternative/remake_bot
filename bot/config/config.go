@@ -95,3 +95,7 @@ func SessionSecret() string {
 func VoiceVoxKey() string {
 	return cfg.VoiceVoxKey
 }
+
+func InternalURL() string {
+	return cfg.InternalURL
+}

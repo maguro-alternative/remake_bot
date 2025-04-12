@@ -10,4 +10,5 @@ type Config struct {
 	DBPort			string `env:"DB_PORT" envDefault:"5432"`
 	SessionSecret	string `env:"SESSION_SECRET" envDefault:""`
 	VoiceVoxKey		string `env:"VOICEVOX_KEY" envDefault:""`
+	InternalURL		string `env:"INTERNAL_URL" envDefault:"http://localhost:8080"`
 }

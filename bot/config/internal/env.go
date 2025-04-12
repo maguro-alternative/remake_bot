@@ -11,4 +11,5 @@ type Config struct {
 	SessionSecret	string `env:"SESSION_SECRET" envDefault:""`
 	VoiceVoxKey		string `env:"VOICEVOX_KEY" envDefault:""`
 	InternalURL		string `env:"INTERNAL_URL" envDefault:"http://localhost:8080"`
+	ChannelNo 		string `env:"CHANNEL_NO" envDefault:""`
 }

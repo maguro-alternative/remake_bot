@@ -99,3 +99,7 @@ func VoiceVoxKey() string {
 func InternalURL() string {
 	return cfg.InternalURL
 }
+
+func ChannelNo() string {
+	return cfg.ChannelNo
+}

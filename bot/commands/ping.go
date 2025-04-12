@@ -2,9 +2,12 @@ package commands
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
+	"github.com/maguro-alternative/remake_bot/bot/config"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -47,6 +50,24 @@ func (h *commandHandler) handlePing(s mock.Session, state *discordgo.State, voic
 	if err != nil {
 		fmt.Printf("error responding to ping command: %v\n", err)
 		return err
+	}
+	req, err := http.NewRequest(http.MethodPost, config.InternalURL(), strings.NewReader(`{"message":"Pong"}`))
+	if err != nil {
+		fmt.Printf("error creating request: %v\n", err)
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+config.ChannelNo())
+	resp, err := h.client.Do(req)
+	if err != nil {
+		fmt.Printf("error sending request: %v\n", err)
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("error response from server: %v\n", resp.Status)
+		return fmt.Errorf("error response from server: %v", resp.Status)
 	}
 	return nil
 }

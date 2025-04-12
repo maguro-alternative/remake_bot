@@ -57,7 +57,7 @@ func (h *commandHandler) handlePing(s mock.Session, state *discordgo.State, voic
 		return err
 	}
 
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Bearer "+config.ChannelNo())
 	resp, err := h.client.Do(req)
 	if err != nil {

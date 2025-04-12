@@ -67,6 +67,7 @@ func (h *commandHandler) handlePing(s mock.Session, state *discordgo.State, voic
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		fmt.Printf("error response from server: %v\n", resp.Status)
+		fmt.Printf("error response from server: %v\n", resp.Body)
 		return fmt.Errorf("error response from server: %v", resp.Status)
 	}
 	return nil

@@ -103,3 +103,7 @@ func InternalURL() string {
 func ChannelNo() string {
 	return cfg.ChannelNo
 }
+
+func SlashCommandDebugGuildID() string {
+	return cfg.SlachCommandDebugGuildID
+}

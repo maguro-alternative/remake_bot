@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"encoding/json"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
@@ -66,8 +67,12 @@ func (h *commandHandler) handlePing(s mock.Session, state *discordgo.State, voic
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
+		var body map[string]interface{}
 		fmt.Printf("error response from server: %v\n", resp.Status)
-		fmt.Printf("error response from server: %v\n", resp.Body)
+		if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+			fmt.Printf("error decoding response body: %v\n", err)
+		}
+		fmt.Printf("response body: %v\n", body)
 		return fmt.Errorf("error response from server: %v", resp.Status)
 	}
 	return nil

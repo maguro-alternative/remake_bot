@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 	"encoding/json"
+	"net/url"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
@@ -52,7 +53,9 @@ func (h *commandHandler) handlePing(s mock.Session, state *discordgo.State, voic
 		fmt.Printf("error responding to ping command: %v\n", err)
 		return err
 	}
-	req, err := http.NewRequest(http.MethodPost, config.InternalURL(), strings.NewReader(`{"message":"Pong"}`))
+	form := url.Values{}
+	form.Add("message", "test")
+	req, err := http.NewRequest(http.MethodPost, config.InternalURL(), strings.NewReader(form.Encode()))
 	if err != nil {
 		fmt.Printf("error creating request: %v\n", err)
 		return err

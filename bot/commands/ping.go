@@ -3,13 +3,9 @@ package commands
 import (
 	"fmt"
 	"net/http"
-	"strings"
-	"encoding/json"
-	"net/url"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
-	"github.com/maguro-alternative/remake_bot/bot/config"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -52,31 +48,6 @@ func (h *commandHandler) handlePing(s mock.Session, state *discordgo.State, voic
 	if err != nil {
 		fmt.Printf("error responding to ping command: %v\n", err)
 		return err
-	}
-	form := url.Values{}
-	form.Add("message", "test")
-	req, err := http.NewRequest(http.MethodPost, config.InternalURL(), strings.NewReader(form.Encode()))
-	if err != nil {
-		fmt.Printf("error creating request: %v\n", err)
-		return err
-	}
-
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Bearer "+config.ChannelNo())
-	resp, err := h.client.Do(req)
-	if err != nil {
-		fmt.Printf("error sending request: %v\n", err)
-		return err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		var body map[string]interface{}
-		fmt.Printf("error response from server: %v\n", resp.Status)
-		if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
-			fmt.Printf("error decoding response body: %v\n", err)
-		}
-		fmt.Printf("response body: %v\n", body)
-		return fmt.Errorf("error response from server: %v", resp.Status)
 	}
 	return nil
 }

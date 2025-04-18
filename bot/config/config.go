@@ -95,3 +95,15 @@ func SessionSecret() string {
 func VoiceVoxKey() string {
 	return cfg.VoiceVoxKey
 }
+
+func InternalURL() string {
+	return cfg.InternalURL
+}
+
+func ChannelNo() string {
+	return cfg.ChannelNo
+}
+
+func SlashCommandDebugGuildID() string {
+	return cfg.SlachCommandDebugGuildID
+}

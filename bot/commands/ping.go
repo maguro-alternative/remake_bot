@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
@@ -17,7 +18,7 @@ func PingCommand(repo repository.RepositoryFunc) *command {
 		説明: Pong!
 		オプション: なし
 	*/
-	exec := newCogHandler(repo, nil)
+	exec := newCogHandler(repo, &http.Client{})
 	return &command{
 		Name:        "ping",
 		Description: "Pong!",

@@ -171,68 +171,25 @@ func onMessageCreateFunc2(
 	s mock.Session,
 	vs *discordgo.MessageCreate,
 ) error {
-	var channel repository.LinePostDiscordChannel
-	var imageUrls []string
-	sendTextBuilder := strings.Builder{}
-
-	channel, err := repo.GetLinePostDiscordChannelByChannelID(ctx, vs.ChannelID)
-	if err != nil && err.Error() != "sql: no rows in result set" {
-		slog.ErrorContext(ctx, "line_post_discord_channelの取得に失敗しました", "エラー:", err.Error())
-		return err
-	} else if err != nil {
-		err = repo.InsertLinePostDiscordChannelByChannelIDAndGuildID(ctx, vs.ChannelID, vs.GuildID)
-		if err != nil {
-			slog.ErrorContext(ctx, "line_post_discord_channelの登録に失敗しました", "エラー:", err.Error())
-			return err
-		}
-		channel = repository.LinePostDiscordChannel{
-			Ng:         false,
-			BotMessage: false,
-		}
-	}
-	ngTypes, err := repo.GetLineNgDiscordMessageTypeByChannelID(ctx, vs.ChannelID)
+	// 1. チャンネル情報取得
+	channel, err := getOrCreateChannel(ctx, repo, vs)
 	if err != nil {
-		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
-		return err
-	}
-	ngDiscordUserIDs, err := repo.GetLineNgDiscordUserIDByChannelID(ctx, vs.ChannelID)
-	if err != nil {
-		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
-		return err
-	}
-	ngDiscordRoleIDs, err := repo.GetLineNgDiscordRoleIDByChannelID(ctx, vs.ChannelID)
-	if err != nil {
-		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
-		return err
-	}
-	// メッセージの種類がNGの場合は処理を終了
-	for _, ngType := range ngTypes {
-		if vs.Message.Type == discordgo.MessageType(ngType) {
-			slog.InfoContext(ctx, "NG Type")
-			return err
-		}
-	}
-	// メッセージの送信者がNGの場合は処理を終了
-	for _, ngDiscordID := range ngDiscordUserIDs {
-		if vs.Author.ID == ngDiscordID {
-			slog.InfoContext(ctx, "NG User")
-			return err
-		}
-	}
-	for _, ngDiscordRoleID := range ngDiscordRoleIDs {
-		for _, role := range vs.Member.Roles {
-			if role == ngDiscordRoleID {
-				slog.InfoContext(ctx, "NG Role")
-				return err
-			}
-		}
-	}
-	// チャンネルがNGの場合、またはBotメッセージでない場合は処理を終了
-	if channel.Ng || (!channel.BotMessage && vs.Author.Bot) {
-		slog.InfoContext(ctx, "NG Channel or Bot Message")
 		return err
 	}
 
+	// 2. 権限チェック
+	err = validateMessagePermissions(ctx, repo, vs, channel)
+	if err != nil {
+		return err
+	}
+
+	// 3. LINE WORKS認証情報取得
+	lineWorksCredentials, err := getDecryptedLineWorksCredentials(ctx, repo, aesCrypto, vs.GuildID)
+	if err != nil {
+		return err
+	}
+
+	// 取得したデータを後続の処理で使うため、変数に保持
 	lineWorksBotApi, err := repo.GetLineWorksBotByGuildID(ctx, vs.GuildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_works_botの取得に失敗しました", "エラー:", err.Error())
@@ -241,27 +198,6 @@ func onMessageCreateFunc2(
 	lineWorksBotIv, err := repo.GetLineWorksBotIVByGuildID(ctx, vs.GuildID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_works_bot_ivの取得に失敗しました", "エラー:", err.Error())
-		return err
-	}
-
-	lineWorksBotToken, err := aesCrypto.Decrypt(lineWorksBotApi.LineWorksBotToken[0], lineWorksBotIv.LineWorksBotTokenIV[0])
-	if err != nil {
-		slog.ErrorContext(ctx, "line_works_bot_tokenの復号化に失敗しました", "エラー:", err.Error())
-		return err
-	}
-	lineWorksRefreshToken, err := aesCrypto.Decrypt(lineWorksBotApi.LineWorksRefreshToken[0], lineWorksBotIv.LineWorksRefreshTokenIV[0])
-	if err != nil {
-		slog.ErrorContext(ctx, "line_works_refresh_tokenの復号化に失敗しました", "エラー:", err.Error())
-		return err
-	}
-	lineWorksGroupID, err := aesCrypto.Decrypt(lineWorksBotApi.LineWorksGroupID[0], lineWorksBotIv.LineWorksGroupIDIV[0])
-	if err != nil {
-		slog.ErrorContext(ctx, "line_works_group_idの復号化に失敗しました", "エラー:", err.Error())
-		return err
-	}
-	lineWorksBotID, err := aesCrypto.Decrypt(lineWorksBotApi.LineWorksBotID[0], lineWorksBotIv.LineWorksBotIDIV[0])
-	if err != nil {
-		slog.ErrorContext(ctx, "line_works_bot_idの復号化に失敗しました", "エラー:", err.Error())
 		return err
 	}
 
@@ -367,7 +303,7 @@ func onMessageCreateFunc2(
 
 	refreshAccessToken, err := lineworksInfoReru.RefreshAccessToken(
 		ctx,
-		string(lineWorksRefreshToken),
+		lineWorksCredentials.RefreshToken,
 	)
 	if err != nil {
 		slog.ErrorContext(ctx, "アクセストークンのリフレッシュに失敗しました", "エラー:", err.Error())
@@ -380,9 +316,9 @@ func onMessageCreateFunc2(
 	lineworksRequ = lineworks.NewLineWorks(
 		*client,
 		refreshAccessToken.AccessToken,
-		string(lineWorksRefreshToken),
-		string(lineWorksBotID),
-		string(lineWorksGroupID),
+		lineWorksCredentials.RefreshToken,
+		lineWorksCredentials.BotID,
+		lineWorksCredentials.GroupID,
 	)
 	res, err = lineworksRequ.PushLineWorksMessage(ctx, message)
 	if res.StatusCode == 201 {
@@ -499,140 +435,57 @@ func onMessageCreateFunc3(
 	s mock.Session,
 	vs *discordgo.MessageCreate,
 ) error {
-	var channel repository.LinePostDiscordChannel
-	var imageUrls []string
-	var videoUrls []string
-	var voiceUrls []string
-	var videoCount, voiceCount int
-
-	sendTextBuilder := strings.Builder{}
-
-	channel, err := repo.GetLinePostDiscordChannelByChannelID(ctx, vs.ChannelID)
-	if err != nil && err.Error() != "sql: no rows in result set" {
-		slog.ErrorContext(ctx, "line_post_discord_channelの取得に失敗しました", "エラー:", err.Error())
-		return err
-	} else if err != nil {
-		err = repo.InsertLinePostDiscordChannelByChannelIDAndGuildID(ctx, vs.ChannelID, vs.GuildID)
-		if err != nil {
-			slog.ErrorContext(ctx, "line_post_discord_channelの登録に失敗しました", "エラー:", err.Error())
-			return err
-		}
-		channel = repository.LinePostDiscordChannel{
-			Ng:         false,
-			BotMessage: false,
-		}
-	}
-	ngTypes, err := repo.GetLineNgDiscordMessageTypeByChannelID(ctx, vs.ChannelID)
+	// 1. チャンネル情報取得
+	channel, err := getOrCreateChannel(ctx, repo, vs)
 	if err != nil {
-		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
 		return err
 	}
-	ngDiscordUserIDs, err := repo.GetLineNgDiscordUserIDByChannelID(ctx, vs.ChannelID)
+
+	// 2. 権限チェック
+	err = validateMessagePermissions(ctx, repo, vs, channel)
 	if err != nil {
-		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
 		return err
 	}
-	ngDiscordRoleIDs, err := repo.GetLineNgDiscordRoleIDByChannelID(ctx, vs.ChannelID)
+
+	// 3. メッセージテキスト生成
+	messageText, err := buildMessageText(ctx, s, vs)
 	if err != nil {
-		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
 		return err
 	}
-	// メッセージの種類がNGの場合は処理を終了
-	for _, ngType := range ngTypes {
-		if vs.Message.Type == discordgo.MessageType(ngType) {
-			slog.InfoContext(ctx, "NG Type")
-			return err
-		}
-	}
-	// メッセージの送信者がNGの場合は処理を終了
-	for _, ngDiscordID := range ngDiscordUserIDs {
-		if vs.Author.ID == ngDiscordID {
-			slog.InfoContext(ctx, "NG User")
-			return err
-		}
-	}
-	for _, ngDiscordRoleID := range ngDiscordRoleIDs {
-		for _, role := range vs.Member.Roles {
-			if role == ngDiscordRoleID {
-				slog.InfoContext(ctx, "NG Role")
-				return err
-			}
-		}
-	}
-	// チャンネルがNGの場合、またはBotメッセージでない場合は処理を終了
-	if channel.Ng || (!channel.BotMessage && vs.Author.Bot) {
-		slog.InfoContext(ctx, "NG Channel or Bot Message")
-		return err
+	var sendTextBuilder strings.Builder
+	sendTextBuilder.WriteString(messageText)
+
+	// 4. スタンプ処理
+	stickerImageUrls := processStickerItems(vs)
+
+	// 5. 添付ファイル処理（URLのみ取得）
+	imageUrls, videoUrls, voiceUrls, unsupportedUrls := processAttachmentsSimple(vs)
+
+	// 6. 全画像URLをマージ
+	allImageUrls := append(stickerImageUrls, imageUrls...)
+
+	// 7. 未対応ファイルURLを追加
+	for _, url := range unsupportedUrls {
+		sendTextBuilder.WriteString(url + "\n")
 	}
 
-	// メッセージの種類によって処理を分岐
-	switch vs.Message.Type {
-	case discordgo.MessageTypeUserPremiumGuildSubscription:
-		sendTextBuilder.WriteString(vs.Message.Author.Username + "がサーバーブーストしました。")
-	case discordgo.MessageTypeUserPremiumGuildSubscriptionTierOne:
-		sendTextBuilder.WriteString(vs.Message.Author.Username + "がサーバーブーストし、レベル1になりました！！！！！！！！")
-	case discordgo.MessageTypeUserPremiumGuildSubscriptionTierTwo:
-		sendTextBuilder.WriteString(vs.Message.Author.Username + "がサーバーブーストし、レベル2になりました！！！！！！！！")
-	case discordgo.MessageTypeUserPremiumGuildSubscriptionTierThree:
-		sendTextBuilder.WriteString(vs.Message.Author.Username + "がサーバーブーストし、レベル3になりました！！！！！！！！")
-	case discordgo.MessageTypeGuildMemberJoin:
-		sendTextBuilder.WriteString(vs.Message.Author.Username + "が参加しました。")
-	default:
-		st, err := s.Channel(vs.ChannelID)
-		if err != nil {
-			slog.ErrorContext(ctx, "channel取得に失敗しました", "エラー:", err.Error())
-			return err
-		}
-		sendTextBuilder.WriteString(st.Name + "にて、" + vs.Message.Author.Username)
+	// 8. 統計情報追加
+	if len(allImageUrls) > 0 {
+		sendTextBuilder.WriteString(" 画像を" + strconv.Itoa(len(allImageUrls)) + "枚、")
 	}
-
-	// スタンプが送信されていた場合、画像URLを取得
-	if vs.StickerItems != nil {
-		for _, sticker := range vs.StickerItems {
-			switch sticker.FormatType {
-			case 1:
-				imageUrls = append(imageUrls, "https://cdn.discordapp.com/stickers/"+sticker.ID+".png")
-			case 2:
-				imageUrls = append(imageUrls, "https://cdn.discordapp.com/stickers/"+sticker.ID+".apng")
-			case 4:
-				imageUrls = append(imageUrls, "https://cdn.discordapp.com/stickers/"+sticker.ID+".gif")
-			}
-		}
-	}
-
-	// 添付ファイルが送信されていた場合、LINE用に変換
-	for _, attachment := range vs.Message.Attachments {
-		extension := filepath.Ext(attachment.Filename)
-		switch extension {
-		case ".png", ".jpg", ".jpeg", ".gif":
-			imageUrls = append(imageUrls, attachment.URL)
-		case ".mp4", ".mov", ".avi", ".wmv", ".flv", ".webm":
-			videoUrls = append(videoUrls, attachment.URL)
-		case ".mp3", ".wav", ".ogg", ".m4a":
-			voiceUrls = append(voiceUrls, attachment.URL)
-		default:
-			slog.InfoContext(ctx, "未対応のファイル形式です。")
-			sendTextBuilder.WriteString(attachment.URL + "\n")
-		}
-	}
-
-	if len(imageUrls) > 0 {
-		sendTextBuilder.WriteString(" 画像を" + strconv.Itoa(len(imageUrls)) + "枚、")
-	}
-	if videoCount > 0 {
+	if len(videoUrls) > 0 {
 		sendTextBuilder.WriteString(" 動画を" + strconv.Itoa(len(videoUrls)) + "個、")
 	}
-	if voiceCount > 0 {
+	if len(voiceUrls) > 0 {
 		sendTextBuilder.WriteString(" 音声を" + strconv.Itoa(len(voiceUrls)) + "個、")
 	}
-	if len(imageUrls) > 0 || videoCount > 0 || voiceCount > 0 {
+	if len(allImageUrls) > 0 || len(videoUrls) > 0 || len(voiceUrls) > 0 {
 		sendTextBuilder.WriteString(" 送信しました。")
 	}
-
 	sendTextBuilder.WriteString("「 " + vs.Message.Content + " 」")
 
-	// LINEに送信
-	for _, url := range imageUrls {
+	// 9. 全メディアURLを追加
+	for _, url := range allImageUrls {
 		sendTextBuilder.WriteString(url + "\n")
 	}
 	for _, url := range videoUrls {
@@ -642,6 +495,7 @@ func onMessageCreateFunc3(
 		sendTextBuilder.WriteString(url + "\n")
 	}
 
+	// 10. 内部APIに送信
 	form := url.Values{}
 	form.Add("message", sendTextBuilder.String())
 	req, err := http.NewRequest(http.MethodPost, config.InternalURL(), strings.NewReader(form.Encode()))
@@ -657,7 +511,8 @@ func onMessageCreateFunc3(
 		return err
 	}
 	defer resp.Body.Close()
-	return err
+	
+	return nil
 }
 
 // getOrCreateChannel チャンネル情報を取得、存在しない場合は作成

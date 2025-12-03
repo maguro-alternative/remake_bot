@@ -396,3 +396,26 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 	})
 
 }
+
+func TestLineWorksRequest_PushMessage(t *testing.T) {
+	ctx := context.Background()
+	// スタブHTTPクライアントを作成
+	stubClient := mock.NewStubHttpClient(func(req *http.Request) *http.Response {
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader("")),
+		}
+	})
+	t.Run("正常系", func(t *testing.T) {
+		err := onMessageCreateFunc2(
+			ctx,
+			stubClient,
+			&repository.RepositoryFuncMock{},
+			&ffmpeg.FfmpegMock{},
+			&crypto.AESMock{},
+			&mock.SessionMock{},
+			&discordgo.MessageCreate{},
+		)
+		assert.NoError(t, err)
+	})
+}

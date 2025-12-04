@@ -543,6 +543,12 @@ func TestLineWorksRequest_PushMessage(t *testing.T) {
 						BotMessage: false,
 					}, nil
 				},
+				GetLineWorksBotByGuildIDFunc: func(ctx context.Context, guildID string) (*repository.LineWorksBot, error) {
+					return lineWorksBot, nil
+				},
+				GetLineWorksBotIVByGuildIDFunc: func(ctx context.Context, guildID string) (*repository.LineWorksBotIV, error) {
+					return &lineWorksBotIv, nil
+				},
 				GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 					return nil, nil
 				},
@@ -554,8 +560,18 @@ func TestLineWorksRequest_PushMessage(t *testing.T) {
 				},
 			},
 			&ffmpeg.FfmpegMock{},
-			&crypto.AESMock{},
-			&mock.SessionMock{},
+			&crypto.AESMock{
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return []byte("decrypted"), nil
+				},
+			},
+			&mock.SessionMock{
+				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
+					return &discordgo.Channel{
+						GuildID: "guildID",
+					}, nil
+				},
+			},
 			&discordgo.MessageCreate{
 				Message: &discordgo.Message{
 					Content: "test",

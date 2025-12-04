@@ -764,7 +764,13 @@ func TestInternalAPIRequest_PostMessage(t *testing.T) {
 			},
 			&ffmpeg.FfmpegMock{},
 			&crypto.AESMock{},
-			&mock.SessionMock{},
+			&mock.SessionMock{
+				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
+					return &discordgo.Channel{
+						GuildID: "guildID",
+					}, nil
+				},
+			},
 			&discordgo.MessageCreate{
 				Message: &discordgo.Message{
 					Content: "test",

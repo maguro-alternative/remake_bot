@@ -8,13 +8,31 @@ ENV LC_ALL ja_JP.UTF-8
 ENV TZ JST-9
 ENV TERM xterm
 
-# Copy source code
-COPY . /root/src
+# Step 1: Copy everything except .git to reduce build context
+COPY go.mod go.sum /root/src/
+COPY pkg/ /root/src/pkg/
+COPY core/ /root/src/core/
+COPY bot/ /root/src/bot/
+COPY web/ /root/src/web/
+COPY repository/ /root/src/repository/
+COPY tasks/ /root/src/tasks/
+COPY testutil/ /root/src/testutil/
 
-# Ensure vendor directory is properly copied
+# Step 2: Explicitly copy vendor directory to ensure it's included
 COPY vendor/ /root/src/vendor/
 
 WORKDIR /root/src
+
+# Debug: Check if vendor directory is properly copied
+RUN echo "=== Checking vendor directory after COPY ===" && \
+    echo "Vendor directory exists:" && \
+    ls -la vendor/ && \
+    echo "line-works-sdk-go directory exists:" && \
+    ls -la vendor/line-works-sdk-go/ && \
+    echo "Total files in line-works-sdk-go:" && \
+    find vendor/line-works-sdk-go -type f | wc -l && \
+    echo "Go files in line-works-sdk-go:" && \
+    find vendor/line-works-sdk-go -name "*.go" | head -5 || echo "No Go files found"
 
 # Verify that the vendor directory exists
 RUN if [ ! -d vendor/line-works-sdk-go/pkg/lineworks ]; then \

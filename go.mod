@@ -8,7 +8,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/cockroachdb/errors v1.11.3
 	github.com/google/uuid v1.6.0
-	github.com/maguro-alternative/line-works-sdk-go v0.0.0-20251227154948-5db0eae07667
+	github.com/maguro-alternative/line-works-sdk-go v0.0.0-20251228075418-f0b8dba12b89
 	github.com/mmcdole/gofeed v1.3.0
 )
 

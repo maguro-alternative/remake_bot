@@ -74,9 +74,4 @@ require (
 	google.golang.org/api v0.194.0
 )
 
-// Fix import path vs repository URL mismatch
-// Repository URL: github.com/maguro-alternative/line-works-sdk-go (correct)
-// Remote go.mod declares: github.com/sasakiharuki/line-works-sdk-go (incorrect)
-// This replace directive allows Go to fetch from the correct repository
-replace github.com/sasakiharuki/line-works-sdk-go => github.com/maguro-alternative/line-works-sdk-go v0.0.0-20251227154948-5db0eae07667
 

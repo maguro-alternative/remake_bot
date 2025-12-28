@@ -1,0 +1,40 @@
+# Include .git for submodule initialization, but exclude some heavy git files
+.git/hooks/
+.git/info/
+.git/logs/
+.git/refs/remotes/
+
+# Node modules (not needed for Go build)
+node_modules/
+package-lock.json
+package.json
+
+# Build artifacts
+main
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test files
+*_test.go
+
+# Documentation that's not needed in container
+README.md
+*.md
+!docs/
+
+# Environment files
+.env.local
+.env.development
+.env.test
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo

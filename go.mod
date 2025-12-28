@@ -74,9 +74,6 @@ require (
 	google.golang.org/api v0.194.0
 )
 
-// Local development: use local copy
+// Local development and production: use local vendored copy
+// This approach is necessary for private repositories
 replace github.com/maguro-alternative/line-works-sdk-go => ./vendor/line-works-sdk-go
-
-// For production builds, this replace directive should be removed or updated
-// to use a specific Git commit/tag via:
-// replace github.com/maguro-alternative/line-works-sdk-go => github.com/maguro-alternative/line-works-sdk-go v0.1.0

@@ -13,11 +13,26 @@ RUN mkdir -p /root/src
 COPY . /root/src
 WORKDIR /root/src
 
-# Initialize git submodules if they exist
-RUN if [ -f .gitmodules ]; then \
-    git config --global --add safe.directory /root/src && \
-    git config --global --add safe.directory /root/src/vendor/line-works-sdk-go && \
-    git submodule update --init --recursive; \
+# Setup Git configuration for submodules (needed for private repos)
+RUN git config --global user.email "docker@example.com" && \
+    git config --global user.name "Docker Build"
+
+# Initialize git repository and restore submodules
+# This step requires the .git directory to be copied
+RUN if [ -d .git ]; then \
+        git config --global --add safe.directory /root/src && \
+        git config --global --add safe.directory /root/src/vendor/line-works-sdk-go && \
+        git submodule update --init --recursive; \
+    else \
+        echo "Warning: .git directory not found. Submodules will not be initialized."; \
+        echo "Make sure vendor/line-works-sdk-go is included in the Docker build context."; \
+    fi
+
+# Verify that the vendor directory exists
+RUN if [ ! -d vendor/line-works-sdk-go/pkg/lineworks ]; then \
+        echo "Error: LINE Works SDK not found at vendor/line-works-sdk-go/pkg/lineworks"; \
+        echo "Please ensure the submodule is properly initialized or the vendor directory is included."; \
+        exit 1; \
     fi
 
 # Docker内で扱うffmpegをインストール

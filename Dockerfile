@@ -27,15 +27,9 @@ ENV GOSUMDB=off
 
 # Configure git for GitHub access (requires GITHUB_TOKEN build arg)
 ARG GITHUB_TOKEN
-RUN if [ -n "$GITHUB_TOKEN" ]; then \
-        git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
-        echo "Git configured with GitHub token"; \
-    else \
-        echo "Warning: No GITHUB_TOKEN provided. This may cause build failures for private repositories."; \
-        echo "Use: docker build --build-arg GITHUB_TOKEN=your_token_here ."; \
-    fi
+RUN git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
 
-# Download dependencies (will fetch from GitHub directly)
+# Download dependencies
 RUN go mod download
 
 # Build the application

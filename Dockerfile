@@ -21,14 +21,13 @@ COPY testutil/ /root/src/testutil/
 WORKDIR /root/src
 
 # Configure Go for private repositories  
-ENV GOPRIVATE=github.com/sasakiharuki/line-works-sdk-go
+ENV GOPRIVATE=github.com/maguro-alternative/line-works-sdk-go
 ENV GOPROXY=direct
 ENV GOSUMDB=off
 
 # Configure git for GitHub access (requires GITHUB_TOKEN build arg)
 ARG GITHUB_TOKEN
-RUN git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
-    git config --global url."https://${GITHUB_TOKEN}@github.com/maguro-alternative/line-works-sdk-go".insteadOf "https://github.com/maguro-alternative/line-works-sdk-go"
+RUN git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
 
 # Download dependencies
 RUN go mod download

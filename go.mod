@@ -8,8 +8,8 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/cockroachdb/errors v1.11.3
 	github.com/google/uuid v1.6.0
+	github.com/maguro-alternative/line-works-sdk-go v0.0.0-20251227154948-5db0eae07667
 	github.com/mmcdole/gofeed v1.3.0
-	github.com/sasakiharuki/line-works-sdk-go v0.0.0-20251227154948-5db0eae07667
 )
 
 require (
@@ -75,8 +75,8 @@ require (
 )
 
 // Fix import path vs repository URL mismatch
-// Import path: github.com/maguro-alternative/line-works-sdk-go  
-// Actual module: github.com/sasakiharuki/line-works-sdk-go (from remote go.mod)
-// Repository: github.com/maguro-alternative/line-works-sdk-go
-replace github.com/maguro-alternative/line-works-sdk-go => github.com/sasakiharuki/line-works-sdk-go v0.0.0-20251227154948-5db0eae07667
+// Repository URL: github.com/maguro-alternative/line-works-sdk-go (correct)
+// Remote go.mod declares: github.com/sasakiharuki/line-works-sdk-go (incorrect)
+// This replace directive allows Go to fetch from the correct repository
+replace github.com/sasakiharuki/line-works-sdk-go => github.com/maguro-alternative/line-works-sdk-go v0.0.0-20251227154948-5db0eae07667
 

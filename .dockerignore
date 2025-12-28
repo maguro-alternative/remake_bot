@@ -1,8 +1,5 @@
-# Include .git for submodule initialization, but exclude some heavy git files
-.git/hooks/
-.git/info/
-.git/logs/
-.git/refs/remotes/
+# Git directory (exclude to reduce build context size)
+.git/
 
 # Node modules (not needed for Go build)
 node_modules/
@@ -38,3 +35,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Important: vendor/ directory is NOT excluded
+# It contains the LINE Works SDK submodule that must be included

@@ -8,33 +8,34 @@ ENV LC_ALL ja_JP.UTF-8
 ENV TZ JST-9
 ENV TERM xterm
 
-# ./root/src ディレクトリを作成 ホームのファイルをコピーして、移動
-RUN mkdir -p /root/src
+# Copy source code
 COPY . /root/src
+
+# Ensure vendor directory is properly copied
+COPY vendor/ /root/src/vendor/
+
 WORKDIR /root/src
-
-# Setup Git configuration for submodules (needed for private repos)
-RUN git config --global user.email "docker@example.com" && \
-    git config --global user.name "Docker Build"
-
-# Initialize git repository and restore submodules
-# This step requires the .git directory to be copied
-RUN if [ -d .git ]; then \
-        git config --global --add safe.directory /root/src && \
-        git config --global --add safe.directory /root/src/vendor/line-works-sdk-go && \
-        git submodule update --init --recursive; \
-    else \
-        echo "Warning: .git directory not found. Submodules will not be initialized."; \
-        echo "Make sure vendor/line-works-sdk-go is included in the Docker build context."; \
-    fi
 
 # Verify that the vendor directory exists
 RUN if [ ! -d vendor/line-works-sdk-go/pkg/lineworks ]; then \
         echo "Error: LINE Works SDK not found at vendor/line-works-sdk-go/pkg/lineworks"; \
-        echo "Please ensure the submodule is properly initialized or the vendor directory is included."; \
+        echo "Available vendor contents:"; \
+        ls -la vendor/ || echo "No vendor directory"; \
+        if [ -d vendor/line-works-sdk-go ]; then \
+            echo "line-works-sdk-go contents:"; \
+            ls -la vendor/line-works-sdk-go/; \
+        fi; \
+        echo ""; \
+        echo "To fix this issue, run locally:"; \
+        echo "  git submodule update --init --recursive"; \
+        echo "  docker build ."; \
         exit 1; \
+    else \
+        echo "LINE Works SDK found successfully"; \
+        echo "SDK contents:"; \
+        ls -la vendor/line-works-sdk-go/pkg/lineworks/; \
     fi
 
 # Docker内で扱うffmpegをインストール
 RUN go mod download && \
-    go build -o ./main ./core/main.go
+    go build -mod=mod -o ./main ./core/main.go

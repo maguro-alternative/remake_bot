@@ -27,7 +27,7 @@ ENV GOSUMDB=off
 
 # Configure git for GitHub access (requires GITHUB_TOKEN build arg)
 ARG GITHUB_TOKEN
-RUN git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+RUN git config --global url."https://$GITHUB_TOKEN:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
 # Download dependencies
 RUN go mod download

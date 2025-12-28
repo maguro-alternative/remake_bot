@@ -1,0 +1,3 @@
+[submodule "vendor/line-works-sdk-go"]
+	path = vendor/line-works-sdk-go
+	url = https://github.com/maguro-alternative/line-works-sdk-go.git

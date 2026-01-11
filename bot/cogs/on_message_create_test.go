@@ -12,6 +12,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
+	"github.com/maguro-alternative/remake_bot/pkg/lineworks_service"
 
 	"github.com/maguro-alternative/remake_bot/bot/ffmpeg"
 
@@ -633,6 +634,11 @@ func TestInternalAPIRequest_PostMessage(t *testing.T) {
 					},
 				},
 			},
+			&lineworks_service.LineWorksServiceMock{
+				SendMessageFunc: func(ctx context.Context, guildID string, message string) error {
+					return nil
+				},
+			},
 		)
 		assert.NoError(t, err)
 	})
@@ -689,6 +695,11 @@ func TestInternalAPIRequest_PostMessage(t *testing.T) {
 					},
 				},
 			},
+			&lineworks_service.LineWorksServiceMock{
+				SendMessageFunc: func(ctx context.Context, guildID string, message string) error {
+					return nil
+				},
+			},
 		)
 		assert.NoError(t, err)
 	})
@@ -737,6 +748,11 @@ func TestInternalAPIRequest_PostMessage(t *testing.T) {
 					},
 				},
 			},
+			&lineworks_service.LineWorksServiceMock{
+				SendMessageFunc: func(ctx context.Context, guildID string, message string) error {
+					return nil
+				},
+			},
 		)
 		assert.NoError(t, err)
 	})
@@ -777,6 +793,11 @@ func TestInternalAPIRequest_PostMessage(t *testing.T) {
 					Author: &discordgo.User{
 						Bot: false,
 					},
+				},
+			},
+			&lineworks_service.LineWorksServiceMock{
+				SendMessageFunc: func(ctx context.Context, guildID string, message string) error {
+					return nil
 				},
 			},
 		)

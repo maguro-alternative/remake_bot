@@ -13,4 +13,6 @@ type Config struct {
 	InternalURL              string `env:"INTERNAL_URL" envDefault:"http://localhost:8080"`
 	ChannelNo                string `env:"CHANNEL_NO" envDefault:""`
 	SlachCommandDebugGuildID string `env:"SLACK_COMMAND_DEBUG_GUILD_ID" envDefault:""`
+	LineWorksID       string `env:"LINE_WORKS_ID" envDefault:""`
+	LineWorksPassword string `env:"LINE_WORKS_PASSWORD" envDefault:""`
 }

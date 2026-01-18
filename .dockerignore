@@ -1,0 +1,20 @@
+# Git directory (exclude to reduce build context size)
+.git/
+
+# Node modules (not needed for Go build)
+node_modules/
+
+# Environment files
+.env.local
+.env.development
+.env.test
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Note: Using explicit COPY commands in Dockerfile instead of wildcards

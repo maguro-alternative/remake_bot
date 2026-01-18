@@ -107,3 +107,11 @@ func ChannelNo() string {
 func SlashCommandDebugGuildID() string {
 	return cfg.SlachCommandDebugGuildID
 }
+
+func LineWorksID() string {
+	return cfg.LineWorksID
+}
+
+func LineWorksPassword() string {
+	return cfg.LineWorksPassword
+}

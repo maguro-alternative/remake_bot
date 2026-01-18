@@ -5,7 +5,6 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
+	"github.com/maguro-alternative/remake_bot/pkg/lineworks_service"
 
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/pkg/line"
@@ -44,9 +44,9 @@ func (h *cogHandler) onMessageCreate(s *discordgo.Session, vs *discordgo.Message
 	if err != nil {
 		slog.ErrorContext(ctx, "OnMessageCreate2 Error", "Error:", err.Error())
 	}
-	err = onMessageCreateFunc3(ctx, h.client, repo, ff, aesCrypto, s, vs)
+	err = onMessageCreateFunc3(ctx, h.client, repo, ff, aesCrypto, s, vs, h.lineWorksService)
 	if err != nil {
-		slog.ErrorContext(ctx, "OnMessageCreate Error", "Error:", err.Error())
+		slog.ErrorContext(ctx, "OnMessageCreate3 Error", "Error:", err.Error())
 	}
 }
 
@@ -66,9 +66,12 @@ func onMessageCreateFunc(
 	}
 
 	// 2. 権限チェック
-	err = validateMessagePermissions(ctx, repo, vs, channel)
+	perm, err := validateMessagePermissions(ctx, repo, vs, channel)
 	if err != nil {
 		return err
+	}
+	if !perm {
+		return nil
 	}
 
 	// 3. LINE Bot認証情報取得
@@ -178,9 +181,12 @@ func onMessageCreateFunc2(
 	}
 
 	// 2. 権限チェック
-	err = validateMessagePermissions(ctx, repo, vs, channel)
+	perm, err := validateMessagePermissions(ctx, repo, vs, channel)
 	if err != nil {
 		return err
+	}
+	if !perm {
+		return nil
 	}
 
 	// 3. LINE WORKS認証情報取得
@@ -434,6 +440,7 @@ func onMessageCreateFunc3(
 	aesCrypto crypto.AESInterface,
 	s mock.Session,
 	vs *discordgo.MessageCreate,
+	lineWorksService lineworks_service.LineWorksServiceInterface,
 ) error {
 	// 1. チャンネル情報取得
 	channel, err := getOrCreateChannel(ctx, repo, vs)
@@ -442,9 +449,12 @@ func onMessageCreateFunc3(
 	}
 
 	// 2. 権限チェック
-	err = validateMessagePermissions(ctx, repo, vs, channel)
+	perm, err := validateMessagePermissions(ctx, repo, vs, channel)
 	if err != nil {
 		return err
+	}
+	if !perm {
+		return nil
 	}
 
 	// 3. メッセージテキスト生成
@@ -452,65 +462,21 @@ func onMessageCreateFunc3(
 	if err != nil {
 		return err
 	}
-	var sendTextBuilder strings.Builder
-	sendTextBuilder.WriteString(messageText)
 
-	// 4. スタンプ処理
-	stickerImageUrls := processStickerItems(vs)
+	// 4. 最終メッセージ構築
+	finalMessage := buildFinalMessage(vs, messageText)
 
-	// 5. 添付ファイル処理（URLのみ取得）
-	imageUrls, videoUrls, voiceUrls, unsupportedUrls := processAttachmentsSimple(vs)
-
-	// 6. 全画像URLをマージ
-	allImageUrls := append(stickerImageUrls, imageUrls...)
-
-	// 7. 未対応ファイルURLを追加
-	for _, url := range unsupportedUrls {
-		sendTextBuilder.WriteString(url + "\n")
-	}
-
-	// 8. 統計情報追加
-	if len(allImageUrls) > 0 {
-		sendTextBuilder.WriteString(" 画像を" + strconv.Itoa(len(allImageUrls)) + "枚、")
-	}
-	if len(videoUrls) > 0 {
-		sendTextBuilder.WriteString(" 動画を" + strconv.Itoa(len(videoUrls)) + "個、")
-	}
-	if len(voiceUrls) > 0 {
-		sendTextBuilder.WriteString(" 音声を" + strconv.Itoa(len(voiceUrls)) + "個、")
-	}
-	if len(allImageUrls) > 0 || len(videoUrls) > 0 || len(voiceUrls) > 0 {
-		sendTextBuilder.WriteString(" 送信しました。")
-	}
-	sendTextBuilder.WriteString("「 " + vs.Message.Content + " 」")
-
-	// 9. 全メディアURLを追加
-	for _, url := range allImageUrls {
-		sendTextBuilder.WriteString(url + "\n")
-	}
-	for _, url := range videoUrls {
-		sendTextBuilder.WriteString(url + "\n")
-	}
-	for _, url := range voiceUrls {
-		sendTextBuilder.WriteString(url + "\n")
-	}
-
-	// 10. 内部APIに送信
-	form := url.Values{}
-	form.Add("message", sendTextBuilder.String())
-	req, err := http.NewRequest(http.MethodPost, config.InternalURL(), strings.NewReader(form.Encode()))
+	// 5. LINE WORKS即座送信（バックグラウンドサービス経由）
+	err = lineWorksService.SendMessage(ctx, vs.GuildID, finalMessage)
 	if err != nil {
-		slog.ErrorContext(ctx, "リクエストの作成に失敗しました", "エラー:", err.Error())
-		return err
+		slog.WarnContext(ctx, "LINE WORKS送信失敗（スキップします）",
+			"guildID", vs.GuildID, "error", err)
+		// LINE WORKS送信失敗でもエラーにしない（元の挙動維持）
+		return nil
 	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Bearer "+config.ChannelNo())
-	resp, err := client.Do(req)
-	if err != nil {
-		slog.ErrorContext(ctx, "リクエストの送信に失敗しました", "エラー:", err.Error())
-		return err
-	}
-	defer resp.Body.Close()
+
+	slog.InfoContext(ctx, "LINE WORKS送信成功",
+		"guildID", vs.GuildID, "messageLength", len(finalMessage))
 
 	return nil
 }
@@ -545,23 +511,23 @@ func validateMessagePermissions(
 	repo repository.RepositoryFunc,
 	vs *discordgo.MessageCreate,
 	channel repository.LinePostDiscordChannel,
-) error {
+) (bool, error) {
 	// チャンネルがNGの場合、またはBotメッセージでない場合は処理を終了
 	if channel.Ng || (!channel.BotMessage && vs.Author.Bot) {
 		slog.InfoContext(ctx, "NG Channel or Bot Message")
-		return nil
+		return false, nil
 	}
 
 	// NGメッセージタイプのチェック
 	ngTypes, err := repo.GetLineNgDiscordMessageTypeByChannelID(ctx, vs.ChannelID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_ng_discord_message_typeの取得に失敗しました", "エラー:", err.Error())
-		return err
+		return false, err
 	}
 	for _, ngType := range ngTypes {
 		if vs.Message.Type == discordgo.MessageType(ngType) {
 			slog.InfoContext(ctx, "NG Type")
-			return nil
+			return false, nil
 		}
 	}
 
@@ -569,12 +535,12 @@ func validateMessagePermissions(
 	ngDiscordUserIDs, err := repo.GetLineNgDiscordUserIDByChannelID(ctx, vs.ChannelID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_ng_discord_user_idの取得に失敗しました", "エラー:", err.Error())
-		return err
+		return false, err
 	}
 	for _, ngDiscordID := range ngDiscordUserIDs {
 		if vs.Author.ID == ngDiscordID {
 			slog.InfoContext(ctx, "NG User")
-			return nil
+			return false, nil
 		}
 	}
 
@@ -582,18 +548,18 @@ func validateMessagePermissions(
 	ngDiscordRoleIDs, err := repo.GetLineNgDiscordRoleIDByChannelID(ctx, vs.ChannelID)
 	if err != nil {
 		slog.ErrorContext(ctx, "line_ng_discord_role_idの取得に失敗しました", "エラー:", err.Error())
-		return err
+		return false, err
 	}
 	for _, ngDiscordRoleID := range ngDiscordRoleIDs {
 		for _, role := range vs.Member.Roles {
 			if role == ngDiscordRoleID {
 				slog.InfoContext(ctx, "NG Role")
-				return nil
+				return false, nil
 			}
 		}
 	}
 
-	return nil
+	return true, nil
 }
 
 // buildMessageText メッセージの種類によってテキストを生成
@@ -690,7 +656,7 @@ func getDecryptedLineBotCredentials(
 	return &lineBotDecrypt, nil
 }
 
-// LineWorksCredentials LINE WORKS認証情報
+// LineWorksCredentials LINE WORKS認証情報（旧API用）
 type LineWorksCredentials struct {
 	BotToken     string
 	RefreshToken string
@@ -699,7 +665,7 @@ type LineWorksCredentials struct {
 	BotSecret    string
 }
 
-// getDecryptedLineWorksCredentials LINE WORKSの認証情報を取得・復号化
+// getDecryptedLineWorksCredentials LINE WORKSの認証情報を取得・復号化（旧API用）
 func getDecryptedLineWorksCredentials(
 	ctx context.Context,
 	repo repository.RepositoryFunc,
@@ -750,6 +716,54 @@ func getDecryptedLineWorksCredentials(
 		BotID:        string(lineWorksBotID),
 		BotSecret:    string(lineWorksBotSecret),
 	}, nil
+}
+
+// buildFinalMessage builds the final message for LINE Works
+func buildFinalMessage(vs *discordgo.MessageCreate, messageText string) string {
+	var sendTextBuilder strings.Builder
+	sendTextBuilder.WriteString(messageText)
+
+	// スタンプ処理
+	stickerImageUrls := processStickerItems(vs)
+
+	// 添付ファイル処理（URLのみ取得）
+	imageUrls, videoUrls, voiceUrls, unsupportedUrls := processAttachmentsSimple(vs)
+
+	// 全画像URLをマージ
+	allImageUrls := append(stickerImageUrls, imageUrls...)
+
+	// 未対応ファイルURLを追加
+	for _, url := range unsupportedUrls {
+		sendTextBuilder.WriteString(url + "\n")
+	}
+
+	// 統計情報追加
+	if len(allImageUrls) > 0 {
+		sendTextBuilder.WriteString(" 画像を" + strconv.Itoa(len(allImageUrls)) + "枚、")
+	}
+	if len(videoUrls) > 0 {
+		sendTextBuilder.WriteString(" 動画を" + strconv.Itoa(len(videoUrls)) + "個、")
+	}
+	if len(voiceUrls) > 0 {
+		sendTextBuilder.WriteString(" 音声を" + strconv.Itoa(len(voiceUrls)) + "個、")
+	}
+	if len(allImageUrls) > 0 || len(videoUrls) > 0 || len(voiceUrls) > 0 {
+		sendTextBuilder.WriteString(" 送信しました。")
+	}
+	sendTextBuilder.WriteString("「 " + vs.Message.Content + " 」")
+
+	// 全メディアURLを追加
+	for _, url := range allImageUrls {
+		sendTextBuilder.WriteString("\n" + url)
+	}
+	for _, url := range videoUrls {
+		sendTextBuilder.WriteString("\n" + url)
+	}
+	for _, url := range voiceUrls {
+		sendTextBuilder.WriteString("\n" + url)
+	}
+
+	return sendTextBuilder.String()
 }
 
 // AttachmentResult 添付ファイル処理の結果

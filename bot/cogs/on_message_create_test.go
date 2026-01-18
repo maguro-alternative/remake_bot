@@ -12,6 +12,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/pkg/crypto"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
+	"github.com/maguro-alternative/remake_bot/pkg/lineworks_service"
 
 	"github.com/maguro-alternative/remake_bot/bot/ffmpeg"
 
@@ -543,6 +544,12 @@ func TestLineWorksRequest_PushMessage(t *testing.T) {
 						BotMessage: false,
 					}, nil
 				},
+				GetLineWorksBotByGuildIDFunc: func(ctx context.Context, guildID string) (*repository.LineWorksBot, error) {
+					return lineWorksBot, nil
+				},
+				GetLineWorksBotIVByGuildIDFunc: func(ctx context.Context, guildID string) (*repository.LineWorksBotIV, error) {
+					return &lineWorksBotIv, nil
+				},
 				GetLineNgDiscordMessageTypeByChannelIDFunc: func(ctx context.Context, channelID string) ([]int, error) {
 					return nil, nil
 				},
@@ -554,8 +561,18 @@ func TestLineWorksRequest_PushMessage(t *testing.T) {
 				},
 			},
 			&ffmpeg.FfmpegMock{},
-			&crypto.AESMock{},
-			&mock.SessionMock{},
+			&crypto.AESMock{
+				DecryptFunc: func(data []byte, iv []byte) (decrypted []byte, err error) {
+					return []byte("decrypted"), nil
+				},
+			},
+			&mock.SessionMock{
+				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
+					return &discordgo.Channel{
+						GuildID: "guildID",
+					}, nil
+				},
+			},
 			&discordgo.MessageCreate{
 				Message: &discordgo.Message{
 					Content: "test",
@@ -617,6 +634,11 @@ func TestInternalAPIRequest_PostMessage(t *testing.T) {
 					},
 				},
 			},
+			&lineworks_service.LineWorksServiceMock{
+				SendMessageFunc: func(ctx context.Context, guildID string, message string) error {
+					return nil
+				},
+			},
 		)
 		assert.NoError(t, err)
 	})
@@ -673,6 +695,11 @@ func TestInternalAPIRequest_PostMessage(t *testing.T) {
 					},
 				},
 			},
+			&lineworks_service.LineWorksServiceMock{
+				SendMessageFunc: func(ctx context.Context, guildID string, message string) error {
+					return nil
+				},
+			},
 		)
 		assert.NoError(t, err)
 	})
@@ -721,6 +748,11 @@ func TestInternalAPIRequest_PostMessage(t *testing.T) {
 					},
 				},
 			},
+			&lineworks_service.LineWorksServiceMock{
+				SendMessageFunc: func(ctx context.Context, guildID string, message string) error {
+					return nil
+				},
+			},
 		)
 		assert.NoError(t, err)
 	})
@@ -748,13 +780,24 @@ func TestInternalAPIRequest_PostMessage(t *testing.T) {
 			},
 			&ffmpeg.FfmpegMock{},
 			&crypto.AESMock{},
-			&mock.SessionMock{},
+			&mock.SessionMock{
+				ChannelFunc: func(channelID string, options ...discordgo.RequestOption) (st *discordgo.Channel, err error) {
+					return &discordgo.Channel{
+						GuildID: "guildID",
+					}, nil
+				},
+			},
 			&discordgo.MessageCreate{
 				Message: &discordgo.Message{
 					Content: "test",
 					Author: &discordgo.User{
 						Bot: false,
 					},
+				},
+			},
+			&lineworks_service.LineWorksServiceMock{
+				SendMessageFunc: func(ctx context.Context, guildID string, message string) error {
+					return nil
 				},
 			},
 		)

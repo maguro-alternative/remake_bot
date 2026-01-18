@@ -44,7 +44,6 @@ type Repository interface {
 	DeletePermissionRoleIDsByGuildID(ctx context.Context, guildId string) error
 }
 
-
 var (
 	_ Repository = (*repository.Repository)(nil)
 )

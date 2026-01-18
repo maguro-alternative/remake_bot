@@ -8,6 +8,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/cockroachdb/errors v1.11.3
 	github.com/google/uuid v1.6.0
+	github.com/maguro-alternative/line-works-sdk-go v0.0.0-20260111022751-6f3b61426691
 	github.com/mmcdole/gofeed v1.3.0
 )
 
@@ -22,6 +23,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-resty/resty/v2 v2.12.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect

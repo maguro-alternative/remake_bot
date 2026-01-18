@@ -91,3 +91,11 @@ func DatabaseURLForMigration() string {
 func SessionSecret() string {
 	return cfg.SessionSecret
 }
+
+func LineWorksID() string {
+	return cfg.LineWorksID
+}
+
+func LineWorksPassword() string {
+	return cfg.LineWorksPassword
+}

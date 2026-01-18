@@ -8,11 +8,29 @@ ENV LC_ALL ja_JP.UTF-8
 ENV TZ JST-9
 ENV TERM xterm
 
-# ./root/src ディレクトリを作成 ホームのファイルをコピーして、移動
-RUN mkdir -p /root/src
-COPY . /root/src
+# Copy source code (no need for vendor directory anymore)
+COPY go.mod go.sum /root/src/
+COPY pkg/ /root/src/pkg/
+COPY core/ /root/src/core/
+COPY bot/ /root/src/bot/
+COPY web/ /root/src/web/
+COPY repository/ /root/src/repository/
+COPY tasks/ /root/src/tasks/
+COPY testutil/ /root/src/testutil/
+
 WORKDIR /root/src
 
-# Docker内で扱うffmpegをインストール
-RUN go mod download && \
-    go build -o ./main ./core/main.go
+# Configure Go for private repositories  
+ENV GOPRIVATE=github.com/maguro-alternative/line-works-sdk-go
+ENV GOPROXY=direct
+ENV GOSUMDB=off
+
+# Configure git for GitHub access (requires GITHUB_TOKEN build arg)
+ARG GITHUB_TOKEN
+RUN git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+
+# Download dependencies
+RUN go mod download
+
+# Build the application
+RUN go build -o ./main ./core/main.go

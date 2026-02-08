@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
+	"path/filepath"
 	"time"
 
 	"github.com/maguro-alternative/remake_bot/bot/config"
@@ -16,11 +16,14 @@ import (
 
 	"github.com/bwmarrin/dgvoice"
 	"github.com/bwmarrin/discordgo"
+	voicevoxcorego "github.com/sh1ma/voicevoxcore.go"
 )
 
 const (
 	// voicevox_core local API endpoint
 	VoiceVoxLocalAPIURL = "http://localhost:50021"
+	// voicevox_core library path
+	VoiceVoxCoreDictPath = "/voicevox_core/open_jtalk_dic_utf_8-1.11"
 )
 
 var (
@@ -292,49 +295,82 @@ func getVoiceVoxFile(
 	intonation int64,
 	speed int64,
 ) (string, error) {
-	filepath := fmt.Sprintf("%s/%s.wav", os.TempDir(), time.Now().Format("20060102150405"))
-	file, err := os.Create(filepath)
+	// Try voicevoxcore.go first
+	audioData, err := getVoiceVoxFileFromLibrary(text, speakerId, pitch, intonation, speed)
+	if err == nil {
+		return audioData, nil
+	}
+
+	// Fallback to external API if library is unavailable
+	fmt.Printf("voicevoxcore.go not available, falling back to external API: %v\n", err)
+	return getVoiceVoxFileFromExternalAPI(client, key, text, speakerId, pitch, intonation, speed)
+}
+
+func getVoiceVoxFileFromLibrary(
+	text string,
+	speakerId string,
+	pitch int64,
+	intonation int64,
+	speed int64,
+) (string, error) {
+	// Parse speaker ID to int
+	var speakerIDInt int
+	_, err := fmt.Sscanf(speakerId, "%d", &speakerIDInt)
 	if err != nil {
-		fmt.Printf("error creating file: %v\n", err)
-		return "", err
+		return "", fmt.Errorf("invalid speaker ID: %v", err)
 	}
-	defer file.Close()
 
-	// Try local voicevox_core API first
-	// VOICEVOX Core API: /audio endpoint requires POST with query parameters
-	apiURL := fmt.Sprintf("%s/audio", VoiceVoxLocalAPIURL)
+	// Check if voicevox_core dictionary exists
+	if _, err := os.Stat(VoiceVoxCoreDictPath); os.IsNotExist(err) {
+		return "", fmt.Errorf("voicevox_core dictionary not found at %s", VoiceVoxCoreDictPath)
+	}
 
-	// Build query parameters
-	q := url.Values{}
-	q.Add("text", text)
-	q.Add("speaker", speakerId)
-	q.Add("speedScale", strconv.FormatFloat(float64(speed)/100.0, 'f', 2, 64))
-	q.Add("pitchScale", strconv.FormatFloat(float64(pitch)/100.0, 'f', 2, 64))
-	q.Add("intonationScale", strconv.FormatFloat(float64(intonation)/100.0, 'f', 2, 64))
+	// Initialize voicevoxcore.go
+	core := voicevoxcorego.New()
+	defer core.Finalize()
 
-	fullURL := apiURL + "?" + q.Encode()
+	// Set up initialization options
+	// accelerationMode: 0 (auto), cpuNumThreads: 0 (auto), 
+	// loadAllModels: false (load on demand), dictPath
+	initOpts := voicevoxcorego.NewVoicevoxInitializeOptions(0, 0, false, VoiceVoxCoreDictPath)
+	if err := core.Initialize(initOpts); err != nil {
+		return "", fmt.Errorf("failed to initialize voicevoxcore: %w", err)
+	}
 
-	req, err := http.NewRequest("POST", fullURL, nil)
+	// Load the speaker model
+	if err := core.LoadModel(uint(speakerIDInt)); err != nil {
+		return "", fmt.Errorf("failed to load model for speaker %d: %w", speakerIDInt, err)
+	}
+
+	// Generate AudioQuery first
+	audioQueryOpts := voicevoxcorego.NewVoicevoxAudioQueryOptions(false)
+	query, err := core.AudioQuery(text, uint(speakerIDInt), audioQueryOpts)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to generate audio query: %w", err)
 	}
 
-	resp, err := client.Do(req)
+	// Set voice parameters (convert from percentage to fractional scale)
+	// pitch: 100 = 1.0x
+	// speed: 100 = 1.0x
+	// intonation: 100 = 1.0x
+	query.PitchScale = float32(pitch) / 100.0
+	query.SpeedScale = float32(speed) / 100.0
+	query.IntonationScale = float32(intonation) / 100.0
+
+	// Generate audio using modified AudioQuery
+	synthesisOpts := voicevoxcorego.NewVoicevoxSynthesisOptions(false)
+	audioData, err := core.Synthesis(query, speakerIDInt, synthesisOpts)
 	if err != nil {
-		// Fallback to external API if local voicevox_core is not available
-		fmt.Printf("voicevox_core not available, falling back to external API: %v\n", err)
-		return getVoiceVoxFileFromExternalAPI(client, key, text, speakerId, pitch, intonation, speed)
+		return "", fmt.Errorf("failed to synthesize audio: %w", err)
 	}
-	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
-		// Fallback to external API on API error
-		fmt.Printf("voicevox_core API error: %d, falling back to external API\n", resp.StatusCode)
-		return getVoiceVoxFileFromExternalAPI(client, key, text, speakerId, pitch, intonation, speed)
-	}
-	defer resp.Body.Close()
 
-	_, err = io.Copy(file, resp.Body)
-	return filepath, err
+	// Save to temporary file
+	temppath := filepath.Join(os.TempDir(), fmt.Sprintf("voicevox_%d.wav", time.Now().UnixNano()))
+	if err := os.WriteFile(temppath, audioData, 0600); err != nil {
+		return "", fmt.Errorf("failed to write audio file: %w", err)
+	}
+
+	return temppath, nil
 }
 
 func getVoiceVoxFileFromExternalAPI(
@@ -357,11 +393,21 @@ func getVoiceVoxFileFromExternalAPI(
 	}
 	defer file.Close()
 
-	// External API parameters are in different format
+	// External API parameters - convert to the correct format (0-100 scale to -0.15~0.15 for pitch, 0.5~2.0 for speed)
+	// pitch: -100~100 (percentage) → -0.15~0.15 (absolute pitch change in semitones)
+	// speed: 0~200 (percentage) → 0.5~2.0 (multiplier)
+	// intonation: 0~200 (percentage) → 0.0~2.0 (multiplier)
+
+	pitchValue := (float64(pitch) - 100.0) / 100.0 * 0.15 // convert to ±0.15 range
+	speedValue := float64(speed) / 100.0                  // convert to 0.5~2.0 range (default 1.0)
+	intonationValue := float64(intonation) / 100.0        // convert to 0.5~2.0 range (default 1.0)
+
 	externalURL := fmt.Sprintf(
-		"https://api.su-shiki.com/v2/voicevox/audio/?key=%s&speaker=%s&pitch=%d&intonationScale=%d&speed=%d&text=%s",
-		key, speakerId, pitch, intonation, speed, url.QueryEscape(text),
+		"https://api.su-shiki.com/v2/voicevox/audio/?key=%s&speaker=%s&pitch=%.2f&intonationScale=%.2f&speed=%.2f&text=%s",
+		key, speakerId, pitchValue, intonationValue, speedValue, url.QueryEscape(text),
 	)
+
+	fmt.Printf("External API URL: %s\n", externalURL)
 
 	req, err := http.NewRequest("GET", externalURL, nil)
 	if err != nil {

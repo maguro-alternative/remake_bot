@@ -45,13 +45,11 @@ WORKDIR /opt/voicevox
 # Install voicevox_core dependencies
 RUN apt-get -y update && apt-get install -y \
     curl \
-    unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Download and extract voicevox_core (latest CPU version)
-RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.15.4/voicevox_core-0.15.4-linux-x64-cpu.zip" -o voicevox_core.zip && \
-    unzip voicevox_core.zip && \
-    rm voicevox_core.zip && \
+# Download voicevox_core (latest CPU version - direct binary download)
+# Note: The download URLs are for direct binaries, not zip files
+RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/download-linux-x64" -o voicevox_core && \
     chmod +x voicevox_core
 
 # ============================================================

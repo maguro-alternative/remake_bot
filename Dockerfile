@@ -53,9 +53,11 @@ RUN apt-get -y update && apt-get install -y \
 RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/voicevox_core-linux-x64-0.16.3.zip" -o voicevox_core.zip && \
     unzip -q voicevox_core.zip && \
     rm voicevox_core.zip && \
-    ls -la /opt/voicevox && \
-    find /opt/voicevox -type f -name "*voicevox*" && \
-    find /opt/voicevox -type f -executable
+    # The zip contains a downloader tool, run it to download the actual C API
+    chmod +x voicevox_core && \
+    ./voicevox_core --only c-api --output /opt/voicevox_downloaded && \
+    # Copy the actual C API binary
+    find /opt/voicevox_downloaded -name "voicevox_core" -type f -exec chmod +x {} \;
 
 # ============================================================
 # Stage 3: Runtime image
@@ -78,8 +80,8 @@ ENV TERM xterm
 # Copy Go binary from builder stage
 COPY --from=builder /root/src/main /app/main
 
-# Copy voicevox_core from installer stage - find it first
-COPY --from=voicevox_installer /opt/voicevox /app/voicevox_resources
+# Copy voicevox_core from installer stage
+COPY --from=voicevox_installer /opt/voicevox_downloaded /app/voicevox_resources
 RUN find /app/voicevox_resources -name "voicevox_core" -type f -exec cp {} /app/voicevox_core \; && chmod +x /app/voicevox_core
 
 

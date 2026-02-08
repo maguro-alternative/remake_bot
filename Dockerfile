@@ -54,8 +54,8 @@ RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/
     unzip -q voicevox_core.zip && \
     rm voicevox_core.zip && \
     # The zip contains a downloader tool, run it to download the actual C API
-    chmod +x voicevox_core && \
-    ./voicevox_core --only c-api --output /opt/voicevox_downloaded && \
+    chmod +x /app/voicevox_core && \
+    /app/voicevox_core --only c-api --output /opt/voicevox_downloaded && \
     # Copy the actual C API binary
     find /opt/voicevox_downloaded -name "voicevox_core" -type f -exec chmod +x {} \;
 

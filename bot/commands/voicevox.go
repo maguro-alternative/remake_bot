@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/maguro-alternative/remake_bot/pkg/sharedtime"
@@ -14,6 +16,11 @@ import (
 
 	"github.com/bwmarrin/dgvoice"
 	"github.com/bwmarrin/discordgo"
+)
+
+const (
+	// voicevox_core local API endpoint
+	VoiceVoxLocalAPIURL = "http://localhost:50021"
 )
 
 var (
@@ -293,19 +300,32 @@ func getVoiceVoxFile(
 	}
 	defer file.Close()
 
-	//"https://api.su-shiki.com/v2/voicevox/audio/?key={key}&speaker={id}&pitch={pitch}&intonationScale={intonation}&speed={speed}&text={text}"
-	url := fmt.Sprintf("https://api.su-shiki.com/v2/voicevox/audio/?key=%s&speaker=%s&pitch=%d&intonationScale=%d&speed=%d&text=%s", key, speakerId, pitch, intonation, speed, text)
-	req, err := http.NewRequest("GET", url, nil)
+	// Use local voicevox_core API instead of external API
+	// VOICEVOX Core API: /audio endpoint requires POST with query parameters
+	apiURL := fmt.Sprintf("%s/audio", VoiceVoxLocalAPIURL)
+	
+	// Build query parameters
+	q := url.Values{}
+	q.Add("text", text)
+	q.Add("speaker", speakerId)
+	q.Add("speedScale", strconv.FormatFloat(float64(speed)/100.0, 'f', 2, 64)) // speed is percentage
+	q.Add("pitchScale", strconv.FormatFloat(float64(pitch)/100.0, 'f', 2, 64))  // pitch is percentage
+	q.Add("intonationScale", strconv.FormatFloat(float64(intonation)/100.0, 'f', 2, 64))
+	
+	fullURL := apiURL + "?" + q.Encode()
+	
+	req, err := http.NewRequest("POST", fullURL, nil)
 	if err != nil {
 		return "", err
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to connect to voicevox_core API: %w", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("error while getting voicevox file: %v", resp.Status)
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("voicevox_core API error: %d - %s", resp.StatusCode, string(bodyBytes))
 	}
 	defer resp.Body.Close()
 

@@ -34,3 +34,94 @@ RUN go mod download
 
 # Build the application
 RUN go build -o ./main ./core/main.go
+
+# ============================================================
+# Stage 2: voicevox_core installer
+# ============================================================
+FROM python:3.11-bullseye AS voicevox_installer
+
+WORKDIR /opt/voicevox
+
+# Install voicevox_core dependencies
+RUN apt-get -y update && apt-get install -y \
+    curl \
+    unzip \
+    libssl3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download and extract voicevox_core (latest CPU version)
+RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.15.4/voicevox_core-0.15.4-linux-x64-cpu.zip" -o voicevox_core.zip && \
+    unzip voicevox_core.zip && \
+    rm voicevox_core.zip && \
+    chmod +x voicevox_core
+
+# ============================================================
+# Stage 3: Runtime image
+# ============================================================
+FROM ubuntu:22.04
+
+RUN apt-get -y update && apt-get -y install locales && apt-get install -y \
+    ffmpeg \
+    curl \
+    libssl3 \
+    ca-certificates \
+    && localedef -f UTF-8 -i ja_JP ja_JP.UTF-8 \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV LANG ja_JP.UTF-8
+ENV LANGUAGE ja_JP:ja
+ENV LC_ALL ja_JP.UTF-8
+ENV TZ JST-9
+ENV TERM xterm
+
+# Copy Go binary from builder stage
+COPY --from=builder /root/src/main /app/main
+
+# Copy voicevox_core from installer stage
+COPY --from=voicevox_installer /opt/voicevox/voicevox_core /app/voicevox_core
+COPY --from=voicevox_installer /opt/voicevox/open_jtalk_dic_utf_8-1.11.tar.gz /app/voicevox_resource/
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+# Use Railway PORT environment variable or default to 5000\n\
+PORT=${PORT:-5000}\n\
+\n\
+# Check if voicevox should be disabled\n\
+ENABLE_VOICEVOX=${ENABLE_VOICEVOX:-true}\n\
+\n\
+if [ "$ENABLE_VOICEVOX" = "true" ]; then\n\
+  # Start voicevox_core in background\n\
+  echo "Starting VOICEVOX Core..."\n\
+  /app/voicevox_core --port 50021 --cpu_num_threads 2 > /tmp/voicevox.log 2>&1 &\n\
+  VOICEVOX_PID=$!\n\
+  \n\
+  # Wait for voicevox_core to be ready\n\
+  echo "Waiting for VOICEVOX Core to start..."\n\
+  for i in {1..30}; do\n\
+    if curl -s http://localhost:50021/version > /dev/null 2>&1; then\n\
+      echo "VOICEVOX Core started successfully"\n\
+      break\n\
+    fi\n\
+    if [ $i -eq 30 ]; then\n\
+      echo "Warning: Failed to start VOICEVOX Core, continuing without it"\n\
+      cat /tmp/voicevox.log\n\
+      break\n\
+    fi\n\
+    sleep 1\n\
+  done\n\
+else\n\
+  echo "VOICEVOX Core disabled"\n\
+fi\n\
+\n\
+# Start main application with PORT environment variable\n\
+echo "Starting application on port $PORT..."\n\
+export PORT=$PORT\n\
+exec /app/main\n\
+' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+
+WORKDIR /app
+
+EXPOSE 5000
+CMD ["/app/entrypoint.sh"]

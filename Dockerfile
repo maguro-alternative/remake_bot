@@ -79,7 +79,7 @@ ENV TERM xterm
 COPY --from=builder /root/src/main /app/main
 
 # Copy voicevox_core from installer stage
-COPY --from=voicevox_installer /opt/voicevox/download /app/voicevox_core
+COPY --from=voicevox_installer /opt/voicevox/download /app/download
 
 
 # Create startup script

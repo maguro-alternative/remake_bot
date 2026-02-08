@@ -53,7 +53,7 @@ RUN apt-get -y update && apt-get install -y \
 RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/voicevox_core-linux-x64-0.16.3.zip" -o voicevox_core.zip && \
     unzip -q voicevox_core.zip && \
     rm voicevox_core.zip && \
-    chmod +x voicevox_core
+    find . -name "voicevox_core" -type f -exec chmod +x {} \;
 
 # ============================================================
 # Stage 3: Runtime image
@@ -76,8 +76,9 @@ ENV TERM xterm
 # Copy Go binary from builder stage
 COPY --from=builder /root/src/main /app/main
 
-# Copy voicevox_core from installer stage
-COPY --from=voicevox_installer /opt/voicevox/voicevox_core /app/voicevox_core
+# Copy voicevox_core from installer stage - find it first
+COPY --from=voicevox_installer /opt/voicevox /app/voicevox_resources
+RUN find /app/voicevox_resources -name "voicevox_core" -type f -exec cp {} /app/voicevox_core \; && chmod +x /app/voicevox_core
 
 
 # Create startup script

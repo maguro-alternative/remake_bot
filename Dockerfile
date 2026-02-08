@@ -45,19 +45,16 @@ WORKDIR /opt/voicevox
 # Install voicevox_core dependencies
 RUN apt-get -y update && apt-get install -y \
     curl \
-    unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Download voicevox_core C API (actual core, not downloader tool)
-# Version 0.16.3 - Linux x64 CPU version
-RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/voicevox_core-linux-x64-0.16.3.zip" -o voicevox_core.zip && \
-    unzip -q voicevox_core.zip && \
-    rm voicevox_core.zip && \
-    # The zip contains a downloader tool, run it to download the actual C API
-    chmod +x /app/voicevox_core && \
-    /app/voicevox_core --only c-api --output /opt/voicevox_downloaded && \
-    # Copy the actual C API binary
-    find /opt/voicevox_downloaded -name "voicevox_core" -type f -exec chmod +x {} \;
+# Download voicevox_core (latest CPU version - direct binary download)
+# Note: The download URLs are for direct binaries, not zip files
+RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/download-linux-x64" -o voicevox_core && \
+    chmod +x voicevox_core && \
+    mkdir models && \
+    # Download default models
+    curl -L -o models/0.vvm https://raw.githubusercontent.com/VOICEVOX/voicevox_vvm/main/vvms/0.vvm && \
+    ./download --exclude models
 
 # ============================================================
 # Stage 3: Runtime image
@@ -81,8 +78,7 @@ ENV TERM xterm
 COPY --from=builder /root/src/main /app/main
 
 # Copy voicevox_core from installer stage
-COPY --from=voicevox_installer /opt/voicevox_downloaded /app/voicevox_resources
-RUN find /app/voicevox_resources -name "voicevox_core" -type f -exec cp {} /app/voicevox_core \; && chmod +x /app/voicevox_core
+COPY --from=voicevox_installer /opt/voicevox/voicevox_core /app/voicevox_core
 
 
 # Create startup script

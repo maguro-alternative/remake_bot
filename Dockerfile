@@ -49,13 +49,13 @@ RUN apt-get -y update && apt-get install -y \
 
 # Download voicevox_core (latest CPU version - direct binary download)
 # Note: The download URLs are for direct binaries, not zip files
-RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/download-linux-x64" -o voicevox_core && \
-    chmod +x voicevox_core && \
+RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/download-linux-x64" -o download && \
+    chmod +x download && \
     mkdir models && \
     # Download default models
     curl -L -o models/0.vvm https://raw.githubusercontent.com/VOICEVOX/voicevox_vvm/main/vvms/0.vvm && \
     # Run with automatic acceptance of terms (non-interactive)
-    echo "y" | ./voicevox_core --exclude models || true
+    echo "y" | ./download --exclude models || true
 
 # ============================================================
 # Stage 3: Runtime image
@@ -79,7 +79,7 @@ ENV TERM xterm
 COPY --from=builder /root/src/main /app/main
 
 # Copy voicevox_core from installer stage
-COPY --from=voicevox_installer /opt/voicevox/voicevox_core /app/voicevox_core
+COPY --from=voicevox_installer /opt/voicevox/download /app/voicevox_core
 
 
 # Create startup script

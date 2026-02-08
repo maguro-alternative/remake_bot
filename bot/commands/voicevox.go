@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/maguro-alternative/remake_bot/pkg/sharedtime"
 	"github.com/maguro-alternative/remake_bot/bot/config"
+	"github.com/maguro-alternative/remake_bot/pkg/sharedtime"
 	"github.com/maguro-alternative/remake_bot/repository"
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
@@ -190,9 +190,9 @@ func (h *commandHandler) handleVoiceVox(
 	text := ""
 	speacker := "ずんだもん"
 	speakerId := "3"
-	pitch := int64(0)
-	intonation := int64(1)
-	speed := int64(1)
+	pitch := int64(100)      // 100 = 1.0x speed
+	intonation := int64(100) // 100 = 1.0x intonation
+	speed := int64(100)      // 100 = 1.0x speed
 
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionApplicationCommandAutocompleteResult,
@@ -300,20 +300,20 @@ func getVoiceVoxFile(
 	}
 	defer file.Close()
 
-	// Use local voicevox_core API instead of external API
+	// Try local voicevox_core API first
 	// VOICEVOX Core API: /audio endpoint requires POST with query parameters
 	apiURL := fmt.Sprintf("%s/audio", VoiceVoxLocalAPIURL)
-	
+
 	// Build query parameters
 	q := url.Values{}
 	q.Add("text", text)
 	q.Add("speaker", speakerId)
-	q.Add("speedScale", strconv.FormatFloat(float64(speed)/100.0, 'f', 2, 64)) // speed is percentage
-	q.Add("pitchScale", strconv.FormatFloat(float64(pitch)/100.0, 'f', 2, 64))  // pitch is percentage
+	q.Add("speedScale", strconv.FormatFloat(float64(speed)/100.0, 'f', 2, 64))
+	q.Add("pitchScale", strconv.FormatFloat(float64(pitch)/100.0, 'f', 2, 64))
 	q.Add("intonationScale", strconv.FormatFloat(float64(intonation)/100.0, 'f', 2, 64))
-	
+
 	fullURL := apiURL + "?" + q.Encode()
-	
+
 	req, err := http.NewRequest("POST", fullURL, nil)
 	if err != nil {
 		return "", err
@@ -321,11 +321,61 @@ func getVoiceVoxFile(
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("failed to connect to voicevox_core API: %w", err)
+		// Fallback to external API if local voicevox_core is not available
+		fmt.Printf("voicevox_core not available, falling back to external API: %v\n", err)
+		return getVoiceVoxFileFromExternalAPI(client, key, text, speakerId, pitch, intonation, speed)
+	}
+	if resp.StatusCode != http.StatusOK {
+		resp.Body.Close()
+		// Fallback to external API on API error
+		fmt.Printf("voicevox_core API error: %d, falling back to external API\n", resp.StatusCode)
+		return getVoiceVoxFileFromExternalAPI(client, key, text, speakerId, pitch, intonation, speed)
+	}
+	defer resp.Body.Close()
+
+	_, err = io.Copy(file, resp.Body)
+	return filepath, err
+}
+
+func getVoiceVoxFileFromExternalAPI(
+	client *http.Client,
+	key string,
+	text string,
+	speakerId string,
+	pitch int64,
+	intonation int64,
+	speed int64,
+) (string, error) {
+	if key == "" {
+		return "", fmt.Errorf("voicevox_core API unavailable and no VOICEVOX_KEY configured for external API")
+	}
+
+	filepath := fmt.Sprintf("%s/%s.wav", os.TempDir(), time.Now().Format("20060102150405"))
+	file, err := os.Create(filepath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	// External API parameters are in different format
+	externalURL := fmt.Sprintf(
+		"https://api.su-shiki.com/v2/voicevox/audio/?key=%s&speaker=%s&pitch=%d&intonationScale=%d&speed=%d&text=%s",
+		key, speakerId, pitch, intonation, speed, url.QueryEscape(text),
+	)
+
+	req, err := http.NewRequest("GET", externalURL, nil)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to connect to external voicevox API: %w", err)
 	}
 	if resp.StatusCode != http.StatusOK {
 		bodyBytes, _ := io.ReadAll(resp.Body)
-		return "", fmt.Errorf("voicevox_core API error: %d - %s", resp.StatusCode, string(bodyBytes))
+		resp.Body.Close()
+		return "", fmt.Errorf("external voicevox API error: %d - %s", resp.StatusCode, string(bodyBytes))
 	}
 	defer resp.Body.Close()
 

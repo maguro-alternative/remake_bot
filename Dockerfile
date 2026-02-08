@@ -54,7 +54,7 @@ RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/
     mkdir models && \
     # Download default models
     curl -L -o models/0.vvm https://raw.githubusercontent.com/VOICEVOX/voicevox_vvm/main/vvms/0.vvm && \
-    ./download --exclude models
+    voicevox_core --exclude models
 
 # ============================================================
 # Stage 3: Runtime image

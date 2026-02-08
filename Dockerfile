@@ -53,7 +53,9 @@ RUN apt-get -y update && apt-get install -y \
 RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/voicevox_core-linux-x64-0.16.3.zip" -o voicevox_core.zip && \
     unzip -q voicevox_core.zip && \
     rm voicevox_core.zip && \
-    find . -name "voicevox_core" -type f -exec chmod +x {} \;
+    ls -la /opt/voicevox && \
+    find /opt/voicevox -type f -name "*voicevox*" && \
+    find /opt/voicevox -type f -executable
 
 # ============================================================
 # Stage 3: Runtime image

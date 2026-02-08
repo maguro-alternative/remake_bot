@@ -38,7 +38,7 @@ RUN go build -o ./main ./core/main.go
 # ============================================================
 # Stage 2: voicevox_core installer
 # ============================================================
-FROM python:3.11-bullseye AS voicevox_installer
+FROM python:3.11-bookworm AS voicevox_installer
 
 WORKDIR /opt/voicevox
 
@@ -59,7 +59,7 @@ RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/
 # ============================================================
 # Stage 3: Runtime image
 # ============================================================
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 RUN apt-get -y update && apt-get -y install locales && apt-get install -y \
     ffmpeg \

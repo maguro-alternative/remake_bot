@@ -46,7 +46,6 @@ WORKDIR /opt/voicevox
 RUN apt-get -y update && apt-get install -y \
     curl \
     unzip \
-    libssl3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Download and extract voicevox_core (latest CPU version)
@@ -63,7 +62,6 @@ FROM ubuntu:22.04
 RUN apt-get -y update && apt-get -y install locales && apt-get install -y \
     ffmpeg \
     curl \
-    libssl3 \
     ca-certificates \
     && localedef -f UTF-8 -i ja_JP ja_JP.UTF-8 \
     && rm -rf /var/lib/apt/lists/*

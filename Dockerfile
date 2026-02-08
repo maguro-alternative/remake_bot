@@ -75,7 +75,7 @@ COPY --from=builder /root/src/main /app/main
 
 # Copy voicevox_core from installer stage
 COPY --from=voicevox_installer /opt/voicevox/voicevox_core /app/voicevox_core
-COPY --from=voicevox_installer /opt/voicevox/open_jtalk_dic_utf_8-1.11.tar.gz /app/voicevox_resource/
+
 
 # Create startup script
 RUN echo '#!/bin/bash\n\

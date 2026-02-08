@@ -1,14 +1,42 @@
-FROM golang:1.23.0-bullseye AS builder
+FROM golang:1.23.0-bookworm AS voicevox_setup
 
-RUN apt-get -y update && apt-get -y install locales && apt-get -y upgrade && apt-get install -y ffmpeg &&\
-    localedef -f UTF-8 -i ja_JP ja_JP.UTF-8
+WORKDIR /opt/voicevox
+
+RUN apt-get -y update && apt-get install -y curl unzip && rm -rf /var/lib/apt/lists/*
+
+# Download voicevox_core library (Linux x86_64)
+RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/voicevox_core-0.16.3-linux-x64.zip" -o voicevox.zip && \
+    unzip voicevox.zip && \
+    rm voicevox.zip && \
+    ls -la
+
+# ============================================================
+# Stage 2: Go Builder with CGO support
+# ============================================================
+FROM golang:1.23.0-bookworm AS builder
+
+# Install CGO dependencies and ffmpeg
+RUN apt-get -y update && apt-get -y install locales && apt-get -y upgrade && \
+    apt-get install -y ffmpeg build-essential pkg-config && \
+    localedef -f UTF-8 -i ja_JP ja_JP.UTF-8 && \
+    rm -rf /var/lib/apt/lists/*
+
 ENV LANG ja_JP.UTF-8
 ENV LANGUAGE ja_JP:ja
 ENV LC_ALL ja_JP.UTF-8
 ENV TZ JST-9
 ENV TERM xterm
 
-# Copy source code (no need for vendor directory anymore)
+# Copy voicevox_core from setup stage
+COPY --from=voicevox_setup /opt/voicevox /voicevox_core
+
+# Set up library environment for CGO
+ENV LD_LIBRARY_PATH=/voicevox_core:$LD_LIBRARY_PATH
+ENV CGO_CFLAGS="-I/voicevox_core"
+ENV CGO_LDFLAGS="-L/voicevox_core"
+ENV CGO_ENABLED=1
+
+# Copy source code
 COPY go.mod go.sum /root/src/
 COPY pkg/ /root/src/pkg/
 COPY core/ /root/src/core/
@@ -32,28 +60,8 @@ RUN git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "htt
 # Download dependencies
 RUN go mod download
 
-# Build the application
+# Build the application with CGO
 RUN go build -o ./main ./core/main.go
-
-# ============================================================
-# Stage 2: voicevox_core installer
-# ============================================================
-FROM python:3.11-bookworm AS voicevox_installer
-
-WORKDIR /opt/voicevox
-
-# Install voicevox_core dependencies
-RUN apt-get -y update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Download voicevox_core (latest CPU version - direct binary download)
-# Note: The download URLs are for direct binaries, not zip files
-RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/download-linux-x64" -o download && \
-    chmod +x download && \
-    mkdir models && \
-    # Run with automatic acceptance of terms (non-interactive)
-    echo "y" | ./download || true
 
 # ============================================================
 # Stage 3: Runtime image
@@ -76,8 +84,11 @@ ENV TERM xterm
 # Copy Go binary from builder stage
 COPY --from=builder /root/src/main /app/main
 
-# Copy voicevox_core from installer stage
-COPY --from=voicevox_installer /opt/voicevox/voicevox_core /app/voicevox_core
+# Copy voicevox_core library from setup stage
+COPY --from=voicevox_setup /opt/voicevox /voicevox_core
+
+# Set up library path
+ENV LD_LIBRARY_PATH=/voicevox_core:$LD_LIBRARY_PATH
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
@@ -85,33 +96,6 @@ set -e\n\
 \n\
 # Use Railway PORT environment variable or default to 5000\n\
 PORT=${PORT:-5000}\n\
-\n\
-# Check if voicevox should be disabled\n\
-ENABLE_VOICEVOX=${ENABLE_VOICEVOX:-true}\n\
-\n\
-if [ "$ENABLE_VOICEVOX" = "true" ]; then\n\
-  # Start voicevox_core in background\n\
-  echo "Starting VOICEVOX Core..."\n\
-  /app/voicevox_core --port 50021 --cpu_num_threads 2 > /tmp/voicevox.log 2>&1 &\n\
-  VOICEVOX_PID=$!\n\
-  \n\
-  # Wait for voicevox_core to be ready\n\
-  echo "Waiting for VOICEVOX Core to start..."\n\
-  for i in {1..30}; do\n\
-    if curl -s http://localhost:50021/version > /dev/null 2>&1; then\n\
-      echo "VOICEVOX Core started successfully"\n\
-      break\n\
-    fi\n\
-    if [ $i -eq 30 ]; then\n\
-      echo "Warning: Failed to start VOICEVOX Core, continuing without it"\n\
-      cat /tmp/voicevox.log\n\
-      break\n\
-    fi\n\
-    sleep 1\n\
-  done\n\
-else\n\
-  echo "VOICEVOX Core disabled"\n\
-fi\n\
 \n\
 # Start main application with PORT environment variable\n\
 echo "Starting application on port $PORT..."\n\

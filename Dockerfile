@@ -1,14 +1,42 @@
 FROM golang:1.23.0-bookworm AS voicevox_setup
 
+# Allow overriding the voicevox core asset URL at build time:
+# docker build --build-arg VOICEVOX_ASSET_URL=<url> -t remake_bot:v1 .
+ARG VOICEVOX_ASSET_URL="https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/download-linux-x64"
+ENV VOICEVOX_ASSET_URL=${VOICEVOX_ASSET_URL}
+
 WORKDIR /opt/voicevox
 
-RUN apt-get -y update && apt-get install -y curl unzip && rm -rf /var/lib/apt/lists/*
+RUN apt-get -y update && apt-get install -y curl unzip file && rm -rf /var/lib/apt/lists/*
 
-# Download voicevox_core library (Linux x86_64)
-RUN curl -L "https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/voicevox_core-0.16.3-linux-x64.zip" -o voicevox.zip && \
-    unzip voicevox.zip && \
-    rm voicevox.zip && \
-    ls -la
+# Download voicevox_core (supports zip, tar.gz, or direct binary) with retries and debug output
+RUN set -eux; \
+        OUT=/opt/voicevox/voicevox.asset; \
+        curl -sSL -D /tmp/curl_headers.txt --retry 3 --retry-delay 5 -o "$OUT" "$VOICEVOX_ASSET_URL" || true; \
+        echo "curl headers:"; cat /tmp/curl_headers.txt || true; \
+        echo "downloaded file info:"; ls -la "$OUT" || true; \
+        if [ ! -s "$OUT" ] || [ $(stat -c%s "$OUT" || echo 0) -lt 1000 ]; then \
+                echo "Downloaded file looks too small or empty; dumping first 4KiB:"; \
+                head -c 4096 "$OUT" || true; \
+                false; \
+        fi; \
+        mimetype=$(file -b --mime-type "$OUT" || true); \
+        echo "detected mime-type: $mimetype"; \
+        case "$mimetype" in \
+            application/zip) \
+                unzip "$OUT" -d /opt/voicevox ;; \
+            application/gzip|application/x-gzip) \
+                tar -xzf "$OUT" -C /opt/voicevox ;; \
+            application/x-tar) \
+                tar -xf "$OUT" -C /opt/voicevox ;; \
+            application/octet-stream|binary|application/x-pie-executable|application/x-executable|application/x-elf) \
+                echo "Treating as binary; moving to /opt/voicevox/"; \
+                mkdir -p /opt/voicevox && mv "$OUT" /opt/voicevox/voicevox_core_binary && chmod +x /opt/voicevox/voicevox_core_binary ;; \
+            *) \
+                echo "Unknown asset mime-type: $mimetype"; false ;; \
+        esac; \
+        rm -f /tmp/curl_headers.txt || true; \
+        ls -la /opt/voicevox
 
 # ============================================================
 # Stage 2: Go Builder with CGO support

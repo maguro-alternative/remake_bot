@@ -3,7 +3,9 @@ FROM golang:1.23.0-bookworm AS voicevox_setup
 # Allow overriding the voicevox core asset URL at build time:
 # docker build --build-arg VOICEVOX_ASSET_URL=<url> -t remake_bot:v1 .
 ARG VOICEVOX_ASSET_URL="https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/download-linux-x64"
+ARG VOICEVOX_VERSION="0.16.3"
 ENV VOICEVOX_ASSET_URL=${VOICEVOX_ASSET_URL}
+ENV VOICEVOX_VERSION=${VOICEVOX_VERSION}
 
 WORKDIR /opt/voicevox
 
@@ -31,7 +33,10 @@ RUN set -eux; \
                 tar -xf "$OUT" -C /opt/voicevox ;; \
             application/octet-stream|binary|application/x-pie-executable|application/x-executable|application/x-elf) \
                 echo "Treating as binary; moving to /opt/voicevox/"; \
-                mkdir -p /opt/voicevox && mv "$OUT" /opt/voicevox/voicevox_core_binary && chmod +x /opt/voicevox/voicevox_core_binary ;; \
+                mkdir -p /opt/voicevox && mv "$OUT" /opt/voicevox/voicevox_core_binary && chmod +x /opt/voicevox/voicevox_core_binary; \
+                echo "Attempting to fetch header files for VOICEVOX ${VOICEVOX_VERSION}"; \
+                curl -fsSL -o /opt/voicevox/voicevox_core.h "https://raw.githubusercontent.com/VOICEVOX/voicevox_core/v${VOICEVOX_VERSION}/include/voicevox_core.h" || echo "warning: couldn't fetch voicevox_core.h"; \
+                curl -fsSL -o /opt/voicevox/version.h "https://raw.githubusercontent.com/VOICEVOX/voicevox_core/v${VOICEVOX_VERSION}/include/version.h" || true ;; \
             *) \
                 echo "Unknown asset mime-type: $mimetype"; false ;; \
         esac; \

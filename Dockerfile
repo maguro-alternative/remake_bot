@@ -98,6 +98,10 @@ COPY --from=builder /root/src/main /app/main
 
 # Copy voicevox_core library from setup stage
 COPY --from=voicevox_setup /opt/voicevox /voicevox_core
+RUN mkdir -p /usr/local/lib && \
+    if [ -d /voicevox_core/core_files ]; then cp -a /voicevox_core/core_files/lib/. /usr/local/lib/ || true; fi && \
+    ldconfig || true
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 # Set up library path
 ENV LD_LIBRARY_PATH=/voicevox_core:$LD_LIBRARY_PATH

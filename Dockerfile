@@ -1,10 +1,7 @@
 FROM golang:1.23.0-bookworm AS voicevox_setup
 
 # Allow overriding the voicevox core asset URL at build time:
-# docker build --build-arg VOICEVOX_ASSET_URL=<url> -t remake_bot:v1 .
-ARG VOICEVOX_ASSET_URL="https://github.com/VOICEVOX/voicevox_core/releases/download/0.16.3/download-linux-x64"
-ARG VOICEVOX_VERSION="0.16.3"
-ENV VOICEVOX_ASSET_URL=${VOICEVOX_ASSET_URL}
+ARG VOICEVOX_VERSION="0.14.1"
 ENV VOICEVOX_VERSION=${VOICEVOX_VERSION}
 
 WORKDIR /opt/voicevox
@@ -12,36 +9,15 @@ WORKDIR /opt/voicevox
 RUN apt-get -y update && apt-get install -y curl unzip file && rm -rf /var/lib/apt/lists/*
 
 # Download voicevox_core (supports zip, tar.gz, or direct binary) with retries and debug output
+# 1. ARM64(aarch64) 用の 0.14.1 バイナリをダウンロード
+# URL 内の "x64" を "arm64" に変更するのが肝です
+RUN wget https://github.com/VOICEVOX/voicevox_core/releases/download/0.14.1/voicevox_core-linux-arm64-cpu-0.14.1.zip \
+    && unzip voicevox_core-linux-arm64-cpu-0.14.1.zip \
+    && mv voicevox_core-linux-arm64-cpu-0.14.1 core_files
 RUN set -eux; \
-        OUT=/opt/voicevox/voicevox.asset; \
-        curl -sSL -D /tmp/curl_headers.txt --retry 3 --retry-delay 5 -o "$OUT" "$VOICEVOX_ASSET_URL" || true; \
-        echo "curl headers:"; cat /tmp/curl_headers.txt || true; \
-        echo "downloaded file info:"; ls -la "$OUT" || true; \
-        if [ ! -s "$OUT" ] || [ $(stat -c%s "$OUT" || echo 0) -lt 1000 ]; then \
-                echo "Downloaded file looks too small or empty; dumping first 4KiB:"; \
-                head -c 4096 "$OUT" || true; \
-                false; \
-        fi; \
-        mimetype=$(file -b --mime-type "$OUT" || true); \
-        echo "detected mime-type: $mimetype"; \
-        case "$mimetype" in \
-            application/zip) \
-                unzip "$OUT" -d /opt/voicevox ;; \
-            application/gzip|application/x-gzip) \
-                tar -xzf "$OUT" -C /opt/voicevox ;; \
-            application/x-tar) \
-                tar -xf "$OUT" -C /opt/voicevox ;; \
-            application/octet-stream|binary|application/x-pie-executable|application/x-executable|application/x-elf) \
-                echo "Treating as binary; moving to /opt/voicevox/"; \
-                mkdir -p /opt/voicevox && mv "$OUT" /opt/voicevox/voicevox_core_binary && chmod +x /opt/voicevox/voicevox_core_binary; \
-                echo "Attempting to fetch header files for VOICEVOX ${VOICEVOX_VERSION}"; \
-                curl -fsSL -o /opt/voicevox/voicevox_core.h "https://raw.githubusercontent.com/VOICEVOX/voicevox_core/v${VOICEVOX_VERSION}/include/voicevox_core.h" || echo "warning: couldn't fetch voicevox_core.h"; \
-                curl -fsSL -o /opt/voicevox/version.h "https://raw.githubusercontent.com/VOICEVOX/voicevox_core/v${VOICEVOX_VERSION}/include/version.h" || true ;; \
-            *) \
-                echo "Unknown asset mime-type: $mimetype"; false ;; \
-        esac; \
-        rm -f /tmp/curl_headers.txt || true; \
-        ls -la /opt/voicevox
+    cp -a /voicevox_core/core_files/include/. /usr/local/include/ || true; \
+    cp -a /voicevox_core/core_files/lib/. /usr/local/lib/ || true; \
+    ldconfig || true
 
 # ============================================================
 # Stage 2: Go Builder with CGO support
@@ -50,7 +26,7 @@ FROM golang:1.23.0-bookworm AS builder
 
 # Install CGO dependencies and ffmpeg
 RUN apt-get -y update && apt-get -y install locales && apt-get -y upgrade && \
-    apt-get install -y ffmpeg build-essential pkg-config && \
+    apt-get install -y ffmpeg build-essential pkg-config libopus-dev && \
     localedef -f UTF-8 -i ja_JP ja_JP.UTF-8 && \
     rm -rf /var/lib/apt/lists/*
 
@@ -65,8 +41,8 @@ COPY --from=voicevox_setup /opt/voicevox /voicevox_core
 
 # Set up library environment for CGO
 ENV LD_LIBRARY_PATH=/voicevox_core:$LD_LIBRARY_PATH
-ENV CGO_CFLAGS="-I/voicevox_core"
-ENV CGO_LDFLAGS="-L/voicevox_core"
+ENV CGO_CFLAGS="-I/usr/local/include -I/voicevox_core/core_files"
+ENV CGO_LDFLAGS="-L/usr/local/lib -L/voicevox_core/core_files -Wl,-rpath,/usr/local/lib"
 ENV CGO_ENABLED=1
 
 # Copy source code

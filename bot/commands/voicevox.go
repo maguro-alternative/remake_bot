@@ -23,7 +23,7 @@ const (
 	// voicevox_core local API endpoint
 	VoiceVoxLocalAPIURL = "http://localhost:50021"
 	// voicevox_core library path
-	VoiceVoxCoreDictPath = "/voicevox_core/open_jtalk_dic_utf_8-1.11"
+	VoiceVoxCoreDictPath = "/voicevox_core_files/open_jtalk_dic_utf_8-1.11"
 )
 
 var (

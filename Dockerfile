@@ -93,18 +93,21 @@ ENV LC_ALL ja_JP.UTF-8
 ENV TZ JST-9
 ENV TERM xterm
 
-# Copy Go binary from builder stage
+# 1. 実行バイナリのコピー
 COPY --from=builder /root/src/main /app/main
 
-# Copy voicevox_core library from setup stage
-COPY --from=voicevox_setup /opt/voicevox /voicevox_core
-RUN mkdir -p /usr/local/lib && \
-    if [ -d /voicevox_core/core_files ]; then cp -a /voicevox_core/core_files/lib/. /usr/local/lib/ || true; fi && \
-    ldconfig || true
-ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+# 2. ライブラリの配置（0.14.1の構造に合わせる）
+COPY --from=voicevox_setup /opt/voicevox/core_files /voicevox_core_files
 
-# Set up library path
-ENV LD_LIBRARY_PATH=/voicevox_core:$LD_LIBRARY_PATH
+# 0.14.1では .so はフォルダ直下にあるため、ワイルドカードでコピー
+# libvoicevox_core.so と libonnxruntime.so.x.x.x の両方が必要です
+RUN mkdir -p /usr/local/lib && \
+    cp /voicevox_core_files/libvoicevox_core.so /usr/local/lib/ && \
+    cp /voicevox_core_files/libonnxruntime.so* /usr/local/lib/ && \
+    ldconfig
+
+# 4. パスの設定
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 # Create startup script
 RUN echo '#!/bin/bash\n\

@@ -4,6 +4,8 @@ FROM golang:1.23.0-bookworm AS voicevox_setup
 ARG VOICEVOX_VERSION="0.14.1"
 ENV VOICEVOX_VERSION=${VOICEVOX_VERSION}
 
+ARG TARGETARCH
+
 WORKDIR /opt/voicevox
 
 RUN apt-get -y update && apt-get install -y curl unzip file && rm -rf /var/lib/apt/lists/*
@@ -11,9 +13,10 @@ RUN apt-get -y update && apt-get install -y curl unzip file && rm -rf /var/lib/a
 # Download voicevox_core (supports zip, tar.gz, or direct binary) with retries and debug output
 # 1. ARM64(aarch64) 用の 0.14.1 バイナリをダウンロード
 # URL 内の "x64" を "arm64" に変更するのが肝です
-RUN wget https://github.com/VOICEVOX/voicevox_core/releases/download/0.14.1/voicevox_core-linux-arm64-cpu-0.14.1.zip \
-    && unzip voicevox_core-linux-arm64-cpu-0.14.1.zip \
-    && mv voicevox_core-linux-arm64-cpu-0.14.1 core_files
+RUN if [ "$TARGETARCH" = "amd64" ]; then ARCH="x64"; else ARCH="arm64"; fi && \
+    && wget https://github.com/VOICEVOX/voicevox_core/releases/download/0.14.1/voicevox_core-linux-${ARCH}-cpu-0.14.1.zip \
+    && unzip voicevox_core-linux-${ARCH}-cpu-0.14.1.zip \
+    && mv voicevox_core-linux-${ARCH}-cpu-0.14.1 core_files
 RUN set -eux; \
     cp -a /voicevox_core/core_files/include/. /usr/local/include/ || true; \
     cp -a /voicevox_core/core_files/lib/. /usr/local/lib/ || true; \

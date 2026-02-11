@@ -100,6 +100,7 @@ COPY --from=builder /root/src/main /app/main
 
 # 2. ライブラリの配置（0.14.1の構造に合わせる）
 COPY --from=voicevox_setup /opt/voicevox/core_files /voicevox_core_files
+COPY --from=voicevox_setup /opt/voicevox/core_files/open_jtalk_dic_utf_8-1.11 /app/open_jtalk_dic_utf_8-1.11
 
 # 0.14.1では .so はフォルダ直下にあるため、ワイルドカードでコピー
 # libvoicevox_core.so と libonnxruntime.so.x.x.x の両方が必要です

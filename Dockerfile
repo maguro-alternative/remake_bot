@@ -13,7 +13,7 @@ RUN apt-get -y update && apt-get install -y curl unzip file && rm -rf /var/lib/a
 # Download voicevox_core (supports zip, tar.gz, or direct binary) with retries and debug output
 # 1. ARM64(aarch64) 用の 0.14.1 バイナリをダウンロード
 # URL 内の "x64" を "arm64" に変更するのが肝です
-RUN if [ "$TARGETARCH" = "amd64" ]; then ARCH="x64"; else ARCH="arm64"; fi && \
+RUN if [ "$TARGETARCH" = "amd64" ]; then ARCH="x64"; else ARCH="arm64"; fi \
     && wget https://github.com/VOICEVOX/voicevox_core/releases/download/0.14.1/voicevox_core-linux-${ARCH}-cpu-0.14.1.zip \
     && unzip voicevox_core-linux-${ARCH}-cpu-0.14.1.zip \
     && mv voicevox_core-linux-${ARCH}-cpu-0.14.1 core_files

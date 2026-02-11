@@ -17,6 +17,8 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then ARCH="x64"; else ARCH="arm64"; fi \
     && wget https://github.com/VOICEVOX/voicevox_core/releases/download/0.14.1/voicevox_core-linux-${ARCH}-cpu-0.14.1.zip \
     && unzip voicevox_core-linux-${ARCH}-cpu-0.14.1.zip \
     && mv voicevox_core-linux-${ARCH}-cpu-0.14.1 core_files
+RUN wget http://downloads.sourceforge.net/open-jtalk/open_jtalk_dic_utf_8-1.11.tar.gz \
+    && tar xvf open_jtalk_dic_utf_8-1.11.tar.gz -C core_files
 RUN set -eux; \
     cp -a /voicevox_core/core_files/include/. /usr/local/include/ || true; \
     cp -a /voicevox_core/core_files/lib/. /usr/local/lib/ || true; \

@@ -357,16 +357,15 @@ func getVoiceVoxFileFromLibrary(
 	query.SpeedScale = float32(speed) / 100.0
 	query.IntonationScale = float32(intonation) / 100.0
 
-	// Generate audio using modified AudioQuery
-	synthesisOpts := voicevoxcorego.NewVoicevoxSynthesisOptions(false)
-	audioData, err := core.Synthesis(query, speakerIDInt, synthesisOpts)
+	ttsOptions := voicevoxcorego.NewVoicevoxTtsOptions(false, true)
+	result, err := core.Tts(text, 1, ttsOptions)
 	if err != nil {
 		return "", fmt.Errorf("failed to synthesize audio: %w", err)
 	}
 
 	// Save to temporary file
 	temppath := filepath.Join(os.TempDir(), fmt.Sprintf("voicevox_%d.wav", time.Now().UnixNano()))
-	if err := os.WriteFile(temppath, audioData, 0600); err != nil {
+	if err := os.WriteFile(temppath, result, 0600); err != nil {
 		return "", fmt.Errorf("failed to write audio file: %w", err)
 	}
 

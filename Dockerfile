@@ -107,6 +107,7 @@ COPY --from=voicevox_setup /opt/voicevox/core_files/open_jtalk_dic_utf_8-1.11 /a
 RUN mkdir -p /usr/local/lib && \
     cp /voicevox_core_files/libvoicevox_core.so /usr/local/lib/ && \
     cp /voicevox_core_files/libonnxruntime.so* /usr/local/lib/ && \
+    cp -r /voicevox_core_files/model /usr/local/lib/model && \
     ldconfig
 
 # 4. パスの設定

@@ -98,6 +98,9 @@ ENV TERM xterm
 # 1. 実行バイナリのコピー
 COPY --from=builder /root/src/main /app/main
 
+# 1.5 ウェブテンプレートをランタイムにコピー（web/templates/layout.html が必要）
+COPY --from=builder /root/src/web /app/web
+
 # 2. ライブラリの配置（0.14.1の構造に合わせる）
 COPY --from=voicevox_setup /opt/voicevox/core_files /voicevox_core_files
 COPY --from=voicevox_setup /opt/voicevox/core_files/open_jtalk_dic_utf_8-1.11 /app/open_jtalk_dic_utf_8-1.11

@@ -22,29 +22,44 @@ const MaxConsecutiveDisconnects = 5
 // RegisterConnectionHandlers はWebSocket接続の状態変化を監視するハンドラを登録する。
 func RegisterConnectionHandlers(s *discordgo.Session) {
 	s.AddHandler(func(s *discordgo.Session, d *discordgo.Disconnect) {
-		count := disconnectCount.Add(1)
-		lastDisconnectTime.Store(time.Now().Unix())
-		slog.Warn("Discord WebSocket切断を検知しました",
-			"連続切断回数", count,
-			"自動再接続待ち", s.ShouldReconnectOnError,
-		)
+		onDisconnect(s.ShouldReconnectOnError)
 	})
 
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Resumed) {
-		prev := disconnectCount.Swap(0)
-		slog.Info("Discord WebSocket再接続(Resume)に成功しました",
-			"復旧までの切断回数", prev,
-		)
+		onResumed()
 	})
 
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-		prev := disconnectCount.Swap(0)
-		if prev > 0 {
-			slog.Info("Discord WebSocket再接続(Ready)に成功しました",
-				"復旧までの切断回数", prev,
-			)
-		}
+		onReady()
 	})
+}
+
+// onDisconnect はWebSocket切断時に呼ばれる。
+func onDisconnect(shouldReconnect bool) {
+	count := disconnectCount.Add(1)
+	lastDisconnectTime.Store(time.Now().Unix())
+	slog.Warn("Discord WebSocket切断を検知しました",
+		"連続切断回数", count,
+		"自動再接続待ち", shouldReconnect,
+	)
+}
+
+// onResumed はWebSocket再接続(Resume)成功時に呼ばれる。
+func onResumed() {
+	prev := disconnectCount.Swap(0)
+	slog.Info("Discord WebSocket再接続(Resume)に成功しました",
+		"復旧までの切断回数", prev,
+	)
+}
+
+// onReady はWebSocket再接続(Ready)成功時に呼ばれる。
+func onReady() {
+	prev := disconnectCount.Swap(0)
+	if prev > 0 {
+		slog.Info("Discord WebSocket再接続(Ready)に成功しました",
+			"復旧までの切断回数", prev,
+		)
+	}
 }
 
 // IsHealthy はBotのWebSocket接続が健全かどうかを返す。

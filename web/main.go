@@ -2,8 +2,11 @@ package web
 
 import (
 	"encoding/gob"
+	"encoding/json"
 	"net/http"
+	"time"
 
+	"github.com/maguro-alternative/remake_bot/bot/cogs"
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
@@ -101,9 +104,28 @@ func NewWebRouter(
 	// 静的ファイルのハンドリング
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/templates/static/"))))
 
-	// ヘルスチェック
+	// ヘルスチェック（Discord WebSocket接続の状態も確認）
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
+		healthy := cogs.IsHealthy(discordSession)
+		disconnectCount, lastDisconnect := cogs.GetDisconnectInfo()
+
+		w.Header().Set("Content-Type", "application/json")
+		if !healthy {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		} else {
+			w.WriteHeader(http.StatusOK)
+		}
+
+		var lastDisconnectStr string
+		if !lastDisconnect.IsZero() {
+			lastDisconnectStr = lastDisconnect.Format(time.RFC3339)
+		}
+		json.NewEncoder(w).Encode(map[string]any{
+			"status":               map[bool]string{true: "ok", false: "unhealthy"}[healthy],
+			"discord_data_ready":   discordSession.DataReady,
+			"consecutive_disconnects": disconnectCount,
+			"last_disconnect":      lastDisconnectStr,
+		})
 	})
 
 	mux.Handle("/", loginRequiredChain.ThenFunc(indexView.NewIndexViewHandler(indexService).Index))

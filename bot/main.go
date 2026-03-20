@@ -69,6 +69,9 @@ func BotOnReady(indexDB db.Driver, client *http.Client) (*discordgo.Session, fun
 		return nil, func() {}, errors.WithStack(err)
 	}
 
+	// WebSocket切断・再接続の監視ハンドラを登録
+	cogs.RegisterConnectionHandlers(discordSession)
+
 	cogs.RegisterHandlers(discordSession, indexDB, client, lineWorksService)
 	cleanupCommandHandlers, err := commands.RegisterCommands(discordSession, indexDB, client)
 

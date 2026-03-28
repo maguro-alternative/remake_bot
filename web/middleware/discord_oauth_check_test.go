@@ -128,7 +128,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/guilds", nil)
 
-		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetDiscordUser(&user)
 		sessionStore.SetDiscordOAuthToken("test")
@@ -285,7 +285,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/guild/111", nil)
 
-		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetDiscordUser(&user)
 		sessionStore.SetDiscordOAuthToken("test")
@@ -390,7 +390,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/guild/111", nil)
 
-		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetDiscordUser(&user)
 		sessionStore.SetDiscordOAuthToken("test")
@@ -495,7 +495,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/guild/111", nil)
 
-		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetDiscordUser(&user)
 		sessionStore.SetDiscordOAuthToken("test")
@@ -600,7 +600,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/guild/111/linetoken", nil)
 
-		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetDiscordUser(&user)
 		sessionStore.SetDiscordOAuthToken("test")
@@ -711,7 +711,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/guild/111/linetoken", nil)
 
-		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetDiscordUser(&user)
 		sessionStore.SetDiscordOAuthToken("test")
@@ -826,7 +826,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/guild/111/linetoken", nil)
 
-		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetDiscordUser(&user)
 		sessionStore.SetDiscordOAuthToken("test")
@@ -931,7 +931,7 @@ func TestDiscordOAuthCheckMiddleware(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/guild/111/linetoken", nil)
 
-		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetDiscordUser(&user)
 		sessionStore.SetDiscordOAuthToken("test")

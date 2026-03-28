@@ -49,7 +49,7 @@ func DiscordOAuthCheckMiddleware(
 			}
 			ctx := r.Context()
 			pathParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/"), "/")
-			sessionStore, err := session.NewSessionStore(r, indexService.CookieStore, config.SessionSecret())
+			sessionStore, err := session.NewSessionStore(r, indexService.CookieStore, config.SessionName())
 			if err != nil {
 				slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)

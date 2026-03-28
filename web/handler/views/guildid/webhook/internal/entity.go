@@ -7,6 +7,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/testutil/mock"
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/web/shared/htmlutil"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -26,7 +27,7 @@ func CreateUpdateWebhookForm(
 ) string {
 	return `
 		<details style="margin: 0 0 0 1em;">
-            <summary>` + webhook.SubscriptionType + `:` + webhook.SubscriptionID + `</summary>
+            <summary>` + htmlutil.EscapeString(webhook.SubscriptionType) + `:` + htmlutil.EscapeString(webhook.SubscriptionID) + `</summary>
 			<label for="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">Webhook</label>
 			<select name="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" id="updateWebhookType` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">
 				` + webhookForm + `
@@ -37,7 +38,7 @@ func CreateUpdateWebhookForm(
 			</select>
 			<br/>
 			<label for="updateSubscriptionId` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `">サービスID</label>
-			<input type="text" name="updateSubscriptionId` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" id="updateSubscriptionId` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" value="` + webhook.SubscriptionID + `" />
+			<input type="text" name="updateSubscriptionId` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" id="updateSubscriptionId` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `" value="` + htmlutil.EscapeString(webhook.SubscriptionID) + `" />
 			<br/>
 			<br/>
 			<label for="updateMemberMention` + strconv.Itoa(int(*webhook.WebhookSerialID)) + `[]">メンションするユーザー</label>
@@ -165,11 +166,12 @@ func CreateNewWebhookForm(
 func CreateSubscriptionsSelectForm(subscriptionNames []string, selectedSucscriptionName string) string {
 	selectSubscriptionsFormBuilder := strings.Builder{}
 	for _, subscriptionName := range subscriptionNames {
+		escaped := htmlutil.EscapeString(subscriptionName)
 		if subscriptionName == selectedSucscriptionName {
-			selectSubscriptionsFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, subscriptionName, subscriptionName))
+			selectSubscriptionsFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, escaped, escaped))
 			continue
 		}
-		selectSubscriptionsFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, subscriptionName, subscriptionName))
+		selectSubscriptionsFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, escaped, escaped))
 	}
 	return selectSubscriptionsFormBuilder.String()
 }
@@ -186,7 +188,7 @@ func CreateWordWebhookForm(
 			<label for="%s">%s</label>
 			<input type="text" id="%s" name="%s" value="%s">
 			<button type="button" onclick="document.getElementById('%s').remove(); this.remove();">削除</button>
-		`, wordId, label, wordId, wordId, word.Word, wordId))
+		`, wordId, label, wordId, wordId, htmlutil.EscapeString(word.Word), wordId))
 	}
 	return wordFormBuilder.String()
 }
@@ -208,15 +210,17 @@ func CreateWebhookSelectForm(
 		typeIcon := "🔊"
 		if channel.Type == discordgo.ChannelTypeGuildText {
 			typeIcon = "📝"
+			escapedChannelName := htmlutil.EscapeString(channel.Name)
+			escapedWebhookName := htmlutil.EscapeString(guildWebhook.Name)
 			if guildWebhook.ID == selectedWebhookID {
 				selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
 				<option value="%s" selected>%s:%s:%s</option>`,
-				guildWebhook.ID, typeIcon, channel.Name, guildWebhook.Name))
+				htmlutil.EscapeString(guildWebhook.ID), typeIcon, escapedChannelName, escapedWebhookName))
 				continue
 			}
 			selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
 			<option value="%s">%s:%s:%s</option>`,
-			guildWebhook.ID, typeIcon, channel.Name, guildWebhook.Name))
+			htmlutil.EscapeString(guildWebhook.ID), typeIcon, escapedChannelName, escapedWebhookName))
 		} else if channel.Type == discordgo.ChannelTypeGuildForum {
 			typeIcon = ""
 			if len(channel.PermissionOverwrites) != 0 {
@@ -236,15 +240,18 @@ func CreateWebhookSelectForm(
 				if channel.ID != guildWebhook.ChannelID {
 					continue
 				}
+				escapedChannelName := htmlutil.EscapeString(channel.Name)
+				escapedThreadName := htmlutil.EscapeString(thread.Name)
+				escapedWebhookName := htmlutil.EscapeString(guildWebhook.Name)
 				if thread.ID == selectedWebhookID {
 					selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
 			<option value="%s-%s" selected>%s:%s:%s:%s</option>`,
-			guildWebhook.ID, thread.ID, typeIcon, channel.Name, thread.Name, guildWebhook.Name))
+			htmlutil.EscapeString(guildWebhook.ID), htmlutil.EscapeString(thread.ID), typeIcon, escapedChannelName, escapedThreadName, escapedWebhookName))
 					continue
 				}
 				selectWebhookFormBuilder.WriteString(fmt.Sprintf(`
 			<option value="%s-%s">%s:%s:%s:%s</option>`,
-			guildWebhook.ID, thread.ID, typeIcon, channel.Name, thread.Name, guildWebhook.Name))
+			htmlutil.EscapeString(guildWebhook.ID), htmlutil.EscapeString(thread.ID), typeIcon, escapedChannelName, escapedThreadName, escapedWebhookName))
 			}
 		}
 	}
@@ -261,11 +268,13 @@ func CreateMemberSelectForm(guild *discordgo.Guild, users []string) (string) {
 				break
 			}
 		}
+		escapedID := htmlutil.EscapeString(member.User.ID)
+		escapedName := htmlutil.EscapeString(member.User.Username)
 		if selectedFlag {
-			selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, member.User.ID, member.User.Username))
+			selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, escapedID, escapedName))
 			continue
 		}
-		selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, member.User.ID, member.User.Username))
+		selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, escapedID, escapedName))
 	}
 	return selectMemberFormBuilder.String()
 }
@@ -280,11 +289,13 @@ func CreateRoleSelectForm(guild *discordgo.Guild, roles []string) (string) {
 				break
 			}
 		}
+		escapedID := htmlutil.EscapeString(role.ID)
+		escapedName := htmlutil.EscapeString(role.Name)
 		if selectedFlag {
-			selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, role.ID, role.Name))
+			selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, escapedID, escapedName))
 			continue
 		}
-		selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, role.ID, role.Name))
+		selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, escapedID, escapedName))
 	}
 	return selectRoleFormBuilder.String()
 }

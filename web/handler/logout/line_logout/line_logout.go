@@ -26,7 +26,7 @@ func (h *LineLogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	sessionStore, err := session.NewSessionStore(r, h.LineLogoutService.CookieStore, config.SessionSecret())
+	sessionStore, err := session.NewSessionStore(r, h.LineLogoutService.CookieStore, config.SessionName())
 	if err != nil {
 		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
+	"github.com/maguro-alternative/remake_bot/web/shared/htmlutil"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -50,7 +51,7 @@ func CreateVcSignalForm(
 		categoryComponentBuilders[categoryIndex].WriteString(fmt.Sprintf(`
 		<details>
             <summary>%s</summary>
-		`, categoryChannelName))
+		`, htmlutil.EscapeString(categoryChannelName)))
 		for _, channel := range vcChannels {
 			var sendSignalFlag, joinBotFlag, everyoneMentionFlag string
 			if channel.ID == "" {
@@ -75,41 +76,43 @@ func CreateVcSignalForm(
 				channelsInCategory,
 				categoryPositions,
 			)
+			escapedName := htmlutil.EscapeString(channel.Name)
+			escapedID := htmlutil.EscapeString(channel.ID)
 			categoryComponentBuilders[categoryIndex].WriteString(`
 			<details style="margin: 0 0 0 1em;">
-                <summary>` + channel.Name + `</summary>
+                <summary>` + escapedName + `</summary>
 				<div style="margin: 0 0 0 1em;">
-					<label for="sendSignal` + channel.ID + `">通知を送信する</label>
-					<input type="checkbox" id="sendSignal` + channel.ID + `" name="sendSignal` + channel.ID + `" ` + sendSignalFlag + ` />
+					<label for="sendSignal` + escapedID + `">通知を送信する</label>
+					<input type="checkbox" id="sendSignal` + escapedID + `" name="sendSignal` + escapedID + `" ` + sendSignalFlag + ` />
 					<br/>
-					<label for="joinBot` + channel.ID + `">Botの入退出を通知する</label>
-					<input type="checkbox" id="joinBot` + channel.ID + `" name="joinBot` + channel.ID + `"` + joinBotFlag + ` />
+					<label for="joinBot` + escapedID + `">Botの入退出を通知する</label>
+					<input type="checkbox" id="joinBot` + escapedID + `" name="joinBot` + escapedID + `"` + joinBotFlag + ` />
 					<br/>
-					<label for="everyoneMention` + channel.ID + `">通知に@everyoneメンションをつける</label>
-					<input type="checkbox" id="everyoneMention` + channel.ID + `" name="everyoneMention` + channel.ID + `"` + everyoneMentionFlag + ` />
+					<label for="everyoneMention` + escapedID + `">通知に@everyoneメンションをつける</label>
+					<input type="checkbox" id="everyoneMention` + escapedID + `" name="everyoneMention` + escapedID + `"` + everyoneMentionFlag + ` />
 					<br/>
-					<label for="defaultChannel` + channel.ID + `">送信先チャンネル</label><br/>
-					<select id="defaultChannel` + channel.ID + `" name="defaultChannelId` + channel.ID + `" >
+					<label for="defaultChannel` + escapedID + `">送信先チャンネル</label><br/>
+					<select id="defaultChannel` + escapedID + `" name="defaultChannelId` + escapedID + `" >
 						` + htmlSelectChannels + `
 					</select>
 					<br/>
-					<label for="vcSignalNgUserIds` + channel.ID + `[]">NGユーザー</label><br/>
-					<select id="ng_users` + channel.ID + `[]" name="vcSignalNgUserIds` + channel.ID + `[]" multiple>
+					<label for="vcSignalNgUserIds` + escapedID + `[]">NGユーザー</label><br/>
+					<select id="ng_users` + escapedID + `[]" name="vcSignalNgUserIds` + escapedID + `[]" multiple>
 						` + selectNgMemberForm + `
 					</select>
 					<br/>
-					<label for="vcSignalNgRoleIds` + channel.ID + `[]">NGロール</label><br/>
-					<select id="ng_roles` + channel.ID + `[]" name="vcSignalNgRoleIds` + channel.ID + `[]" multiple>
+					<label for="vcSignalNgRoleIds` + escapedID + `[]">NGロール</label><br/>
+					<select id="ng_roles` + escapedID + `[]" name="vcSignalNgRoleIds` + escapedID + `[]" multiple>
 						` + selectNgRoleForm + `
 					</select>
 					<br/>
-					<label for="vcSignalMentionUserIds` + channel.ID + `[]">メンションユーザー</label><br/>
-					<select id="mention_users` + channel.ID + `[]" name="vcSignalMentionUserIds` + channel.ID + `[]" multiple>
+					<label for="vcSignalMentionUserIds` + escapedID + `[]">メンションユーザー</label><br/>
+					<select id="mention_users` + escapedID + `[]" name="vcSignalMentionUserIds` + escapedID + `[]" multiple>
 						` + selectMentionMemberForm + `
 					</select>
 					<br/>
-					<label for="vcSignalMentionRoleIds` + channel.ID + `[]">メンションロール</label><br/>
-					<select id="mention_roles` + channel.ID + `[]" name="vcSignalMentionRoleIds` + channel.ID + `[]" multiple>
+					<label for="vcSignalMentionRoleIds` + escapedID + `[]">メンションロール</label><br/>
+					<select id="mention_roles` + escapedID + `[]" name="vcSignalMentionRoleIds` + escapedID + `[]" multiple>
 						` + selectMentionRoleForm + `
 					</select>
 					<br/>
@@ -136,11 +139,13 @@ func createMemberSelectForm(guild *discordgo.Guild, users []string) (string) {
 				break
 			}
 		}
+		escapedID := htmlutil.EscapeString(member.User.ID)
+		escapedName := htmlutil.EscapeString(member.User.Username)
 		if selectedFlag {
-			selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, member.User.ID, member.User.Username))
+			selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, escapedID, escapedName))
 			continue
 		}
-		selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, member.User.ID, member.User.Username))
+		selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, escapedID, escapedName))
 	}
 	return selectMemberFormBuilder.String()
 }
@@ -155,11 +160,13 @@ func createRoleSelectForm(guild *discordgo.Guild, roles []string) (string) {
 				break
 			}
 		}
+		escapedID := htmlutil.EscapeString(role.ID)
+		escapedName := htmlutil.EscapeString(role.Name)
 		if selectedFlag {
-			selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, role.ID, role.Name))
+			selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, escapedID, escapedName))
 			continue
 		}
-		selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, role.ID, role.Name))
+		selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, escapedID, escapedName))
 	}
 	return selectRoleFormBuilder.String()
 }

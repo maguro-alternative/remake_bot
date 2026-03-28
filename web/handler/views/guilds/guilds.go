@@ -14,6 +14,7 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/shared/htmlutil"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
@@ -81,19 +82,22 @@ func (g *GuildsViewHandler) Index(w http.ResponseWriter, r *http.Request) {
 	accountVer.WriteString(components.CreateLineAccountVer(lineSession.User))
 	htmlGuildBuilders := strings.Builder{}
 	for _, guild := range matchGuilds {
+		escapedName := htmlutil.EscapeString(guild.Name)
+		escapedID := htmlutil.EscapeString(guild.ID)
+		escapedIcon := htmlutil.EscapeString(guild.Icon)
 		if guild.Icon == "" {
 			htmlGuildBuilders.WriteString(`
-			<a href="/guild/` + guild.ID + `">
-				<img src="/static/img/discord-icon.jpg" alt="` + guild.Name + `">
-				<li>` + guild.Name + `</li>
+			<a href="/guild/` + escapedID + `">
+				<img src="/static/img/discord-icon.jpg" alt="` + escapedName + `">
+				<li>` + escapedName + `</li>
 			</a><br>
 			`)
 			continue
 		}
 		htmlGuildBuilders.WriteString(`
-		<a href="/guild/` + guild.ID + `">
-			<img src="https://cdn.discordapp.com/icons/` + guild.ID + `/` + guild.Icon + `.png" alt="` + guild.Name + `">
-			<li>` + guild.Name + `</li>
+		<a href="/guild/` + escapedID + `">
+			<img src="https://cdn.discordapp.com/icons/` + escapedID + `/` + escapedIcon + `.png" alt="` + escapedName + `">
+			<li>` + escapedName + `</li>
 		</a><br>
 		`)
 	}

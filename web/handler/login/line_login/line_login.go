@@ -20,6 +20,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/web/components"
 	"github.com/maguro-alternative/remake_bot/web/config"
 	"github.com/maguro-alternative/remake_bot/web/service"
+	"github.com/maguro-alternative/remake_bot/web/shared/htmlutil"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 	"github.com/maguro-alternative/remake_bot/web/shared/session"
 )
@@ -104,7 +105,7 @@ func (h *LineLoginHandler) Index(w http.ResponseWriter, r *http.Request) {
 				<li>%s</li>
 			</a>
 			<br><br>
-		`, lineBot.GuildID, lineBotProfile.PictureURL, lineBotProfile.DisplayName))
+		`, htmlutil.EscapeString(lineBot.GuildID), htmlutil.EscapeString(lineBotProfile.PictureURL), htmlutil.EscapeString(lineBotProfile.DisplayName)))
 	}
 	// Discordの認証情報なしでもアクセス可能なためエラーレスポンスは出さない
 	discordLoginUser, err := ctxvalue.DiscordUserFromContext(ctx)
@@ -144,7 +145,7 @@ func (h *LineLoginHandler) LineLogin(w http.ResponseWriter, r *http.Request) {
 	guildID := r.PathValue("guildId")
 	state := uuid.New().String()
 	nonce := uuid.New().String()
-	sessionStore, err := session.NewSessionStore(r, h.indexService.CookieStore, config.SessionSecret())
+	sessionStore, err := session.NewSessionStore(r, h.indexService.CookieStore, config.SessionName())
 	if err != nil {
 		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

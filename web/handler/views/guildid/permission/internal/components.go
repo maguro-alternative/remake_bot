@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+
+	"github.com/maguro-alternative/remake_bot/web/shared/htmlutil"
 )
 
 type PermissionCode struct {
@@ -32,7 +34,7 @@ func CreatePermissionCodeForm(guildID string, permissionCode PermissionCode) str
 	<h3>%s</h3>
 	<h6>編集を許可する権限コード</h6>
 	<input type="number" name="%sPermissionCode" value=%d min=0 max=1099511627775/>
-	`, permissionCode.Type, permissionCode.Type, permissionCode.Code)
+	`, htmlutil.EscapeString(permissionCode.Type), htmlutil.EscapeString(permissionCode.Type), permissionCode.Code)
 }
 
 func CreatePermissionSelectForm(
@@ -51,10 +53,10 @@ func CreatePermissionSelectForm(
 			}
 		}
 		if selectedFlag {
-			selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, member.User.ID, member.User.Username))
+			selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, htmlutil.EscapeString(member.User.ID), htmlutil.EscapeString(member.User.Username)))
 			continue
 		}
-		selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, member.User.ID, member.User.Username))
+		selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, htmlutil.EscapeString(member.User.ID), htmlutil.EscapeString(member.User.Username)))
 	}
 	selectRoleFormBuilder := strings.Builder{}
 	for _, role := range guild.Roles {
@@ -66,10 +68,10 @@ func CreatePermissionSelectForm(
 			}
 		}
 		if selectedFlag {
-			selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, role.ID, role.Name))
+			selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, htmlutil.EscapeString(role.ID), htmlutil.EscapeString(role.Name)))
 			continue
 		}
-		selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, role.ID, role.Name))
+		selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, htmlutil.EscapeString(role.ID), htmlutil.EscapeString(role.Name)))
 	}
 	return fmt.Sprintf(`
 	<h6>編集を許可するメンバー</h6>
@@ -77,5 +79,5 @@ func CreatePermissionSelectForm(
 	<h6>編集を許可するロール</h6>
 	<select name="%sRolePermissionId" multiple>%s</select>
 	<br/><br/>
-	`, permission, selectMemberFormBuilder.String(), permission, selectRoleFormBuilder.String())
+	`, htmlutil.EscapeString(permission), selectMemberFormBuilder.String(), htmlutil.EscapeString(permission), selectRoleFormBuilder.String())
 }

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/maguro-alternative/remake_bot/web/components"
+	"github.com/maguro-alternative/remake_bot/web/shared/htmlutil"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -47,7 +48,7 @@ func CreateLinePostDiscordChannelForm(
 		categoryComponentBuilders[categoryIndex].WriteString(fmt.Sprintf(`
 		<details>
             <summary>%s</summary>
-		`, categoryChannelName))
+		`, htmlutil.EscapeString(categoryChannelName)))
 		for _, channel := range channels {
 			if channel.ID == "" {
 				continue
@@ -60,28 +61,30 @@ func CreateLinePostDiscordChannelForm(
 			if channel.BotMessage {
 				botNgFlag = "checked"
 			}
+			escapedName := htmlutil.EscapeString(channel.Name)
+			escapedID := htmlutil.EscapeString(channel.ID)
 			categoryComponentBuilders[categoryIndex].WriteString(`
 			<details style="margin: 0 0 0 1em;">
-                <summary>` + channel.Name + `</summary>
+                <summary>` + escapedName + `</summary>
 				<div style="margin: 0 0 0 1em;">
-					<label for="ng` + channel.ID + `">LINEへ送信しない</label>
-					<input type="checkbox" id="ng` + channel.ID + `" name="ng` + channel.ID + `" ` + messageNgFlag + ` />
+					<label for="ng` + escapedID + `">LINEへ送信しない</label>
+					<input type="checkbox" id="ng` + escapedID + `" name="ng` + escapedID + `" ` + messageNgFlag + ` />
 					<br/>
-					<label for="botMessage` + channel.ID + `">Botのメッセージを送信する</label>
-					<input type="checkbox" id="botMessage` + channel.ID + `" name="botMessage` + channel.ID + `"` + botNgFlag + ` />
+					<label for="botMessage` + escapedID + `">Botのメッセージを送信する</label>
+					<input type="checkbox" id="botMessage` + escapedID + `" name="botMessage` + escapedID + `"` + botNgFlag + ` />
 					<br/>
-					<label for="ngTypes` + channel.ID + `[]">NGタイプ</label><br/>
-					<select id="ngTypes` + channel.ID + `[]" name="ngTypes` + channel.ID + `[]" multiple>
+					<label for="ngTypes` + escapedID + `[]">NGタイプ</label><br/>
+					<select id="ngTypes` + escapedID + `[]" name="ngTypes` + escapedID + `[]" multiple>
 						` + selectMessageTypeForm + `
 					</select>
 					<br/>
-					<label for="ngUsers` + channel.ID + `[]">NGユーザー</label><br/>
-					<select id="ng_users` + channel.ID + `[]" name="ngUsers` + channel.ID + `[]" multiple>
+					<label for="ngUsers` + escapedID + `[]">NGユーザー</label><br/>
+					<select id="ng_users` + escapedID + `[]" name="ngUsers` + escapedID + `[]" multiple>
 						` + selectMemberForm + `
 					</select>
 					<br/>
-					<label for="ngRoles` + channel.ID + `[]">NGロール</label><br/>
-					<select id="ngRoles` + channel.ID + `[]" name="ngRoles` + channel.ID + `[]" multiple>
+					<label for="ngRoles` + escapedID + `[]">NGロール</label><br/>
+					<select id="ngRoles` + escapedID + `[]" name="ngRoles` + escapedID + `[]" multiple>
 						` + selectRoleForm + `
 					</select>
 					<br/>
@@ -108,11 +111,13 @@ func createSelectForm(guild *discordgo.Guild, channel DiscordChannelSet, message
 				break
 			}
 		}
+		escapedID := htmlutil.EscapeString(member.User.ID)
+		escapedName := htmlutil.EscapeString(member.User.Username)
 		if selectedFlag {
-			selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, member.User.ID, member.User.Username))
+			selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, escapedID, escapedName))
 			continue
 		}
-		selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, member.User.ID, member.User.Username))
+		selectMemberFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, escapedID, escapedName))
 	}
 	selectRoleFormBuilder := strings.Builder{}
 	for _, role := range guild.Roles {
@@ -123,11 +128,13 @@ func createSelectForm(guild *discordgo.Guild, channel DiscordChannelSet, message
 				break
 			}
 		}
+		escapedID := htmlutil.EscapeString(role.ID)
+		escapedName := htmlutil.EscapeString(role.Name)
 		if selectedFlag {
-			selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, role.ID, role.Name))
+			selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, escapedID, escapedName))
 			continue
 		}
-		selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, role.ID, role.Name))
+		selectRoleFormBuilder.WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, escapedID, escapedName))
 	}
 	selectMessageTypeFormBuilder := strings.Builder{}
 	for i, messageType := range messageTypes {
@@ -138,11 +145,12 @@ func createSelectForm(guild *discordgo.Guild, channel DiscordChannelSet, message
 				break
 			}
 		}
+		escapedType := htmlutil.EscapeString(messageType)
 		if selectedFlag {
-			selectMessageTypeFormBuilder.WriteString(fmt.Sprintf(`<option value=%d selected>%s</option>`, i, messageType))
+			selectMessageTypeFormBuilder.WriteString(fmt.Sprintf(`<option value=%d selected>%s</option>`, i, escapedType))
 			continue
 		}
-		selectMessageTypeFormBuilder.WriteString(fmt.Sprintf(`<option value=%d>%s</option>`, i, messageType))
+		selectMessageTypeFormBuilder.WriteString(fmt.Sprintf(`<option value=%d>%s</option>`, i, escapedType))
 	}
 	return selectMemberFormBuilder.String(), selectRoleFormBuilder.String(), selectMessageTypeFormBuilder.String()
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/maguro-alternative/remake_bot/web/shared/htmlutil"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
@@ -15,7 +16,7 @@ func CreateLineAccountVer(lineUser model.LineIdTokenUser) string {
 	<button type="button" id="popover-btn" class="btn btn-primary">
 		<a href="/logout/line" class="btn btn-primary">ログアウト</a>
 	</button>
-	`, lineUser.Name, lineUser.Picture))
+	`, htmlutil.EscapeString(lineUser.Name), htmlutil.EscapeString(lineUser.Picture)))
 	if lineUser.Name == "" {
 		lineAccountVer.Reset()
 		lineAccountVer.WriteString(`

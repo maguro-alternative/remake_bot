@@ -43,7 +43,7 @@ func (h *LineCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		ctx = context.Background()
 	}
 
-	sessionStore, err := session.NewSessionStore(r, h.svc.CookieStore, config.SessionSecret())
+	sessionStore, err := session.NewSessionStore(r, h.svc.CookieStore, config.SessionName())
 	if err != nil {
 		slog.ErrorContext(r.Context(), "sessionの取得に失敗しました。", "エラー:", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

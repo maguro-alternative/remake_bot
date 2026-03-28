@@ -16,7 +16,8 @@ document.getElementById('form').onsubmit = async function (event) {
     await fetch(`/api/${guildId}/group`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': getCsrfToken()
         },
         body: jsonData
     }).then((res) => {

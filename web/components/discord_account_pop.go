@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/maguro-alternative/remake_bot/web/shared/htmlutil"
 	"github.com/maguro-alternative/remake_bot/web/shared/model"
 )
 
@@ -15,7 +16,7 @@ func CreateDiscordAccountVer(discordUser model.DiscordUser) string {
 	<button type="button" id="popover-btn" class="btn btn-primary">
 		<a href="/logout/discord" class="btn btn-primary">ログアウト</a>
 	</button>
-	`, discordUser.Username, discordUser.ID, discordUser.Avatar))
+	`, htmlutil.EscapeString(discordUser.Username), htmlutil.EscapeString(discordUser.ID), htmlutil.EscapeString(discordUser.Avatar)))
 	if discordUser.ID == "" {
 		discordAccountVer.Reset()
 		discordAccountVer.WriteString(`

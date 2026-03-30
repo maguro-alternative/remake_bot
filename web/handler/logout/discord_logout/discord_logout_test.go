@@ -29,7 +29,7 @@ func TestServeHTTP(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handlerFunc := http.HandlerFunc(handler.ServeHTTP)
 
-		sessionStore, err := session.NewSessionStore(req, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(req, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetDiscordUser(&model.DiscordUser{
 			ID:       "123",

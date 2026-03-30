@@ -65,6 +65,13 @@ func NewWebRouter(
 
 	// セッションストアを作成します。
 	cookieStore := sessions.NewCookieStore([]byte(config.SessionSecret()))
+	cookieStore.Options = &sessions.Options{
+		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   86400, // 24 hours
+		Secure:   false, // Set to true if using HTTPS in production
+	}
 
 	// create a *service.TODOService type variable using the *sql.DB type variable
 	var indexService = service.NewIndexService(
@@ -82,20 +89,24 @@ func NewWebRouter(
 
 	// register routes
 	mux := http.NewServeMux()
+	csrfMiddleware := middleware.CSRFMiddleware(*indexService)
 	middleChain := alice.New(middleware.LogMiddleware)
-	discordMiddleChain := alice.New(middleware.DiscordOAuthCheckMiddleware(*indexService, repo, true), middleware.LogMiddleware)
-	lineMiddleChain := alice.New(middleware.LineOAuthCheckMiddleware(*indexService, repo, aesCrypto, true), middleware.LogMiddleware)
+	discordMiddleChain := alice.New(csrfMiddleware, middleware.DiscordOAuthCheckMiddleware(*indexService, repo, true), middleware.LogMiddleware)
+	lineMiddleChain := alice.New(csrfMiddleware, middleware.LineOAuthCheckMiddleware(*indexService, repo, aesCrypto, true), middleware.LogMiddleware)
 	loginRequiredChain := alice.New(
+		csrfMiddleware,
 		middleware.DiscordOAuthCheckMiddleware(*indexService, repo, false),
 		middleware.LineOAuthCheckMiddleware(*indexService, repo, aesCrypto, false),
 		middleware.LogMiddleware,
 	)
 	discordLoginRequiredChain := alice.New(
+		csrfMiddleware,
 		middleware.DiscordOAuthCheckMiddleware(*indexService, repo, true),
 		middleware.LineOAuthCheckMiddleware(*indexService, repo, aesCrypto, false),
 		middleware.LogMiddleware,
 	)
 	lineLoginRequiredChain := alice.New(
+		csrfMiddleware,
 		middleware.DiscordOAuthCheckMiddleware(*indexService, repo, false),
 		middleware.LineOAuthCheckMiddleware(*indexService, repo, aesCrypto, true),
 		middleware.LogMiddleware,

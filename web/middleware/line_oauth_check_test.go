@@ -45,7 +45,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 					Picture: "test",
 					Email:   "test",
 				}
-				sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+				sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 				require.NoError(t, err)
 				sessionStore.SetLineUser(user)
 				sessionStore.SetLineOAuthToken("test")
@@ -56,7 +56,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 			})
 		}
 		middlewareEndFixture := func(r *http.Request) {
-			sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+			sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 			require.NoError(t, err)
 			sessionStore.CleanupLineUser()
 			sessionStore.CleanupLineOAuthToken()
@@ -180,7 +180,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 		req.Header.Set("Authorization", "Bearer test")
 		w := httptest.NewRecorder()
 
-		sessionStore, err := session.NewSessionStore(req, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(req, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetLineUser(user)
 		sessionStore.SetLineOAuthToken("test")
@@ -317,7 +317,7 @@ func TestLineOAuthCheckMiddleware(t *testing.T) {
 		req.Header.Set("Authorization", "Bearer test")
 		w := httptest.NewRecorder()
 
-		sessionStore, err := session.NewSessionStore(req, cookieStore, config.SessionSecret())
+		sessionStore, err := session.NewSessionStore(req, cookieStore, config.SessionName())
 		require.NoError(t, err)
 		sessionStore.SetLineUser(user)
 		sessionStore.SetLineOAuthToken("test")

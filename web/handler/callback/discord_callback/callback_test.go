@@ -23,7 +23,7 @@ func TestDiscordCallbackHandler_ServeHTTP(t *testing.T) {
 	t.Run("successful callback", func(t *testing.T) {
 		middlewareStartFixture := func(h http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+				sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 				require.NoError(t, err)
 				sessionStore.SetDiscordState("123")
 				err = sessionStore.SessionSave(r, w)
@@ -32,7 +32,7 @@ func TestDiscordCallbackHandler_ServeHTTP(t *testing.T) {
 			})
 		}
 		middlewareEndFixture := func(r *http.Request) {
-			sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionSecret())
+			sessionStore, err := session.NewSessionStore(r, cookieStore, config.SessionName())
 			require.NoError(t, err)
 			sessionStore.CleanupDiscordOAuthToken()
 			sessionStore.CleanupDiscordUser()

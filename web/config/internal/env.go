@@ -14,7 +14,7 @@ type Config struct {
 	PrivateKey          string `env:"PRIVATE_KEY" envDefault:"645E739A7F9F162725C1533DC2C5E827"`
 	Port                string `env:"PORT" envDefault:"8080"`
 	ServerUrl           string `env:"SERVER_URL" envDefault:"http://localhost:8080"`
-	SessionName         string `env:"SESSION_NAME" envDefault:""`
+	SessionName         string `env:"SESSION_NAME" envDefault:"remake_bot_session"`
 	SessionSecret       string `env:"SESSION_SECRET" envDefault:"test"`
 	YouTubeAPIKey       string `env:"YOUTUBE_API_KEY" envDefault:""`
 	YoutubeAccessToken  string `env:"YOUTUBE_ACCESS_TOKEN" envDefault:""`

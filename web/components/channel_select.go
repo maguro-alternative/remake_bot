@@ -3,6 +3,8 @@ package components
 import (
 	"fmt"
 	"strings"
+
+	"github.com/maguro-alternative/remake_bot/web/shared/htmlutil"
 )
 
 func CreateSelectChennelOptions(
@@ -30,10 +32,10 @@ func CreateSelectChennelOptions(
 				continue
 			}
 			if defaultChannelID == channelSelect.ID {
-				categoryOptions[categoryIndex].WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, channelSelect.ID, channelSelect.Name))
+				categoryOptions[categoryIndex].WriteString(fmt.Sprintf(`<option value="%s" selected>%s</option>`, htmlutil.EscapeString(channelSelect.ID), htmlutil.EscapeString(channelSelect.Name)))
 				continue
 			}
-			categoryOptions[categoryIndex].WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, channelSelect.ID, channelSelect.Name))
+			categoryOptions[categoryIndex].WriteString(fmt.Sprintf(`<option value="%s">%s</option>`, htmlutil.EscapeString(channelSelect.ID), htmlutil.EscapeString(channelSelect.Name)))
 		}
 	}
 	for _, categoryOption := range categoryOptions {

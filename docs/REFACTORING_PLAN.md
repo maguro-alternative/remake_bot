@@ -156,18 +156,30 @@
 
 ---
 
-## Phase 5: bot 層の分解 — メッセージ送信パスの一本化
+## Phase 5: bot 層の分解 — メッセージ送信パスの一本化と送信先抽象の導入
 
-> 目的: 913行の `on_message_create.go` を解体し、3系統あった送信実装を現行系に一本化する。
+> 目的: 913行の `on_message_create.go` を解体し、送信実装を現行系(`lineworks_service` 経由)に一本化する。
+> あわせて、**今後も送信バックエンドの追加・置き換え(LINE Notify → LINE WORKS のような移行)が起こる前提**で、
+> ハンドラ本体をコピーせずに送信先を足し替えられる構造にする。
+
+### 設計方針: 送信先のプラグイン化
+
+過去の経緯(LINE Notify 廃止 → Func2 直接送信 → Func3 キュー送信)が示す通り、送信バックエンドの世代交代は今後も発生し得る。その際に「ハンドラごと複製して旧実装をコメントアウトで残す」現状のパターンを繰り返さないため、以下の構造に再編する。
+
+- **前処理と送信を分離する**: 権限チェック・メッセージテキスト構築・スタンプ/添付ファイル処理までを共通パイプラインとし、正規化されたメッセージ(`OutboundMessage`: テキスト、画像URL群、音声ファイル等)を生成する。ここは送信先に依存しない。
+- **`MessageSender` インターフェースを定義する**: `Send(ctx context.Context, guildID string, msg OutboundMessage) error` 程度の小さな契約。現行の `lineworks_service` 送信を最初の実装とする。
+- **送信先はギルド設定/環境変数で選択・複数登録可能にする**: 新バックエンド導入時は新しい `MessageSender` 実装を追加して登録するだけで済み、移行期間中は新旧2実装を並列稼働(両方に配送)させてから旧実装を削除する、という手順が**ハンドラに一切手を入れずに**できる。
+- 旧実装の削除は「実装ファイル+登録1行」の削除で完結するため、死蔵コードが溜まらない。
 
 ### 作業項目
 
-1. **送信パスの整理**(要・事前確認)
-   - 現状アクティブなのは `onMessageCreateFunc2`(LINE WORKS 直接送信+トークンリフレッシュ265行)と `onMessageCreateFunc3`(`lineworks_service` 経由のキュー送信48行)の両方。
-   - **両方が同時に動く必要があるのか、Func3 への移行途中なのかをオーナーに確認**するのが最初のタスク。移行途中なら Func2 を削除して `lineworks_service` に一本化、両方必要なら共通前処理を抽出して並列維持。
-   - トークンリフレッシュ処理(Func2 内の~120行)は `pkg/lineworks_service` 側の責務に移す。
-2. **ファイル分割**
-   - `on_message_create.go` → `message_handler.go`(エントリ+権限チェック)/ `message_builder.go`(`buildMessageText` / `processStickerItems` / `buildFinalMessage`)/ `credentials.go`(復号系ヘルパー。Phase 4 の共通ヘルパーを利用)/ `attachments.go`(ffmpeg変換)。
+1. **送信パスの一本化**(決定済み: Func3 に特化する)
+   - `onMessageCreateFunc2`(LINE WORKS 直接送信+トークンリフレッシュ、265行)を削除し、`onMessageCreateFunc3` 系(`lineworks_service` 経由)に一本化する。
+   - Func2 のみが持っていたトークンリフレッシュ処理(~120行)は、`pkg/lineworks_service` 側に同等機能があることを確認してから削除する。不足があれば先に `lineworks_service` 側へ移植する(挙動を失わないことが削除の前提条件)。
+   - Func2 専用のヘルパー・テストも併せて削除。
+2. **送信先抽象の導入とファイル分割**
+   - 上記設計方針に従い `on_message_create.go` を分割: `message_handler.go`(エントリ+権限チェック+パイプライン呼び出し)/ `message_builder.go`(`buildMessageText` / `processStickerItems` / `buildFinalMessage` → `OutboundMessage` 生成)/ `attachments.go`(ffmpeg変換)/ `sender.go`(`MessageSender` インターフェースと登録機構)/ `sender_lineworks.go`(`lineworks_service` 実装。復号系ヘルパーは Phase 4 の共通ヘルパーを利用)。
+   - `MessageSender` にはモック実装(`SenderMock`)を用意し、ハンドラのテストを送信先非依存にする(既存の FfmpegMock と同じ function-field パターン)。
    - `on_voice_state_update.go` の295行関数を join/leave/camera/stream のイベント種別ごとの関数に分割。
 3. **context の是正**
    - `bot/main.go` で生成した親 context(シグナルで cancel される)をハンドラ構造体に保持させ、イベントごとに `context.WithTimeout(parent, ...)` を切る形へ。`context.Background()` の直接生成をハンドラから排除。
@@ -177,13 +189,18 @@
    - YouTube/ニコニコの `run()` 共有は維持しつつ、フィード種別をパラメータ化して `tasks/main.go` の switch を除去。
 
 ### 完了条件
+- メッセージ送信の実装系統が `lineworks_service` 経由の1系統のみ(Func2 とその専用コードが消滅)。
+- 共通前処理 → `MessageSender` インターフェースの構造になっており、新しい送信先の追加が「実装1ファイル+登録1行」で完結する。
 - `bot/cogs/` の1ファイル最大行数が300行以下、1関数最大100行以下。
-- メッセージ送信の実装系統が(オーナー確認の結果に応じて)1系統、または共通前処理+2出口の構造。
 - ハンドラ内の `context.Background()` 直接生成ゼロ。
-- 既存の cogs テスト(SessionMock / RepositoryFuncMock 利用)グリーン。
+- 既存の cogs テスト(SessionMock / RepositoryFuncMock 利用)グリーン。送信抽象に対するテストを追加。
 
 ### リスク
-- 高(本計画中もっとも挙動変更リスクが高いフェーズ)。Func2/Func3 の並存理由の確認を必ず先行させる。分割→一本化の順で、分割だけのPRと送信パス変更のPRを必ず分ける。
+- 高(本計画中もっとも挙動変更リスクが高いフェーズ)。PRは必ず次の順で分ける:
+  1. ファイル分割と `MessageSender` 抽象の導入(Func2/Func3 とも既存挙動のまま新構造に載せる)
+  2. トークンリフレッシュ機能の `lineworks_service` 側カバレッジ確認・移植
+  3. Func2(直接送信)の削除
+  この順なら、3で問題が出ても revert 1つで旧経路に戻せる。
 
 ---
 

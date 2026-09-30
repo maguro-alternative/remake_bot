@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	_ "embed"
 	"log/slog"
 	"net"
 	"net/http"
@@ -19,8 +18,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-//go:embed schema.sql
-var schema string // schema.sqlの内容をschemaに代入
 var permissionTypes = []string{"lineBot", "linePostDiscordChannel", "vcSignal", "webhook", "lineWorksToken"}
 
 func main() {
@@ -32,10 +29,7 @@ func main() {
 	}
 	defer cleanup()
 
-	// データベースの初期化
-	if _, err := dbV1.ExecContext(ctx, schema); err != nil {
-		panic(err)
-	}
+	// スキーマの適用は起動前に atlas schema apply で行う(docs/SCHEMA.md 参照)
 
 	client := http.Client{
 		Timeout: 5 * time.Second,

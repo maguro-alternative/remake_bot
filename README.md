@@ -144,8 +144,7 @@ LINE連携を使用する場合は以下のフォームにトークンを入力�
 │   │   ├── internal
 │   │   │   └── env.go
 │   │   └── config.go
-|   ├── main.go
-│   └── schema.sql              // データベースのスキーマ
+|   └── main.go
 ├── fixtures                    // データベースのテスト用のフィクスチャ
 ├── pkg                         // 共通のパッケージ
 │   ├── crypto                  // 暗号化関連のパッケージ
@@ -154,6 +153,8 @@ LINE連携を使用する場合は以下のフォームにトークンを入力�
 │   ├── sharedtime              // botがVCに入室した時間を共有するためのパッケージ
 │   └── youtube                 // YouTube関連のパッケージ
 ├── repository                  // データベース操作のリポジトリ
+├── schema
+│   └── schema.sql              // データベースのスキーマ(atlas schema apply で適用、docs/SCHEMA.md 参照)
 ├── tasks                       // 定期的に行うタスク(Webhookの送信など)
 ├── testutil                    // テスト用のユーティリティ
 ├── web                         // Webサーバーを動かすためのディレクトリ
@@ -206,8 +207,7 @@ LINE連携を使用する場合は以下のフォームにトークンを入力�
 │   │   ├── internal
 │   │   │   └── env.go
 │   │   └── config.go
-|   ├── main.go
-│   └── schema.sql                                  // データベースのスキーマ
+|   └── main.go
 ├── fixtures
 ├── pkg
 │   ├── crypto
@@ -269,6 +269,8 @@ LINE連携を使用する場合は以下のフォームにトークンを入力�
 │   ├── webhook_word.go
 │   ├── webhook_test.go
 │   └── webhook.go
+├── schema
+│   └── schema.sql                                  // データベースのスキーマ(あるべき姿)
 ├── tasks
 │   ├── internal
 │   │   ├── youtube_test.go

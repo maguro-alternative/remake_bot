@@ -1,0 +1,47 @@
+name: schema
+
+on:
+  pull_request:
+    paths:
+      - "schema/**"
+      - "atlas.hcl"
+      - ".github/workflows/schema.yml"
+  push:
+    branches: [main]
+    paths:
+      - "schema/**"
+      - "atlas.hcl"
+      - ".github/workflows/schema.yml"
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ariga/setup-atlas@v0
+        with:
+          version: v1.3.3
+
+      - name: 空のDBへ schema.sql を適用
+        run: atlas schema apply --env local --auto-approve
+
+      - name: 再適用で差分が出ないこと(冪等性)
+        run: |
+          out=$(atlas schema apply --env local --dry-run)
+          echo "$out"
+          echo "$out" | grep -q "Schema is synced"

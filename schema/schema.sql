@@ -7,7 +7,7 @@
     type (TEXT): 権限の種類 (line_post_discord_channel, line_bot, vc, webhook)
     code (BIGINT): Discord上での権限コード
 */
-CREATE TABLE IF NOT EXISTS permissions_code (
+CREATE TABLE permissions_code (
     guild_id TEXT NOT NULL,
     type TEXT NOT NULL,
     code BIGINT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS permissions_code (
     user_id (TEXT): 対象ID (ユーザーID)
     permission (TEXT): 権限レベル(read, write, admin)
 */
-CREATE TABLE IF NOT EXISTS permissions_user_id (
+CREATE TABLE permissions_user_id (
     guild_id TEXT NOT NULL,
     type TEXT NOT NULL,
     user_id TEXT NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS permissions_user_id (
     user_id (TEXT): 対象ID (ロールID)
     permission (TEXT): 権限レベル(read, write, admin)
 */
-CREATE TABLE IF NOT EXISTS permissions_role_id (
+CREATE TABLE permissions_role_id (
     guild_id TEXT NOT NULL,
     type TEXT NOT NULL,
     role_id TEXT NOT NULL,
@@ -60,7 +60,7 @@ DiscordからLINEへのメッセージ送信設定を保存するテーブル
     ng (BOOLEAN): 送信NGのチャンネルか
     bot_message (BOOLEAN): Botのメッセージを送信するか
 */
-CREATE TABLE IF NOT EXISTS line_post_discord_channel (
+CREATE TABLE line_post_discord_channel (
     channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     ng BOOLEAN NOT NULL,
@@ -77,7 +77,7 @@ LINEへ送信しないメッセージの種類を保存するテーブル
     guild_id (TEXT PRIMARY KEY): サーバーID
     type (INTEGER PRIMARY KEY): メッセージの種類(ピン止め、スレッド、スレッドの返信)
 */
-CREATE TABLE IF NOT EXISTS line_ng_discord_message_type (
+CREATE TABLE line_ng_discord_message_type (
     channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     type INTEGER NOT NULL,
@@ -93,7 +93,7 @@ LINEへ送信しないDiscordユーザーを保存するテーブル
     guild_id (TEXT PRIMARY KEY): サーバーID
     id (TEXT PRIMARY KEY): ID
 */
-CREATE TABLE IF NOT EXISTS line_ng_discord_user_id (
+CREATE TABLE line_ng_discord_user_id (
     channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
@@ -109,7 +109,7 @@ LINEへ送信しないDiscordロールを保存するテーブル
     guild_id (TEXT PRIMARY KEY): サーバーID
     id (TEXT PRIMARY KEY): ID
 */
-CREATE TABLE IF NOT EXISTS line_ng_discord_role_id (
+CREATE TABLE line_ng_discord_role_id (
     channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     role_id TEXT NOT NULL,
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS line_ng_discord_role_id (
     everyone_mention (BOOLEAN): @everyoneを通知するか
 */
 
-CREATE TABLE IF NOT EXISTS vc_signal_channel (
+CREATE TABLE vc_signal_channel (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     send_signal BOOLEAN NOT NULL,
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS vc_signal_channel (
     id (TEXT): ID
 */
 
-CREATE TABLE IF NOT EXISTS vc_signal_ng_user_id (
+CREATE TABLE vc_signal_ng_user_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS vc_signal_ng_user_id (
 */
 
 
-CREATE TABLE IF NOT EXISTS vc_signal_ng_role_id (
+CREATE TABLE vc_signal_ng_role_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     role_id TEXT NOT NULL,
@@ -184,14 +184,14 @@ CREATE TABLE IF NOT EXISTS vc_signal_ng_role_id (
     user_id (TEXT): ユーザーID
 */
 
-CREATE TABLE IF NOT EXISTS vc_signal_mention_user_id (
+CREATE TABLE vc_signal_mention_user_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
     PRIMARY KEY(vc_channel_id, user_id)
 );
 
-CREATE TABLE IF NOT EXISTS vc_signal_mention_role_id (
+CREATE TABLE vc_signal_mention_role_id (
     vc_channel_id TEXT NOT NULL,
     guild_id TEXT NOT NULL,
     role_id TEXT NOT NULL,
@@ -211,7 +211,7 @@ CREATE TABLE IF NOT EXISTS vc_signal_mention_role_id (
 
 */
 
-CREATE TABLE IF NOT EXISTS webhook (
+CREATE TABLE webhook (
     webhook_serial_id SERIAL,
     guild_id TEXT NOT NULL,
     webhook_id TEXT NOT NULL,
@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS webhook (
     user_id (TEXT): ユーザーID
 */
 
-CREATE TABLE IF NOT EXISTS webhook_user_mention (
+CREATE TABLE webhook_user_mention (
     webhook_serial_id INTEGER,
     user_id TEXT NOT NULL,
     PRIMARY KEY(webhook_serial_id, user_id),
@@ -244,7 +244,7 @@ CREATE TABLE IF NOT EXISTS webhook_user_mention (
     role_id (TEXT): ロールID
 */
 
-CREATE TABLE IF NOT EXISTS webhook_role_mention (
+CREATE TABLE webhook_role_mention (
     webhook_serial_id INTEGER,
     role_id TEXT NOT NULL,
     PRIMARY KEY(webhook_serial_id, role_id),
@@ -265,7 +265,7 @@ CREATE TABLE IF NOT EXISTS webhook_role_mention (
         MentionAnd : メンション条件をANDで結合
     word (TEXT): 単語
 */
-CREATE TABLE IF NOT EXISTS webhook_word (
+CREATE TABLE webhook_word (
     webhook_serial_id INTEGER,
     conditions TEXT NOT NULL,
     word TEXT NOT NULL,
@@ -273,14 +273,14 @@ CREATE TABLE IF NOT EXISTS webhook_word (
     FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS webhook_thread (
+CREATE TABLE webhook_thread (
     webhook_serial_id INTEGER,
     thread_id TEXT NOT NULL,
     PRIMARY KEY(webhook_serial_id, thread_id),
     FOREIGN KEY(webhook_serial_id) REFERENCES webhook(webhook_serial_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS line_bot (
+CREATE TABLE line_bot (
     guild_id TEXT NOT NULL,
     line_notify_token BYTEA,
     line_bot_token BYTEA,
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS line_bot (
     PRIMARY KEY(guild_id)
 );
 
-CREATE TABLE IF NOT EXISTS line_bot_iv (
+CREATE TABLE line_bot_iv (
     guild_id TEXT NOT NULL,
     line_notify_token_iv BYTEA,
     line_bot_token_iv BYTEA,
@@ -304,7 +304,7 @@ CREATE TABLE IF NOT EXISTS line_bot_iv (
     PRIMARY KEY(guild_id)
 );
 
-CREATE TABLE IF NOT EXISTS line_works_bot_info (
+CREATE TABLE line_works_bot_info (
     guild_id TEXT NOT NULL,
     line_works_client_id BYTEA,
     line_works_client_secret BYTEA,
@@ -315,7 +315,7 @@ CREATE TABLE IF NOT EXISTS line_works_bot_info (
     PRIMARY KEY(guild_id)
 );
 
-CREATE TABLE IF NOT EXISTS line_works_bot_info_iv (
+CREATE TABLE line_works_bot_info_iv (
     guild_id TEXT NOT NULL,
     line_works_client_id_iv BYTEA,
     line_works_client_secret_iv BYTEA,
@@ -326,7 +326,7 @@ CREATE TABLE IF NOT EXISTS line_works_bot_info_iv (
     PRIMARY KEY(guild_id)
 );
 
-CREATE TABLE IF NOT EXISTS line_works_bot (
+CREATE TABLE line_works_bot (
     guild_id TEXT NOT NULL,
     line_works_bot_token BYTEA,
     line_works_refresh_token BYTEA,
@@ -339,7 +339,7 @@ CREATE TABLE IF NOT EXISTS line_works_bot (
     PRIMARY KEY(guild_id)
 );
 
-CREATE TABLE IF NOT EXISTS line_works_bot_iv (
+CREATE TABLE line_works_bot_iv (
     guild_id TEXT NOT NULL,
     line_works_bot_token_iv BYTEA,
     line_works_refresh_token_iv BYTEA,

@@ -30,7 +30,7 @@
    - ロギング: `slog` と `fmt.Printf`/`fmt.Println` が混在(`pkg/db/db.go:159` にデバッグ用 `fmt.Println` が残存)。
    - context: イベントハンドラが毎回 `context.Background()` を生成し、キャンセル・タイムアウトが伝播しない。
 6. **設定の3重管理**: `core/config` / `bot/config` / `web/config` がほぼ同じ内容。環境変数の追加時に3箇所修正が必要。
-7. **マイグレーション基盤なし**: `schema.sql`(352行)を起動時に `go:embed` で流し込むだけ。スキーマ変更の履歴管理ができない。
+7. **スキーマ管理基盤なし**: `schema.sql`(352行)を起動時に `go:embed` で流し込むだけ(`IF NOT EXISTS` のため既存テーブルへの変更が反映されない)。
 
 ---
 
@@ -232,7 +232,7 @@
 
 ---
 
-## Phase 7: 設定統一・マイグレーション導入・起動構成の整理
+## Phase 7: 設定統一・スキーマ管理導入・起動構成の整理
 
 > 目的: 横断インフラの3重管理を解消し、スキーマ変更を安全にする。
 
@@ -241,41 +241,35 @@
 1. **config パッケージの統一**
    - `core/config`(101行)/ `bot/config`(117行)/ `web/config`(126行)を `internal/config` 1パッケージに統合。`caarlos0/env` + `sync.Once` の現方式は維持。
    - 3パッケージ間の差分(web専用のセッション系、bot専用のトークン系)はフィールドとして統合し、利用側のimportを一括置換。
-2. **マイグレーションツールの導入**(Atlas で差分生成 + golang-migrate で起動時適用)
-   - 方針: スキーマの「あるべき姿」は宣言的に `schema.sql` で管理し、Atlas(Community Edition)の `migrate diff` でバージョン付きマイグレーションを自動生成する。適用は Atlas に Go 組み込み用の安定APIが無いため、golang-migrate ライブラリで起動時に行う(ランタイムイメージに atlas バイナリを入れない)。
-   - 現行 `core/schema.sql`(352行)から `IF NOT EXISTS` を外し、Atlas の desired state として扱う(配置は `schema/schema.sql` 等へ移動を検討)。
-   - `atlas.hcl` を追加し、`migration.dir = "file://migrations?format=golang-migrate"`、`dev = "docker://postgres/<本番と同じメジャー>/dev"` を定義する。
-   - `atlas migrate diff init` で `migrations/<version>_init.up.sql` と `atlas.sum` を生成し、ベースラインとする。
-   - 起動時 `ExecContext(schema)` を削除し、`embed.FS` に埋め込んだ `migrations/` を golang-migrate(`iofs` source + `postgres` driver)で `Up()` する処理に置換する。
-   - 以降のスキーマ変更フロー: `schema.sql` を編集 → `atlas migrate diff <name>` → 生成SQLをレビューしてコミット。
-   - CI(GitHub Actions)に以下を組み込む:
-     - `atlas migrate validate`(`atlas.sum` の整合性検査)
-     - `atlas migrate diff --dry-run` 相当で `schema.sql` と `migrations/` の差分が無いことを確認(マイグレーションの生成漏れ検出)
-     - `atlas migrate lint --latest 1`(破壊的変更の検出。ログイン要否をバージョンごとに確認)
-     - 新規Postgresへマイグレーション適用 → repository テスト実行
-   - 以降のスキーマ変更(例: Phase 4 で見送ったIVテーブル統合)はマイグレーションとして実施可能になる。
-3. **エントリポイントの整理**: `core/main.go`(197行)の起動シーケンス(DB → migrate → bot → web → tasks)を関数分割し、graceful shutdown(Phase 5 で導入した親context)と接続。
+2. **スキーマ管理ツールの導入**(Atlas 宣言的ワークフロー / ridgepole 相当) — **実施済み**(手順は `docs/SCHEMA.md`)
+   - 方針: `schema/schema.sql` に「あるべき姿」だけを書き、`atlas schema apply` で DB との差分をその場で適用する。マイグレーションファイルの履歴は持たない。
+   - `core/schema.sql` を `schema/schema.sql` へ移動し、`IF NOT EXISTS` を外した。
+   - `atlas.hcl` に `env "local"`(dev DB は Docker の `postgres/16`)と `env "prod"`(dev DB は同一サーバー上の空DB `ATLAS_DEV_URL`)を定義。`diff.skip` でテーブル・スキーマの DROP を抑止(ridgepole の `--drop-table` 無し相当)。
+   - 起動時の `ExecContext(schema)` を削除。本番は Railway の pre-deploy(`railway.json` → `scripts/schema-apply.sh`)で適用し、失敗時はデプロイを中断する。ランタイムイメージに Atlas Community 版バイナリを同梱。
+   - CI(`.github/workflows/schema.yml`): 空の Postgres への適用と、再適用で差分が出ないこと(冪等性)を検査。
+   - 以降のスキーマ変更(例: Phase 4 で見送ったIVテーブル統合)は `schema.sql` の編集として実施可能になる。
+3. **エントリポイントの整理**: `core/main.go`(197行)の起動シーケンス(DB → bot → web → tasks)を関数分割し、graceful shutdown(Phase 5 で導入した親context)と接続。
 4. **Dockerfile の見直し**: ビルドキャッシュ効率(go.mod/go.sum を先にCOPY)、不要レイヤーの削減。CIでのビルド時間短縮。
 
 ### 完了条件
 - config パッケージが1つ。環境変数の追加が1箇所の修正で済む。
-- `atlas.hcl` と `migrations/`(golang-migrate 形式 + `atlas.sum`)が存在し、CIで validate / 生成漏れチェック / lint が通る。
-- CIで新規DBに対して migrate → 全テストが通る。
-- 起動時に `schema.sql` を直接流す処理が消えている。
+- `atlas.hcl` と `schema/schema.sql` が存在し、CIで空DBへの適用と冪等性チェックが通る。
+- 起動時に `schema.sql` を直接流す処理が消え、デプロイ時に `atlas schema apply` で適用される。
 
 ### リスク
-- 中。マイグレーションのベースライン化は既存本番DBとの整合確認が必要。
-  - 事前に `atlas schema diff --from "$PROD_DATABASE_URL" --to file://schema.sql --dev-url docker://postgres/<ver>/dev` で本番と `schema.sql` の乖離(手動ALTER等)が無いことを確認し、差分があれば `schema.sql` 側を本番に合わせてからベースラインを生成する。
-  - 既存本番DBには初回マイグレーションを流さず、`migrate force <init version>` で `schema_migrations` に適用済みとして記録する。この手順を運用手順書として残す。
-- 開発者のローカル・CI に Atlas CLI と Docker(dev DB用)が必要になる。Makefile にインストール/実行ターゲットを用意する。
-- Atlas Community Edition はビュー・トリガー・関数等の一部機能が非対応(Pro機能)。現行スキーマはテーブルのみのため影響なしだが、将来これらを導入する場合は手書きマイグレーションとの併用を検討する。
+- 中。宣言的適用のため、`schema.sql` の変更がそのまま本番に反映される。
+  - カラムの削除・リネームは DROP(+ADD)として実行されデータが失われる。テーブル DROP は抑止しているがカラム DROP は抑止していないため、レビューと本番 dry-run(`atlas schema apply --env prod --dry-run`)で確認する。
+  - 初回デプロイ前に本番へ dry-run し、旧方式で作成済みのスキーマと `schema.sql` が一致(`Schema is synced`)することを確認する。
+- 本番の Postgres に差分計算用の空DB(`atlas_dev`)と環境変数 `ATLAS_DEV_URL` の設定が必要。dev DB の Postgres メジャーバージョン(ローカル/CIは 16)は本番に合わせる。
+- 開発者のローカル・CI に Atlas CLI と Docker(dev DB用)が必要になる。Makefile 導入時に実行ターゲットを用意する。
+- Atlas Community 版はビュー・トリガー・関数等が非対応。現行スキーマはテーブルのみのため影響なし。
 
 ---
 
 ## Phase 8: 仕上げ — 観測性・ドキュメント・lint最終化
 
 1. **lint の最終厳格化**: `gocyclo`(複雑度上限)、`funlen` 等を有効化し、Phase 5/6 で達成した「1関数100行以下」を機械的に強制。
-2. **ドキュメント整備**: アーキテクチャ図(bot / web / tasks / repository / pkg の依存関係)、開発手順(make コマンド)、運用手順(Atlas によるマイグレーション生成・適用・ベースライン手順)を `docs/` に追加。`CLAUDE.md` の作成も検討。
+2. **ドキュメント整備**: アーキテクチャ図(bot / web / tasks / repository / pkg の依存関係)、開発手順(make コマンド)、運用手順(Atlas によるスキーマ適用手順)を `docs/` に追加。`CLAUDE.md` の作成も検討。
 3. **観測性**: slog のフィールド名規約統一(現状 `"Error:"` のようなコロン付きキーが混在)、接続ヘルスモニタ(`on_connection.go`)のメトリクス露出検討。
 4. **積み残し課題の棚卸し**: Phase 4 で見送った復号キャッシュ、IVテーブル統合、`RepositoryFuncMock` の自動生成化、discordgo Session のインターフェース化、などを Issue 化。
 
@@ -301,5 +295,5 @@ Phase 1 (CI/安全網)
 - CI(ビルド・lint・Goテスト・Jestテスト・Dockerビルド)が全PRで実行されグリーン。
 - コピペ由来の同型実装(InsertMany / DeleteNotIn / 暗号化マッピング / セッションゲッター / ハンドラ定型処理)が各1箇所。
 - 最大ファイル913行 → 300行以下、81メソッドインターフェース → 機能別5分割。
-- 設定1箇所・マイグレーション管理あり・死蔵コードゼロ。
+- 設定1箇所・スキーマ管理あり・死蔵コードゼロ。
 - テストカバレッジが開始時点を下回らない。

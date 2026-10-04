@@ -6,8 +6,7 @@
 │   │   ├── internal
 │   │   │   └── env.go
 │   │   └── config.go
-|   ├── main.go
-│   └── schema.sql
+|   └── main.go
 ```
 
 ## config
@@ -18,5 +17,4 @@
 botのメインとなるコードです。
 ここを実行することで起動します。
 
-## schema.sql
-データベースのスキーマです。
+DBスキーマは起動前に `atlas schema apply` で適用します(`docs/SCHEMA.md` 参照)。

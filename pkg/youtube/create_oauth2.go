@@ -2,19 +2,21 @@ package youtube
 
 import (
 	"encoding/json"
+
+	"github.com/samber/mo"
 )
 
 type oAuth2Credentials struct {
-	AccessToken   string  `json:"access_token"`
-	ClientID      string  `json:"client_id"`
-	ClientSecret  string  `json:"client_secret"`
-	RefreshToken  string  `json:"refresh_token"`
-	TokenExpiry   string  `json:"token_expiry"`
-	TokenURI      string  `json:"token_uri"`
-	UserAgent     *string `json:"user_agent"`
-	RevokeURI     string  `json:"revoke_uri"`
-	IDToken       *string `json:"id_token"`
-	IDTokenJWT    *string `json:"id_token_jwt"`
+	AccessToken   string            `json:"access_token"`
+	ClientID      string            `json:"client_id"`
+	ClientSecret  string            `json:"client_secret"`
+	RefreshToken  string            `json:"refresh_token"`
+	TokenExpiry   string            `json:"token_expiry"`
+	TokenURI      string            `json:"token_uri"`
+	UserAgent     mo.Option[string] `json:"user_agent"`
+	RevokeURI     string            `json:"revoke_uri"`
+	IDToken       mo.Option[string] `json:"id_token"`
+	IDTokenJWT    mo.Option[string] `json:"id_token_jwt"`
 	TokenResponse struct {
 		AccessToken string `json:"access_token"`
 		ExpiresIn   int    `json:"expires_in"`
@@ -36,10 +38,10 @@ func createOAuth2(accessToken, clientID, clientSecret, refreshToken, tokenExpiry
 		RefreshToken: refreshToken,
 		TokenExpiry:  tokenExpiry,
 		TokenURI:     "https://oauth2.googleapis.com/token",
-		UserAgent:    nil,
+		UserAgent:    mo.None[string](),
 		RevokeURI:    "https://oauth2.googleapis.com/revoke",
-		IDToken:      nil,
-		IDTokenJWT:   nil,
+		IDToken:      mo.None[string](),
+		IDTokenJWT:   mo.None[string](),
 		TokenResponse: struct {
 			AccessToken string `json:"access_token"`
 			ExpiresIn   int    `json:"expires_in"`

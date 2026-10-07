@@ -67,7 +67,7 @@ func TestHmac_LineHmac(t *testing.T) {
 
 		decrypt, err := LineHmac(privateKey, requestBodyByte, aesCrypto, lineBot, lineBotIv, header)
 		assert.NoError(t, err)
-		assert.NotNil(t, decrypt)
+		assert.True(t, decrypt.IsPresent())
 	})
 	t.Run("異常系", func(t *testing.T) {
 		requestBodyByte := []byte(`{"events":[{"replyToken":"","type":"message","timestamp":0,"source":{"userId":"Udeadbw00dbaadbeefdeadbeefdeadbeef","type":"user"},"message":{"type":"text","id":"1234567890","text":"Hello, world"}}]}`)
@@ -75,6 +75,6 @@ func TestHmac_LineHmac(t *testing.T) {
 
 		decrypt, err := LineHmac(privateKey, requestBodyByte, aesCrypto, lineBot, lineBotIv, header)
 		assert.NoError(t, err)
-		assert.Nil(t, decrypt)
+		assert.True(t, decrypt.IsAbsent())
 	})
 }

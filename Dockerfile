@@ -1,4 +1,4 @@
-FROM golang:1.23.0-bookworm AS voicevox_setup
+FROM golang:1.27.1-bookworm AS voicevox_setup
 
 # Allow overriding the voicevox core asset URL at build time:
 ARG VOICEVOX_VERSION="0.14.1"
@@ -27,7 +27,7 @@ RUN set -eux; \
 # ============================================================
 # Stage 2: Go Builder with CGO support
 # ============================================================
-FROM golang:1.23.0-bookworm AS builder
+FROM golang:1.27.1-bookworm AS builder
 
 # Install CGO dependencies and ffmpeg
 RUN apt-get -y update && apt-get -y install locales && apt-get -y upgrade && \

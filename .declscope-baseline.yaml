@@ -1,0 +1,93 @@
+# declscope baseline
+#
+# Violations recorded here are suppressed; new ones are still reported.
+# Regenerate with:
+#
+#     declscope baseline ./...
+#
+# Do not edit by hand. An entry disappears when its violation is fixed, so the
+# diff of a regeneration is the record of what was cleaned up.
+packages:
+  github.com/maguro-alternative/remake_bot/bot/cogs:
+    boundary:
+      cogHandler:
+        - cogHandler
+        - cogHandler.client
+        - cogHandler.db
+        - cogHandler.lineWorksService
+      onMessageCreate:
+        - cogHandler.onMessageCreate
+      onVoiceStateUpdate:
+        - cogHandler.onVoiceStateUpdate
+  github.com/maguro-alternative/remake_bot/bot/cogs/internal:
+    overexported:
+      entity:
+        - LineBotDecrypt.DebugMode
+        - LineBotDecrypt.DefaultChannelID
+  github.com/maguro-alternative/remake_bot/bot/commands:
+    boundary:
+      commandHandler:
+        - command
+        - commandHandler
+        - commandHandler.client
+        - newCogHandler
+  github.com/maguro-alternative/remake_bot/pkg/line:
+    boundary:
+      line:
+        - LineRequest.client
+        - LineRequest.lineBotToken
+        - LineRequest.lineGroupID
+        - LineRequest.lineNotifyToken
+  github.com/maguro-alternative/remake_bot/pkg/lineworks:
+    boundary:
+      lineworks:
+        - LineWorksInfo.client
+        - LineWorksInfo.lineWorksClientID
+        - LineWorksInfo.lineWorksClientSecret
+        - LineWorksInfo.lineWorksPrivateKey
+        - LineWorksInfo.lineWorksServiceAccount
+        - lineWorks
+        - lineWorks.client
+        - lineWorks.lineWorksBotID
+        - lineWorks.lineWorksGroupID
+        - lineWorks.lineWorksToken
+  github.com/maguro-alternative/remake_bot/pkg/lineworks_service:
+    boundary:
+      service:
+        - ClientInfo.mu
+  github.com/maguro-alternative/remake_bot/pkg/youtube:
+    boundary:
+      createClientSecret:
+        - createClientSecret
+      createOauth2:
+        - createOAuth2
+  github.com/maguro-alternative/remake_bot/repository:
+    boundary:
+      repository:
+        - Repository.db
+  github.com/maguro-alternative/remake_bot/tasks/internal:
+    boundary:
+      youtube:
+        - run
+  github.com/maguro-alternative/remake_bot/testutil/fixtures:
+    boundary:
+      fixtures:
+        - ModelConnector.addToFixture
+        - ModelConnector.connect
+        - ModelConnector.insertTable
+        - ModelConnector.setter
+  github.com/maguro-alternative/remake_bot/web/handler/api/lineworks_bot/internal:
+    overexported:
+      entity:
+        - LineWorksBotDecrypt.DebugMode
+        - LineWorksBotDecrypt.LineWorksBotSecret
+  github.com/maguro-alternative/remake_bot/web/shared/ctxvalue:
+    boundary:
+      ctxvalue:
+        - contextKey
+  github.com/maguro-alternative/remake_bot/web/shared/session:
+    boundary:
+      session:
+        - sessionKey
+        - sessionStore
+        - sessionStore.session

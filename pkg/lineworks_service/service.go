@@ -9,12 +9,13 @@ import (
 	"time"
 
 	sdklineworks "github.com/maguro-alternative/line-works-sdk-go/pkg/lineworks"
+	"github.com/samber/mo"
 )
 
 // LineWorksService manages LINE Works SDK clients for multiple guilds
 type LineWorksService struct {
 	configMap     map[string]*LineWorksConfig // for backward compatibility
-	unifiedConfig *LineWorksConfig            // unified config for all guilds
+	unifiedConfig mo.Option[*LineWorksConfig] // unified config for all guilds
 	clientPool    *ClientPool
 	messageQueue  *MessageQueue
 	ctx           context.Context
@@ -35,7 +36,7 @@ func NewService(worksID, password string, channelNo int) (*LineWorksService, err
 		return &LineWorksService{
 			configMap:     make(map[string]*LineWorksConfig),
 			clientPool:    NewClientPool(),
-			unifiedConfig: nil,
+			unifiedConfig: mo.None[*LineWorksConfig](),
 		}, nil
 	}
 
@@ -49,9 +50,9 @@ func NewService(worksID, password string, channelNo int) (*LineWorksService, err
 	service := &LineWorksService{
 		configMap:     map[string]*LineWorksConfig{"unified": unifiedConfig},
 		clientPool:    NewClientPool(),
-		unifiedConfig: unifiedConfig,
+		unifiedConfig: mo.Some(unifiedConfig),
 	}
-	
+
 	// Create message queue with reference to the service
 	service.messageQueue = NewMessageQueue(service, 100, 3)
 
@@ -63,7 +64,8 @@ func (s *LineWorksService) Start(ctx context.Context) error {
 	s.ctx, s.cancel = context.WithCancel(ctx)
 
 	// If no unified config, service is disabled
-	if s.unifiedConfig == nil {
+	unifiedConfig, ok := s.unifiedConfig.Get()
+	if !ok {
 		slog.InfoContext(ctx, "LINE Works service started in disabled mode (no configuration)")
 		return nil
 	}
@@ -81,8 +83,8 @@ func (s *LineWorksService) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to prewarm LINE Works client: %w", err)
 	}
 
-	slog.InfoContext(ctx, "LINE Works service started with unified configuration", 
-		"worksID", s.unifiedConfig.WorksID, "channelNo", s.unifiedConfig.ChannelNo)
+	slog.InfoContext(ctx, "LINE Works service started with unified configuration",
+		"worksID", unifiedConfig.WorksID, "channelNo", unifiedConfig.ChannelNo)
 	return nil
 }
 
@@ -109,10 +111,10 @@ func (s *LineWorksService) Stop() {
 // SendMessage sends a message to LINE Works using unified configuration
 func (s *LineWorksService) SendMessage(ctx context.Context, guildID, message string) error {
 	// Check if service is enabled
-	if s.unifiedConfig == nil {
+	if s.unifiedConfig.IsAbsent() {
 		return nil // Service is disabled, silently skip
 	}
-	
+
 	// Try to send via queue first
 	return s.messageQueue.EnqueueMessage(ctx, guildID, message)
 }
@@ -120,17 +122,18 @@ func (s *LineWorksService) SendMessage(ctx context.Context, guildID, message str
 // SendMessageDirect sends message directly to LINE Works (bypassing queue)
 func (s *LineWorksService) SendMessageDirect(ctx context.Context, guildID, message string) error {
 	// Check if service is enabled
-	if s.unifiedConfig == nil {
+	unifiedConfig, ok := s.unifiedConfig.Get()
+	if !ok {
 		return nil // Service is disabled, silently skip
 	}
 
 	// Use unified config for any guild
-	client, err := s.clientPool.GetClient(ctx, "unified", s.unifiedConfig)
+	client, err := s.clientPool.GetClient(ctx, "unified", unifiedConfig)
 	if err != nil {
 		return fmt.Errorf("failed to get unified LINE Works client: %w", err)
 	}
 
-	_, err = client.SendTextMessage(ctx, s.unifiedConfig.ChannelNo, message, nil)
+	_, err = client.SendTextMessage(ctx, unifiedConfig.ChannelNo, message, nil)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to send LINE Works message",
 			"guildID", guildID, "error", err)
@@ -138,20 +141,21 @@ func (s *LineWorksService) SendMessageDirect(ctx context.Context, guildID, messa
 	}
 
 	slog.DebugContext(ctx, "LINE Works message sent successfully",
-		"guildID", guildID, "channelNo", s.unifiedConfig.ChannelNo, "messageLength", len(message))
+		"guildID", guildID, "channelNo", unifiedConfig.ChannelNo, "messageLength", len(message))
 
 	return nil
 }
 
 // prewarmClientBlocking preloads the unified client during startup (blocking)
 func (s *LineWorksService) prewarmClientBlocking(ctx context.Context) error {
-	if s.unifiedConfig == nil {
+	unifiedConfig, ok := s.unifiedConfig.Get()
+	if !ok {
 		return nil
 	}
 
-	slog.InfoContext(ctx, "Pre-warming LINE Works client...", "worksID", s.unifiedConfig.WorksID)
+	slog.InfoContext(ctx, "Pre-warming LINE Works client...", "worksID", unifiedConfig.WorksID)
 
-	client, err := s.clientPool.GetClient(ctx, "unified", s.unifiedConfig)
+	client, err := s.clientPool.GetClient(ctx, "unified", unifiedConfig)
 	if err != nil {
 		return fmt.Errorf("failed to create and login LINE Works client: %w", err)
 	}
@@ -163,7 +167,7 @@ func (s *LineWorksService) prewarmClientBlocking(ctx context.Context) error {
 	}
 
 	slog.InfoContext(ctx, "LINE Works client pre-warmed and logged in successfully",
-		"worksID", s.unifiedConfig.WorksID,
+		"worksID", unifiedConfig.WorksID,
 		"userName", myInfo.GetDisplayName())
 
 	return nil
@@ -181,11 +185,11 @@ func (s *LineWorksService) GetServiceStatus() ServiceStatus {
 	status := ServiceStatus{
 		Clients: s.clientPool.GetAllClients(),
 	}
-	
+
 	if s.messageQueue != nil {
 		status.Queue = s.messageQueue.GetQueueStatus()
 	}
-	
+
 	return status
 }
 
@@ -196,7 +200,7 @@ func (s *LineWorksService) RemoveClient(clientID string) {
 
 // IsEnabled returns true if the service is enabled (has configuration)
 func (s *LineWorksService) IsEnabled() bool {
-	return s.unifiedConfig != nil
+	return s.unifiedConfig.IsPresent()
 }
 
 // ClientInfo represents LINE Works client information for a guild
@@ -229,13 +233,13 @@ type ServiceStatus struct {
 	Queue   QueueStatus             `json:"queue"`
 }
 
-type LineWorksServiceMock struct{
-	StartFunc func(ctx context.Context) error
-	StopFunc  func()
-	SendMessageFunc func(ctx context.Context, guildID, message string) error
+type LineWorksServiceMock struct {
+	StartFunc             func(ctx context.Context) error
+	StopFunc              func()
+	SendMessageFunc       func(ctx context.Context, guildID, message string) error
 	SendMessageDirectFunc func(ctx context.Context, guildID, message string) error
-	GetServiceStatusFunc func() ServiceStatus
-	RemoveClientFunc func(guildID string)
+	GetServiceStatusFunc  func() ServiceStatus
+	RemoveClientFunc      func(guildID string)
 }
 
 func (s *LineWorksServiceMock) Start(ctx context.Context) error {
@@ -261,7 +265,7 @@ func (s *LineWorksServiceMock) GetServiceStatus() ServiceStatus {
 func (s *LineWorksServiceMock) RemoveClient(guildID string) {
 	s.RemoveClientFunc(guildID)
 }
-	
+
 var (
 	_ LineWorksServiceInterface = (*LineWorksService)(nil)
 	_ LineWorksServiceInterface = (*LineWorksServiceMock)(nil)

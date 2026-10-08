@@ -1,0 +1,42 @@
+name: lint
+
+on:
+  pull_request:
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - ".declscope*.yaml"
+      - "scripts/fetch-voicevox-header.py"
+      - ".github/workflows/lint.yml"
+  push:
+    branches: [main]
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - ".declscope*.yaml"
+      - "scripts/fetch-voicevox-header.py"
+      - ".github/workflows/lint.yml"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      # cgo パッケージ(voicevox)を型チェックするためにヘッダだけ取得する
+      - name: voicevox_core.h を取得
+        run: |
+          python3 scripts/fetch-voicevox-header.py "$RUNNER_TEMP/voicevox"
+          echo "CGO_CFLAGS=-I$RUNNER_TEMP/voicevox" >> "$GITHUB_ENV"
+
+      - name: declscope
+        run: go tool declscope ./...
+
+      - name: molint
+        run: go tool molint ./...

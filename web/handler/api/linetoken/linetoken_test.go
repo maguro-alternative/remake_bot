@@ -61,6 +61,7 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 		h := &LineTokenHandler{}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/linetoken", bytes.NewReader([]byte("")))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
@@ -70,7 +71,8 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 			indexService: &service.IndexService{},
 		}
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest(http.MethodPost, "/api/987654321/linetoken", bytes.NewReader([]byte(`{"default_channel_id":"aaa123456789"}`)))
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/linetoken", bytes.NewReader([]byte(`{"defaultChannelId":"aaa123456789"}`)))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusUnprocessableEntity, w.Code)
 	})
@@ -78,8 +80,9 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 	t.Run("LineBotの更新が成功すること", func(t *testing.T) {
 		h := &LineTokenHandler{
 			indexService: &service.IndexService{
-				Client:         stubClient,
-				DiscordSession: &discordgo.Session{},
+				Client:          stubClient,
+				DiscordBotState: newGuildState(t),
+				DiscordSession:  &discordgo.Session{},
 			},
 			repo: &repository.RepositoryFuncMock{
 				GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
@@ -130,15 +133,105 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 		}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/linetoken", bytes.NewReader(bodyJson))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("リクエストボディのguildIdは無視され、URLのguildIdで更新されること", func(t *testing.T) {
+		h := &LineTokenHandler{
+			indexService: &service.IndexService{
+				Client:          stubClient,
+				DiscordBotState: newGuildState(t),
+				DiscordSession:  &discordgo.Session{},
+			},
+			repo: &repository.RepositoryFuncMock{
+				GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
+					assert.Equal(t, "987654321", guildID)
+					return repository.LineBot{
+						GuildID:          "123",
+						LineNotifyToken:  pq.ByteaArray{[]byte("lineNotifyStr")},
+						LineBotToken:     pq.ByteaArray{[]byte("lineBotStr")},
+						LineBotSecret:    pq.ByteaArray{[]byte("lineBotSecretStr")},
+						LineGroupID:      pq.ByteaArray{[]byte("lineGroupStr")},
+						LineClientID:     pq.ByteaArray{[]byte("lineClientID")},
+						LineClientSecret: pq.ByteaArray{[]byte("lineClientSecret")},
+					}, nil
+				},
+				GetAllColumnsLineBotIvByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBotIv, error) {
+					return repository.LineBotIv{
+						LineNotifyTokenIv:  pq.ByteaArray{[]byte("decodeNotifyToken")},
+						LineBotTokenIv:     pq.ByteaArray{[]byte("decodeBotToken")},
+						LineBotSecretIv:    pq.ByteaArray{[]byte("decodeBotSecret")},
+						LineGroupIDIv:      pq.ByteaArray{[]byte("decodeGroupID")},
+						LineClientIDIv:     pq.ByteaArray{[]byte("decodeClientID")},
+						LineClientSecretIv: pq.ByteaArray{[]byte("decodeClientSecret")},
+					}, nil
+				},
+				UpdateLineBotFunc: func(ctx context.Context, lineBot *repository.LineBot) error {
+					assert.Equal(t, "987654321", lineBot.GuildID)
+					return nil
+				},
+				UpdateLineBotIvFunc: func(ctx context.Context, lineBotIv *repository.LineBotIv) error {
+					assert.Equal(t, "987654321", lineBotIv.GuildID)
+					return nil
+				},
+			},
+			aesCrypto: &crypto.AESMock{
+				EncryptFunc: func(data []byte) (encrypted []byte, iv []byte, err error) {
+					return []byte("test"), []byte("test"), nil
+				},
+				DecryptFunc: func(data []byte, iv []byte) ([]byte, error) {
+					if string(iv) == string("decodeNotifyToken") {
+						return []byte("testnotifytoken"), nil
+					} else if string(iv) == string("decodeBotToken") {
+						return []byte("testbottoken"), nil
+					} else if string(iv) == string("decodeBotSecret") {
+						return []byte("testbotsecret"), nil
+					} else if string(iv) == string("decodeGroupID") {
+						return []byte("testgroupid"), nil
+					}
+					return nil, nil
+				},
+			},
+		}
+		otherGuildBodyJson, err := json.Marshal(internal.LineBotJson{
+			GuildID:          "111111111",
+			DefaultChannelID: "123456789",
+		})
+		assert.NoError(t, err)
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/linetoken", bytes.NewReader(otherGuildBodyJson))
+		r.SetPathValue("guildId", "987654321")
+		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("他のサーバーのチャンネルをデフォルトチャンネルに指定すると、Bad Requestが返ること", func(t *testing.T) {
+		otherChannelBodyJson, err := json.Marshal(internal.LineBotJson{
+			DefaultChannelID: "222222222",
+		})
+		assert.NoError(t, err)
+		h := &LineTokenHandler{
+			indexService: &service.IndexService{
+				Client:          stubClient,
+				DiscordBotState: newGuildState(t),
+			},
+			repo: &repository.RepositoryFuncMock{},
+		}
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/linetoken", bytes.NewReader(otherChannelBodyJson))
+		r.SetPathValue("guildId", "987654321")
+		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 
 	t.Run("Deleteフラグが立った場合、該当する(すべて)ものがnilになること", func(t *testing.T) {
 		h := &LineTokenHandler{
 			indexService: &service.IndexService{
-				Client:         stubClient,
-				DiscordSession: &discordgo.Session{},
+				Client:          stubClient,
+				DiscordBotState: newGuildState(t),
+				DiscordSession:  &discordgo.Session{},
 			},
 			repo: &repository.RepositoryFuncMock{
 				GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
@@ -209,6 +302,7 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 		assert.NoError(t, err)
 
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/linetoken", bytes.NewReader(bodyJsonDelete))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
@@ -216,8 +310,9 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 	t.Run("Deleteフラグが立った場合、該当する(notifyとbotのtoken)ものがnilになること", func(t *testing.T) {
 		h := &LineTokenHandler{
 			indexService: &service.IndexService{
-				Client:         stubClient,
-				DiscordSession: &discordgo.Session{},
+				Client:          stubClient,
+				DiscordBotState: newGuildState(t),
+				DiscordSession:  &discordgo.Session{},
 			},
 			repo: &repository.RepositoryFuncMock{
 				GetAllColumnsLineBotByGuildIDFunc: func(ctx context.Context, guildID string) (repository.LineBot, error) {
@@ -284,7 +379,20 @@ func TestLineTokenHandler_ServeHTTP(t *testing.T) {
 		assert.NoError(t, err)
 
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/linetoken", bytes.NewReader(bodyJsonDelete))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
+}
+
+func newGuildState(t *testing.T) *discordgo.State {
+	state := discordgo.NewState()
+	err := state.GuildAdd(&discordgo.Guild{
+		ID: "987654321",
+		Channels: []*discordgo.Channel{
+			{ID: "123456789", GuildID: "987654321", Type: discordgo.ChannelTypeGuildText},
+		},
+	})
+	assert.NoError(t, err)
+	return state
 }

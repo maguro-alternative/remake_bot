@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"crypto/subtle"
 	"log/slog"
 	"net/http"
 
@@ -45,7 +46,7 @@ func CSRFMiddleware(indexService service.IndexService) func(http.Handler) http.H
 					Value:    token,
 					Path:     "/",
 					SameSite: http.SameSiteStrictMode,
-					Secure:   r.TLS != nil,
+					Secure:   r.TLS != nil || config.IsSecureServer(),
 				})
 				h.ServeHTTP(w, r)
 				return
@@ -66,7 +67,7 @@ func CSRFMiddleware(indexService service.IndexService) func(http.Handler) http.H
 				return
 			}
 
-			if requestToken != sessionToken {
+			if subtle.ConstantTimeCompare([]byte(requestToken), []byte(sessionToken)) != 1 {
 				slog.WarnContext(r.Context(), "CSRFミドルウェア: CSRFトークンが一致しません。")
 				http.Error(w, "Forbidden - CSRF token mismatch", http.StatusForbidden)
 				return

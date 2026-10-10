@@ -85,3 +85,28 @@ func TestGenerateIV(t *testing.T) {
 		assert.Equal(t, tokenText, string(decrypted))
 	})
 }
+
+func TestPkcs7Unpad(t *testing.T) {
+	t.Run("正しいパディングが削除されること", func(t *testing.T) {
+		data := append([]byte("0123456789ab"), 4, 4, 4, 4)
+		unpadded, err := pkcs7Unpad(data)
+		assert.NoError(t, err)
+		assert.Equal(t, []byte("0123456789ab"), unpadded)
+	})
+
+	t.Run("パディング長がデータ長を超える場合panicせずエラーを返すこと", func(t *testing.T) {
+		_, err := pkcs7Unpad([]byte{0xff})
+		assert.Error(t, err)
+	})
+
+	t.Run("パディングのバイトが不一致の場合エラーを返すこと", func(t *testing.T) {
+		data := append([]byte("0123456789ab"), 1, 2, 3, 4)
+		_, err := pkcs7Unpad(data)
+		assert.Error(t, err)
+	})
+
+	t.Run("空のデータの場合エラーを返すこと", func(t *testing.T) {
+		_, err := pkcs7Unpad([]byte{})
+		assert.Error(t, err)
+	})
+}

@@ -9,17 +9,21 @@ import (
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/line_post_discord_channel/internal"
+	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
 type LinePostDiscordChannelHandler struct {
-	repo repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 }
 
 func NewLinePostDiscordChannelHandler(
+	indexService *service.IndexService,
 	repo repository.RepositoryFunc,
 ) *LinePostDiscordChannelHandler {
 	return &LinePostDiscordChannelHandler{
-		repo: repo,
+		indexService: indexService,
+		repo:         repo,
 	}
 }
 
@@ -48,6 +52,14 @@ func (h *LinePostDiscordChannelHandler) ServeHTTP(w http.ResponseWriter, r *http
 	}
 
 	lineChannelJson.GuildID = r.PathValue("guildId")
+	// 他のサーバーのチャンネル設定を書き換えられないよう、全てこのサーバーのチャンネルか検証する
+	for _, channel := range lineChannelJson.Channels {
+		if !h.indexService.IsGuildChannel(lineChannelJson.GuildID, channel.ChannelID) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			slog.WarnContext(ctx, "このサーバーに属さないチャンネルが指定されました。", "guildId", lineChannelJson.GuildID, "channelId", channel.ChannelID)
+			return
+		}
+	}
 
 	lineChannels, lineNgTypes, lineNgUserIDs, lineNgRoleIDs := lineChannelJsonRead(lineChannelJson)
 

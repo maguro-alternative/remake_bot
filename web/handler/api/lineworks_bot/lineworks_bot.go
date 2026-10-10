@@ -156,7 +156,6 @@ func (h *LineWorksHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	slog.InfoContext(ctx, "%v", lineWorksProfile)
 
 	switch lineWorksResponses.Content.Type {
 	case "text":

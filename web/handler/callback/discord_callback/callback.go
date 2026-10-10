@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/gob"
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -50,7 +49,7 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	}
 	// 2. 認可ページからリダイレクトされてきたときに送られてくるstateパラメータ
 	if r.URL.Query().Get("state") != state {
-		slog.ErrorContext(ctx, "stateが一致しません。", "state:", state, "r.URL.Query()", r.URL.Query().Get("state"))
+		slog.ErrorContext(ctx, "stateが一致しません。")
 		sessionStore.CleanupDiscordState()
 		err = sessionStore.StoreSave(r, w, h.svc.CookieStore)
 		if err != nil {
@@ -73,6 +72,11 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	defer cleanupTokenBody()
+	if token.AccessToken == "" {
+		slog.ErrorContext(ctx, "アクセストークンが空です。")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 	sessionStore.SetDiscordOAuthToken(token.AccessToken)
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://discord.com/api/users/@me", nil)
 	if err != nil {
@@ -88,6 +92,11 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		slog.ErrorContext(ctx, "ユーザー情報の取得に失敗しました。", "ステータスコード:", resp.StatusCode)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
 		slog.ErrorContext(ctx, "ユーザー情報のデコードに失敗しました。", "エラー:", err.Error())
@@ -108,7 +117,7 @@ func (h *DiscordCallbackHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	slog.InfoContext(ctx, fmt.Sprintf("ユーザー情報: %+v", user))
+	slog.InfoContext(ctx, "Discordログインに成功しました。", "userId", user.ID)
 	// 4. ログイン後のページに遷移
 	http.Redirect(w, r, "/guilds", http.StatusFound)
 }

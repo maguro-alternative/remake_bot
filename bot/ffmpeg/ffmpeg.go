@@ -24,6 +24,10 @@ func (f Ffmpeg) ConversionAudioFile(tmpFile, tmpFileNotExt string) error {
 	cmd := exec.CommandContext(
 		f.ctx,
 		"ffmpeg",
+		// 外部から受け取ったファイルを変換するため、HLSプレイリスト等を経由した
+		// ローカルファイルの読み取りや外部への通信を禁止する
+		"-protocol_whitelist",
+		"file",
 		"-i",
 		tmpFile,
 		tmpFileNotExt+".m4a",
@@ -36,6 +40,8 @@ func (f Ffmpeg) GetAudioFileSecond(tmpFile, tmpFileNotExt string) (float64, erro
 		f.ctx,
 		"ffprobe",
 		"-hide_banner",
+		"-protocol_whitelist",
+		"file",
 		tmpFileNotExt+".m4a",
 		"-show_entries",
 		"format=duration",

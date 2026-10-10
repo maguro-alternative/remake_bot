@@ -56,12 +56,13 @@ func (h *LineWorksTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	// 権限チェックはURLのguildIdに対して行われるため、リクエストボディのguildIdは信用せず常にURLの値を使う
 	guildId := r.PathValue("guildId")
-	if guildId == "" {
-		guildId = lineWorksTokenJson.GuildID
-	}
-	if lineWorksTokenJson.GuildID == "" {
-		lineWorksTokenJson.GuildID = guildId
+	lineWorksTokenJson.GuildID = guildId
+	if !h.indexService.IsGuildChannel(guildId, lineWorksTokenJson.DefaultChannelID) {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		slog.ErrorContext(ctx, "サーバーに存在しないチャンネルが指定されました。")
+		return
 	}
 
 	worksBot, err := h.repo.GetLineWorksBotByGuildID(ctx, guildId)

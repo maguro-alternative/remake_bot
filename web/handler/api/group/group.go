@@ -9,17 +9,21 @@ import (
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/group/internal"
+	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
 type LineGroupHandler struct {
-	repo repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 }
 
 func NewLineGroupHandler(
+	indexService *service.IndexService,
 	repo repository.RepositoryFunc,
 ) *LineGroupHandler {
 	return &LineGroupHandler{
-		repo: repo,
+		indexService: indexService,
+		repo:         repo,
 	}
 }
 
@@ -45,6 +49,11 @@ func (g *LineGroupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	guildId := r.PathValue("guildId")
+	if !g.indexService.IsGuildChannel(guildId, lineGroupJson.DefaultChannelID) {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		slog.ErrorContext(ctx, "サーバーに存在しないチャンネルが指定されました。", "guildId", guildId)
+		return
+	}
 	err := g.repo.UpdateLineBot(ctx, &repository.LineBot{
 		GuildID:          guildId,
 		DefaultChannelID: lineGroupJson.DefaultChannelID,

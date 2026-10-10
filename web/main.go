@@ -48,6 +48,9 @@ import (
 	"github.com/justinas/alice"
 )
 
+// リクエストボディの上限(1MiB)
+const maxRequestBodyBytes = 1 << 20
+
 func init() {
 	// セッションに保存する構造体の型を登録
 	// これがない場合、エラーが発生する
@@ -70,7 +73,7 @@ func NewWebRouter(
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   86400, // 24 hours
-		Secure:   false, // Set to true if using HTTPS in production
+		Secure:   config.IsSecureServer(), // HTTPSで公開している場合のみCookieを送信する
 	}
 
 	// create a *service.TODOService type variable using the *sql.DB type variable
@@ -159,13 +162,24 @@ func NewWebRouter(
 	mux.Handle("/logout/line", middleChain.Then(lineLogout.NewLineLogoutHandler(indexService)))
 	mux.Handle("/callback/discord-callback/", middleChain.Then(discordCallback.NewDiscordCallbackHandler(indexService)))
 	mux.Handle("/callback/line-callback/", middleChain.Then(lineCallback.NewLineCallbackHandler(indexService, repo, aesCrypto)))
-	mux.Handle("/api/{guildId}/group", lineMiddleChain.Then(group.NewLineGroupHandler(repo)))
+	mux.Handle("/api/{guildId}/group", lineMiddleChain.Then(group.NewLineGroupHandler(indexService, repo)))
 	mux.Handle("/api/{guildId}/permission", discordMiddleChain.Then(permission.NewPermissionHandler(repo)))
 	mux.Handle("/api/{guildId}/linetoken", discordMiddleChain.Then(linetoken.NewLineTokenHandler(indexService, repo, aesCrypto)))
 	mux.Handle("/api/{guildId}/lineworks-token", discordMiddleChain.Then(lineworksToken.NewLineWorksTokenHandler(indexService, repo, aesCrypto)))
-	mux.Handle("/api/{guildId}/line-post-discord-channel", discordMiddleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(repo)))
-	mux.Handle("/api/{guildId}/vc-signal", discordMiddleChain.Then(vcSignal.NewVcSignalHandler(repo)))
-	mux.Handle("/api/{guildId}/webhook", discordMiddleChain.Then(webhook.NewWebhookHandler(repo)))
+	mux.Handle("/api/{guildId}/line-post-discord-channel", discordMiddleChain.Then(linePostDiscordChannel.NewLinePostDiscordChannelHandler(indexService, repo)))
+	mux.Handle("/api/{guildId}/vc-signal", discordMiddleChain.Then(vcSignal.NewVcSignalHandler(indexService, repo)))
+	mux.Handle("/api/{guildId}/webhook", discordMiddleChain.Then(webhook.NewWebhookHandler(indexService, repo)))
 
-	http.ListenAndServe(":"+config.Port(), mux)
+	server := &http.Server{
+		Addr: ":" + config.Port(),
+		// 巨大なリクエストボディによるメモリ枯渇を防ぐ
+		Handler:           http.MaxBytesHandler(mux, maxRequestBodyBytes),
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      60 * time.Second,
+		IdleTimeout:       120 * time.Second,
+	}
+	if err := server.ListenAndServe(); err != nil {
+		panic(err)
+	}
 }

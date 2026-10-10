@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/maguro-alternative/remake_bot/web/config/internal"
@@ -95,6 +96,33 @@ func SessionName() string {
 
 func SessionSecret() string {
 	return cfg.SessionSecret
+}
+
+// 開発用の既定値。本番でこの値のまま起動するとセッション偽造やトークン復号が可能になる
+const (
+	insecureDefaultPrivateKey    = "645E739A7F9F162725C1533DC2C5E827"
+	insecureDefaultSessionSecret = "test"
+	minSessionSecretLength       = 32
+)
+
+// ValidateSecrets は秘密鍵が既定値や弱い値のままでないかを検証します。
+// 起動時に呼び出し、エラーの場合は起動を中止してください。
+func ValidateSecrets() error {
+	if cfg.PrivateKey == "" || cfg.PrivateKey == insecureDefaultPrivateKey {
+		return errors.New("PRIVATE_KEY が未設定または既定値です。ランダムな値を設定してください")
+	}
+	if cfg.SessionSecret == "" || cfg.SessionSecret == insecureDefaultSessionSecret {
+		return errors.New("SESSION_SECRET が未設定または既定値です。ランダムな値を設定してください")
+	}
+	if len(cfg.SessionSecret) < minSessionSecretLength {
+		return errors.Newf("SESSION_SECRET は %d 文字以上にしてください", minSessionSecretLength)
+	}
+	return nil
+}
+
+// IsSecureServer はサーバーURLがHTTPSかどうかを返します。
+func IsSecureServer() bool {
+	return strings.HasPrefix(cfg.ServerUrl, "https://")
 }
 
 func YouTubeAPIKey() string {

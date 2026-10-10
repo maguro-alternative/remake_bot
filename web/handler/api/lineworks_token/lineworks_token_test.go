@@ -76,6 +76,7 @@ func TestLineWorksTokenHandler_ServeHTTP(t *testing.T) {
 		h := NewLineWorksTokenHandler(nil, nil, nil)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/lineworks-token", strings.NewReader(""))
+		r.SetPathValue("guildId", "1")
 
 		h.ServeHTTP(w, r)
 
@@ -97,6 +98,7 @@ func TestLineWorksTokenHandler_ServeHTTP(t *testing.T) {
 		h := NewLineWorksTokenHandler(
 			&service.IndexService{
 				Client:         stubClient,
+				DiscordBotState: newGuildState(t),
 				DiscordSession: &discordgo.Session{},
 			},
 			&repository.RepositoryFuncMock{
@@ -168,7 +170,20 @@ func TestLineWorksTokenHandler_ServeHTTP(t *testing.T) {
 		)
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/lineworks-token", bytes.NewReader(bodyJson))
+		r.SetPathValue("guildId", "1")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
+}
+
+func newGuildState(t *testing.T) *discordgo.State {
+	state := discordgo.NewState()
+	err := state.GuildAdd(&discordgo.Guild{
+		ID: "1",
+		Channels: []*discordgo.Channel{
+			{ID: "1", GuildID: "1", Type: discordgo.ChannelTypeGuildText},
+		},
+	})
+	assert.NoError(t, err)
+	return state
 }

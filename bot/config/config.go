@@ -33,6 +33,17 @@ func MustInit() {
 	}
 }
 
+// 開発用の既定値。本番でこの値のまま起動するとDBに保存したトークンを誰でも復号できる
+const insecureDefaultPrivateKey = "645E739A7F9F162725C1533DC2C5E827"
+
+// ValidatePrivateKey は秘密鍵が既定値のままでないかを検証します。
+func ValidatePrivateKey() error {
+	if cfg.PrivateKey == "" || cfg.PrivateKey == insecureDefaultPrivateKey {
+		return errors.New("PRIVATE_KEY が未設定または既定値です。ランダムな値を設定してください")
+	}
+	return nil
+}
+
 func PrivateKey() string {
 	return cfg.PrivateKey
 }

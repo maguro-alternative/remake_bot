@@ -15,9 +15,10 @@ func LineWorksValidateRequest(body []byte, signature string, botSecret string) b
 	h.Write(body)
 	encodedBody := h.Sum(nil)
 
-	// Encode to BASE64
-	encodedB64Body := base64.StdEncoding.EncodeToString(encodedBody)
-
-	// Compare signatures
-	return encodedB64Body == signature
+	// Compare signatures in constant time to prevent timing attacks
+	decodedSignature, err := base64.StdEncoding.DecodeString(signature)
+	if err != nil {
+		return false
+	}
+	return hmac.Equal(encodedBody, decodedSignature)
 }

@@ -31,3 +31,20 @@ func NewIndexService(
 		DiscordBotState: discordBotState,
 	}
 }
+
+// IsGuildChannel はチャンネルが指定したサーバーに属しているかを返します。
+// 他のサーバーのチャンネルIDを設定値として保存されないよう、APIで受け取ったチャンネルIDの検証に使います。
+// チャンネルIDが空の場合は未設定とみなし、trueを返します。
+func (s *IndexService) IsGuildChannel(guildID, channelID string) bool {
+	if channelID == "" {
+		return true
+	}
+	if s.DiscordBotState == nil {
+		return false
+	}
+	channel, err := s.DiscordBotState.Channel(channelID)
+	if err != nil {
+		return false
+	}
+	return channel.GuildID == guildID
+}

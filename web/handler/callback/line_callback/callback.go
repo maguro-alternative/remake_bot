@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -194,8 +193,8 @@ func verifyIdToken(ctx context.Context, nonceClient *http.Client, idToken, clien
 		return nil, func() {}, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		slog.InfoContext(ctx, resp.Status)
-		slog.InfoContext(ctx, form.Encode())
+		// フォームにはid_tokenが含まれるためログに出力しない
+		slog.InfoContext(ctx, "id_tokenの検証に失敗しました。", "ステータス:", resp.Status)
 		var e struct {
 			Error            string `json:"error"`
 			ErrorDescription string `json:"error_description"`
@@ -207,6 +206,6 @@ func verifyIdToken(ctx context.Context, nonceClient *http.Client, idToken, clien
 	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
 		return nil, func() {}, err
 	}
-	slog.InfoContext(ctx, fmt.Sprintf("ユーザー情報: %+v", user))
+	slog.InfoContext(ctx, "LINEログインに成功しました。", "userId", user.Sub)
 	return &user, func() { resp.Body.Close() }, nil
 }

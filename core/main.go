@@ -10,10 +10,12 @@ import (
 	"time"
 
 	"github.com/maguro-alternative/remake_bot/bot"
+	botConfig "github.com/maguro-alternative/remake_bot/bot/config"
 	"github.com/maguro-alternative/remake_bot/core/config"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
 	"github.com/maguro-alternative/remake_bot/tasks"
 	"github.com/maguro-alternative/remake_bot/web"
+	webConfig "github.com/maguro-alternative/remake_bot/web/config"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -22,6 +24,13 @@ var permissionTypes = []string{"lineBot", "linePostDiscordChannel", "vcSignal", 
 
 func main() {
 	ctx := context.Background()
+	// 秘密鍵が既定値のままの場合は起動しない
+	if err := webConfig.ValidateSecrets(); err != nil {
+		panic(err)
+	}
+	if err := botConfig.ValidatePrivateKey(); err != nil {
+		panic(err)
+	}
 	// データベースの接続を開始
 	dbV1, cleanup, err := db.NewDB(ctx, config.DatabaseName(), config.DatabaseURL())
 	if err != nil {

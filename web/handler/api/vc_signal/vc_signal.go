@@ -9,17 +9,21 @@ import (
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/vc_signal/internal"
+	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
 type VcSignalHandler struct {
-	repo repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 }
 
 func NewVcSignalHandler(
+	indexService *service.IndexService,
 	repo repository.RepositoryFunc,
 ) *VcSignalHandler {
 	return &VcSignalHandler{
-		repo: repo,
+		indexService: indexService,
+		repo:         repo,
 	}
 }
 
@@ -48,6 +52,15 @@ func (h *VcSignalHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unprocessable Entity", http.StatusUnprocessableEntity)
 		slog.ErrorContext(ctx, "jsonのバリデーションに失敗しました:", "エラー:", err.Error())
 		return
+	}
+
+	// 他のサーバーのチャンネル設定を書き換えられないよう、全てこのサーバーのチャンネルか検証する
+	for _, vcSignal := range vcSignalJson.VcSignals {
+		if !h.indexService.IsGuildChannel(guildId, vcSignal.VcChannelID) || !h.indexService.IsGuildChannel(guildId, vcSignal.SendChannelId) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			slog.WarnContext(ctx, "このサーバーに属さないチャンネルが指定されました。", "guildId", guildId, "vcChannelId", vcSignal.VcChannelID, "sendChannelId", vcSignal.SendChannelId)
+			return
+		}
 	}
 
 	for _, vcSignal := range vcSignalJson.VcSignals {

@@ -76,12 +76,18 @@ func DiscordOAuthCheckMiddleware(
 
 			req.Header.Set("Authorization", "Bearer "+discordOAuthToken)
 			resp, err := indexService.Client.Do(req)
+			if err == nil {
+				defer resp.Body.Close()
+			}
 			if (err != nil || resp.StatusCode != http.StatusOK) && loginRequiredFlag {
-				slog.WarnContext(ctx, "ユーザー情報に問題があります。", "エラー:", err, "ステータスコード:", resp.StatusCode)
+				statusCode := 0
+				if resp != nil {
+					statusCode = resp.StatusCode
+				}
+				slog.WarnContext(ctx, "ユーザー情報に問題があります。", "エラー:", err, "ステータスコード:", statusCode)
 				http.Redirect(w, r, "/login/discord", http.StatusFound)
 				return
 			}
-			defer resp.Body.Close()
 
 			discordLoginUser := &model.DiscordOAuthSession{
 				User:  *discordUser,
@@ -110,6 +116,11 @@ func DiscordOAuthCheckMiddleware(
 			}
 			userPermissionCode = getUserRolePermissionCode(member, guild)
 
+			if len(guild.Channels) == 0 {
+				slog.WarnContext(ctx, "サーバーにチャンネルがありません。", "guildId", guildId)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
 			memberPermission, err := indexService.DiscordSession.UserChannelPermissions(discordLoginUser.User.ID, guild.Channels[0].ID)
 			if err != nil {
 				slog.WarnContext(ctx, "メンバー権限の取得に失敗しました。", "guildId", guildId, "userId", discordLoginUser.User.ID)
@@ -129,6 +140,17 @@ func DiscordOAuthCheckMiddleware(
 
 			permissionType := pathParts[2]
 			switch permissionType {
+			case "permission":
+				// 権限設定は他の設定へのアクセス権を付与できるため、サーバー管理者のみに限定する
+				if !hasGuildAdminPermission(permissionData.PermissionCode) {
+					slog.WarnContext(ctx, "管理者権限のないユーザーが権限設定にアクセスしました。", "guildId", guildId, "userId", discordLoginUser.User.ID)
+					http.Error(w, "Forbidden", http.StatusForbidden)
+					return
+				}
+				permissionData.Permission = "all"
+				ctx = ctxvalue.ContextWithDiscordPermission(ctx, permissionData)
+				h.ServeHTTP(w, r.WithContext(ctx))
+				return
 			case "linetoken":
 				permissionType = "lineBot"
 			case "line-post-discord-channel":
@@ -185,6 +207,11 @@ func DiscordOAuthCheckMiddleware(
 			h.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
+}
+
+// hasGuildAdminPermission はサーバーの管理者権限(管理者またはサーバー管理)を持っているかを返します。
+func hasGuildAdminPermission(permissionCode int64) bool {
+	return permissionCode&(discordgo.PermissionAdministrator|discordgo.PermissionManageServer) != 0
 }
 
 func getUserRolePermissionCode(

@@ -11,7 +11,9 @@ import (
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/vc_signal/internal"
+	"github.com/maguro-alternative/remake_bot/web/service"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,6 +34,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		h := &VcSignalHandler{}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodGet, "/api/987654321/vc-signal", nil)
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusMethodNotAllowed, w.Code)
 	})
@@ -40,6 +43,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(vcSignal)
 		assert.NoError(t, err)
 		h := &VcSignalHandler{
+			indexService: newIndexService(t),
 			repo: &repository.RepositoryFuncMock{
 				UpdateVcSignalChannelFunc: func(ctx context.Context, vcSignalChannelNotGuildID repository.VcSignalChannelNotGuildID) error {
 					return nil
@@ -72,6 +76,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/vc-signal", bytes.NewReader(bodyJson))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
@@ -80,6 +85,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		h := &VcSignalHandler{}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/vc-signal", bytes.NewReader([]byte("")))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
@@ -88,6 +94,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		h := &VcSignalHandler{}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/vc-signal", bytes.NewReader([]byte("{}")))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusUnprocessableEntity, w.Code)
 	})
@@ -96,6 +103,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(vcSignal)
 		assert.NoError(t, err)
 		h := &VcSignalHandler{
+			indexService: newIndexService(t),
 			repo: &repository.RepositoryFuncMock{
 				UpdateVcSignalChannelFunc: func(ctx context.Context, vcSignalChannelNotGuildID repository.VcSignalChannelNotGuildID) error {
 					return assert.AnError
@@ -104,6 +112,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/vc-signal", bytes.NewReader(bodyJson))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
@@ -113,6 +122,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(vcSignal)
 		assert.NoError(t, err)
 		h := &VcSignalHandler{
+			indexService: newIndexService(t),
 			repo: &repository.RepositoryFuncMock{
 				UpdateVcSignalChannelFunc: func(ctx context.Context, vcSignalChannelNotGuildID repository.VcSignalChannelNotGuildID) error {
 					return nil
@@ -145,6 +155,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/vc-signal", bytes.NewReader(bodyJson))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
@@ -154,6 +165,7 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(vcSignal)
 		assert.NoError(t, err)
 		h := &VcSignalHandler{
+			indexService: newIndexService(t),
 			repo: &repository.RepositoryFuncMock{
 				UpdateVcSignalChannelFunc: func(ctx context.Context, vcSignalChannelNotGuildID repository.VcSignalChannelNotGuildID) error {
 					return nil
@@ -186,7 +198,50 @@ func TestVcSignalHandler_ServeHTTP(t *testing.T) {
 		}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/api/987654321/vc-signal", bytes.NewReader(bodyJson))
+		r.SetPathValue("guildId", "987654321")
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
+
+	t.Run("他のサーバーのチャンネルを指定すると、Forbiddenが返ること", func(t *testing.T) {
+		otherGuildBodyJson, err := json.Marshal(internal.VcSignalJson{
+			VcSignals: []internal.VcSignal{
+				{VcChannelID: "222222222", SendSignal: true, SendChannelId: "987654321"},
+			},
+		})
+		assert.NoError(t, err)
+		h := &VcSignalHandler{
+			indexService: newIndexService(t),
+			repo: &repository.RepositoryFuncMock{
+				UpdateVcSignalChannelFunc: func(ctx context.Context, vcChannel repository.VcSignalChannelNotGuildID) error {
+					t.Fatal("UpdateVcSignalChannel should not be called")
+					return nil
+				},
+			},
+		}
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/vc-signal", bytes.NewReader(otherGuildBodyJson))
+		r.SetPathValue("guildId", "987654321")
+		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusForbidden, w.Code)
+	})
+}
+
+func newIndexService(t *testing.T) *service.IndexService {
+	state := discordgo.NewState()
+	err := state.GuildAdd(&discordgo.Guild{
+		ID: "987654321",
+		Channels: []*discordgo.Channel{
+			{ID: "987654321", GuildID: "987654321", Type: discordgo.ChannelTypeGuildVoice},
+		},
+	})
+	assert.NoError(t, err)
+	err = state.GuildAdd(&discordgo.Guild{
+		ID: "111111111",
+		Channels: []*discordgo.Channel{
+			{ID: "222222222", GuildID: "111111111", Type: discordgo.ChannelTypeGuildText},
+		},
+	})
+	assert.NoError(t, err)
+	return &service.IndexService{DiscordBotState: state}
 }

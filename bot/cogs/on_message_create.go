@@ -24,6 +24,7 @@ import (
 	"github.com/maguro-alternative/remake_bot/bot/ffmpeg"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/cockroachdb/errors"
 	"github.com/lib/pq"
 )
 
@@ -821,11 +822,18 @@ func processAttachmentsForLine(
 			result.LineMessageTypes = append(result.LineMessageTypes, lineMessageType)
 
 		case ".mp3", ".wav", ".ogg", ".m4a":
-			tmpFile := os.TempDir() + "/" + attachment.Filename
-			tmpFileNotExt := os.TempDir() + "/" + fileNameNoExt
+			// ファイル名に依存したパス操作や同名ファイルの衝突を防ぐため、添付ごとに専用の一時ディレクトリを使う
+			tmpDir, err := os.MkdirTemp("", "remake_bot_audio_")
+			if err != nil {
+				slog.ErrorContext(ctx, "一時ディレクトリの作成に失敗しました", "エラー:", err.Error())
+				return nil, err
+			}
+			defer os.RemoveAll(tmpDir)
+			tmpFileNotExt := filepath.Join(tmpDir, fileNameNoExt)
+			tmpFile := tmpFileNotExt + extension
 			slog.InfoContext(ctx, "download:"+attachment.URL)
 
-			err := downloadFile(client, tmpFile, attachment.URL)
+			err = downloadFile(client, tmpFile, attachment.URL)
 			if err != nil {
 				slog.ErrorContext(ctx, "ファイルのダウンロードに失敗しました", "エラー:", err.Error())
 				return nil, err
@@ -897,6 +905,9 @@ func processAttachmentsSimple(vs *discordgo.MessageCreate) (imageUrls, videoUrls
 	return
 }
 
+// 音声変換のためにダウンロードする添付ファイルの上限(100MiB)
+const maxAttachmentDownloadBytes = 100 << 20
+
 func downloadFile(client *http.Client, tmpFilePath, url string) error {
 	f, err := os.Create(tmpFilePath)
 	if err != nil {
@@ -908,6 +919,16 @@ func downloadFile(client *http.Client, tmpFilePath, url string) error {
 		return err
 	}
 	defer resp.Body.Close()
-	_, err = io.Copy(f, resp.Body)
-	return err
+	if resp.StatusCode != http.StatusOK {
+		return errors.Newf("unexpected status code: %d", resp.StatusCode)
+	}
+	// 巨大なファイルでディスクを埋められないよう上限を設ける
+	n, err := io.Copy(f, io.LimitReader(resp.Body, maxAttachmentDownloadBytes+1))
+	if err != nil {
+		return err
+	}
+	if n > maxAttachmentDownloadBytes {
+		return errors.New("attachment is too large")
+	}
+	return nil
 }

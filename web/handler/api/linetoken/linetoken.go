@@ -59,9 +59,12 @@ func (h *LineTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	guildId := r.PathValue("guildId")
-	if lineTokenJson.GuildID == "" {
-		lineTokenJson.GuildID = guildId
+	// 権限チェックはURLのguildIdに対して行われるため、リクエストボディのguildIdは信用せず常にURLの値を使う
+	lineTokenJson.GuildID = r.PathValue("guildId")
+	if !h.indexService.IsGuildChannel(lineTokenJson.GuildID, lineTokenJson.DefaultChannelID) {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		slog.ErrorContext(ctx, "サーバーに存在しないチャンネルが指定されました。")
+		return
 	}
 
 	if err := verifyLineToken(ctx, h.repo, h.aesCrypto, h.indexService.Client, &lineTokenJson); err != nil {

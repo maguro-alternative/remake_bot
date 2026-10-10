@@ -71,6 +71,12 @@ func LineOAuthCheckMiddleware(
 				h.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
+			// LINEログイン時にグループの所属を確認したサーバー以外の操作を禁止する
+			if pathGuildId := r.PathValue("guildId"); pathGuildId != "" && pathGuildId != sessionGuildId {
+				slog.WarnContext(ctx, "ログインしたサーバーと異なるサーバーへのアクセスがありました。", "sessionGuildId", sessionGuildId, "pathGuildId", pathGuildId)
+				http.Error(w, "Forbidden", http.StatusForbidden)
+				return
+			}
 			lineLoginUser = &model.LineOAuthSession{
 				User:           *lineUser,
 				Token:          lineToken,

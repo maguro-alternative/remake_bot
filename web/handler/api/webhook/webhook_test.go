@@ -10,9 +10,12 @@ import (
 	"time"
 
 	"github.com/maguro-alternative/remake_bot/repository"
+	"github.com/maguro-alternative/remake_bot/testutil/mock"
 
 	"github.com/maguro-alternative/remake_bot/web/handler/api/webhook/internal"
+	"github.com/maguro-alternative/remake_bot/web/service"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,6 +51,7 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(webhook)
 		assert.NoError(t, err)
 		h := &WebhookHandler{
+			indexService: newIndexService(),
 			repo: &repository.RepositoryFuncMock{
 				InsertWebhookFunc: func(ctx context.Context, guildID, webhookID, subscriptionType, subscriptionID string, lastPostedAt time.Time) (int64, error) {
 					return 1, nil
@@ -67,6 +71,7 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(webhook)
 		assert.NoError(t, err)
 		h := &WebhookHandler{
+			indexService: newIndexService(),
 			repo: &repository.RepositoryFuncMock{
 				InsertWebhookFunc: func(ctx context.Context, guildID, webhookID, subscriptionType, subscriptionID string, lastPostedAt time.Time) (int64, error) {
 					return 0, assert.AnError
@@ -83,6 +88,7 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(webhook)
 		assert.NoError(t, err)
 		h := &WebhookHandler{
+			indexService: newIndexService(),
 			repo: &repository.RepositoryFuncMock{
 				InsertWebhookFunc: func(ctx context.Context, guildID, webhookID, subscriptionType, subscriptionID string, lastPostedAt time.Time) (int64, error) {
 					return 1, nil
@@ -103,6 +109,7 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(webhook)
 		assert.NoError(t, err)
 		h := &WebhookHandler{
+			indexService: newIndexService(),
 			repo: &repository.RepositoryFuncMock{
 				InsertWebhookFunc: func(ctx context.Context, guildID, webhookID, subscriptionType, subscriptionID string, lastPostedAt time.Time) (int64, error) {
 					return 1, nil
@@ -126,6 +133,7 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(webhook)
 		assert.NoError(t, err)
 		h := &WebhookHandler{
+			indexService: newIndexService(),
 			repo: &repository.RepositoryFuncMock{
 				InsertWebhookFunc: func(ctx context.Context, guildID, webhookID, subscriptionType, subscriptionID string, lastPostedAt time.Time) (int64, error) {
 					return 1, nil
@@ -149,6 +157,7 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(webhook)
 		assert.NoError(t, err)
 		h := &WebhookHandler{
+			indexService: newIndexService(),
 			repo: &repository.RepositoryFuncMock{
 				InsertWebhookFunc: func(ctx context.Context, guildID, webhookID, subscriptionType, subscriptionID string, lastPostedAt time.Time) (int64, error) {
 					return 1, nil
@@ -189,6 +198,7 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		bodyJson, err := json.Marshal(webhook)
 		assert.NoError(t, err)
 		h := WebhookHandler{
+			indexService: newIndexService(),
 			repo: &repository.RepositoryFuncMock{
 				InsertWebhookFunc: func(ctx context.Context, guildID, webhookID, subscriptionType, subscriptionID string, lastPostedAt time.Time) (int64, error) {
 					assert.Equal(t, webhookID, "987654321")
@@ -208,4 +218,74 @@ func TestWebhookHandler_ServeHTTP(t *testing.T) {
 		h.ServeHTTP(w, r)
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
+
+	t.Run("他のサーバーのWebhookを新規登録しようとすると、Forbiddenが返ること", func(t *testing.T) {
+		webhook := internal.WebhookJson{
+			NewWebhooks: []*internal.NewWebhook{
+				{
+					WebhookID:        "111111111",
+					SubscriptionType: "youtube",
+					SubscriptionId:   "987654321",
+				},
+			},
+		}
+		bodyJson, err := json.Marshal(webhook)
+		assert.NoError(t, err)
+		h := &WebhookHandler{
+			indexService: newIndexService(),
+			repo: &repository.RepositoryFuncMock{
+				InsertWebhookFunc: func(ctx context.Context, guildID, webhookID, subscriptionType, subscriptionID string, lastPostedAt time.Time) (int64, error) {
+					t.Fatal("InsertWebhook should not be called")
+					return 0, nil
+				},
+			},
+		}
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/webhook", bytes.NewReader(bodyJson))
+		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusForbidden, w.Code)
+	})
+
+	t.Run("他のサーバーの登録情報を削除しようとすると、Forbiddenが返ること", func(t *testing.T) {
+		webhook := internal.WebhookJson{
+			UpdateWebhooks: []*internal.UpdateWebhook{
+				{
+					WebhookSerialID:  999,
+					WebhookID:        "987654321",
+					SubscriptionType: "youtube",
+					SubscriptionId:   "987654321",
+					DeleteFlag:       true,
+				},
+			},
+		}
+		bodyJson, err := json.Marshal(webhook)
+		assert.NoError(t, err)
+		serialID := int64(1)
+		h := &WebhookHandler{
+			indexService: newIndexService(),
+			repo: &repository.RepositoryFuncMock{
+				GetAllColumnsWebhooksByGuildIDFunc: func(ctx context.Context, guildID string) ([]*repository.Webhook, error) {
+					return []*repository.Webhook{{WebhookSerialID: &serialID, GuildID: guildID, WebhookID: "987654321"}}, nil
+				},
+				DeleteWebhookByWebhookSerialIDFunc: func(ctx context.Context, webhookSerialID int64) error {
+					t.Fatal("DeleteWebhookByWebhookSerialID should not be called")
+					return nil
+				},
+			},
+		}
+		w := httptest.NewRecorder()
+		r := httptest.NewRequest(http.MethodPost, "/api/987654321/webhook", bytes.NewReader(bodyJson))
+		h.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusForbidden, w.Code)
+	})
+}
+
+func newIndexService() *service.IndexService {
+	return &service.IndexService{
+		DiscordSession: &mock.SessionMock{
+			GuildWebhooksFunc: func(guildID string, options ...discordgo.RequestOption) ([]*discordgo.Webhook, error) {
+				return []*discordgo.Webhook{{ID: "987654321", GuildID: guildID}}, nil
+			},
+		},
+	}
 }

@@ -25,11 +25,23 @@ func pkcs7Pad(data []byte) []byte {
 	return append(data, trailing...)
 }
 
-func pkcs7Unpad(data []byte) []byte {
+func pkcs7Unpad(data []byte) ([]byte, error) {
 	/*パディングを削除する*/
 	dataLength := len(data)
+	if dataLength == 0 {
+		return nil, fmt.Errorf("data is empty")
+	}
 	padLength := int(data[dataLength-1])
-	return data[:dataLength-padLength]
+	// 不正なパディングでスライスの範囲外参照(panic)が起きないよう検証する
+	if padLength == 0 || padLength > aes.BlockSize || padLength > dataLength {
+		return nil, fmt.Errorf("invalid padding")
+	}
+	for _, b := range data[dataLength-padLength:] {
+		if int(b) != padLength {
+			return nil, fmt.Errorf("invalid padding")
+		}
+	}
+	return data[:dataLength-padLength], nil
 }
 
 type AES struct {
@@ -69,7 +81,6 @@ func (a AES) Encrypt(data []byte) (iv []byte, encrypted []byte, err error) {
 // Decrypt は、dataをAES復号化します。
 func (a AES) Decrypt(data []byte, iv []byte) ([]byte, error) {
 	if len(data) % aes.BlockSize != 0 {
-		fmt.Println(len(data), aes.BlockSize)
 		return nil, fmt.Errorf("data length must be a multiple of the block size")
 	}
 	/*AES復号化*/
@@ -80,13 +91,12 @@ func (a AES) Decrypt(data []byte, iv []byte) ([]byte, error) {
 	decrypted := make([]byte, len(data))
 	// ブロックサイズとivの長さが一致しない場合、panicを起こす
 	if len(iv) != block.BlockSize() {
-		fmt.Println(len(iv), block.BlockSize())
 		return nil, fmt.Errorf("iv length must be equal to block size")
 	}
 	// 復号化
 	cbcDecrypter := cipher.NewCBCDecrypter(block, iv)
 	cbcDecrypter.CryptBlocks(decrypted, data)
-	return pkcs7Unpad(decrypted), nil
+	return pkcs7Unpad(decrypted)
 }
 
 type AESMock struct {

@@ -10,18 +10,24 @@ import (
 
 	"github.com/maguro-alternative/remake_bot/repository"
 
+	"github.com/cockroachdb/errors"
+
 	"github.com/maguro-alternative/remake_bot/web/handler/api/webhook/internal"
+	"github.com/maguro-alternative/remake_bot/web/service"
 )
 
 type WebhookHandler struct {
-	repo repository.RepositoryFunc
+	indexService *service.IndexService
+	repo         repository.RepositoryFunc
 }
 
 func NewWebhookHandler(
+	indexService *service.IndexService,
 	repo repository.RepositoryFunc,
 ) *WebhookHandler {
 	return &WebhookHandler{
-		repo: repo,
+		indexService: indexService,
+		repo:         repo,
 	}
 }
 
@@ -49,6 +55,13 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		slog.ErrorContext(ctx, "jsonのバリデーションに失敗しました:", "エラー:", err.Error())
+		return
+	}
+
+	// 他のサーバーのWebhookや登録情報を操作できないよう、全てこのサーバーのものか検証する
+	if err := h.validateOwnership(ctx, guildId, &webhookJson); err != nil {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		slog.WarnContext(ctx, "このサーバーに属さないWebhookが指定されました:", "guildId", guildId, "エラー:", err.Error())
 		return
 	}
 
@@ -275,4 +288,56 @@ func (h *WebhookHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+// validateOwnership はリクエストに含まれるWebhookのIDと登録情報のシリアルIDが、全て指定したサーバーのものかを検証します。
+func (h *WebhookHandler) validateOwnership(
+	ctx context.Context,
+	guildId string,
+	webhookJson *internal.WebhookJson,
+) error {
+	guildWebhooks, err := h.indexService.DiscordSession.GuildWebhooks(guildId)
+	if err != nil {
+		return err
+	}
+	guildWebhookIDs := make(map[string]struct{}, len(guildWebhooks))
+	for _, guildWebhook := range guildWebhooks {
+		guildWebhookIDs[guildWebhook.ID] = struct{}{}
+	}
+	isGuildWebhook := func(webhookID string) bool {
+		_, ok := guildWebhookIDs[strings.Split(webhookID, "-")[0]]
+		return ok
+	}
+
+	for _, webhook := range webhookJson.NewWebhooks {
+		if webhook.SubscriptionId == "" {
+			continue
+		}
+		if !isGuildWebhook(webhook.WebhookID) {
+			return errors.Newf("webhook %s is not in guild", webhook.WebhookID)
+		}
+	}
+
+	if len(webhookJson.UpdateWebhooks) == 0 {
+		return nil
+	}
+	registeredWebhooks, err := h.repo.GetAllColumnsWebhooksByGuildID(ctx, guildId)
+	if err != nil {
+		return err
+	}
+	registeredSerialIDs := make(map[int64]struct{}, len(registeredWebhooks))
+	for _, registeredWebhook := range registeredWebhooks {
+		if registeredWebhook.WebhookSerialID != nil {
+			registeredSerialIDs[*registeredWebhook.WebhookSerialID] = struct{}{}
+		}
+	}
+	for _, webhook := range webhookJson.UpdateWebhooks {
+		if _, ok := registeredSerialIDs[webhook.WebhookSerialID]; !ok {
+			return errors.Newf("webhook serial id %d is not in guild", webhook.WebhookSerialID)
+		}
+		if !webhook.DeleteFlag && !isGuildWebhook(webhook.WebhookID) {
+			return errors.Newf("webhook %s is not in guild", webhook.WebhookID)
+		}
+	}
+	return nil
 }

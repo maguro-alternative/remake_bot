@@ -339,7 +339,8 @@ func TestLineRequest_PushMessageNotify(t *testing.T) {
 			},
 			&ffmpeg.FfmpegMock{
 				ConversionAudioFileFunc: func(tmpFile, tmpFileNotExt string) error {
-					return nil
+					// 変換後のファイルを作成する
+					return os.WriteFile(tmpFileNotExt+".m4a", []byte("dummy"), 0o600)
 				},
 				GetAudioFileSecondFunc: func(tmpFile, tmpFileNotExt string) (float64, error) {
 					return 0.0, nil

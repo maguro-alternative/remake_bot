@@ -16,7 +16,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/justinas/alice v1.2.0
 	github.com/lib/pq v1.10.9
-	github.com/maguro-alternative/line-works-sdk-go v0.0.0-20260111022751-6f3b61426691
+	github.com/maguro-alternative/line-works-sdk-go v0.0.0-20260519224552-1ef890139cb4
 	github.com/mmcdole/gofeed v1.3.0
 	github.com/sh1ma/voicevoxcore.go v0.0.6-0.20230702034957-496911426164
 	github.com/stretchr/testify v1.9.0

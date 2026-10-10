@@ -90,7 +90,7 @@ func (h *LineWorksTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	lineWorksInfo := newLineWorksInfoGenerate(
+	lineWorksInfo, err := newLineWorksInfoGenerate(
 		h.indexService.Client,
 		h.aesCrypto,
 		&lineWorksTokenJson,
@@ -99,6 +99,11 @@ func (h *LineWorksTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 		worksBotInfo,
 		worksBotInfoIv,
 	)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		slog.ErrorContext(ctx, "line_works_bot_infoの復号に失敗しました:"+err.Error())
+		return
+	}
 
 	lineWorksTokenResponse, err := lineWorksInfo.GetAccessToken(
 		ctx,
@@ -326,43 +331,43 @@ func newLineWorksInfoGenerate(
 	worksBotIv *repository.LineWorksBotIV,
 	worksBotInfo *repository.LineWorksBotInfo,
 	worksBotInfoIv *repository.LineWorksBotInfoIV,
-) *lineworks.LineWorksInfo {
+) (*lineworks.LineWorksInfo, error) {
 	var clientIdByte, clientSecretByte, serviceAccountByte, privateKeyByte, domainIdByte, adminIdByte []byte
 	var err error
 	if len(worksBotInfo.LineWorksClientID) > 0 {
 		clientIdByte, err = aesCrypto.Decrypt(worksBotInfo.LineWorksClientID[0], worksBotInfoIv.LineWorksClientIDIV[0])
 		if err != nil {
-			return nil
+			return nil, err
 		}
 	}
 	if len(worksBotInfo.LineWorksClientSecret) > 0 {
 		clientSecretByte, err = aesCrypto.Decrypt(worksBotInfo.LineWorksClientSecret[0], worksBotInfoIv.LineWorksClientSecretIV[0])
 		if err != nil {
-			return nil
+			return nil, err
 		}
 	}
 	if len(worksBotInfo.LineWorksServiceAccount) > 0 {
 		serviceAccountByte, err = aesCrypto.Decrypt(worksBotInfo.LineWorksServiceAccount[0], worksBotInfoIv.LineWorksServiceAccountIV[0])
 		if err != nil {
-			return nil
+			return nil, err
 		}
 	}
 	if len(worksBotInfo.LineWorksPrivateKey) > 0 {
 		privateKeyByte, err = aesCrypto.Decrypt(worksBotInfo.LineWorksPrivateKey[0], worksBotInfoIv.LineWorksPrivateKeyIV[0])
 		if err != nil {
-			return nil
+			return nil, err
 		}
 	}
 	if len(worksBotInfo.LineWorksDomainID) > 0 {
 		domainIdByte, err = aesCrypto.Decrypt(worksBotInfo.LineWorksDomainID[0], worksBotInfoIv.LineWorksDomainIDIV[0])
 		if err != nil {
-			return nil
+			return nil, err
 		}
 	}
 	if len(worksBotInfo.LineWorksAdminID) > 0 {
 		adminIdByte, err = aesCrypto.Decrypt(worksBotInfo.LineWorksAdminID[0], worksBotInfoIv.LineWorksAdminIDIV[0])
 		if err != nil {
-			return nil
+			return nil, err
 		}
 	}
 
@@ -400,5 +405,5 @@ func newLineWorksInfoGenerate(
 		privateKey,
 		domainId,
 		adminId,
-	)
+	), nil
 }

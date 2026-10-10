@@ -18,6 +18,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/maguro-alternative/line-works-sdk-go v0.0.0-20260519224552-1ef890139cb4
 	github.com/mmcdole/gofeed v1.3.0
+	github.com/samber/mo v1.17.0
 	github.com/sh1ma/voicevoxcore.go v0.0.6-0.20230702034957-496911426164
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/oauth2 v0.37.0
@@ -52,6 +53,9 @@ require (
 	github.com/mmcdole/goxpp v1.1.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/mpyw/declscope v0.20.1 // indirect
+	github.com/mpyw/go-skill-embed v0.2.1 // indirect
+	github.com/mpyw/molint v0.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
@@ -65,12 +69,21 @@ require (
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
+	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/net v0.61.0 // indirect
+	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
+	golang.org/x/tools v0.51.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260706201446-f0a921348800 // indirect
 	google.golang.org/grpc v1.84.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	layeh.com/gopus v0.0.0-20210501142526-1ee02d434e32 // indirect
+)
+
+tool (
+	github.com/mpyw/declscope/cmd/declscope
+	github.com/mpyw/molint/cmd/molint
 )

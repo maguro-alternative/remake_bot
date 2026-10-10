@@ -83,14 +83,15 @@ func (h *LineBotHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// リクエストボディの検証
-		lineBotDecrypt, err = internal.LineHmac(privateKey, requestBodyByte, h.aesCrypto, lineBot, lineBotIv, r.Header.Get("X-Line-Signature"))
+		matched, err := internal.LineHmac(privateKey, requestBodyByte, h.aesCrypto, lineBot, lineBotIv, r.Header.Get("X-Line-Signature"))
 		if err != nil {
 			slog.ErrorContext(ctx, "署名の検証に失敗しました。", "エラー:", err.Error())
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 		// 署名が一致した場合はループを抜ける
-		if lineBotDecrypt != nil {
+		if decrypt, ok := matched.Get(); ok {
+			lineBotDecrypt = decrypt
 			break
 		}
 		// 署名が一致しなかった場合は最後のループでエラーを返す

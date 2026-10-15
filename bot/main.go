@@ -62,6 +62,8 @@ func BotOnReady(indexDB db.Driver, client *http.Client) (*discordgo.Session, fun
 	}
 
 	discordSession.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAll)
+	// 再接続時のOp7/Op9受信などはInformationalでしか出力されないため、切断原因の調査用に上げておく
+	discordSession.LogLevel = discordgo.LogInformational
 	discordSession.Token = discordToken
 	err = discordSession.Open()
 	if err != nil {

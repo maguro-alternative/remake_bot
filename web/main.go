@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/maguro-alternative/remake_bot/bot/cogs"
+	"github.com/maguro-alternative/remake_bot/bot"
 	"github.com/maguro-alternative/remake_bot/repository"
 
 	"github.com/maguro-alternative/remake_bot/pkg/db"
@@ -120,8 +120,8 @@ func NewWebRouter(
 
 	// ヘルスチェック（Discord WebSocket接続の状態も確認）
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		healthy := cogs.IsHealthy(discordSession)
-		disconnectCount, lastDisconnect := cogs.GetDisconnectInfo()
+		healthy := bot.IsHealthy(discordSession)
+		disconnectCount, lastDisconnect := bot.GetDisconnectInfo()
 
 		w.Header().Set("Content-Type", "application/json")
 		if !healthy {

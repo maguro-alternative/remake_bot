@@ -1,4 +1,4 @@
-package cogs
+package health
 
 import (
 	"testing"
@@ -79,12 +79,12 @@ func TestGetDisconnectInfo(t *testing.T) {
 	t.Run("Resume後もlastDisconnectTimeは保持される", func(t *testing.T) {
 		resetState()
 
-		onDisconnect(true)
-		onDisconnect(true)
+		OnDisconnect(true)
+		OnDisconnect(true)
 		_, lastDisconnect := GetDisconnectInfo()
 		assert.False(t, lastDisconnect.IsZero())
 
-		onResumed()
+		OnResumed()
 		count, lastDisconnectAfterResume := GetDisconnectInfo()
 		assert.Equal(t, int64(0), count)
 		assert.False(t, lastDisconnectAfterResume.IsZero())
@@ -95,7 +95,7 @@ func TestOnDisconnect(t *testing.T) {
 	t.Run("呼び出すとカウントが1増える", func(t *testing.T) {
 		resetState()
 
-		onDisconnect(true)
+		OnDisconnect(true)
 
 		assert.Equal(t, int64(1), disconnectCount.Load())
 		assert.NotEqual(t, int64(0), lastDisconnectTime.Load())
@@ -104,9 +104,9 @@ func TestOnDisconnect(t *testing.T) {
 	t.Run("複数回呼び出すとカウントが累積する", func(t *testing.T) {
 		resetState()
 
-		onDisconnect(true)
-		onDisconnect(true)
-		onDisconnect(true)
+		OnDisconnect(true)
+		OnDisconnect(true)
+		OnDisconnect(true)
 
 		assert.Equal(t, int64(3), disconnectCount.Load())
 	})
@@ -115,7 +115,7 @@ func TestOnDisconnect(t *testing.T) {
 		resetState()
 		before := time.Now().Unix()
 
-		onDisconnect(true)
+		OnDisconnect(true)
 
 		after := time.Now().Unix()
 		ts := lastDisconnectTime.Load()
@@ -129,7 +129,7 @@ func TestOnResumed(t *testing.T) {
 		resetState()
 		disconnectCount.Store(3)
 
-		onResumed()
+		OnResumed()
 
 		assert.Equal(t, int64(0), disconnectCount.Load())
 	})
@@ -140,7 +140,7 @@ func TestOnReady(t *testing.T) {
 		resetState()
 		disconnectCount.Store(2)
 
-		onReady()
+		OnReady()
 
 		assert.Equal(t, int64(0), disconnectCount.Load())
 	})
@@ -148,7 +148,7 @@ func TestOnReady(t *testing.T) {
 	t.Run("カウントが0の場合もそのまま0", func(t *testing.T) {
 		resetState()
 
-		onReady()
+		OnReady()
 
 		assert.Equal(t, int64(0), disconnectCount.Load())
 	})
@@ -160,11 +160,11 @@ func TestDisconnectからの復旧(t *testing.T) {
 		s := &discordgo.Session{DataReady: true}
 
 		for i := 0; i < int(MaxConsecutiveDisconnects); i++ {
-			onDisconnect(true)
+			OnDisconnect(true)
 		}
 		assert.False(t, IsHealthy(s))
 
-		onResumed()
+		OnResumed()
 		assert.True(t, IsHealthy(s))
 	})
 
@@ -173,11 +173,11 @@ func TestDisconnectからの復旧(t *testing.T) {
 		s := &discordgo.Session{DataReady: true}
 
 		for i := 0; i < int(MaxConsecutiveDisconnects); i++ {
-			onDisconnect(true)
+			OnDisconnect(true)
 		}
 		assert.False(t, IsHealthy(s))
 
-		onReady()
+		OnReady()
 		assert.True(t, IsHealthy(s))
 	})
 }

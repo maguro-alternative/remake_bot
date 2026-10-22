@@ -7,12 +7,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime/pprof"
 	"time"
 
 	"github.com/maguro-alternative/remake_bot/bot"
 	botConfig "github.com/maguro-alternative/remake_bot/bot/config"
 	"github.com/maguro-alternative/remake_bot/core/config"
 	"github.com/maguro-alternative/remake_bot/pkg/db"
+	"github.com/maguro-alternative/remake_bot/pkg/watchdog"
 	"github.com/maguro-alternative/remake_bot/tasks"
 	"github.com/maguro-alternative/remake_bot/web"
 	webConfig "github.com/maguro-alternative/remake_bot/web/config"
@@ -78,6 +80,20 @@ func main() {
 	go func() {
 		tasks.Run(ctx, dbV1, discord)
 	}()
+
+	// discordgoは再接続中にデッドロックして自力で復旧できないことがあるため、
+	// Discord接続が復旧しない場合はプロセスを終了し、Railwayの再起動に任せる
+	go watchdog.Run(
+		ctx,
+		30*time.Second,
+		5*time.Minute,
+		func() bool { return bot.IsHealthy(discord) },
+		func() {
+			// 原因調査のため終了前にgoroutineのスタックを出力する
+			pprof.Lookup("goroutine").WriteTo(os.Stderr, 2)
+			os.Exit(1)
+		},
+	)
 
 	// Ctrl+Cを受け取るためのチャンネル
 	sc := make(chan os.Signal, 1)

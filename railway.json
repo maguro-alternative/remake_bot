@@ -1,6 +1,7 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "deploy": {
-    "preDeployCommand": ["/app/scripts/schema-apply.sh"]
+    "preDeployCommand": ["/app/scripts/schema-apply.sh"],
+    "restartPolicyType": "ALWAYS"
   }
 }

@@ -1,6 +1,6 @@
 module github.com/maguro-alternative/remake_bot
 
-go 1.27.3
+go 1.27.4
 
 require (
 	github.com/bwmarrin/dgvoice v0.0.0-20210225172318-caaac756e02e
